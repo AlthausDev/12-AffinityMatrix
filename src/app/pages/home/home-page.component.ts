@@ -1,71 +1,79 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ProfileStore } from '../../core/profile.store';
 
 @Component({
   selector: 'app-home-page',
+  imports: [RouterLink],
   template: `
-    <main class="shell">
-      <section class="intro" aria-labelledby="page-title">
-        <p class="eyebrow">MVP · 0.1.0.0</p>
-        <h1 id="page-title">Affinity Matrix</h1>
-        <p class="summary">
-          Create portable preference profiles and compare them locally.
-        </p>
-        <p class="status">Project scaffold ready. Profile management comes next.</p>
+    <main class="page">
+      <header class="page-header home-header">
+        <div>
+          <p class="eyebrow">MVP · 0.1.0.0</p>
+          <h1>Affinity Matrix</h1>
+          <p class="muted lead">
+            Create portable preference profiles and compare them locally. The working title may
+            change as the product evolves.
+          </p>
+        </div>
+        <div class="header-actions">
+          <a class="button" routerLink="/profiles/new">Create profile</a>
+          <button class="button secondary" type="button" disabled>Import profile</button>
+        </div>
+      </header>
+
+      @if (profileStore.error()) {
+        <p class="alert" role="alert">{{ profileStore.error() }}</p>
+      }
+
+      <section aria-labelledby="local-profiles-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">This browser</p>
+            <h2 id="local-profiles-title">Local profiles</h2>
+          </div>
+          <span class="count-badge">{{ profileStore.profiles().length }}</span>
+        </div>
+
+        @if (profileStore.profiles().length === 0) {
+          <div class="panel empty-state">
+            <h3>No profiles yet</h3>
+            <p class="muted">
+              Create the first profile. It will be stored only in this browser until you explicitly
+              export or share it.
+            </p>
+            <a class="button" routerLink="/profiles/new">Create profile</a>
+          </div>
+        } @else {
+          <div class="profile-list">
+            @for (profile of profileStore.profiles(); track profile.id) {
+              <a class="profile-row" [routerLink]="['/profiles', profile.id]">
+                <div>
+                  <strong>{{ profile.metadata.alias || 'Untitled profile' }}</strong>
+                  <span class="muted">
+                    {{ answerCount(profile.answers) }} answered ·
+                    {{ profile.metadata.filterByProfileMetadata ? 'filter enabled' : 'full questionnaire' }}
+                  </span>
+                </div>
+                <span aria-hidden="true">→</span>
+              </a>
+            }
+          </div>
+        }
       </section>
+
+      <footer class="privacy-note">
+        <strong>Local by default.</strong>
+        <span class="muted">Profiles stay on this device unless you explicitly export them.</span>
+      </footer>
     </main>
-  `,
-  styles: `
-    :host {
-      display: block;
-    }
-
-    .shell {
-      width: min(100% - 2rem, 72rem);
-      margin-inline: auto;
-      padding-block: clamp(3rem, 10vw, 8rem);
-    }
-
-    .intro {
-      max-width: 42rem;
-      padding: clamp(1.5rem, 5vw, 3rem);
-      border: 1px solid var(--border-subtle);
-      border-radius: 1rem;
-      background: var(--surface-panel);
-    }
-
-    .eyebrow,
-    .status {
-      color: var(--text-secondary);
-    }
-
-    .eyebrow {
-      margin: 0 0 0.75rem;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(2rem, 8vw, 4rem);
-      line-height: 1;
-    }
-
-    .summary {
-      margin: 1.5rem 0 0;
-      color: var(--text-secondary);
-      font-size: clamp(1rem, 2vw, 1.2rem);
-      line-height: 1.6;
-    }
-
-    .status {
-      margin: 2rem 0 0;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border-subtle);
-      font-size: 0.9rem;
-    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomePageComponent {}
+export class HomePageComponent {
+  readonly profileStore = inject(ProfileStore);
+
+  answerCount(answers: object): number {
+    return Object.keys(answers).length;
+  }
+}
