@@ -1,4 +1,5 @@
 import { ValidationIssue, Validator } from '../shared/validator';
+import { isStableId } from '../shared/stable-id';
 import {
   DEPENDS_ON_MAX_LENGTH,
   DESIRED_FREQUENCY_VALUES,
@@ -14,8 +15,10 @@ import {
 } from './profile-metadata';
 import { DETAIL_CAPABLE_PREFERENCES, isPreference } from './preference';
 
-const STABLE_ID_PATTERN = /^[a-z0-9](?:[a-z0-9._-]{0,119})$/u;
 const MAX_ANSWER_COUNT = 10_000;
+const METADATA_KEYS = ['alias', 'sex', 'orientation'] as const;
+const ANSWER_KEYS = ['practiceId', 'roleId', 'preference', 'details'] as const;
+const DETAIL_KEYS = ['context', 'desiredFrequency', 'initiative', 'dependsOn'] as const;
 
 export interface ProfileDataShape {
   readonly metadata: ProfileMetadata;
@@ -35,7 +38,7 @@ export abstract class ProfileDataValidator<T extends ProfileDataShape> extends V
       return [{ path: 'metadata', message: 'Metadata must be an object.' }];
     }
 
-    const issues: ValidationIssue[] = [];
+    const issues: ValidationIssue[] = this.validateAllowedKeys(value, METADATA_KEYS, 'metadata');
     const alias = value['alias'];
     const sex = value['sex'];
     const orientation = value['orientation'];
@@ -80,27 +83,23 @@ export abstract class ProfileDataValidator<T extends ProfileDataShape> extends V
     return issues;
   }
 
-  protected isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
-  }
-
   private validateAnswer(key: string, value: unknown): ValidationIssue[] {
     const path = `answers.${key}`;
     if (!this.isRecord(value)) {
       return [{ path, message: 'Answer must be an object.' }];
     }
 
-    const issues: ValidationIssue[] = [];
+    const issues: ValidationIssue[] = this.validateAllowedKeys(value, ANSWER_KEYS, path);
     const practiceId = value['practiceId'];
     const roleId = value['roleId'];
     const preference = value['preference'];
     const details = value['details'];
 
-    if (typeof practiceId !== 'string' || !STABLE_ID_PATTERN.test(practiceId)) {
+    if (!isStableId(practiceId)) {
       issues.push({ path: `${path}.practiceId`, message: 'Practice id must be a stable lowercase identifier.' });
     }
 
-    if (typeof roleId !== 'string' || !STABLE_ID_PATTERN.test(roleId)) {
+    if (!isStableId(roleId)) {
       issues.push({ path: `${path}.roleId`, message: 'Role id must be a stable lowercase identifier.' });
     }
 
@@ -128,7 +127,8 @@ export abstract class ProfileDataValidator<T extends ProfileDataShape> extends V
       return [{ path: `${path}.details`, message: 'Answer details must be an object.' }];
     }
 
-    const issues: ValidationIssue[] = [];
+    const detailsPath = `${path}.details`;
+    const issues: ValidationIssue[] = this.validateAllowedKeys(value, DETAIL_KEYS, detailsPath);
     const context = value['context'];
     const desiredFrequency = value['desiredFrequency'];
     const initiative = value['initiative'];
@@ -140,7 +140,7 @@ export abstract class ProfileDataValidator<T extends ProfileDataShape> extends V
       Object.keys(value).length > 0
     ) {
       issues.push({
-        path: `${path}.details`,
+        path: detailsPath,
         message: 'Optional experience details only apply to favorite, like, depends, or curious answers.',
       });
     }
@@ -149,33 +149,33 @@ export abstract class ProfileDataValidator<T extends ProfileDataShape> extends V
       context !== undefined &&
       !EXPERIENCE_CONTEXT_VALUES.includes(context as (typeof EXPERIENCE_CONTEXT_VALUES)[number])
     ) {
-      issues.push({ path: `${path}.details.context`, message: 'Experience context uses an unsupported value.' });
+      issues.push({ path: `${detailsPath}.context`, message: 'Experience context uses an unsupported value.' });
     }
 
     if (
       desiredFrequency !== undefined &&
       !DESIRED_FREQUENCY_VALUES.includes(desiredFrequency as (typeof DESIRED_FREQUENCY_VALUES)[number])
     ) {
-      issues.push({ path: `${path}.details.desiredFrequency`, message: 'Desired frequency uses an unsupported value.' });
+      issues.push({ path: `${detailsPath}.desiredFrequency`, message: 'Desired frequency uses an unsupported value.' });
     }
 
     if (
       initiative !== undefined &&
       !INITIATIVE_PREFERENCE_VALUES.includes(initiative as (typeof INITIATIVE_PREFERENCE_VALUES)[number])
     ) {
-      issues.push({ path: `${path}.details.initiative`, message: 'Initiative preference uses an unsupported value.' });
+      issues.push({ path: `${detailsPath}.initiative`, message: 'Initiative preference uses an unsupported value.' });
     }
 
     if (dependsOn !== undefined) {
       if (preference !== 'depends') {
-        issues.push({ path: `${path}.details.dependsOn`, message: 'A dependency note only applies to a depends answer.' });
+        issues.push({ path: `${detailsPath}.dependsOn`, message: 'A dependency note only applies to a depends answer.' });
       }
 
       if (typeof dependsOn !== 'string' || dependsOn.trim().length === 0) {
-        issues.push({ path: `${path}.details.dependsOn`, message: 'Dependency note must be non-empty when provided.' });
+        issues.push({ path: `${detailsPath}.dependsOn`, message: 'Dependency note must be non-empty when provided.' });
       } else if (dependsOn.length > DEPENDS_ON_MAX_LENGTH) {
         issues.push({
-          path: `${path}.details.dependsOn`,
+          path: `${detailsPath}.dependsOn`,
           message: `Dependency note cannot exceed ${DEPENDS_ON_MAX_LENGTH} characters.`,
         });
       }
