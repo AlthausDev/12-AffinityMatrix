@@ -14,20 +14,13 @@ import { ProfileStore } from '../../core/profile.store';
       <header class="page-header">
         <p class="eyebrow">Portability</p>
         <h1>Import profile</h1>
-        <p class="muted">
-          Paste a profile code to inspect it before deciding whether to save it in this browser.
-        </p>
+        <p class="muted">Paste a profile code to inspect it before deciding whether to save it in this browser.</p>
       </header>
 
       <section class="panel form-grid">
         <label class="field">
           <span>Profile code</span>
-          <textarea
-            class="code-box"
-            placeholder="Paste profile code"
-            [value]="code()"
-            (input)="updateCode($event)"
-          ></textarea>
+          <textarea class="code-box" placeholder="Paste profile code" [value]="code()" (input)="updateCode($event)"></textarea>
         </label>
 
         @if (codeError()) {
@@ -35,9 +28,7 @@ import { ProfileStore } from '../../core/profile.store';
         }
 
         <div class="form-actions">
-          <button class="button" type="button" [disabled]="!code().trim()" (click)="inspectCode()">
-            Inspect profile
-          </button>
+          <button class="button" type="button" [disabled]="!code().trim()" (click)="inspectCode()">Inspect profile</button>
         </div>
       </section>
 
@@ -50,18 +41,9 @@ import { ProfileStore } from '../../core/profile.store';
           </div>
 
           <dl class="status-list">
-            <div>
-              <dt>Sex</dt>
-              <dd>{{ portable.metadata.sex || 'Not specified' }}</dd>
-            </div>
-            <div>
-              <dt>Orientation</dt>
-              <dd>{{ portable.metadata.orientation || 'Not specified' }}</dd>
-            </div>
-            <div>
-              <dt>Question filter</dt>
-              <dd>{{ portable.metadata.filterByProfileMetadata ? 'Enabled' : 'Disabled' }}</dd>
-            </div>
+            <div><dt>Sex</dt><dd>{{ portable.metadata.sex || 'Not specified' }}</dd></div>
+            <div><dt>Orientation</dt><dd>{{ portable.metadata.orientation || 'Not specified' }}</dd></div>
+            <div><dt>Question filter</dt><dd>{{ portable.metadata.filterByProfileMetadata ? 'Enabled' : 'Disabled' }}</dd></div>
           </dl>
 
           <div class="form-actions import-actions">
@@ -71,6 +53,23 @@ import { ProfileStore } from '../../core/profile.store';
         </section>
       }
     </main>
+  `,
+  styles: `
+    .code-box {
+      min-height: 12rem;
+      resize: vertical;
+      padding: 0.75rem;
+      border: 1px solid var(--border-strong);
+      border-radius: 0.5rem;
+      background: var(--surface-elevated);
+      color: var(--text-primary);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+
+    .import-preview { margin-top: 1.5rem; }
+    .import-actions { margin-top: 1.5rem; }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
