@@ -18,7 +18,7 @@ import { ProfileStore } from '../../core/profile.store';
         </div>
         <div class="header-actions">
           <a class="button" routerLink="/profiles/new">Create profile</a>
-          <button class="button secondary" type="button" disabled>Import profile</button>
+          <a class="button secondary" routerLink="/profiles/import">Import profile</a>
         </div>
       </header>
 
@@ -39,10 +39,13 @@ import { ProfileStore } from '../../core/profile.store';
           <div class="panel empty-state">
             <h3>No profiles yet</h3>
             <p class="muted">
-              Create the first profile. It will be stored only in this browser until you explicitly
-              export or share it.
+              Create the first profile or import a portable code. Profiles remain in this browser
+              until you explicitly export or share them.
             </p>
-            <a class="button" routerLink="/profiles/new">Create profile</a>
+            <div class="header-actions">
+              <a class="button" routerLink="/profiles/new">Create profile</a>
+              <a class="button secondary" routerLink="/profiles/import">Import profile</a>
+            </div>
           </div>
         } @else {
           <div class="profile-list">
