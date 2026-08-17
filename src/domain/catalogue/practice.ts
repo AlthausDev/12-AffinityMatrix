@@ -1,30 +1,38 @@
 import { Sex } from '../profile/profile-metadata';
 
+export type PracticeId = string;
+export type RoleId = string;
 export type RolePerspective = 'active' | 'receptive' | 'neutral';
 
 export interface RoleApplicability {
-  selfSex?: readonly Sex[];
-  partnerSex?: readonly Sex[];
+  readonly selfSex?: readonly Sex[];
+  readonly partnerSex?: readonly Sex[];
 }
 
 export interface PracticeRole {
-  id: string;
-  label: string;
-  perspective: RolePerspective;
-  applicability?: RoleApplicability;
+  readonly id: RoleId;
+  readonly label: string;
+  readonly perspective: RolePerspective;
+  readonly applicability?: RoleApplicability;
+}
+
+export interface RoleCompatibilityPair {
+  readonly leftRoleId: RoleId;
+  readonly rightRoleId: RoleId;
 }
 
 export interface Practice {
-  id: string;
-  categoryId: string;
-  label: string;
-  description?: string;
-  roles: readonly PracticeRole[];
+  readonly id: PracticeId;
+  readonly categoryId: string;
+  readonly label: string;
+  readonly description?: string;
+  readonly roles: readonly PracticeRole[];
+  readonly compatibleRolePairs: readonly RoleCompatibilityPair[];
 }
 
 export interface PracticeCategory {
-  id: string;
-  label: string;
-  description?: string;
-  order: number;
+  readonly id: string;
+  readonly label: string;
+  readonly description?: string;
+  readonly order: number;
 }
