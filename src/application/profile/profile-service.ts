@@ -37,7 +37,11 @@ export class ProfileService {
     return profile;
   }
 
-  updateMetadata(id: ProfileId, metadata: ProfileMetadata): Profile | undefined {
+  updateProfile(
+    id: ProfileId,
+    metadata: ProfileMetadata,
+    settings: ProfileSettings,
+  ): Profile | undefined {
     const current = this.repository.findById(id);
     if (!current) {
       return undefined;
@@ -46,21 +50,19 @@ export class ProfileService {
     return this.save({
       ...current,
       metadata: { ...metadata },
+      settings: { ...settings },
       updatedAt: this.clock.now(),
     });
   }
 
+  updateMetadata(id: ProfileId, metadata: ProfileMetadata): Profile | undefined {
+    const current = this.repository.findById(id);
+    return current ? this.updateProfile(id, metadata, current.settings) : undefined;
+  }
+
   updateSettings(id: ProfileId, settings: ProfileSettings): Profile | undefined {
     const current = this.repository.findById(id);
-    if (!current) {
-      return undefined;
-    }
-
-    return this.save({
-      ...current,
-      settings: { ...settings },
-      updatedAt: this.clock.now(),
-    });
+    return current ? this.updateProfile(id, current.metadata, settings) : undefined;
   }
 
   upsertAnswer(id: ProfileId, answer: PracticeAnswer): Profile | undefined {
@@ -70,11 +72,16 @@ export class ProfileService {
     }
 
     const key = createAnswerKey(answer.practiceId, answer.roleId);
+    const safeAnswer: PracticeAnswer = {
+      ...answer,
+      ...(answer.details ? { details: { ...answer.details } } : {}),
+    };
+
     return this.save({
       ...current,
       answers: {
         ...current.answers,
-        [key]: answer,
+        [key]: safeAnswer,
       },
       updatedAt: this.clock.now(),
     });
