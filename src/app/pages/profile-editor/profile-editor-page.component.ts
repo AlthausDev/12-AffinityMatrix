@@ -38,7 +38,7 @@ interface ProfileFormModel {
         <form class="panel form-grid" (submit)="save($event)">
           <label class="field">
             <span>Alias</span>
-            <input type="text" autocomplete="off" maxlength="80" placeholder="Optional" [formField]="profileForm.alias" />
+            <input type="text" autocomplete="off" placeholder="Optional" [formField]="profileForm.alias" />
           </label>
 
           <label class="field">
@@ -104,7 +104,7 @@ export class ProfileEditorPageComponent {
     this.profileStore.clearError();
 
     const value = this.model();
-    const alias = value.alias.trim();
+    const alias = value.alias.trim().slice(0, 80);
     const metadata: ProfileMetadata = {
       filterByProfileMetadata: value.filterByProfileMetadata,
       ...(alias ? { alias } : {}),
