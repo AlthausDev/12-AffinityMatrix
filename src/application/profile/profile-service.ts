@@ -55,16 +55,6 @@ export class ProfileService {
     });
   }
 
-  updateMetadata(id: ProfileId, metadata: ProfileMetadata): Profile | undefined {
-    const current = this.repository.findById(id);
-    return current ? this.updateProfile(id, metadata, current.settings) : undefined;
-  }
-
-  updateSettings(id: ProfileId, settings: ProfileSettings): Profile | undefined {
-    const current = this.repository.findById(id);
-    return current ? this.updateProfile(id, current.metadata, settings) : undefined;
-  }
-
   upsertAnswer(id: ProfileId, answer: PracticeAnswer): Profile | undefined {
     const current = this.repository.findById(id);
     if (!current) {
