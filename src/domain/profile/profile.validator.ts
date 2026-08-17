@@ -2,13 +2,27 @@ import { ValidationIssue } from '../shared/validator';
 import { Profile, PROFILE_SCHEMA_VERSION } from './profile';
 import { ProfileDataValidator } from './profile-data.validator';
 
+const PROFILE_KEYS = [
+  'schemaVersion',
+  'id',
+  'metadata',
+  'settings',
+  'answers',
+  'createdAt',
+  'updatedAt',
+] as const;
+const SETTINGS_KEYS = ['filterQuestionnaireByMetadata'] as const;
+
 export class ProfileValidator extends ProfileDataValidator<Profile> {
   override validate(value: unknown): readonly ValidationIssue[] {
     if (!this.isRecord(value)) {
       return [{ path: '', message: 'Profile must be an object.' }];
     }
 
-    const issues = this.validateProfileData(value);
+    const issues = [
+      ...this.validateAllowedKeys(value, PROFILE_KEYS),
+      ...this.validateProfileData(value),
+    ];
 
     if (value['schemaVersion'] !== PROFILE_SCHEMA_VERSION) {
       issues.push({ path: 'schemaVersion', message: 'Profile schema version is unsupported.' });
@@ -19,8 +33,16 @@ export class ProfileValidator extends ProfileDataValidator<Profile> {
     }
 
     const settings = value['settings'];
-    if (!this.isRecord(settings) || typeof settings['filterQuestionnaireByMetadata'] !== 'boolean') {
-      issues.push({ path: 'settings.filterQuestionnaireByMetadata', message: 'Questionnaire filter setting must be boolean.' });
+    if (!this.isRecord(settings)) {
+      issues.push({ path: 'settings', message: 'Profile settings must be an object.' });
+    } else {
+      issues.push(...this.validateAllowedKeys(settings, SETTINGS_KEYS, 'settings'));
+      if (typeof settings['filterQuestionnaireByMetadata'] !== 'boolean') {
+        issues.push({
+          path: 'settings.filterQuestionnaireByMetadata',
+          message: 'Questionnaire filter setting must be boolean.',
+        });
+      }
     }
 
     if (!this.isIsoTimestamp(value['createdAt'])) {
@@ -29,6 +51,14 @@ export class ProfileValidator extends ProfileDataValidator<Profile> {
 
     if (!this.isIsoTimestamp(value['updatedAt'])) {
       issues.push({ path: 'updatedAt', message: 'updatedAt must be an ISO timestamp.' });
+    }
+
+    if (
+      this.isIsoTimestamp(value['createdAt']) &&
+      this.isIsoTimestamp(value['updatedAt']) &&
+      value['updatedAt'] < value['createdAt']
+    ) {
+      issues.push({ path: 'updatedAt', message: 'updatedAt cannot be earlier than createdAt.' });
     }
 
     return issues;
