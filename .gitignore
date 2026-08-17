@@ -1,0 +1,26 @@
+# Dependencies
+/node_modules
+
+# Angular build output
+/dist
+/.angular
+
+# Coverage
+/coverage
+
+# IDEs and editors
+/.idea
+/.vscode/*
+!/.vscode/extensions.json
+!/.vscode/launch.json
+!/.vscode/tasks.json
+*.code-workspace
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
