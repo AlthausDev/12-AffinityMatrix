@@ -5,8 +5,8 @@ import { ProfileValidator, profileValidator } from '../../domain/profile/profile
 import { ProfileStoreMigrator } from './profile-store-migration';
 
 const STORE_VERSION = 2 as const;
-export const DEFAULT_PROFILE_STORAGE_KEY = 'affinity-matrix.profiles';
-export const LEGACY_PROFILE_STORAGE_KEYS = ['profiles.v1'] as const;
+export const DEFAULT_PROFILE_STORAGE_KEY = 'preference-profile-store';
+export const LEGACY_PROFILE_STORAGE_KEYS = ['affinity-matrix.profiles', 'profiles.v1'] as const;
 
 interface StoredProfilesV2 {
   readonly version: typeof STORE_VERSION;
