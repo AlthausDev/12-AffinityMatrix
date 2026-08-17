@@ -1,4 +1,4 @@
-import { PROFILE_SCHEMA_VERSION } from '../../domain/profile/profile';
+const PROFILE_SCHEMA_VERSION_V2 = 2 as const;
 
 export abstract class ProfileStoreMigration {
   constructor(
@@ -50,7 +50,7 @@ export class ProfilesV1ToV2Migration extends ProfileStoreMigration {
 
     return {
       ...value,
-      schemaVersion: PROFILE_SCHEMA_VERSION,
+      schemaVersion: PROFILE_SCHEMA_VERSION_V2,
       metadata,
       settings: {
         filterQuestionnaireByMetadata: filterValue === undefined ? true : filterValue,
