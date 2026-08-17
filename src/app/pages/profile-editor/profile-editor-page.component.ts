@@ -1,14 +1,20 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { FormField, form } from '@angular/forms/signals';
+import { FormField, form, maxLength } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProfileStore } from '../../core/profile.store';
-import { ProfileMetadata, Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
+import {
+  PROFILE_ALIAS_MAX_LENGTH,
+  ProfileMetadata,
+  Sex,
+  SexualOrientation,
+} from '../../../domain/profile/profile-metadata';
+import { ProfileSettings } from '../../../domain/profile/profile-settings';
 
 interface ProfileFormModel {
   alias: string;
   sex: '' | Sex;
   orientation: '' | SexualOrientation;
-  filterByProfileMetadata: boolean;
+  filterQuestionnaireByMetadata: boolean;
 }
 
 @Component({
@@ -39,6 +45,9 @@ interface ProfileFormModel {
           <label class="field">
             <span>Alias</span>
             <input type="text" autocomplete="off" placeholder="Optional" [formField]="profileForm.alias" />
+            @if (profileForm.alias().touched() && profileForm.alias().invalid()) {
+              <small class="field-error">{{ profileForm.alias().errors()[0].message }}</small>
+            }
           </label>
 
           <label class="field">
@@ -61,7 +70,7 @@ interface ProfileFormModel {
           </label>
 
           <label class="check-field">
-            <input type="checkbox" [formField]="profileForm.filterByProfileMetadata" />
+            <input type="checkbox" [formField]="profileForm.filterQuestionnaireByMetadata" />
             <span>
               <strong>Filter questionnaire</strong>
               <small>Hide roles that do not match the optional profile data above.</small>
@@ -94,27 +103,40 @@ export class ProfileEditorPageComponent {
     alias: this.existingProfile?.metadata.alias ?? '',
     sex: this.existingProfile?.metadata.sex ?? '',
     orientation: this.existingProfile?.metadata.orientation ?? '',
-    filterByProfileMetadata: this.existingProfile?.metadata.filterByProfileMetadata ?? true,
+    filterQuestionnaireByMetadata:
+      this.existingProfile?.settings.filterQuestionnaireByMetadata ?? true,
   });
 
-  readonly profileForm = form(this.model);
+  readonly profileForm = form(this.model, (schemaPath) => {
+    maxLength(schemaPath.alias, PROFILE_ALIAS_MAX_LENGTH, {
+      message: `Alias cannot exceed ${PROFILE_ALIAS_MAX_LENGTH} characters.`,
+    });
+  });
 
   save(event: Event): void {
     event.preventDefault();
     this.profileStore.clearError();
+    this.profileForm().markAsTouched();
+
+    if (this.profileForm().invalid()) {
+      this.profileForm.alias().focusBoundControl();
+      return;
+    }
 
     const value = this.model();
-    const alias = value.alias.trim().slice(0, 80);
+    const alias = value.alias.trim();
     const metadata: ProfileMetadata = {
-      filterByProfileMetadata: value.filterByProfileMetadata,
       ...(alias ? { alias } : {}),
       ...(value.sex ? { sex: value.sex } : {}),
       ...(value.orientation ? { orientation: value.orientation } : {}),
     };
+    const settings: ProfileSettings = {
+      filterQuestionnaireByMetadata: value.filterQuestionnaireByMetadata,
+    };
 
     const saved = this.profileId
-      ? this.profileStore.updateMetadata(this.profileId, metadata)
-      : this.profileStore.create(metadata);
+      ? this.profileStore.updateProfile(this.profileId, metadata, settings)
+      : this.profileStore.create(metadata, settings);
 
     if (saved) {
       void this.router.navigate(['/profiles', saved.id]);

@@ -11,10 +11,7 @@ import { ProfileStore } from '../../core/profile.store';
         <div>
           <p class="eyebrow">MVP · 0.1.0.0</p>
           <h1>Affinity Matrix</h1>
-          <p class="muted lead">
-            Create portable preference profiles and compare them locally. The working title may
-            change as the product evolves.
-          </p>
+          <p class="muted lead">Create portable preference profiles and compare them locally. The working title may change as the product evolves.</p>
         </div>
         <div class="header-actions">
           <a class="button" routerLink="/profiles/new">Create profile</a>
@@ -28,24 +25,15 @@ import { ProfileStore } from '../../core/profile.store';
 
       <section aria-labelledby="local-profiles-title">
         <div class="section-heading">
-          <div>
-            <p class="eyebrow">This browser</p>
-            <h2 id="local-profiles-title">Local profiles</h2>
-          </div>
+          <div><p class="eyebrow">This browser</p><h2 id="local-profiles-title">Local profiles</h2></div>
           <span class="count-badge">{{ profileStore.profiles().length }}</span>
         </div>
 
         @if (profileStore.profiles().length === 0) {
           <div class="panel empty-state">
             <h3>No profiles yet</h3>
-            <p class="muted">
-              Create the first profile or import a portable code. Profiles remain in this browser
-              until you explicitly export or share them.
-            </p>
-            <div class="header-actions">
-              <a class="button" routerLink="/profiles/new">Create profile</a>
-              <a class="button secondary" routerLink="/profiles/import">Import profile</a>
-            </div>
+            <p class="muted">Create the first profile. It will be stored only in this browser until you explicitly export or share it.</p>
+            <a class="button" routerLink="/profiles/new">Create profile</a>
           </div>
         } @else {
           <div class="profile-list">
@@ -53,10 +41,7 @@ import { ProfileStore } from '../../core/profile.store';
               <a class="profile-row" [routerLink]="['/profiles', profile.id]">
                 <div>
                   <strong>{{ profile.metadata.alias || 'Untitled profile' }}</strong>
-                  <span class="muted">
-                    {{ answerCount(profile.answers) }} answered ·
-                    {{ profile.metadata.filterByProfileMetadata ? 'filter enabled' : 'full questionnaire' }}
-                  </span>
+                  <span class="muted">{{ answerCount(profile.answers) }} answered · {{ profile.settings.filterQuestionnaireByMetadata ? 'filter enabled' : 'full questionnaire' }}</span>
                 </div>
                 <span aria-hidden="true">→</span>
               </a>
@@ -67,7 +52,7 @@ import { ProfileStore } from '../../core/profile.store';
 
       <footer class="privacy-note">
         <strong>Local by default.</strong>
-        <span class="muted">Profiles stay on this device unless you explicitly export them.</span>
+        <span class="muted">Profiles are not uploaded, but browser storage is not encrypted. Anyone with access to this browser profile may be able to read them.</span>
       </footer>
     </main>
   `,

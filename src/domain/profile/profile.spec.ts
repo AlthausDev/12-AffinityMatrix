@@ -2,7 +2,7 @@ import { createAnswerKey } from './profile-answer';
 import { createProfile, PROFILE_SCHEMA_VERSION } from './profile';
 
 describe('profile domain', () => {
-  it('creates a profile with filtering enabled by default', () => {
+  it('creates a profile with local questionnaire filtering enabled by default', () => {
     const profile = createProfile({
       id: 'profile-1',
       now: '2026-08-17T12:00:00.000Z',
@@ -11,7 +11,7 @@ describe('profile domain', () => {
 
     expect(profile.schemaVersion).toBe(PROFILE_SCHEMA_VERSION);
     expect(profile.metadata.alias).toBe('Example');
-    expect(profile.metadata.filterByProfileMetadata).toBe(true);
+    expect(profile.settings.filterQuestionnaireByMetadata).toBe(true);
     expect(profile.answers).toEqual({});
   });
 

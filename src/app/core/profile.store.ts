@@ -1,15 +1,14 @@
 import { Injectable, inject, signal } from '@angular/core';
-import {
-  PortableProfileV1,
-  restorePortableProfile,
-} from '../../application/profile/portable-profile';
-import { Profile, ProfileId, createProfile } from '../../domain/profile/profile';
+import { PortableProfile } from '../../application/profile/portable-profile';
+import { PracticeAnswer } from '../../domain/profile/profile-answer';
+import { Profile, ProfileId } from '../../domain/profile/profile';
 import { ProfileMetadata } from '../../domain/profile/profile-metadata';
-import { PROFILE_REPOSITORY } from './profile-repository.token';
+import { DEFAULT_PROFILE_SETTINGS, ProfileSettings } from '../../domain/profile/profile-settings';
+import { PROFILE_SERVICE } from './profile-service.token';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileStore {
-  private readonly repository = inject(PROFILE_REPOSITORY);
+  private readonly service = inject(PROFILE_SERVICE);
   private readonly profilesState = signal<readonly Profile[]>([]);
   private readonly errorState = signal<string | null>(null);
 
@@ -24,38 +23,36 @@ export class ProfileStore {
     return this.profilesState().find((profile) => profile.id === id);
   }
 
-  create(metadata: ProfileMetadata): Profile | undefined {
-    const now = new Date().toISOString();
-    const profile = createProfile({
-      id: crypto.randomUUID(),
-      now,
-      metadata,
-    });
-
-    return this.save(profile);
+  create(
+    metadata: ProfileMetadata,
+    settings: Partial<ProfileSettings> = DEFAULT_PROFILE_SETTINGS,
+  ): Profile | undefined {
+    return this.execute(() => this.service.create(metadata, settings));
   }
 
-  importPortable(portable: PortableProfileV1): Profile | undefined {
-    const now = new Date().toISOString();
-    return this.save(restorePortableProfile(portable, crypto.randomUUID(), now));
+  importPortable(portable: PortableProfile): Profile | undefined {
+    return this.execute(() => this.service.importPortable(portable));
   }
 
-  updateMetadata(id: ProfileId, metadata: ProfileMetadata): Profile | undefined {
-    const current = this.findById(id);
-    if (!current) {
-      return undefined;
-    }
+  updateProfile(
+    id: ProfileId,
+    metadata: ProfileMetadata,
+    settings: ProfileSettings,
+  ): Profile | undefined {
+    return this.execute(() => this.service.updateProfile(id, metadata, settings));
+  }
 
-    return this.save({
-      ...current,
-      metadata,
-      updatedAt: new Date().toISOString(),
-    });
+  upsertAnswer(id: ProfileId, answer: PracticeAnswer): Profile | undefined {
+    return this.execute(() => this.service.upsertAnswer(id, answer));
+  }
+
+  removeAnswer(id: ProfileId, practiceId: string, roleId: string): Profile | undefined {
+    return this.execute(() => this.service.removeAnswer(id, practiceId, roleId));
   }
 
   delete(id: ProfileId): boolean {
     try {
-      this.repository.delete(id);
+      this.service.delete(id);
       this.reload();
       return true;
     } catch (error: unknown) {
@@ -68,9 +65,9 @@ export class ProfileStore {
     this.errorState.set(null);
   }
 
-  private save(profile: Profile): Profile | undefined {
+  private execute(operation: () => Profile | undefined): Profile | undefined {
     try {
-      this.repository.save(profile);
+      const profile = operation();
       this.reload();
       return profile;
     } catch (error: unknown) {
@@ -81,7 +78,7 @@ export class ProfileStore {
 
   private reload(): void {
     try {
-      this.profilesState.set(this.repository.findAll());
+      this.profilesState.set(this.service.findAll());
       this.errorState.set(null);
     } catch (error: unknown) {
       this.profilesState.set([]);

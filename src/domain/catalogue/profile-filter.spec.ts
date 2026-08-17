@@ -1,40 +1,33 @@
 import { PracticeRole } from './practice';
-import { getRelevantPartnerSexes, isRoleVisible } from './profile-filter';
+import {
+  getRelevantPartnerSexes,
+  MetadataQuestionVisibilityPolicy,
+  ProfileQuestionContext,
+} from './profile-filter';
 import { ProfileMetadata } from '../profile/profile-metadata';
 
-function metadata(overrides: Partial<ProfileMetadata> = {}): ProfileMetadata {
+const policy = new MetadataQuestionVisibilityPolicy();
+
+function context(
+  metadata: ProfileMetadata = {},
+  filterQuestionnaireByMetadata = true,
+): ProfileQuestionContext {
   return {
-    filterByProfileMetadata: true,
-    ...overrides,
+    metadata,
+    settings: { filterQuestionnaireByMetadata },
   };
 }
 
 describe('profile filtering', () => {
   it('does not infer partner sex until both sex and orientation are known', () => {
-    expect(getRelevantPartnerSexes(metadata({ sex: 'male' }))).toBeUndefined();
-    expect(getRelevantPartnerSexes(metadata({ orientation: 'heterosexual' }))).toBeUndefined();
+    expect(getRelevantPartnerSexes({ sex: 'male' })).toBeUndefined();
+    expect(getRelevantPartnerSexes({ orientation: 'heterosexual' })).toBeUndefined();
   });
 
-  it('derives the opposite sex for heterosexual profiles', () => {
-    expect(getRelevantPartnerSexes(metadata({ sex: 'male', orientation: 'heterosexual' }))).toEqual([
-      'female',
-    ]);
-    expect(getRelevantPartnerSexes(metadata({ sex: 'female', orientation: 'heterosexual' }))).toEqual([
-      'male',
-    ]);
-  });
-
-  it('derives the same sex for homosexual profiles', () => {
-    expect(getRelevantPartnerSexes(metadata({ sex: 'female', orientation: 'homosexual' }))).toEqual([
-      'female',
-    ]);
-  });
-
-  it('keeps both partner sexes for bisexual profiles', () => {
-    expect(getRelevantPartnerSexes(metadata({ sex: 'male', orientation: 'bisexual' }))).toEqual([
-      'male',
-      'female',
-    ]);
+  it('derives partner sex from orientation', () => {
+    expect(getRelevantPartnerSexes({ sex: 'male', orientation: 'heterosexual' })).toEqual(['female']);
+    expect(getRelevantPartnerSexes({ sex: 'female', orientation: 'homosexual' })).toEqual(['female']);
+    expect(getRelevantPartnerSexes({ sex: 'male', orientation: 'bisexual' })).toEqual(['male', 'female']);
   });
 
   it('filters roles by the profile sex when the role constrains the subject', () => {
@@ -45,8 +38,8 @@ describe('profile filtering', () => {
       applicability: { selfSex: ['female'] },
     };
 
-    expect(isRoleVisible(role, metadata({ sex: 'male' }))).toBe(false);
-    expect(isRoleVisible(role, metadata({ sex: 'female' }))).toBe(true);
+    expect(policy.isRoleVisible(role, context({ sex: 'male' }))).toBe(false);
+    expect(policy.isRoleVisible(role, context({ sex: 'female' }))).toBe(true);
   });
 
   it('filters roles by relevant partner sex when orientation can be applied', () => {
@@ -57,15 +50,11 @@ describe('profile filtering', () => {
       applicability: { partnerSex: ['female'] },
     };
 
-    expect(
-      isRoleVisible(role, metadata({ sex: 'male', orientation: 'heterosexual' })),
-    ).toBe(true);
-    expect(
-      isRoleVisible(role, metadata({ sex: 'male', orientation: 'homosexual' })),
-    ).toBe(false);
+    expect(policy.isRoleVisible(role, context({ sex: 'male', orientation: 'heterosexual' }))).toBe(true);
+    expect(policy.isRoleVisible(role, context({ sex: 'male', orientation: 'homosexual' }))).toBe(false);
   });
 
-  it('keeps roles visible when filtering is disabled', () => {
+  it('keeps all roles visible when filtering is disabled', () => {
     const role: PracticeRole = {
       id: 'receive',
       label: 'Receive',
@@ -73,8 +62,6 @@ describe('profile filtering', () => {
       applicability: { selfSex: ['female'] },
     };
 
-    expect(
-      isRoleVisible(role, metadata({ sex: 'male', filterByProfileMetadata: false })),
-    ).toBe(true);
+    expect(policy.isRoleVisible(role, context({ sex: 'male' }, false))).toBe(true);
   });
 });

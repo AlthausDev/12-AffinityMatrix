@@ -3,11 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProfileStore } from '../../core/profile.store';
 import { Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
 
-const SEX_LABELS: Record<Sex, string> = {
-  male: 'Male',
-  female: 'Female',
-};
-
+const SEX_LABELS: Record<Sex, string> = { male: 'Male', female: 'Female' };
 const ORIENTATION_LABELS: Record<SexualOrientation, string> = {
   heterosexual: 'Heterosexual',
   homosexual: 'Homosexual',
@@ -26,10 +22,7 @@ const ORIENTATION_LABELS: Record<SexualOrientation, string> = {
           <div>
             <p class="eyebrow">Local profile</p>
             <h1>{{ currentProfile.metadata.alias || 'Untitled profile' }}</h1>
-            <p class="muted profile-meta">
-              {{ sexLabel(currentProfile.metadata.sex) }} ·
-              {{ orientationLabel(currentProfile.metadata.orientation) }}
-            </p>
+            <p class="muted profile-meta">{{ sexLabel(currentProfile.metadata.sex) }} · {{ orientationLabel(currentProfile.metadata.orientation) }}</p>
           </div>
           <p class="profile-count">{{ answeredCount() }} answered</p>
         </header>
@@ -39,69 +32,22 @@ const ORIENTATION_LABELS: Record<SexualOrientation, string> = {
         }
 
         <section class="action-grid" aria-label="Profile actions">
-          <article class="action-card disabled-card">
-            <div>
-              <p class="eyebrow">Questionnaire</p>
-              <h2>Answer or modify</h2>
-              <p class="muted">Questionnaire navigation is the next MVP slice.</p>
-            </div>
-            <button class="button secondary" type="button" disabled>Coming next</button>
-          </article>
-
-          <article class="action-card disabled-card">
-            <div>
-              <p class="eyebrow">Comparison</p>
-              <h2>Compare profiles</h2>
-              <p class="muted">Find complementary answers and category-level affinity.</p>
-            </div>
-            <button class="button secondary" type="button" disabled>Not available yet</button>
-          </article>
-
-          <article class="action-card">
-            <div>
-              <p class="eyebrow">Profile data</p>
-              <h2>Edit profile</h2>
-              <p class="muted">Change alias, optional filtering data, or filter behavior.</p>
-            </div>
-            <a class="button" [routerLink]="['/profiles', currentProfile.id, 'edit']">Edit</a>
-          </article>
-
-          <article class="action-card">
-            <div>
-              <p class="eyebrow">Portability</p>
-              <h2>Export or share</h2>
-              <p class="muted">Generate a versioned code that can be copied to another device.</p>
-            </div>
-            <a class="button" [routerLink]="['/profiles', currentProfile.id, 'export']">Export</a>
-          </article>
+          <article class="action-card disabled-card"><div><p class="eyebrow">Questionnaire</p><h2>Answer or modify</h2><p class="muted">Questionnaire navigation is the next MVP slice.</p></div><button class="button secondary" type="button" disabled>Coming next</button></article>
+          <article class="action-card disabled-card"><div><p class="eyebrow">Comparison</p><h2>Compare profiles</h2><p class="muted">Find complementary answers and category-level affinity.</p></div><button class="button secondary" type="button" disabled>Not available yet</button></article>
+          <article class="action-card"><div><p class="eyebrow">Profile data</p><h2>Edit profile</h2><p class="muted">Change alias, optional filtering data, or filter behavior.</p></div><a class="button" [routerLink]="['/profiles', currentProfile.id, 'edit']">Edit</a></article>
+          <article class="action-card"><div><p class="eyebrow">Portability</p><h2>Export or share</h2><p class="muted">Generate a versioned code that can be copied to another device.</p></div><a class="button" [routerLink]="['/profiles', currentProfile.id, 'export']">Export</a></article>
         </section>
 
         <section class="panel profile-status" aria-labelledby="profile-status-title">
-          <div>
-            <p class="eyebrow">MVP status</p>
-            <h2 id="profile-status-title">Profile data</h2>
-          </div>
+          <div><p class="eyebrow">MVP status</p><h2 id="profile-status-title">Profile data</h2></div>
           <dl class="status-list">
-            <div>
-              <dt>Question filter</dt>
-              <dd>{{ currentProfile.metadata.filterByProfileMetadata ? 'Enabled' : 'Disabled' }}</dd>
-            </div>
-            <div>
-              <dt>Answered roles</dt>
-              <dd>{{ answeredCount() }}</dd>
-            </div>
-            <div>
-              <dt>Storage</dt>
-              <dd>Local browser</dd>
-            </div>
+            <div><dt>Question filter</dt><dd>{{ currentProfile.settings.filterQuestionnaireByMetadata ? 'Enabled' : 'Disabled' }}</dd></div>
+            <div><dt>Answered roles</dt><dd>{{ answeredCount() }}</dd></div>
+            <div><dt>Storage</dt><dd>Local browser · not encrypted</dd></div>
           </dl>
         </section>
       } @else {
-        <section class="panel">
-          <h1>Profile not found</h1>
-          <p class="muted">The requested profile is not available in local storage.</p>
-          <a class="button" routerLink="/">Return to profiles</a>
-        </section>
+        <section class="panel"><h1>Profile not found</h1><p class="muted">The requested profile is not available in local storage.</p><a class="button" routerLink="/">Return to profiles</a></section>
       }
     </main>
   `,
@@ -115,11 +61,6 @@ export class ProfileDashboardPageComponent {
   readonly profile = computed(() => this.profileStore.findById(this.profileId));
   readonly answeredCount = computed(() => Object.keys(this.profile()?.answers ?? {}).length);
 
-  sexLabel(sex: Sex | undefined): string {
-    return sex ? SEX_LABELS[sex] : 'Sex not specified';
-  }
-
-  orientationLabel(orientation: SexualOrientation | undefined): string {
-    return orientation ? ORIENTATION_LABELS[orientation] : 'Orientation not specified';
-  }
+  sexLabel(sex: Sex | undefined): string { return sex ? SEX_LABELS[sex] : 'Sex not specified'; }
+  orientationLabel(orientation: SexualOrientation | undefined): string { return orientation ? ORIENTATION_LABELS[orientation] : 'Orientation not specified'; }
 }

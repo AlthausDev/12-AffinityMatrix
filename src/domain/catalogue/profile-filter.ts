@@ -1,7 +1,13 @@
 import { Practice, PracticeRole } from './practice';
 import { ProfileMetadata, Sex } from '../profile/profile-metadata';
+import { ProfileSettings } from '../profile/profile-settings';
 
 const ALL_SEXES: readonly Sex[] = ['male', 'female'];
+
+export interface ProfileQuestionContext {
+  readonly metadata: ProfileMetadata;
+  readonly settings: ProfileSettings;
+}
 
 export function getRelevantPartnerSexes(metadata: ProfileMetadata): readonly Sex[] | undefined {
   const { sex, orientation } = metadata;
@@ -21,32 +27,44 @@ export function getRelevantPartnerSexes(metadata: ProfileMetadata): readonly Sex
   return [sex === 'male' ? 'female' : 'male'];
 }
 
-export function isRoleVisible(role: PracticeRole, metadata: ProfileMetadata): boolean {
-  if (!metadata.filterByProfileMetadata) {
+export abstract class QuestionVisibilityPolicy {
+  abstract isRoleVisible(role: PracticeRole, context: ProfileQuestionContext): boolean;
+
+  getVisibleRoles(practice: Practice, context: ProfileQuestionContext): readonly PracticeRole[] {
+    return practice.roles.filter((role) => this.isRoleVisible(role, context));
+  }
+
+  isPracticeVisible(practice: Practice, context: ProfileQuestionContext): boolean {
+    return this.getVisibleRoles(practice, context).length > 0;
+  }
+}
+
+export class MetadataQuestionVisibilityPolicy extends QuestionVisibilityPolicy {
+  override isRoleVisible(role: PracticeRole, context: ProfileQuestionContext): boolean {
+    if (!context.settings.filterQuestionnaireByMetadata) {
+      return true;
+    }
+
+    const applicability = role.applicability;
+    if (!applicability) {
+      return true;
+    }
+
+    if (
+      context.metadata.sex &&
+      applicability.selfSex &&
+      !applicability.selfSex.includes(context.metadata.sex)
+    ) {
+      return false;
+    }
+
+    const relevantPartnerSexes = getRelevantPartnerSexes(context.metadata);
+    if (relevantPartnerSexes && applicability.partnerSex) {
+      return applicability.partnerSex.some((sex) => relevantPartnerSexes.includes(sex));
+    }
+
     return true;
   }
-
-  const applicability = role.applicability;
-  if (!applicability) {
-    return true;
-  }
-
-  if (metadata.sex && applicability.selfSex && !applicability.selfSex.includes(metadata.sex)) {
-    return false;
-  }
-
-  const relevantPartnerSexes = getRelevantPartnerSexes(metadata);
-  if (relevantPartnerSexes && applicability.partnerSex) {
-    return applicability.partnerSex.some((sex) => relevantPartnerSexes.includes(sex));
-  }
-
-  return true;
 }
 
-export function getVisibleRoles(practice: Practice, metadata: ProfileMetadata): readonly PracticeRole[] {
-  return practice.roles.filter((role) => isRoleVisible(role, metadata));
-}
-
-export function isPracticeVisible(practice: Practice, metadata: ProfileMetadata): boolean {
-  return getVisibleRoles(practice, metadata).length > 0;
-}
+export const defaultQuestionVisibilityPolicy = new MetadataQuestionVisibilityPolicy();
