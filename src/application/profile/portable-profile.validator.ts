@@ -1,8 +1,8 @@
 import { ValidationIssue } from '../../domain/shared/validator';
-import { PROFILE_SCHEMA_VERSION } from '../../domain/profile/profile';
 import { ProfileDataValidator } from '../../domain/profile/profile-data.validator';
 import {
-  PORTABLE_PROFILE_FORMAT_VERSION,
+  PORTABLE_PROFILE_V2_FORMAT_VERSION,
+  PORTABLE_PROFILE_V2_PROFILE_SCHEMA_VERSION,
   PortableProfile,
 } from './portable-profile';
 
@@ -24,11 +24,11 @@ export class PortableProfileValidator extends ProfileDataValidator<PortableProfi
       ...this.validateProfileData(value),
     ];
 
-    if (value['formatVersion'] !== PORTABLE_PROFILE_FORMAT_VERSION) {
+    if (value['formatVersion'] !== PORTABLE_PROFILE_V2_FORMAT_VERSION) {
       issues.push({ path: 'formatVersion', message: 'Portable profile format version is unsupported.' });
     }
 
-    if (value['profileSchemaVersion'] !== PROFILE_SCHEMA_VERSION) {
+    if (value['profileSchemaVersion'] !== PORTABLE_PROFILE_V2_PROFILE_SCHEMA_VERSION) {
       issues.push({ path: 'profileSchemaVersion', message: 'Profile schema version is unsupported.' });
     }
 
