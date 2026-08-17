@@ -8,6 +8,9 @@ on:
       - package.json
       - .github/workflows/generate-lockfile.yml
 
+permissions:
+  contents: write
+
 jobs:
   lockfile:
     runs-on: ubuntu-latest
@@ -15,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          ref: feature_0.1.0.0_architecture-hardening
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -25,9 +30,14 @@ jobs:
       - name: Generate package lock
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
 
-      - name: Upload package lock
-        uses: actions/upload-artifact@v6
-        with:
-          name: package-lock
-          path: package-lock.json
-          if-no-files-found: error
+      - name: Commit package lock
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "package-lock.json is already up to date"
+            exit 0
+          fi
+          git commit -m "chore: add dependency lockfile"
+          git push origin HEAD:feature_0.1.0.0_architecture-hardening
