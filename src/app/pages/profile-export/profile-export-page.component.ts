@@ -48,6 +48,21 @@ import { encodeProfileCode } from '../../../infrastructure/serialization/profile
       }
     </main>
   `,
+  styles: `
+    .code-box {
+      min-height: 14rem;
+      resize: vertical;
+      padding: 0.75rem;
+      border: 1px solid var(--border-strong);
+      border-radius: 0.5rem;
+      background: var(--surface-elevated);
+      color: var(--text-primary);
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileExportPageComponent {
