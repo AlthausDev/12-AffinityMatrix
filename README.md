@@ -15,41 +15,45 @@ The first milestone focuses on validating the core workflow before investing in 
 - Create and edit local profiles.
 - Navigate the questionnaire by category instead of using a single long page.
 - Optionally use basic profile metadata to filter irrelevant questions.
-- Support explicit preference states, including contextual/conditional answers.
+- Support explicit preference states and optional contextual detail.
 - Store profiles locally in the browser without requiring an account.
-- Export and import profiles through a portable serialized representation.
-- Compare two profiles by matching complementary roles and responses.
+- Export and import profiles through a portable, versioned representation.
+- Compare two profiles by matching explicitly compatible roles and responses.
 - Show category-level affinity based on comparable answered pairs.
-- Keep optional answer details available without making the questionnaire cumbersome.
 
 ## Privacy model
 
-The application is designed to work without a backend for the MVP.
+The MVP has no backend, account system, remote profile database, analytics, or tracking requirement. Profiles stay in browser storage unless the user explicitly exports them.
 
-Profiles remain on the user's device unless they are explicitly exported or shared. No account, remote profile database, analytics, or tracking is required for the core workflow.
+Local storage is **not encryption**. A person with access to the same browser profile may be able to inspect locally stored data, and exported profile codes must be treated as private data. Portable codes use encoding, versioning, and an integrity checksum; those mechanisms do not provide secrecy.
+
+## Architecture
+
+The project keeps domain rules independent from Angular and browser APIs. The current structure uses a small set of patterns where they provide a concrete boundary rather than adding ceremony:
+
+- Repository for profile persistence.
+- Application service for profile use cases and transactional updates.
+- Factory plus clock/id ports for profile creation and restoration.
+- Strategy policies for questionnaire visibility and role compatibility.
+- Inherited validators for shared profile invariants.
+- Versioned migrations for local persistence and portable profile formats.
+- Angular stores as UI state adapters rather than domain services.
+
+The model is intended to remain extensible for richer questionnaires, comparison rules, visual summaries, and additional local transports. Chat, public discovery, feeds, and social-network features are intentionally outside the product direction.
 
 ## Planned stack
 
 - Angular 22
 - TypeScript 6
-- Angular Signals
-- Signal Forms
+- Angular Signals and Signal Forms
 - Angular Router
 - CSS
 - Vitest
 - Browser local storage for the initial persistence layer
 
-Domain logic will remain framework-independent TypeScript where practical, keeping comparison, filtering, serialization, and profile rules separate from the UI.
-
 ## Development approach
 
-The project will be developed incrementally:
-
-1. Validate the domain model and questionnaire flow.
-2. Implement local profile persistence and portability.
-3. Implement profile comparison and category affinity.
-4. Refine UX and accessibility.
-5. Add richer visual summaries only after the core workflow is stable.
+The project is developed incrementally: validate domain and questionnaire behavior first, then persistence/portability, comparison, UX/accessibility, and finally richer visual summaries.
 
 ## License
 
