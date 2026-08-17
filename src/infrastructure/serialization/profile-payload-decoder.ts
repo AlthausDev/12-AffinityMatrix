@@ -1,9 +1,9 @@
 import {
-  PORTABLE_PROFILE_FORMAT_VERSION,
+  PORTABLE_PROFILE_V2_FORMAT_VERSION,
+  PORTABLE_PROFILE_V2_PROFILE_SCHEMA_VERSION,
   PortableProfile,
 } from '../../application/profile/portable-profile';
 import { portableProfileValidator } from '../../application/profile/portable-profile.validator';
-import { PROFILE_SCHEMA_VERSION } from '../../domain/profile/profile';
 import { ORIENTATION_VALUES, SEX_VALUES } from '../../domain/profile/profile-metadata';
 
 export const CURRENT_PROFILE_CODE_PREFIX = 'P2';
@@ -85,8 +85,8 @@ export class LegacyProfilePayloadV1Decoder extends ProfilePayloadDecoder {
 
     return portableProfileValidator.assert(
       {
-        formatVersion: PORTABLE_PROFILE_FORMAT_VERSION,
-        profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+        formatVersion: PORTABLE_PROFILE_V2_FORMAT_VERSION,
+        profileSchemaVersion: PORTABLE_PROFILE_V2_PROFILE_SCHEMA_VERSION,
         metadata,
         answers: value['answers'],
       },
