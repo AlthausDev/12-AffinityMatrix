@@ -70,13 +70,42 @@ describe('ProfileValidator', () => {
     expect(validator.validate(candidate).some((issue) => issue.message.includes('Answer key'))).toBe(true);
   });
 
-  it('rejects presentation settings mixed into profile metadata', () => {
+  it('rejects presentation settings with invalid types', () => {
     const candidate = {
       ...validProfile(),
-      metadata: { alias: 'Example' },
       settings: { filterQuestionnaireByMetadata: 'yes' },
     };
 
     expect(validator.isValid(candidate)).toBe(false);
+  });
+
+  it('rejects unknown properties instead of silently carrying them across boundaries', () => {
+    const profile = validProfile();
+    const key = createAnswerKey('bondage', 'receive');
+    const candidate = {
+      ...profile,
+      metadata: { ...profile.metadata, unexpected: true },
+      answers: {
+        [key]: {
+          practiceId: 'bondage',
+          roleId: 'receive',
+          preference: 'depends',
+          details: { dependsOn: 'Context', unexpected: true },
+        },
+      },
+    };
+
+    const issues = validator.validate(candidate);
+    expect(issues.some((issue) => issue.path === 'metadata.unexpected')).toBe(true);
+    expect(issues.some((issue) => issue.path.endsWith('details.unexpected'))).toBe(true);
+  });
+
+  it('rejects an update timestamp earlier than profile creation', () => {
+    const candidate = {
+      ...validProfile(),
+      updatedAt: '2026-08-17T11:59:59.000Z',
+    };
+
+    expect(validator.validate(candidate).some((issue) => issue.path === 'updatedAt')).toBe(true);
   });
 });
