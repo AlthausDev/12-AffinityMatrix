@@ -1,4 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
+import {
+  PortableProfileV1,
+  restorePortableProfile,
+} from '../../application/profile/portable-profile';
 import { Profile, ProfileId, createProfile } from '../../domain/profile/profile';
 import { ProfileMetadata } from '../../domain/profile/profile-metadata';
 import { PROFILE_REPOSITORY } from './profile-repository.token';
@@ -29,6 +33,11 @@ export class ProfileStore {
     });
 
     return this.save(profile);
+  }
+
+  importPortable(portable: PortableProfileV1): Profile | undefined {
+    const now = new Date().toISOString();
+    return this.save(restorePortableProfile(portable, crypto.randomUUID(), now));
   }
 
   updateMetadata(id: ProfileId, metadata: ProfileMetadata): Profile | undefined {

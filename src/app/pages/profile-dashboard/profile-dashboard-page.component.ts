@@ -66,13 +66,13 @@ const ORIENTATION_LABELS: Record<SexualOrientation, string> = {
             <a class="button" [routerLink]="['/profiles', currentProfile.id, 'edit']">Edit</a>
           </article>
 
-          <article class="action-card disabled-card">
+          <article class="action-card">
             <div>
               <p class="eyebrow">Portability</p>
               <h2>Export or share</h2>
-              <p class="muted">Portable profile codes will use the same versioned profile model.</p>
+              <p class="muted">Generate a versioned code that can be copied to another device.</p>
             </div>
-            <button class="button secondary" type="button" disabled>Not available yet</button>
+            <a class="button" [routerLink]="['/profiles', currentProfile.id, 'export']">Export</a>
           </article>
         </section>
 

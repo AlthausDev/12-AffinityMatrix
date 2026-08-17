@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { toPortableProfile } from '../../application/profile/portable-profile';
 import { ProfileRepository } from '../../application/profile/profile-repository';
 import { Profile, ProfileId } from '../../domain/profile/profile';
 import { PROFILE_REPOSITORY } from './profile-repository.token';
@@ -64,5 +65,21 @@ describe('ProfileStore', () => {
     expect(updated?.id).toBe(created!.id);
     expect(updated?.metadata.alias).toBe('Updated');
     expect(updated?.metadata.filterByProfileMetadata).toBe(false);
+  });
+
+  it('imports portable data as a new local profile identity', () => {
+    const original = store.create({
+      alias: 'Portable',
+      sex: 'female',
+      filterByProfileMetadata: true,
+    });
+    expect(original).toBeDefined();
+
+    const imported = store.importPortable(toPortableProfile(original!));
+
+    expect(imported).toBeDefined();
+    expect(imported?.id).not.toBe(original!.id);
+    expect(imported?.metadata.alias).toBe('Portable');
+    expect(store.profiles()).toHaveLength(2);
   });
 });
