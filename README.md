@@ -39,6 +39,8 @@ The project keeps domain rules independent from Angular and browser APIs. The cu
 - Versioned migrations for local persistence and portable profile formats.
 - Angular stores as UI state adapters rather than domain services.
 
+The detailed dependency rules, aggregate boundaries, versioning rules, and extension points are documented in [docs/architecture.md](docs/architecture.md).
+
 The model is intended to remain extensible for richer questionnaires, comparison rules, visual summaries, and additional local transports. Chat, public discovery, feeds, and social-network features are intentionally outside the product direction.
 
 ## Planned stack
