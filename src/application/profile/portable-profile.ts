@@ -25,7 +25,7 @@ export function toPortableProfile(profile: Profile): PortableProfile {
     formatVersion: PORTABLE_PROFILE_V2_FORMAT_VERSION,
     profileSchemaVersion: profile.schemaVersion,
     metadata: { ...profile.metadata },
-    answers: { ...profile.answers },
+    answers: cloneAnswers(profile.answers),
   };
 }
 
@@ -35,8 +35,22 @@ export function restorePortableProfile(portable: PortableProfile, id: string, no
     id,
     metadata: { ...portable.metadata },
     settings: { ...DEFAULT_PROFILE_SETTINGS },
-    answers: { ...portable.answers },
+    answers: cloneAnswers(portable.answers),
     createdAt: now,
     updatedAt: now,
   };
+}
+
+function cloneAnswers(
+  answers: Readonly<Record<AnswerKey, PracticeAnswer>>,
+): Readonly<Record<AnswerKey, PracticeAnswer>> {
+  return Object.fromEntries(
+    Object.entries(answers).map(([key, answer]) => [
+      key,
+      {
+        ...answer,
+        ...(answer.details ? { details: { ...answer.details } } : {}),
+      },
+    ]),
+  ) as Record<AnswerKey, PracticeAnswer>;
 }
