@@ -1,19 +1,25 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { ProfileFactory } from '../../../application/profile/profile-factory';
+import { ProfileConcurrencyError, ProfileRepository } from '../../../application/profile/profile-repository';
 import { ProfileService } from '../../../application/profile/profile-service';
 import { Profile, ProfileId } from '../../../domain/profile/profile';
-import { ProfileRepository } from '../../../application/profile/profile-repository';
 import { PROFILE_SERVICE } from '../../core/profile-service.token';
 import { ProfileStore } from '../../core/profile.store';
 import { ProfileEditorPageComponent } from './profile-editor-page.component';
 
 class MemoryProfileRepository implements ProfileRepository {
   private readonly values = new Map<ProfileId, Profile>();
-  findAll(): readonly Profile[] { return [...this.values.values()]; }
-  findById(id: ProfileId): Profile | undefined { return this.values.get(id); }
-  save(profile: Profile): void { this.values.set(profile.id, profile); }
-  delete(id: ProfileId): void { this.values.delete(id); }
+  async findAll(): Promise<readonly Profile[]> { return [...this.values.values()]; }
+  async findById(id: ProfileId): Promise<Profile | undefined> { return this.values.get(id); }
+  async save(profile: Profile, expectedRevision?: number): Promise<void> {
+    const current = this.values.get(profile.id);
+    if (current && (expectedRevision === undefined || current.revision !== expectedRevision)) {
+      throw new ProfileConcurrencyError();
+    }
+    this.values.set(profile.id, profile);
+  }
+  async delete(id: ProfileId): Promise<void> { this.values.delete(id); }
 }
 
 describe('ProfileEditorPageComponent', () => {
@@ -34,6 +40,8 @@ describe('ProfileEditorPageComponent', () => {
       ],
     }).compileComponents();
 
+    const store = TestBed.inject(ProfileStore);
+    await store.initialize();
     const fixture = TestBed.createComponent(ProfileEditorPageComponent);
     fixture.detectChanges();
 

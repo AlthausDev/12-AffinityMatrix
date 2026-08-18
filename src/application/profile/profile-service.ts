@@ -1,11 +1,11 @@
-import { Clock } from '../shared/clock';
-import { ProfileRepository } from './profile-repository';
-import { ProfileFactory } from './profile-factory';
-import { PortableProfile } from './portable-profile';
-import { createAnswerKey, PracticeAnswer } from '../../domain/profile/profile-answer';
+import { clonePracticeAnswer, createAnswerKey, PracticeAnswer } from '../../domain/profile/profile-answer';
 import { Profile, ProfileId } from '../../domain/profile/profile';
 import { ProfileMetadata } from '../../domain/profile/profile-metadata';
 import { DEFAULT_PROFILE_SETTINGS, ProfileSettings } from '../../domain/profile/profile-settings';
+import { Clock } from '../shared/clock';
+import { PortableProfile } from './portable-profile';
+import { ProfileFactory } from './profile-factory';
+import { ProfileRepository } from './profile-repository';
 
 export class ProfileService {
   constructor(
@@ -14,40 +14,40 @@ export class ProfileService {
     private readonly clock: Clock,
   ) {}
 
-  findAll(): readonly Profile[] {
+  findAll(): Promise<readonly Profile[]> {
     return this.repository.findAll();
   }
 
-  findById(id: ProfileId): Profile | undefined {
+  findById(id: ProfileId): Promise<Profile | undefined> {
     return this.repository.findById(id);
   }
 
-  create(
+  async create(
     metadata: ProfileMetadata,
     settings: Partial<ProfileSettings> = DEFAULT_PROFILE_SETTINGS,
-  ): Profile {
+  ): Promise<Profile> {
     const profile = this.factory.create(metadata, settings, this.clock.now());
-    this.repository.save(profile);
+    await this.repository.save(profile);
     return profile;
   }
 
-  importPortable(portable: PortableProfile): Profile {
+  async importPortable(portable: PortableProfile): Promise<Profile> {
     const profile = this.factory.restore(portable, this.clock.now());
-    this.repository.save(profile);
+    await this.repository.save(profile);
     return profile;
   }
 
-  updateProfile(
+  async updateProfile(
     id: ProfileId,
     metadata: ProfileMetadata,
     settings: ProfileSettings,
-  ): Profile | undefined {
-    const current = this.repository.findById(id);
+  ): Promise<Profile | undefined> {
+    const current = await this.repository.findById(id);
     if (!current) {
       return undefined;
     }
 
-    return this.save({
+    return this.saveNextRevision(current, {
       ...current,
       metadata: { ...metadata },
       settings: { ...settings },
@@ -55,30 +55,25 @@ export class ProfileService {
     });
   }
 
-  upsertAnswer(id: ProfileId, answer: PracticeAnswer): Profile | undefined {
-    const current = this.repository.findById(id);
+  async upsertAnswer(id: ProfileId, answer: PracticeAnswer): Promise<Profile | undefined> {
+    const current = await this.repository.findById(id);
     if (!current) {
       return undefined;
     }
 
     const key = createAnswerKey(answer.practiceId, answer.roleId);
-    const safeAnswer: PracticeAnswer = {
-      ...answer,
-      ...(answer.details ? { details: { ...answer.details } } : {}),
-    };
-
-    return this.save({
+    return this.saveNextRevision(current, {
       ...current,
       answers: {
         ...current.answers,
-        [key]: safeAnswer,
+        [key]: clonePracticeAnswer(answer),
       },
       updatedAt: this.clock.now(),
     });
   }
 
-  removeAnswer(id: ProfileId, practiceId: string, roleId: string): Profile | undefined {
-    const current = this.repository.findById(id);
+  async removeAnswer(id: ProfileId, practiceId: string, roleId: string): Promise<Profile | undefined> {
+    const current = await this.repository.findById(id);
     if (!current) {
       return undefined;
     }
@@ -91,19 +86,27 @@ export class ProfileService {
     const answers = { ...current.answers };
     delete answers[key];
 
-    return this.save({
+    return this.saveNextRevision(current, {
       ...current,
       answers,
       updatedAt: this.clock.now(),
     });
   }
 
-  delete(id: ProfileId): void {
-    this.repository.delete(id);
+  async delete(id: ProfileId): Promise<void> {
+    const current = await this.repository.findById(id);
+    if (!current) {
+      return;
+    }
+    await this.repository.delete(id, current.revision);
   }
 
-  private save(profile: Profile): Profile {
-    this.repository.save(profile);
-    return profile;
+  private async saveNextRevision(current: Profile, candidate: Profile): Promise<Profile> {
+    const next: Profile = {
+      ...candidate,
+      revision: current.revision + 1,
+    };
+    await this.repository.save(next, current.revision);
+    return next;
   }
 }

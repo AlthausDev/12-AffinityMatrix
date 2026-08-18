@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormField, form, maxLength } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ProfileStore } from '../../core/profile.store';
 import {
   PROFILE_ALIAS_MAX_LENGTH,
   ProfileMetadata,
@@ -9,6 +8,7 @@ import {
   SexualOrientation,
 } from '../../../domain/profile/profile-metadata';
 import { ProfileSettings } from '../../../domain/profile/profile-settings';
+import { ProfileStore } from '../../core/profile.store';
 
 interface ProfileFormModel {
   alias: string;
@@ -34,7 +34,7 @@ interface ProfileFormModel {
         <header class="page-header">
           <p class="eyebrow">Profile</p>
           <h1>{{ isEditing ? 'Edit profile' : 'Create profile' }}</h1>
-          <p class="muted">These details are optional. Sex and orientation are only used to hide questions that are unlikely to apply to the profile.</p>
+          <p class="muted">These details are optional. Sex and orientation are used locally for questionnaire filtering and are excluded from exports unless you explicitly include them.</p>
         </header>
 
         @if (profileStore.error()) {
@@ -81,7 +81,7 @@ interface ProfileFormModel {
 
           <div class="form-actions">
             <a class="button secondary" [routerLink]="backLink">Cancel</a>
-            <button class="button" type="submit">{{ isEditing ? 'Save changes' : 'Create profile' }}</button>
+            <button class="button" type="submit" [disabled]="profileStore.saving()">{{ profileStore.saving() ? 'Saving…' : (isEditing ? 'Save changes' : 'Create profile') }}</button>
           </div>
         </form>
       }
@@ -113,7 +113,7 @@ export class ProfileEditorPageComponent {
     });
   });
 
-  save(event: Event): void {
+  async save(event: Event): Promise<void> {
     event.preventDefault();
     this.profileStore.clearError();
     this.profileForm().markAsTouched();
@@ -135,11 +135,11 @@ export class ProfileEditorPageComponent {
     };
 
     const saved = this.profileId
-      ? this.profileStore.updateProfile(this.profileId, metadata, settings)
-      : this.profileStore.create(metadata, settings);
+      ? await this.profileStore.updateProfile(this.profileId, metadata, settings)
+      : await this.profileStore.create(metadata, settings);
 
     if (saved) {
-      void this.router.navigate(['/profiles', saved.id]);
+      await this.router.navigate(['/profiles', saved.id]);
     }
   }
 }

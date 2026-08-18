@@ -1,16 +1,30 @@
+import { Profile, ProfileId } from '../../domain/profile/profile';
 import { Clock } from '../shared/clock';
 import { IdGenerator } from '../shared/id-generator';
-import { Profile, ProfileId } from '../../domain/profile/profile';
-import { ProfileRepository } from './profile-repository';
 import { ProfileFactory } from './profile-factory';
+import { ProfileConcurrencyError, ProfileRepository } from './profile-repository';
 import { ProfileService } from './profile-service';
 
 class MemoryProfileRepository implements ProfileRepository {
   private readonly values = new Map<ProfileId, Profile>();
-  findAll(): readonly Profile[] { return [...this.values.values()]; }
-  findById(id: ProfileId): Profile | undefined { return this.values.get(id); }
-  save(profile: Profile): void { this.values.set(profile.id, profile); }
-  delete(id: ProfileId): void { this.values.delete(id); }
+  async findAll(): Promise<readonly Profile[]> { return [...this.values.values()]; }
+  async findById(id: ProfileId): Promise<Profile | undefined> { return this.values.get(id); }
+  async save(profile: Profile, expectedRevision?: number): Promise<void> {
+    const current = this.values.get(profile.id);
+    if (current) {
+      if (expectedRevision === undefined || current.revision !== expectedRevision) throw new ProfileConcurrencyError();
+    } else if (expectedRevision !== undefined) {
+      throw new ProfileConcurrencyError();
+    }
+    this.values.set(profile.id, profile);
+  }
+  async delete(id: ProfileId, expectedRevision?: number): Promise<void> {
+    const current = this.values.get(id);
+    if (current && (expectedRevision === undefined || current.revision !== expectedRevision)) {
+      throw new ProfileConcurrencyError();
+    }
+    this.values.delete(id);
+  }
 }
 
 class FixedClock implements Clock {
@@ -35,35 +49,36 @@ describe('ProfileService', () => {
     service = new ProfileService(repository, new ProfileFactory(new SequentialIds()), clock);
   });
 
-  it('coordinates profile creation without depending on browser APIs', () => {
-    const profile = service.create(
+  it('coordinates asynchronous profile creation without depending on browser APIs', async () => {
+    const profile = await service.create(
       { alias: 'Example', sex: 'male', orientation: 'heterosexual' },
       { filterQuestionnaireByMetadata: true },
     );
 
     expect(profile.id).toBe('profile-1');
-    expect(repository.findAll()).toHaveLength(1);
+    expect(await repository.findAll()).toHaveLength(1);
   });
 
-  it('updates metadata and settings atomically while preserving identity', () => {
-    const profile = service.create({ alias: 'Original' });
+  it('updates metadata and settings atomically while incrementing the revision', async () => {
+    const profile = await service.create({ alias: 'Original' });
     clock.set('2026-08-17T13:00:00.000Z');
 
-    const updated = service.updateProfile(
+    const updated = await service.updateProfile(
       profile.id,
       { alias: 'Updated', orientation: 'bisexual' },
       { filterQuestionnaireByMetadata: false },
     );
 
     expect(updated?.id).toBe(profile.id);
+    expect(updated?.revision).toBe(profile.revision + 1);
     expect(updated?.metadata.alias).toBe('Updated');
     expect(updated?.settings.filterQuestionnaireByMetadata).toBe(false);
     expect(updated?.updatedAt).toBe('2026-08-17T13:00:00.000Z');
   });
 
-  it('upserts optional answer detail dimensions behind the application service', () => {
-    const profile = service.create({ alias: 'Example' });
-    const updated = service.upsertAnswer(profile.id, {
+  it('upserts optional answer detail dimensions behind the application service', async () => {
+    const profile = await service.create({ alias: 'Example' });
+    const updated = await service.upsertAnswer(profile.id, {
       practiceId: 'bondage',
       roleId: 'receive',
       preference: 'like',
@@ -71,5 +86,6 @@ describe('ProfileService', () => {
     });
 
     expect(updated?.answers['bondage::receive']?.details?.desiredFrequency).toBe('regularly');
+    expect(updated?.revision).toBe(2);
   });
 });

@@ -55,9 +55,8 @@ describe('ProfileValidator', () => {
   });
 
   it('rejects answer keys that do not match the answer role', () => {
-    const profile = validProfile();
     const candidate = {
-      ...profile,
+      ...validProfile(),
       answers: {
         'bondage::give': {
           practiceId: 'bondage',
@@ -75,8 +74,12 @@ describe('ProfileValidator', () => {
       ...validProfile(),
       settings: { filterQuestionnaireByMetadata: 'yes' },
     };
-
     expect(validator.isValid(candidate)).toBe(false);
+  });
+
+  it('rejects invalid revisions and catalogue versions', () => {
+    expect(validator.isValid({ ...validProfile(), revision: 0 })).toBe(false);
+    expect(validator.isValid({ ...validProfile(), catalogueVersion: 0 })).toBe(false);
   });
 
   it('rejects unknown properties instead of silently carrying them across boundaries', () => {

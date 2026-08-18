@@ -43,3 +43,18 @@ export type AnswerKey = `${string}::${string}`;
 export function createAnswerKey(practiceId: string, roleId: string): AnswerKey {
   return `${practiceId}::${roleId}`;
 }
+
+export function clonePracticeAnswer(answer: PracticeAnswer): PracticeAnswer {
+  return {
+    ...answer,
+    ...(answer.details ? { details: { ...answer.details } } : {}),
+  };
+}
+
+export function cloneAnswers(
+  answers: Readonly<Record<AnswerKey, PracticeAnswer>>,
+): Readonly<Record<AnswerKey, PracticeAnswer>> {
+  return Object.fromEntries(
+    Object.entries(answers).map(([key, answer]) => [key, clonePracticeAnswer(answer)]),
+  ) as Record<AnswerKey, PracticeAnswer>;
+}
