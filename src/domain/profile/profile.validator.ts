@@ -1,3 +1,4 @@
+import { isCatalogueVersion } from '../catalogue/catalogue-version';
 import { ValidationIssue } from '../shared/validator';
 import { Profile, PROFILE_SCHEMA_VERSION } from './profile';
 import { ProfileDataValidator } from './profile-data.validator';
@@ -5,6 +6,8 @@ import { ProfileDataValidator } from './profile-data.validator';
 const PROFILE_KEYS = [
   'schemaVersion',
   'id',
+  'revision',
+  'catalogueVersion',
   'metadata',
   'settings',
   'answers',
@@ -30,6 +33,14 @@ export class ProfileValidator extends ProfileDataValidator<Profile> {
 
     if (typeof value['id'] !== 'string' || value['id'].trim().length === 0 || value['id'].length > 200) {
       issues.push({ path: 'id', message: 'Profile id must be a non-empty string.' });
+    }
+
+    if (!Number.isInteger(value['revision']) || (value['revision'] as number) < 1) {
+      issues.push({ path: 'revision', message: 'Profile revision must be a positive integer.' });
+    }
+
+    if (!isCatalogueVersion(value['catalogueVersion'])) {
+      issues.push({ path: 'catalogueVersion', message: 'Catalogue version must be a positive integer.' });
     }
 
     const settings = value['settings'];
