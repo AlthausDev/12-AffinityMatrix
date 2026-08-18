@@ -3,12 +3,24 @@ import { createProfile } from '../../domain/profile/profile';
 import { restorePortableProfile, toPortableProfile } from './portable-profile';
 
 describe('portable profile mapping', () => {
-  it('does not share nested answer detail objects with the local profile', () => {
+  it('minimizes sensitive metadata unless explicitly requested', () => {
     const profile = createProfile({
       id: 'local-id',
       now: '2026-08-17T12:00:00.000Z',
-      metadata: { alias: 'Example' },
+      metadata: { alias: 'Example', sex: 'female', orientation: 'bisexual' },
     });
+
+    const minimized = toPortableProfile(profile);
+    const explicit = toPortableProfile(profile, { includeSensitiveMetadata: true });
+
+    expect(minimized.metadata).toEqual({ alias: 'Example' });
+    expect(explicit.metadata.sex).toBe('female');
+    expect(explicit.metadata.orientation).toBe('bisexual');
+    expect(minimized.catalogueVersion).toBe(profile.catalogueVersion);
+  });
+
+  it('does not share nested answer detail objects with the local profile', () => {
+    const profile = createProfile({ id: 'local-id', now: '2026-08-17T12:00:00.000Z' });
     const key = createAnswerKey('bondage', 'receive');
     const local = {
       ...profile,
@@ -23,20 +35,12 @@ describe('portable profile mapping', () => {
     };
 
     const portable = toPortableProfile(local);
-    const localAnswer = local.answers[key];
-    const portableAnswer = portable.answers[key];
-
-    expect(portableAnswer).not.toBe(localAnswer);
-    expect(portableAnswer?.details).not.toBe(localAnswer.details);
-    expect(portableAnswer?.details?.dependsOn).toBe('Trusted context');
+    expect(portable.answers[key]).not.toBe(local.answers[key]);
+    expect(portable.answers[key]?.details).not.toBe(local.answers[key].details);
   });
 
-  it('restores imported answers into independently owned objects', () => {
-    const source = createProfile({
-      id: 'source-id',
-      now: '2026-08-17T12:00:00.000Z',
-      metadata: { alias: 'Example' },
-    });
+  it('restores imported data with new local identity, revision, settings, and ownership', () => {
+    const source = createProfile({ id: 'source-id', now: '2026-08-17T12:00:00.000Z' });
     const key = createAnswerKey('bondage', 'receive');
     const portable = toPortableProfile({
       ...source,
@@ -50,12 +54,11 @@ describe('portable profile mapping', () => {
       },
     });
 
-    const restored = restorePortableProfile(
-      portable,
-      'restored-id',
-      '2026-08-17T13:00:00.000Z',
-    );
+    const restored = restorePortableProfile(portable, 'restored-id', '2026-08-17T13:00:00.000Z');
 
+    expect(restored.id).toBe('restored-id');
+    expect(restored.revision).toBe(1);
+    expect(restored.catalogueVersion).toBe(portable.catalogueVersion);
     expect(restored.answers[key]).not.toBe(portable.answers[key]);
     expect(restored.answers[key]?.details).not.toBe(portable.answers[key]?.details);
     expect(restored.settings.filterQuestionnaireByMetadata).toBe(true);

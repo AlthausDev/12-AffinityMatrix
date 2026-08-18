@@ -1,6 +1,7 @@
 import { createAnswerKey } from '../../domain/profile/profile-answer';
 import { createProfile } from '../../domain/profile/profile';
 import { ProfileCodeError, VersionedProfileCodeCodec } from './profile-codec';
+import { ProfilePayloadDecoderRegistry } from './profile-payload-decoder';
 
 const codec = new VersionedProfileCodeCodec();
 
@@ -32,18 +33,30 @@ function sampleProfile() {
 }
 
 describe('VersionedProfileCodeCodec', () => {
-  it('round-trips portable profile data including unicode and optional details', () => {
+  it('round-trips portable profile data including unicode, catalogue version, and optional details', () => {
     const decoded = codec.decode(codec.encode(sampleProfile()));
 
     expect(decoded.metadata.alias).toBe('Ána ✓');
+    expect(decoded.catalogueVersion).toBe(1);
     expect(Object.values(decoded.answers)[0]?.preference).toBe('depends');
     expect(Object.values(decoded.answers)[0]?.details?.desiredFrequency).toBe('occasionally');
   });
 
-  it('does not expose local identity, timestamps, or presentation settings', () => {
+  it('minimizes sensitive metadata by default and includes it only when explicitly requested', () => {
+    const minimized = codec.decode(codec.encode(sampleProfile()));
+    const explicit = codec.decode(codec.encode(sampleProfile(), { includeSensitiveMetadata: true }));
+
+    expect(minimized.metadata.sex).toBeUndefined();
+    expect(minimized.metadata.orientation).toBeUndefined();
+    expect(explicit.metadata.sex).toBe('female');
+    expect(explicit.metadata.orientation).toBe('bisexual');
+  });
+
+  it('does not expose local identity, revision, timestamps, or presentation settings', () => {
     const decoded = codec.decode(codec.encode(sampleProfile()));
 
     expect('id' in decoded).toBe(false);
+    expect('revision' in decoded).toBe(false);
     expect('createdAt' in decoded).toBe(false);
     expect('updatedAt' in decoded).toBe(false);
     expect('settings' in decoded).toBe(false);
@@ -55,12 +68,23 @@ describe('VersionedProfileCodeCodec', () => {
     expect(() => codec.decode(corrupted)).toThrow(ProfileCodeError);
   });
 
-  it('migrates a valid P1 code to the current portable model', () => {
-    const legacy = {
+  it('never emits a code that its configured decoder would reject for size', () => {
+    const tinyCodec = new VersionedProfileCodeCodec(new ProfilePayloadDecoderRegistry(), 64);
+    expect(() => tinyCodec.encode(sampleProfile())).toThrow(ProfileCodeError);
+  });
+
+  it('migrates valid P2 and P1 codes to the current portable model', () => {
+    const v2 = {
+      formatVersion: 2,
+      profileSchemaVersion: 2,
+      metadata: { alias: 'Legacy V2', sex: 'female', orientation: 'bisexual' },
+      answers: {},
+    };
+    const v1 = {
       formatVersion: 1,
       profileSchemaVersion: 1,
       metadata: {
-        alias: 'Legacy',
+        alias: 'Legacy V1',
         sex: 'female',
         orientation: 'heterosexual',
         filterByProfileMetadata: true,
@@ -68,20 +92,24 @@ describe('VersionedProfileCodeCodec', () => {
       answers: {},
     };
 
-    const decoded = codec.decode(legacyCode(legacy));
-    expect(decoded.formatVersion).toBe(2);
-    expect(decoded.profileSchemaVersion).toBe(2);
-    expect(decoded.metadata.alias).toBe('Legacy');
-    expect('filterByProfileMetadata' in decoded.metadata).toBe(false);
+    const decodedV2 = codec.decode(legacyCode('P2', v2));
+    const decodedV1 = codec.decode(legacyCode('P1', v1));
+
+    expect(decodedV2.formatVersion).toBe(3);
+    expect(decodedV2.profileSchemaVersion).toBe(3);
+    expect(decodedV2.catalogueVersion).toBe(1);
+    expect(decodedV2.metadata.alias).toBe('Legacy V2');
+    expect(decodedV1.metadata.alias).toBe('Legacy V1');
+    expect('filterByProfileMetadata' in decodedV1.metadata).toBe(false);
   });
 });
 
-function legacyCode(value: unknown): string {
+function legacyCode(prefix: 'P1' | 'P2', value: unknown): string {
   const json = JSON.stringify(value);
   const bytes = new TextEncoder().encode(json);
   const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
   const payload = btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/u, '');
-  return `P1.${payload}.${checksum(payload)}`;
+  return `${prefix}.${payload}.${checksum(payload)}`;
 }
 
 function checksum(value: string): string {
