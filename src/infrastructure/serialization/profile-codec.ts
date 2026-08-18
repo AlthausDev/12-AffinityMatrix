@@ -1,5 +1,9 @@
 import { ProfileCodeCodec } from '../../application/profile/profile-codec';
-import { PortableProfile, toPortableProfile } from '../../application/profile/portable-profile';
+import {
+  PortableProfile,
+  ProfileExportOptions,
+  toPortableProfile,
+} from '../../application/profile/portable-profile';
 import { Profile } from '../../domain/profile/profile';
 import { profileValidator } from '../../domain/profile/profile.validator';
 import { DomainValidationError } from '../../domain/shared/validator';
@@ -9,7 +13,7 @@ import {
   ProfilePayloadDecoderRegistry,
 } from './profile-payload-decoder';
 
-const MAX_CODE_LENGTH = 500_000;
+export const DEFAULT_MAX_PROFILE_CODE_LENGTH = 500_000;
 
 export class ProfileCodeError extends Error {
   constructor(message: string, options?: ErrorOptions) {
@@ -19,23 +23,36 @@ export class ProfileCodeError extends Error {
 }
 
 export class VersionedProfileCodeCodec implements ProfileCodeCodec {
-  constructor(private readonly decoders = new ProfilePayloadDecoderRegistry()) {}
+  constructor(
+    private readonly decoders = new ProfilePayloadDecoderRegistry(),
+    private readonly maxCodeLength = DEFAULT_MAX_PROFILE_CODE_LENGTH,
+  ) {
+    if (!Number.isInteger(maxCodeLength) || maxCodeLength < 1) {
+      throw new Error('Maximum profile code length must be a positive integer.');
+    }
+  }
 
-  encode(profile: Profile): string {
+  encode(profile: Profile, options: ProfileExportOptions = {}): string {
     try {
       profileValidator.assert(profile, 'Cannot export an invalid profile.');
     } catch (error: unknown) {
       throw this.wrapError(error, 'The local profile cannot be exported.');
     }
 
-    const json = JSON.stringify(toPortableProfile(profile));
+    const json = JSON.stringify(toPortableProfile(profile, options));
     const payload = encodeBase64Url(json);
-    return `${CURRENT_PROFILE_CODE_PREFIX}.${payload}.${checksum(payload)}`;
+    const code = `${CURRENT_PROFILE_CODE_PREFIX}.${payload}.${checksum(payload)}`;
+    if (code.length > this.maxCodeLength) {
+      throw new ProfileCodeError(
+        'The profile is too large for the supported portable-code format. Remove optional notes or use a future file export format.',
+      );
+    }
+    return code;
   }
 
   decode(code: string): PortableProfile {
     const normalized = code.trim();
-    if (!normalized || normalized.length > MAX_CODE_LENGTH) {
+    if (!normalized || normalized.length > this.maxCodeLength) {
       throw new ProfileCodeError('The profile code is empty or exceeds the supported size.');
     }
 
@@ -110,6 +127,5 @@ function checksum(value: string): string {
     hash ^= value.charCodeAt(index);
     hash = Math.imul(hash, 0x01000193) >>> 0;
   }
-
   return hash.toString(16).padStart(8, '0');
 }

@@ -1,13 +1,15 @@
 import {
-  PORTABLE_PROFILE_V2_FORMAT_VERSION,
-  PORTABLE_PROFILE_V2_PROFILE_SCHEMA_VERSION,
+  PORTABLE_PROFILE_V3_FORMAT_VERSION,
+  PORTABLE_PROFILE_V3_PROFILE_SCHEMA_VERSION,
   PortableProfile,
 } from '../../application/profile/portable-profile';
 import { portableProfileValidator } from '../../application/profile/portable-profile.validator';
+import { CURRENT_CATALOGUE_VERSION } from '../../domain/catalogue/catalogue-version';
 import { ORIENTATION_VALUES, SEX_VALUES } from '../../domain/profile/profile-metadata';
 
-export const CURRENT_PROFILE_CODE_PREFIX = 'P2';
-export const LEGACY_PROFILE_CODE_PREFIX = 'P1';
+export const CURRENT_PROFILE_CODE_PREFIX = 'P3';
+export const LEGACY_PROFILE_CODE_PREFIX_V2 = 'P2';
+export const LEGACY_PROFILE_CODE_PREFIX_V1 = 'P1';
 
 export class ProfilePayloadDecodeError extends Error {
   constructor(message: string, options?: ErrorOptions) {
@@ -29,23 +31,47 @@ export class CurrentProfilePayloadDecoder extends ProfilePayloadDecoder {
   }
 }
 
-export class LegacyProfilePayloadV1Decoder extends ProfilePayloadDecoder {
-  readonly prefix = LEGACY_PROFILE_CODE_PREFIX;
+export class LegacyProfilePayloadV2Decoder extends ProfilePayloadDecoder {
+  readonly prefix = LEGACY_PROFILE_CODE_PREFIX_V2;
 
   override decode(value: unknown): PortableProfile {
     if (!isRecord(value)) {
-      throw new ProfilePayloadDecodeError('Legacy portable profile must be an object.');
+      throw new ProfilePayloadDecodeError('Legacy V2 portable profile must be an object.');
+    }
+    assertAllowedKeys(value, ['formatVersion', 'profileSchemaVersion', 'metadata', 'answers']);
+    if (value['formatVersion'] !== 2 || value['profileSchemaVersion'] !== 2) {
+      throw new ProfilePayloadDecodeError('The legacy V2 profile code uses an unsupported version.');
+    }
+
+    return portableProfileValidator.assert(
+      {
+        formatVersion: PORTABLE_PROFILE_V3_FORMAT_VERSION,
+        profileSchemaVersion: PORTABLE_PROFILE_V3_PROFILE_SCHEMA_VERSION,
+        catalogueVersion: CURRENT_CATALOGUE_VERSION,
+        metadata: value['metadata'],
+        answers: value['answers'],
+      },
+      'Legacy V2 portable profile migration failed.',
+    );
+  }
+}
+
+export class LegacyProfilePayloadV1Decoder extends ProfilePayloadDecoder {
+  readonly prefix = LEGACY_PROFILE_CODE_PREFIX_V1;
+
+  override decode(value: unknown): PortableProfile {
+    if (!isRecord(value)) {
+      throw new ProfilePayloadDecodeError('Legacy V1 portable profile must be an object.');
     }
 
     assertAllowedKeys(value, ['formatVersion', 'profileSchemaVersion', 'metadata', 'answers']);
-
     if (value['formatVersion'] !== 1 || value['profileSchemaVersion'] !== 1) {
-      throw new ProfilePayloadDecodeError('The legacy profile code uses an unsupported version.');
+      throw new ProfilePayloadDecodeError('The legacy V1 profile code uses an unsupported version.');
     }
 
     const legacyMetadata = value['metadata'];
     if (!isRecord(legacyMetadata)) {
-      throw new ProfilePayloadDecodeError('The legacy profile code contains invalid metadata.');
+      throw new ProfilePayloadDecodeError('The legacy V1 profile code contains invalid metadata.');
     }
 
     assertAllowedKeys(legacyMetadata, [
@@ -56,7 +82,7 @@ export class LegacyProfilePayloadV1Decoder extends ProfilePayloadDecoder {
     ]);
 
     if (typeof legacyMetadata['filterByProfileMetadata'] !== 'boolean') {
-      throw new ProfilePayloadDecodeError('The legacy profile code contains invalid filter metadata.');
+      throw new ProfilePayloadDecodeError('The legacy V1 profile code contains invalid filter metadata.');
     }
 
     const alias = legacyMetadata['alias'];
@@ -64,16 +90,16 @@ export class LegacyProfilePayloadV1Decoder extends ProfilePayloadDecoder {
     const orientation = legacyMetadata['orientation'];
 
     if (alias !== undefined && typeof alias !== 'string') {
-      throw new ProfilePayloadDecodeError('The legacy profile code contains an invalid alias.');
+      throw new ProfilePayloadDecodeError('The legacy V1 profile code contains an invalid alias.');
     }
     if (sex !== undefined && !SEX_VALUES.includes(sex as (typeof SEX_VALUES)[number])) {
-      throw new ProfilePayloadDecodeError('The legacy profile code contains an unsupported sex value.');
+      throw new ProfilePayloadDecodeError('The legacy V1 profile code contains an unsupported sex value.');
     }
     if (
       orientation !== undefined &&
       !ORIENTATION_VALUES.includes(orientation as (typeof ORIENTATION_VALUES)[number])
     ) {
-      throw new ProfilePayloadDecodeError('The legacy profile code contains an unsupported orientation value.');
+      throw new ProfilePayloadDecodeError('The legacy V1 profile code contains an unsupported orientation value.');
     }
 
     const metadata: Record<string, unknown> = {};
@@ -85,12 +111,13 @@ export class LegacyProfilePayloadV1Decoder extends ProfilePayloadDecoder {
 
     return portableProfileValidator.assert(
       {
-        formatVersion: PORTABLE_PROFILE_V2_FORMAT_VERSION,
-        profileSchemaVersion: PORTABLE_PROFILE_V2_PROFILE_SCHEMA_VERSION,
+        formatVersion: PORTABLE_PROFILE_V3_FORMAT_VERSION,
+        profileSchemaVersion: PORTABLE_PROFILE_V3_PROFILE_SCHEMA_VERSION,
+        catalogueVersion: CURRENT_CATALOGUE_VERSION,
         metadata,
         answers: value['answers'],
       },
-      'Legacy portable profile migration failed.',
+      'Legacy V1 portable profile migration failed.',
     );
   }
 }
@@ -101,6 +128,7 @@ export class ProfilePayloadDecoderRegistry {
   constructor(
     decoders: readonly ProfilePayloadDecoder[] = [
       new CurrentProfilePayloadDecoder(),
+      new LegacyProfilePayloadV2Decoder(),
       new LegacyProfilePayloadV1Decoder(),
     ],
   ) {
@@ -123,7 +151,6 @@ export class ProfilePayloadDecoderRegistry {
     if (!decoder) {
       throw new ProfilePayloadDecodeError('The profile code uses an unsupported format.');
     }
-
     return decoder.decode(value);
   }
 }
