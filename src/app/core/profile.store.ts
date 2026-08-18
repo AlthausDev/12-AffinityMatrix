@@ -11,12 +11,18 @@ export class ProfileStore {
   private readonly service = inject(PROFILE_SERVICE);
   private readonly profilesState = signal<readonly Profile[]>([]);
   private readonly errorState = signal<string | null>(null);
+  private readonly loadingState = signal(false);
+  private readonly savingState = signal(false);
+  private initialization?: Promise<void>;
 
   readonly profiles = this.profilesState.asReadonly();
   readonly error = this.errorState.asReadonly();
+  readonly loading = this.loadingState.asReadonly();
+  readonly saving = this.savingState.asReadonly();
 
-  constructor() {
-    this.reload();
+  initialize(): Promise<void> {
+    this.initialization ??= this.reload();
+    return this.initialization;
   }
 
   findById(id: ProfileId): Profile | undefined {
@@ -26,11 +32,11 @@ export class ProfileStore {
   create(
     metadata: ProfileMetadata,
     settings: Partial<ProfileSettings> = DEFAULT_PROFILE_SETTINGS,
-  ): Profile | undefined {
+  ): Promise<Profile | undefined> {
     return this.execute(() => this.service.create(metadata, settings));
   }
 
-  importPortable(portable: PortableProfile): Profile | undefined {
+  importPortable(portable: PortableProfile): Promise<Profile | undefined> {
     return this.execute(() => this.service.importPortable(portable));
   }
 
@@ -38,26 +44,29 @@ export class ProfileStore {
     id: ProfileId,
     metadata: ProfileMetadata,
     settings: ProfileSettings,
-  ): Profile | undefined {
+  ): Promise<Profile | undefined> {
     return this.execute(() => this.service.updateProfile(id, metadata, settings));
   }
 
-  upsertAnswer(id: ProfileId, answer: PracticeAnswer): Profile | undefined {
+  upsertAnswer(id: ProfileId, answer: PracticeAnswer): Promise<Profile | undefined> {
     return this.execute(() => this.service.upsertAnswer(id, answer));
   }
 
-  removeAnswer(id: ProfileId, practiceId: string, roleId: string): Profile | undefined {
+  removeAnswer(id: ProfileId, practiceId: string, roleId: string): Promise<Profile | undefined> {
     return this.execute(() => this.service.removeAnswer(id, practiceId, roleId));
   }
 
-  delete(id: ProfileId): boolean {
+  async delete(id: ProfileId): Promise<boolean> {
+    this.savingState.set(true);
     try {
-      this.service.delete(id);
-      this.reload();
+      await this.service.delete(id);
+      await this.reload();
       return true;
     } catch (error: unknown) {
       this.captureError(error);
       return false;
+    } finally {
+      this.savingState.set(false);
     }
   }
 
@@ -65,24 +74,30 @@ export class ProfileStore {
     this.errorState.set(null);
   }
 
-  private execute(operation: () => Profile | undefined): Profile | undefined {
+  private async execute(operation: () => Promise<Profile | undefined>): Promise<Profile | undefined> {
+    this.savingState.set(true);
     try {
-      const profile = operation();
-      this.reload();
+      const profile = await operation();
+      await this.reload();
       return profile;
     } catch (error: unknown) {
       this.captureError(error);
       return undefined;
+    } finally {
+      this.savingState.set(false);
     }
   }
 
-  private reload(): void {
+  private async reload(): Promise<void> {
+    this.loadingState.set(true);
     try {
-      this.profilesState.set(this.service.findAll());
+      this.profilesState.set(await this.service.findAll());
       this.errorState.set(null);
     } catch (error: unknown) {
       this.profilesState.set([]);
       this.captureError(error);
+    } finally {
+      this.loadingState.set(false);
     }
   }
 

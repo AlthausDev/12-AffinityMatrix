@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ProfileStore } from '../../core/profile.store';
 import { Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
+import { ProfileStore } from '../../core/profile.store';
 
 const SEX_LABELS: Record<Sex, string> = { male: 'Male', female: 'Female' };
 const ORIENTATION_LABELS: Record<SexualOrientation, string> = {
@@ -43,6 +43,8 @@ const ORIENTATION_LABELS: Record<SexualOrientation, string> = {
           <dl class="status-list">
             <div><dt>Question filter</dt><dd>{{ currentProfile.settings.filterQuestionnaireByMetadata ? 'Enabled' : 'Disabled' }}</dd></div>
             <div><dt>Answered roles</dt><dd>{{ answeredCount() }}</dd></div>
+            <div><dt>Revision</dt><dd>{{ currentProfile.revision }}</dd></div>
+            <div><dt>Catalogue</dt><dd>v{{ currentProfile.catalogueVersion }}</dd></div>
             <div><dt>Storage</dt><dd>Local browser · not encrypted</dd></div>
           </dl>
         </section>
