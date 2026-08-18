@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test --watch=false",
-    "test:watch": "ng test"
+    "test:watch": "ng test",
+    "architecture:check": "node scripts/check-architecture.mjs",
+    "verify": "npm run architecture:check && npm test && npm run build"
   },
   "dependencies": {
     "@angular/common": "^22.0.0",
