@@ -13,7 +13,7 @@ import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-ro
   template: `
     <main class="page questionnaire-page">
       @if (profile(); as currentProfile) {
-        <a class="back-link" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']">← Categories</a>
+        <a class="back-link" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']" [queryParams]="includeFiltered() ? { filtered: '1' } : null">← Categories</a>
         @if (category(); as currentCategory) {
           <header class="page-header dashboard-header">
             <div>
@@ -59,10 +59,14 @@ import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-ro
           }
 
           <nav class="questionnaire-nav" aria-label="Questionnaire navigation">
-            <div>@if (neighbours().previousCategoryId; as previousId) { <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', previousId]">← Previous</a> }</div>
-            <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']">Categories</a>
-            <div>@if (neighbours().nextCategoryId; as nextId) { <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', nextId]">Next →</a> }</div>
+            <div>@if (neighbours().previousCategoryId; as previousId) { <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', previousId]" [queryParams]="includeFiltered() ? { filtered: '1' } : null">← Previous</a> }</div>
+            <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']" [queryParams]="includeFiltered() ? { filtered: '1' } : null">Categories</a>
+            <div>@if (neighbours().nextCategoryId; as nextId) { <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', nextId]" [queryParams]="includeFiltered() ? { filtered: '1' } : null">Next →</a> }</div>
           </nav>
+        } @else if (catalogueStore.loading()) {
+          <section class="panel"><h1>Loading questionnaire…</h1><p class="muted">Loading the local catalogue.</p></section>
+        } @else if (!snapshot()) {
+          <section class="panel"><h1>Questionnaire unavailable</h1><p class="muted">{{ catalogueStore.error() || 'The questionnaire catalogue could not be loaded.' }}</p></section>
         } @else {
           <section class="panel"><h1>Category not found</h1><a class="button" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']">Return to categories</a></section>
         }
@@ -92,7 +96,7 @@ export class QuestionnaireCategoryPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly params = toSignal(this.route.paramMap, { initialValue: this.route.snapshot.paramMap });
 
-  readonly includeFiltered = signal(false);
+  readonly includeFiltered = signal(this.route.snapshot.queryParamMap.get('filtered') === '1');
   readonly profileId = computed(() => this.params().get('id') ?? '');
   readonly categoryId = computed(() => this.params().get('category') ?? '');
   readonly profile = computed(() => this.profileStore.findById(this.profileId()));
@@ -109,6 +113,8 @@ export class QuestionnaireCategoryPageComponent {
     const snapshot = this.snapshot();
     return snapshot ? this.questionnaireService.getNeighbours(snapshot, this.categoryId()) : {};
   });
+
+  constructor() { void this.catalogueStore.initialize(); }
 
   toggleFiltered(event: Event): void { this.includeFiltered.set((event.target as HTMLInputElement).checked); }
   saveAnswer(answer: PracticeAnswer): void {

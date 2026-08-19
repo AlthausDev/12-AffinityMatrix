@@ -23,9 +23,7 @@ import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
             <p class="profile-count">{{ totalAnswered() }} / {{ totalQuestions() }} answered</p>
           </header>
 
-          @if (profileStore.error()) {
-            <p class="alert" role="alert">{{ profileStore.error() }}</p>
-          }
+          @if (profileStore.error()) { <p class="alert" role="alert">{{ profileStore.error() }}</p> }
 
           @if (catalogueRelationship() === 'profile-older') {
             <p class="alert">This profile was created against an older catalogue. New catalogue roles remain explicitly unanswered until you choose a response.</p>
@@ -51,28 +49,22 @@ import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
             @for (summary of summaries(); track summary.category.id) {
               <a class="category-card" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', summary.category.id]" [queryParams]="includeFiltered() ? { filtered: '1' } : null">
                 <div class="category-card-heading">
-                  <div>
-                    <p class="eyebrow">{{ summary.answered }} of {{ summary.total }} answered</p>
-                    <h2>{{ summary.category.label }}</h2>
-                  </div>
+                  <div><p class="eyebrow">{{ summary.answered }} of {{ summary.total }} answered</p><h2>{{ summary.category.label }}</h2></div>
                   <strong>{{ summary.completionPercentage }}%</strong>
                 </div>
-                @if (summary.category.description) {
-                  <p class="muted">{{ summary.category.description }}</p>
-                }
+                @if (summary.category.description) { <p class="muted">{{ summary.category.description }}</p> }
                 <div class="progress-track" aria-hidden="true"><span [style.width.%]="summary.completionPercentage"></span></div>
-                @if (summary.filtered > 0 && !includeFiltered()) {
-                  <small class="muted">{{ summary.filtered }} filtered role{{ summary.filtered === 1 ? '' : 's' }}</small>
-                }
+                @if (summary.filtered > 0 && !includeFiltered()) { <small class="muted">{{ summary.filtered }} filtered role{{ summary.filtered === 1 ? '' : 's' }}</small> }
               </a>
             }
           </section>
+        } @else if (catalogueStore.loading()) {
+          <section class="panel"><h1>Loading questionnaire…</h1><p class="muted">Loading the local catalogue.</p></section>
         } @else {
           <section class="panel"><h1>Questionnaire unavailable</h1><p class="muted">{{ catalogueStore.error() || 'The questionnaire catalogue could not be loaded.' }}</p></section>
         }
       } @else {
-        <a class="back-link" routerLink="/">← Profiles</a>
-        <section class="panel"><h1>Profile not found</h1><p class="muted">The requested profile is not available in local storage.</p></section>
+        <a class="back-link" routerLink="/">← Profiles</a><section class="panel"><h1>Profile not found</h1><p class="muted">The requested profile is not available in local storage.</p></section>
       }
     </main>
   `,
@@ -101,36 +93,25 @@ export class QuestionnaireCategoriesPageComponent {
   readonly profile = computed(() => this.profileStore.findById(this.profileId()));
   readonly snapshot = computed(() => this.catalogueStore.snapshot());
   readonly summaries = computed(() => {
-    const profile = this.profile();
-    const snapshot = this.snapshot();
-    return profile && snapshot
-      ? this.questionnaireService.getCategorySummaries(snapshot, profile, this.includeFiltered())
-      : [];
+    const profile = this.profile(); const snapshot = this.snapshot();
+    return profile && snapshot ? this.questionnaireService.getCategorySummaries(snapshot, profile, this.includeFiltered()) : [];
   });
   readonly totalAnswered = computed(() => this.summaries().reduce((sum, item) => sum + item.answered, 0));
   readonly totalQuestions = computed(() => this.summaries().reduce((sum, item) => sum + item.total, 0));
   readonly totalFiltered = computed(() => {
-    const profile = this.profile();
-    const snapshot = this.snapshot();
-    if (!profile || !snapshot) return 0;
-    return this.questionnaireService
-      .getCategorySummaries(snapshot, profile, false)
-      .reduce((sum, item) => sum + item.filtered, 0);
+    const profile = this.profile(); const snapshot = this.snapshot();
+    return profile && snapshot ? this.questionnaireService.getCategorySummaries(snapshot, profile, false).reduce((sum, item) => sum + item.filtered, 0) : 0;
   });
   readonly catalogueRelationship = computed(() => {
-    const profile = this.profile();
-    const snapshot = this.snapshot();
-    return profile && snapshot
-      ? this.questionnaireService.getCatalogueRelationship(snapshot, profile)
-      : 'current';
+    const profile = this.profile(); const snapshot = this.snapshot();
+    return profile && snapshot ? this.questionnaireService.getCatalogueRelationship(snapshot, profile) : 'current';
   });
   readonly unknownAnswerCount = computed(() => {
-    const profile = this.profile();
-    const snapshot = this.snapshot();
+    const profile = this.profile(); const snapshot = this.snapshot();
     return profile && snapshot ? this.questionnaireService.countUnknownAnswers(snapshot, profile) : 0;
   });
 
-  toggleFiltered(event: Event): void {
-    this.includeFiltered.set((event.target as HTMLInputElement).checked);
-  }
+  constructor() { void this.catalogueStore.initialize(); }
+
+  toggleFiltered(event: Event): void { this.includeFiltered.set((event.target as HTMLInputElement).checked); }
 }

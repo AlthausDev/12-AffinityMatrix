@@ -4,8 +4,6 @@ import { ProfileDashboardPageComponent } from './pages/profile-dashboard/profile
 import { ProfileEditorPageComponent } from './pages/profile-editor/profile-editor-page.component';
 import { ProfileExportPageComponent } from './pages/profile-export/profile-export-page.component';
 import { ProfileImportPageComponent } from './pages/profile-import/profile-import-page.component';
-import { QuestionnaireCategoriesPageComponent } from './pages/questionnaire-categories/questionnaire-categories-page.component';
-import { QuestionnaireCategoryPageComponent } from './pages/questionnaire-category/questionnaire-category-page.component';
 
 export const routes: Routes = [
   {
@@ -35,12 +33,16 @@ export const routes: Routes = [
   },
   {
     path: 'profiles/:id/questionnaire',
-    component: QuestionnaireCategoriesPageComponent,
+    loadComponent: () =>
+      import('./pages/questionnaire-categories/questionnaire-categories-page.component')
+        .then((module) => module.QuestionnaireCategoriesPageComponent),
     title: 'Questionnaire categories',
   },
   {
     path: 'profiles/:id/questionnaire/:category',
-    component: QuestionnaireCategoryPageComponent,
+    loadComponent: () =>
+      import('./pages/questionnaire-category/questionnaire-category-page.component')
+        .then((module) => module.QuestionnaireCategoryPageComponent),
     title: 'Questionnaire',
   },
   {
