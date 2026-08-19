@@ -9,15 +9,20 @@ describe('catalogue v2 snapshot', () => {
     expect(catalogueSnapshotValidator.validate(CURRENT_CATALOGUE_SNAPSHOT)).toEqual([]);
   });
 
-  it('adds counterpart context without changing stable practice or role ids', () => {
+  it('splits kissing into directional counterpart-scoped roles', () => {
     const kissing = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.find((practice) => practice.id === 'kissing');
-    const bondage = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.find((practice) => practice.id === 'bondage');
-    const soloToy = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices
-      .find((practice) => practice.id === 'vibrator')
-      ?.roles.find((role) => role.id === 'use-solo');
+    expect(kissing?.roles.map((role) => role.id)).toEqual(['give', 'receive']);
+    expect(kissing?.roles.every((role) => role.contextAxes?.includes('counterpartSex'))).toBe(true);
+    expect(kissing?.compatibleRolePairs).toEqual([{ leftRoleId: 'give', rightRoleId: 'receive' }]);
+  });
 
-    expect(kissing?.roles[0]?.contextAxes).toEqual(['counterpartSex']);
+  it('adds counterpart context while preserving existing semantic role ids where they remain valid', () => {
+    const bondage = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.find((practice) => practice.id === 'bondage');
+    const vibrator = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.find((practice) => practice.id === 'vibrator');
+
+    expect(bondage?.roles.map((role) => role.id)).toEqual(['restrain', 'be-restrained']);
     expect(bondage?.roles.every((role) => role.contextAxes?.includes('counterpartSex'))).toBe(true);
-    expect(soloToy?.contextAxes).toBeUndefined();
+    expect(vibrator?.roles.map((role) => role.id)).toEqual(['use-on-partner', 'use-on-self']);
+    expect(vibrator?.roles.every((role) => role.contextAxes?.includes('counterpartSex'))).toBe(true);
   });
 });

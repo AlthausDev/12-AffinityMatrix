@@ -1,9 +1,9 @@
 import { CatalogueSnapshot } from '../../domain/catalogue/catalogue-snapshot';
 import { CATALOGUE_VERSION_V2 } from '../../domain/catalogue/catalogue-version';
+import { Practice } from '../../domain/catalogue/practice';
 import { CURRENT_CATALOGUE_SNAPSHOT as CATALOGUE_V1 } from './catalogue-v1';
 
 const COUNTERPART_CONTEXT_ROLES = new Set<string>([
-  'kissing::mutual',
   'cuddling::mutual',
   'mutual-masturbation::mutual',
   'cunnilingus::receive',
@@ -34,9 +34,9 @@ const COUNTERPART_CONTEXT_ROLES = new Set<string>([
   'scratching::give',
   'scratching::receive',
   'vibrator::use-on-partner',
-  'vibrator::receive-from-partner',
+  'vibrator::use-on-self',
   'dildo::use-on-partner',
-  'dildo::receive-from-partner',
+  'dildo::use-on-self',
   'roleplay::participate',
   'voyeurism::watch',
   'voyeurism::be-watched',
@@ -44,21 +44,40 @@ const COUNTERPART_CONTEXT_ROLES = new Set<string>([
   'glory-hole::visitor',
 ]);
 
+function migratePractice(practice: Practice): Practice {
+  if (practice.id === 'kissing') {
+    return {
+      ...practice,
+      description: 'Kissing, represented directionally so giving and receiving can vary by counterpart.',
+      roles: [
+        { id: 'give', label: 'Give kisses', perspective: 'active', contextAxes: ['counterpartSex'] },
+        { id: 'receive', label: 'Receive kisses', perspective: 'receptive', contextAxes: ['counterpartSex'] },
+      ],
+      compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
+    };
+  }
+
+  return {
+    ...practice,
+    roles: practice.roles.map((role) =>
+      COUNTERPART_CONTEXT_ROLES.has(`${practice.id}::${role.id}`)
+        ? { ...role, contextAxes: ['counterpartSex'] as const }
+        : role,
+    ),
+  };
+}
+
 /**
- * Catalogue v2 keeps v1's stable practice/role ids and adds a relational counterpart-sex axis
- * only where the same semantic role can reasonably be valued differently by partner sex.
+ * V2 introduces counterpart-sex context for roles whose preference can vary by the other
+ * participant. Existing semantic role ids are preserved unless the old role was too coarse:
+ * kissing::mutual is intentionally retired and split into directional give/receive roles.
+ * Old answers remain preserved as historical unknown answers rather than being guessed into
+ * either new role or either counterpart sex.
  */
 export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
   version: CATALOGUE_VERSION_V2,
   catalogue: {
     categories: CATALOGUE_V1.catalogue.categories,
-    practices: CATALOGUE_V1.catalogue.practices.map((practice) => ({
-      ...practice,
-      roles: practice.roles.map((role) =>
-        COUNTERPART_CONTEXT_ROLES.has(`${practice.id}::${role.id}`)
-          ? { ...role, contextAxes: ['counterpartSex'] as const }
-          : role,
-      ),
-    })),
+    practices: CATALOGUE_V1.catalogue.practices.map(migratePractice),
   },
 };

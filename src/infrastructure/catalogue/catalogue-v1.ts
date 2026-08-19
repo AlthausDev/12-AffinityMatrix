@@ -16,22 +16,34 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
     ],
     practices: [
       {
-        id: 'kissing', categoryId: 'general', label: 'Kissing', description: 'Kissing as a shared activity.',
+        id: 'kissing',
+        categoryId: 'general',
+        label: 'Kissing',
+        description: 'Kissing as a shared activity.',
         roles: [{ id: 'mutual', label: 'Participate', perspective: 'neutral' }],
         compatibleRolePairs: [{ leftRoleId: 'mutual', rightRoleId: 'mutual' }],
       },
       {
-        id: 'cuddling', categoryId: 'general', label: 'Cuddling', description: 'Close physical affection without a directional role.',
+        id: 'cuddling',
+        categoryId: 'general',
+        label: 'Cuddling',
+        description: 'Close physical affection without a directional role.',
         roles: [{ id: 'mutual', label: 'Participate', perspective: 'neutral' }],
         compatibleRolePairs: [{ leftRoleId: 'mutual', rightRoleId: 'mutual' }],
       },
       {
-        id: 'mutual-masturbation', categoryId: 'general', label: 'Mutual masturbation', description: 'Mutual sexual stimulation where both partners participate.',
+        id: 'mutual-masturbation',
+        categoryId: 'general',
+        label: 'Mutual masturbation',
+        description: 'Mutual sexual stimulation where both partners participate.',
         roles: [{ id: 'mutual', label: 'Participate', perspective: 'neutral' }],
         compatibleRolePairs: [{ leftRoleId: 'mutual', rightRoleId: 'mutual' }],
       },
       {
-        id: 'cunnilingus', categoryId: 'oral', label: 'Cunnilingus', description: 'Oral stimulation of a vulva.',
+        id: 'cunnilingus',
+        categoryId: 'oral',
+        label: 'Cunnilingus',
+        description: 'Oral stimulation of a vulva.',
         roles: [
           { id: 'give', label: 'Perform it', perspective: 'active', applicability: { partnerSex: ['female'] } },
           { id: 'receive', label: 'Receive it', perspective: 'receptive', applicability: { selfSex: ['female'] } },
@@ -39,7 +51,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
       },
       {
-        id: 'fellatio', categoryId: 'oral', label: 'Fellatio', description: 'Oral stimulation of a penis.',
+        id: 'fellatio',
+        categoryId: 'oral',
+        label: 'Fellatio',
+        description: 'Oral stimulation of a penis.',
         roles: [
           { id: 'give', label: 'Perform it', perspective: 'active', applicability: { partnerSex: ['male'] } },
           { id: 'receive', label: 'Receive it', perspective: 'receptive', applicability: { selfSex: ['male'] } },
@@ -47,7 +62,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
       },
       {
-        id: 'face-sitting', categoryId: 'oral', label: 'Face-sitting', description: 'One partner sits on the other partner’s face during oral contact.',
+        id: 'face-sitting',
+        categoryId: 'oral',
+        label: 'Face-sitting',
+        description: 'One partner sits on the other partner’s face during oral contact.',
         roles: [
           { id: 'sit-on-partner', label: 'Sit on my partner', perspective: 'active' },
           { id: 'partner-sits-on-me', label: 'Have my partner sit on me', perspective: 'receptive' },
@@ -55,7 +73,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'sit-on-partner', rightRoleId: 'partner-sits-on-me' }],
       },
       {
-        id: 'vaginal-penetration', categoryId: 'penetration', label: 'Vaginal penetration', description: 'Penetration of a vagina.',
+        id: 'vaginal-penetration',
+        categoryId: 'penetration',
+        label: 'Vaginal penetration',
+        description: 'Penetration of a vagina.',
         roles: [
           { id: 'penetrate', label: 'Penetrate my partner', perspective: 'active', applicability: { partnerSex: ['female'] } },
           { id: 'receive', label: 'Be penetrated', perspective: 'receptive', applicability: { selfSex: ['female'] } },
@@ -63,7 +84,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'penetrate', rightRoleId: 'receive' }],
       },
       {
-        id: 'anal-penetration', categoryId: 'penetration', label: 'Anal penetration', description: 'Anal penetration with either directional role.',
+        id: 'anal-penetration',
+        categoryId: 'penetration',
+        label: 'Anal penetration',
+        description: 'Anal penetration with either directional role.',
         roles: [
           { id: 'penetrate', label: 'Penetrate my partner', perspective: 'active' },
           { id: 'receive', label: 'Be penetrated', perspective: 'receptive' },
@@ -71,7 +95,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'penetrate', rightRoleId: 'receive' }],
       },
       {
-        id: 'fingering', categoryId: 'penetration', label: 'Fingering', description: 'Manual penetration or internal stimulation.',
+        id: 'fingering',
+        categoryId: 'penetration',
+        label: 'Fingering',
+        description: 'Manual penetration or internal stimulation.',
         roles: [
           { id: 'give', label: 'Do it to my partner', perspective: 'active' },
           { id: 'receive', label: 'Receive it', perspective: 'receptive' },
@@ -79,7 +106,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
       },
       {
-        id: 'bondage', categoryId: 'restraint', label: 'Bondage', description: 'Restraint using rope or similar means.',
+        id: 'bondage',
+        categoryId: 'restraint',
+        label: 'Bondage',
+        description: 'Restraint using rope or similar means.',
         roles: [
           { id: 'restrain', label: 'Restrain my partner', perspective: 'active' },
           { id: 'be-restrained', label: 'Be restrained', perspective: 'receptive' },
@@ -87,7 +117,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'restrain', rightRoleId: 'be-restrained' }],
       },
       {
-        id: 'handcuffs', categoryId: 'restraint', label: 'Handcuffs', description: 'Restraint using cuffs or similar devices.',
+        id: 'handcuffs',
+        categoryId: 'restraint',
+        label: 'Handcuffs',
+        description: 'Restraint using cuffs or similar devices.',
         roles: [
           { id: 'restrain', label: 'Cuff my partner', perspective: 'active' },
           { id: 'be-restrained', label: 'Be cuffed', perspective: 'receptive' },
@@ -95,7 +128,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'restrain', rightRoleId: 'be-restrained' }],
       },
       {
-        id: 'blindfold', categoryId: 'restraint', label: 'Blindfold', description: 'Removing sight as part of a scene.',
+        id: 'blindfold',
+        categoryId: 'restraint',
+        label: 'Blindfold',
+        description: 'Removing sight as part of a scene.',
         roles: [
           { id: 'blindfold-partner', label: 'Blindfold my partner', perspective: 'active' },
           { id: 'be-blindfolded', label: 'Be blindfolded', perspective: 'receptive' },
@@ -103,7 +139,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'blindfold-partner', rightRoleId: 'be-blindfolded' }],
       },
       {
-        id: 'domination', categoryId: 'power', label: 'Domination', description: 'A consensual dominant/submissive dynamic.',
+        id: 'domination',
+        categoryId: 'power',
+        label: 'Domination',
+        description: 'A consensual dominant/submissive dynamic.',
         roles: [
           { id: 'dominant', label: 'Be dominant', perspective: 'active' },
           { id: 'submissive', label: 'Be submissive', perspective: 'receptive' },
@@ -111,7 +150,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'dominant', rightRoleId: 'submissive' }],
       },
       {
-        id: 'commands', categoryId: 'power', label: 'Giving or following commands', description: 'Consensual command-and-compliance dynamics.',
+        id: 'commands',
+        categoryId: 'power',
+        label: 'Giving or following commands',
+        description: 'Consensual command-and-compliance dynamics.',
         roles: [
           { id: 'give-orders', label: 'Give orders', perspective: 'active' },
           { id: 'follow-orders', label: 'Follow orders', perspective: 'receptive' },
@@ -119,7 +161,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'give-orders', rightRoleId: 'follow-orders' }],
       },
       {
-        id: 'humiliation', categoryId: 'power', label: 'Humiliation', description: 'Consensual erotic humiliation.',
+        id: 'humiliation',
+        categoryId: 'power',
+        label: 'Humiliation',
+        description: 'Consensual erotic humiliation.',
         roles: [
           { id: 'humiliate', label: 'Humiliate my partner', perspective: 'active' },
           { id: 'be-humiliated', label: 'Be humiliated', perspective: 'receptive' },
@@ -127,7 +172,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'humiliate', rightRoleId: 'be-humiliated' }],
       },
       {
-        id: 'spanking', categoryId: 'sensation', label: 'Spanking', description: 'Consensual impact play using the hand.',
+        id: 'spanking',
+        categoryId: 'sensation',
+        label: 'Spanking',
+        description: 'Consensual impact play using the hand.',
         roles: [
           { id: 'give', label: 'Give spanks', perspective: 'active' },
           { id: 'receive', label: 'Receive spanks', perspective: 'receptive' },
@@ -135,7 +183,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
       },
       {
-        id: 'biting', categoryId: 'sensation', label: 'Biting', description: 'Consensual biting as sensation play.',
+        id: 'biting',
+        categoryId: 'sensation',
+        label: 'Biting',
+        description: 'Consensual biting as sensation play.',
         roles: [
           { id: 'give', label: 'Bite my partner', perspective: 'active' },
           { id: 'receive', label: 'Be bitten', perspective: 'receptive' },
@@ -143,7 +194,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
       },
       {
-        id: 'scratching', categoryId: 'sensation', label: 'Scratching', description: 'Consensual scratching as sensation play.',
+        id: 'scratching',
+        categoryId: 'sensation',
+        label: 'Scratching',
+        description: 'Consensual scratching as sensation play.',
         roles: [
           { id: 'give', label: 'Scratch my partner', perspective: 'active' },
           { id: 'receive', label: 'Be scratched', perspective: 'receptive' },
@@ -151,30 +205,40 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
       },
       {
-        id: 'vibrator', categoryId: 'toys', label: 'Vibrator', description: 'Using a vibrator on oneself or a partner.',
+        id: 'vibrator',
+        categoryId: 'toys',
+        label: 'Vibrator',
+        description: 'Using a vibrator with a partner.',
         roles: [
           { id: 'use-on-partner', label: 'Use it on my partner', perspective: 'active' },
-          { id: 'receive-from-partner', label: 'Have my partner use it on me', perspective: 'receptive' },
-          { id: 'use-solo', label: 'Use it on myself', perspective: 'neutral' },
+          { id: 'use-on-self', label: 'Have it used on me', perspective: 'receptive' },
         ],
-        compatibleRolePairs: [{ leftRoleId: 'use-on-partner', rightRoleId: 'receive-from-partner' }],
+        compatibleRolePairs: [{ leftRoleId: 'use-on-partner', rightRoleId: 'use-on-self' }],
       },
       {
-        id: 'dildo', categoryId: 'toys', label: 'Dildo', description: 'Using a dildo on oneself or a partner.',
+        id: 'dildo',
+        categoryId: 'toys',
+        label: 'Dildo',
+        description: 'Using a dildo with a partner.',
         roles: [
           { id: 'use-on-partner', label: 'Use it on my partner', perspective: 'active' },
-          { id: 'receive-from-partner', label: 'Have my partner use it on me', perspective: 'receptive' },
-          { id: 'use-solo', label: 'Use it on myself', perspective: 'neutral' },
+          { id: 'use-on-self', label: 'Have it used on me', perspective: 'receptive' },
         ],
-        compatibleRolePairs: [{ leftRoleId: 'use-on-partner', rightRoleId: 'receive-from-partner' }],
+        compatibleRolePairs: [{ leftRoleId: 'use-on-partner', rightRoleId: 'use-on-self' }],
       },
       {
-        id: 'roleplay', categoryId: 'scenarios', label: 'Roleplay', description: 'Playing fictional or situational roles together.',
+        id: 'roleplay',
+        categoryId: 'scenarios',
+        label: 'Roleplay',
+        description: 'Playing fictional or situational roles together.',
         roles: [{ id: 'participate', label: 'Participate', perspective: 'neutral' }],
         compatibleRolePairs: [{ leftRoleId: 'participate', rightRoleId: 'participate' }],
       },
       {
-        id: 'voyeurism', categoryId: 'scenarios', label: 'Voyeurism / being watched', description: 'A consensual scene involving watching or being watched.',
+        id: 'voyeurism',
+        categoryId: 'scenarios',
+        label: 'Voyeurism / being watched',
+        description: 'A consensual scene involving watching or being watched.',
         roles: [
           { id: 'watch', label: 'Watch', perspective: 'active' },
           { id: 'be-watched', label: 'Be watched', perspective: 'receptive' },
@@ -182,7 +246,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'watch', rightRoleId: 'be-watched' }],
       },
       {
-        id: 'glory-hole', categoryId: 'scenarios', label: 'Glory hole scenario', description: 'A consensual scenario with one person behind a barrier and another approaching it.',
+        id: 'glory-hole',
+        categoryId: 'scenarios',
+        label: 'Glory hole scenario',
+        description: 'A consensual scenario with one person behind a barrier and another approaching it.',
         roles: [
           { id: 'behind', label: 'Be behind the barrier', perspective: 'receptive' },
           { id: 'visitor', label: 'Approach as the participant', perspective: 'active' },
@@ -190,7 +257,10 @@ export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
         compatibleRolePairs: [{ leftRoleId: 'behind', rightRoleId: 'visitor' }],
       },
       {
-        id: 'group-scenario', categoryId: 'scenarios', label: 'Group scenario', description: 'A consensual group scene where someone may be central or participate around them.',
+        id: 'group-scenario',
+        categoryId: 'scenarios',
+        label: 'Group scenario',
+        description: 'A consensual group scene where someone may be central or participate around them.',
         roles: [
           { id: 'center', label: 'Be the center of the scene', perspective: 'receptive' },
           { id: 'participate', label: 'Participate around the center', perspective: 'active' },

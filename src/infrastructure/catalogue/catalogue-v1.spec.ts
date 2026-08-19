@@ -7,4 +7,12 @@ describe('catalogue v1 snapshot', () => {
     expect(CURRENT_CATALOGUE_SNAPSHOT.version).toBe(CATALOGUE_VERSION_V1);
     expect(catalogueSnapshotValidator.validate(CURRENT_CATALOGUE_SNAPSHOT)).toEqual([]);
   });
+
+  it('keeps the role identities that were actually shipped in v1', () => {
+    const kissing = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.find((practice) => practice.id === 'kissing');
+    const vibrator = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.find((practice) => practice.id === 'vibrator');
+
+    expect(kissing?.roles.map((role) => role.id)).toEqual(['mutual']);
+    expect(vibrator?.roles.map((role) => role.id)).toEqual(['use-on-partner', 'use-on-self']);
+  });
 });

@@ -55,7 +55,7 @@ A `PracticeAnswer` separates these concepts:
 practice + semantic role + relational scope -> preference + optional details
 ```
 
-The role describes what the profile owner does or experiences. `AnswerScope` qualifies the relational context in which the same role is valued. For example, `counterpartSex` can hold different preferences for the same role with a man and with a woman without creating duplicate practices or role ids.
+The role describes what the profile owner does or experiences. `AnswerScope` qualifies the relational context in which the same role is valued. For example, `counterpartSex` can hold different preferences for restraining a man and restraining a woman without creating duplicate bondage practices or role ids.
 
 Canonical answer keys are produced only by `createAnswerKey()`. Callers must not construct scoped keys directly. Scope fields are serialized in a stable order so persistence, export, questionnaire progress, and comparison share one identity rule.
 
@@ -63,9 +63,13 @@ Local settings, identity, revision, and timestamps are excluded from portable pr
 
 ### Catalogue
 
-Stable practice and role identifiers must survive label changes. Profiles record `catalogueVersion` independently of schema version. Catalogue snapshots are historical: once shipped, their version semantics must not change.
+Stable practice and role ids survive label-only changes. A semantic split may retire an old role id, but it must never silently reinterpret that id. Historical answers then remain preserved as unknown data until an explicit migration exists.
 
-Catalogue v2 introduces role-declared `counterpartSex` axes while preserving v1 practice and role ids. A future comparison engine must evaluate each scoped answer against the other profile's own sex; the two profiles' `counterpartSex` values are not expected to be equal.
+Profiles record `catalogueVersion` independently of schema version. Catalogue snapshots are historical: once shipped, their question semantics and version numbers must not change.
+
+Catalogue v2 introduces role-declared `counterpartSex` axes. Most v1 semantic role ids are retained. The coarse v1 `kissing::mutual` role is deliberately retired and replaced by directional `kissing::give` and `kissing::receive` roles, because the product now needs independent giving and receiving preferences. Existing `kissing::mutual` answers remain historical rather than being guessed into four new answers.
+
+A future comparison engine must evaluate each scoped answer against the other profile's own sex; the two profiles' `counterpartSex` values are not expected to equal each other. For example, a woman's `counterpartSex: male` answer can complement a man's `counterpartSex: female` answer.
 
 ## Versioning rules
 

@@ -18,7 +18,7 @@ import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
             <div>
               <p class="eyebrow">Questionnaire · catalogue v{{ currentSnapshot.version }}</p>
               <h1>Categories</h1>
-              <p class="muted lead">Answer at your own pace. Unanswered roles stay distinct from Neutral, and every saved answer is stored immediately.</p>
+              <p class="muted lead">Answer at your own pace. Unanswered questions stay distinct from Neutral, and every saved answer is stored immediately.</p>
             </div>
             <p class="profile-count">{{ totalAnswered() }} / {{ totalQuestions() }} answered</p>
           </header>
@@ -26,13 +26,13 @@ import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
           @if (profileStore.error()) { <p class="alert" role="alert">{{ profileStore.error() }}</p> }
 
           @if (catalogueRelationship() === 'profile-older') {
-            <p class="alert">This profile was created against an older catalogue. New catalogue roles remain explicitly unanswered until you choose a response.</p>
+            <p class="alert">This profile was created against an older catalogue. New or refined questions remain explicitly unanswered until you choose a response. Historical answers are preserved.</p>
           } @else if (catalogueRelationship() === 'profile-newer') {
-            <p class="alert">This profile came from a newer catalogue. Answers for unknown roles are preserved even when this version cannot display them.</p>
+            <p class="alert">This profile came from a newer catalogue. Answers for unknown questions are preserved even when this version cannot display them.</p>
           }
 
           @if (unknownAnswerCount() > 0) {
-            <p class="muted form-note">{{ unknownAnswerCount() }} saved answer{{ unknownAnswerCount() === 1 ? '' : 's' }} belong to catalogue roles that are not available in this version.</p>
+            <p class="muted form-note">{{ unknownAnswerCount() }} saved answer{{ unknownAnswerCount() === 1 ? '' : 's' }} belong to historical or unavailable catalogue questions and remain preserved.</p>
           }
 
           @if (totalFiltered() > 0) {
@@ -40,7 +40,7 @@ import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
               <input type="checkbox" [checked]="includeFiltered()" (change)="toggleFiltered($event)" />
               <span>
                 <strong>Show filtered questions</strong>
-                <small>{{ totalFiltered() }} role{{ totalFiltered() === 1 ? '' : 's' }} hidden by the optional profile filter. Showing them does not change the profile settings.</small>
+                <small>{{ totalFiltered() }} question{{ totalFiltered() === 1 ? '' : 's' }} hidden by the optional profile filter. Showing them does not change the profile settings.</small>
               </span>
             </label>
           }
@@ -54,7 +54,7 @@ import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
                 </div>
                 @if (summary.category.description) { <p class="muted">{{ summary.category.description }}</p> }
                 <div class="progress-track" aria-hidden="true"><span [style.width.%]="summary.completionPercentage"></span></div>
-                @if (summary.filtered > 0 && !includeFiltered()) { <small class="muted">{{ summary.filtered }} filtered role{{ summary.filtered === 1 ? '' : 's' }}</small> }
+                @if (summary.filtered > 0 && !includeFiltered()) { <small class="muted">{{ summary.filtered }} filtered question{{ summary.filtered === 1 ? '' : 's' }}</small> }
               </a>
             }
           </section>
