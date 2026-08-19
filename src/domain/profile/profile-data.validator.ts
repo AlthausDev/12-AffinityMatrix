@@ -1,6 +1,8 @@
 import { ValidationIssue, Validator } from '../shared/validator';
 import { isStableId } from '../shared/stable-id';
 import {
+  AnswerScope,
+  createAnswerKey,
   DEPENDS_ON_MAX_LENGTH,
   DESIRED_FREQUENCY_VALUES,
   EXPERIENCE_CONTEXT_VALUES,
@@ -17,7 +19,8 @@ import { DETAIL_CAPABLE_PREFERENCES, isPreference } from './preference';
 
 const MAX_ANSWER_COUNT = 10_000;
 const METADATA_KEYS = ['alias', 'sex', 'orientation'] as const;
-const ANSWER_KEYS = ['practiceId', 'roleId', 'preference', 'details'] as const;
+const ANSWER_KEYS = ['practiceId', 'roleId', 'scope', 'preference', 'details'] as const;
+const SCOPE_KEYS = ['counterpartSex'] as const;
 const DETAIL_KEYS = ['context', 'desiredFrequency', 'initiative', 'dependsOn'] as const;
 
 export interface ProfileDataShape {
@@ -92,6 +95,7 @@ export abstract class ProfileDataValidator<T extends ProfileDataShape> extends V
     const issues: ValidationIssue[] = this.validateAllowedKeys(value, ANSWER_KEYS, path);
     const practiceId = value['practiceId'];
     const roleId = value['roleId'];
+    const scope = value['scope'];
     const preference = value['preference'];
     const details = value['details'];
 
@@ -107,16 +111,43 @@ export abstract class ProfileDataValidator<T extends ProfileDataShape> extends V
       issues.push({ path: `${path}.preference`, message: 'Preference uses an unsupported value.' });
     }
 
+    let validatedScope: AnswerScope | undefined;
+    if (scope !== undefined) {
+      const scopeIssues = this.validateScope(path, scope);
+      issues.push(...scopeIssues);
+      if (scopeIssues.length === 0) {
+        validatedScope = scope as AnswerScope;
+      }
+    }
+
     if (
       typeof practiceId === 'string' &&
       typeof roleId === 'string' &&
-      key !== `${practiceId}::${roleId}`
+      key !== createAnswerKey(practiceId, roleId, validatedScope)
     ) {
-      issues.push({ path, message: 'Answer key must match practiceId and roleId.' });
+      issues.push({ path, message: 'Answer key must match practiceId, roleId, and relational scope.' });
     }
 
     if (details !== undefined) {
       issues.push(...this.validateDetails(path, details, preference));
+    }
+
+    return issues;
+  }
+
+  private validateScope(path: string, value: unknown): ValidationIssue[] {
+    const scopePath = `${path}.scope`;
+    if (!this.isRecord(value)) {
+      return [{ path: scopePath, message: 'Answer scope must be an object.' }];
+    }
+
+    const issues = this.validateAllowedKeys(value, SCOPE_KEYS, scopePath);
+    const counterpartSex = value['counterpartSex'];
+
+    if (counterpartSex === undefined) {
+      issues.push({ path: scopePath, message: 'Answer scope cannot be empty.' });
+    } else if (!SEX_VALUES.includes(counterpartSex as (typeof SEX_VALUES)[number])) {
+      issues.push({ path: `${scopePath}.counterpartSex`, message: 'Counterpart sex uses an unsupported value.' });
     }
 
     return issues;

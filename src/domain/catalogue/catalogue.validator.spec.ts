@@ -1,8 +1,5 @@
 import { PracticeCatalogue } from './catalogue';
-import {
-  PracticeCatalogueValidator,
-  PracticeValidator,
-} from './catalogue.validator';
+import { PracticeCatalogueValidator, PracticeValidator } from './catalogue.validator';
 import { Practice } from './practice';
 
 function validPractice(): Practice {
@@ -11,8 +8,8 @@ function validPractice(): Practice {
     categoryId: 'restraint',
     label: 'Bondage',
     roles: [
-      { id: 'tie', label: 'Tie partner', perspective: 'active' },
-      { id: 'be-tied', label: 'Be tied', perspective: 'receptive' },
+      { id: 'tie', label: 'Tie partner', perspective: 'active', contextAxes: ['counterpartSex'] },
+      { id: 'be-tied', label: 'Be tied', perspective: 'receptive', contextAxes: ['counterpartSex'] },
     ],
     compatibleRolePairs: [{ leftRoleId: 'tie', rightRoleId: 'be-tied' }],
   };
@@ -21,26 +18,32 @@ function validPractice(): Practice {
 describe('PracticeValidator', () => {
   const validator = new PracticeValidator();
 
-  it('accepts explicit semantic roles and compatibility pairs', () => {
+  it('accepts explicit semantic roles, declared context axes, and compatibility pairs', () => {
     expect(validator.validate(validPractice())).toEqual([]);
   });
 
   it('rejects duplicate role ids', () => {
     const practice = validPractice();
-    const candidate = {
-      ...practice,
-      roles: [practice.roles[0], { ...practice.roles[1], id: 'tie' }],
-    };
-
+    const candidate = { ...practice, roles: [practice.roles[0], { ...practice.roles[1], id: 'tie' }] };
     expect(validator.validate(candidate).some((issue) => issue.message.includes('Role ids'))).toBe(true);
   });
 
-  it('rejects compatibility pairs referencing roles that do not exist', () => {
-    const candidate = {
+  it('rejects unsupported or duplicated context axes', () => {
+    const unsupported = {
       ...validPractice(),
-      compatibleRolePairs: [{ leftRoleId: 'tie', rightRoleId: 'missing' }],
+      roles: [{ ...validPractice().roles[0], contextAxes: ['counterpartAge'] }, validPractice().roles[1]],
     };
+    expect(validator.isValid(unsupported)).toBe(false);
 
+    const duplicated = {
+      ...validPractice(),
+      roles: [{ ...validPractice().roles[0], contextAxes: ['counterpartSex', 'counterpartSex'] }, validPractice().roles[1]],
+    };
+    expect(validator.validate(duplicated).some((issue) => issue.message.includes('duplicates'))).toBe(true);
+  });
+
+  it('rejects compatibility pairs referencing roles that do not exist', () => {
+    const candidate = { ...validPractice(), compatibleRolePairs: [{ leftRoleId: 'tie', rightRoleId: 'missing' }] };
     expect(validator.validate(candidate).some((issue) => issue.path.endsWith('rightRoleId'))).toBe(true);
   });
 
@@ -52,7 +55,6 @@ describe('PracticeValidator', () => {
         { leftRoleId: 'be-tied', rightRoleId: 'tie' },
       ],
     };
-
     expect(validator.validate(candidate).some((issue) => issue.message.includes('duplicated'))).toBe(true);
   });
 });
@@ -65,7 +67,6 @@ describe('PracticeCatalogueValidator', () => {
       categories: [{ id: 'restraint', label: 'Restraint', order: 0 }],
       practices: [validPractice()],
     };
-
     expect(validator.validate(catalogue)).toEqual([]);
   });
 
@@ -74,7 +75,6 @@ describe('PracticeCatalogueValidator', () => {
       categories: [{ id: 'other', label: 'Other', order: 0 }],
       practices: [validPractice()],
     };
-
     expect(validator.validate(catalogue).some((issue) => issue.path.endsWith('categoryId'))).toBe(true);
   });
 
@@ -86,7 +86,6 @@ describe('PracticeCatalogueValidator', () => {
       ],
       practices: [],
     };
-
     expect(validator.validate(catalogue).some((issue) => issue.path.endsWith('order'))).toBe(true);
   });
 });

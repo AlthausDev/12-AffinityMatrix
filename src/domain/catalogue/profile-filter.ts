@@ -1,3 +1,4 @@
+import { AnswerScope } from '../profile/profile-answer';
 import { Practice, PracticeRole } from './practice';
 import { ProfileMetadata, Sex } from '../profile/profile-metadata';
 import { ProfileSettings } from '../profile/profile-settings';
@@ -28,7 +29,11 @@ export function getRelevantPartnerSexes(metadata: ProfileMetadata): readonly Sex
 }
 
 export abstract class QuestionVisibilityPolicy {
-  abstract isRoleVisible(role: PracticeRole, context: ProfileQuestionContext): boolean;
+  abstract isRoleVisible(
+    role: PracticeRole,
+    context: ProfileQuestionContext,
+    scope?: AnswerScope,
+  ): boolean;
 
   getVisibleRoles(practice: Practice, context: ProfileQuestionContext): readonly PracticeRole[] {
     return practice.roles.filter((role) => this.isRoleVisible(role, context));
@@ -40,26 +45,36 @@ export abstract class QuestionVisibilityPolicy {
 }
 
 export class MetadataQuestionVisibilityPolicy extends QuestionVisibilityPolicy {
-  override isRoleVisible(role: PracticeRole, context: ProfileQuestionContext): boolean {
+  override isRoleVisible(
+    role: PracticeRole,
+    context: ProfileQuestionContext,
+    scope?: AnswerScope,
+  ): boolean {
     if (!context.settings.filterQuestionnaireByMetadata) {
       return true;
     }
 
     const applicability = role.applicability;
-    if (!applicability) {
-      return true;
-    }
-
     if (
       context.metadata.sex &&
-      applicability.selfSex &&
+      applicability?.selfSex &&
       !applicability.selfSex.includes(context.metadata.sex)
     ) {
       return false;
     }
 
+    const counterpartSex = scope?.counterpartSex;
+    if (counterpartSex) {
+      if (applicability?.partnerSex && !applicability.partnerSex.includes(counterpartSex)) {
+        return false;
+      }
+
+      const relevantPartnerSexes = getRelevantPartnerSexes(context.metadata);
+      return relevantPartnerSexes ? relevantPartnerSexes.includes(counterpartSex) : true;
+    }
+
     const relevantPartnerSexes = getRelevantPartnerSexes(context.metadata);
-    if (relevantPartnerSexes && applicability.partnerSex) {
+    if (relevantPartnerSexes && applicability?.partnerSex) {
       return applicability.partnerSex.some((sex) => relevantPartnerSexes.includes(sex));
     }
 

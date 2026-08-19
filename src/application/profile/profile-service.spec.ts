@@ -1,4 +1,5 @@
 import { Profile, ProfileId } from '../../domain/profile/profile';
+import { createAnswerKey } from '../../domain/profile/profile-answer';
 import { Clock } from '../shared/clock';
 import { IdGenerator } from '../shared/id-generator';
 import { ProfileFactory } from './profile-factory';
@@ -54,21 +55,19 @@ describe('ProfileService', () => {
       { alias: 'Example', sex: 'male', orientation: 'heterosexual' },
       { filterQuestionnaireByMetadata: true },
     );
-
     expect(profile.id).toBe('profile-1');
+    expect(profile.catalogueVersion).toBe(2);
     expect(await repository.findAll()).toHaveLength(1);
   });
 
   it('updates metadata and settings atomically while incrementing the revision', async () => {
     const profile = await service.create({ alias: 'Original' });
     clock.set('2026-08-17T13:00:00.000Z');
-
     const updated = await service.updateProfile(
       profile.id,
       { alias: 'Updated', orientation: 'bisexual' },
       { filterQuestionnaireByMetadata: false },
     );
-
     expect(updated?.id).toBe(profile.id);
     expect(updated?.revision).toBe(profile.revision + 1);
     expect(updated?.metadata.alias).toBe('Updated');
@@ -76,19 +75,40 @@ describe('ProfileService', () => {
     expect(updated?.updatedAt).toBe('2026-08-17T13:00:00.000Z');
   });
 
+  it('stores the same semantic role independently for different counterpart sexes', async () => {
+    const profile = await service.create({ alias: 'Example' });
+    await service.upsertAnswer(profile.id, {
+      practiceId: 'bondage', roleId: 'receive', scope: { counterpartSex: 'female' }, preference: 'favorite',
+    }, 2);
+    const updated = await service.upsertAnswer(profile.id, {
+      practiceId: 'bondage', roleId: 'receive', scope: { counterpartSex: 'male' }, preference: 'curious',
+    }, 2);
+
+    expect(updated?.answers[createAnswerKey('bondage', 'receive', { counterpartSex: 'female' })]?.preference).toBe('favorite');
+    expect(updated?.answers[createAnswerKey('bondage', 'receive', { counterpartSex: 'male' })]?.preference).toBe('curious');
+    expect(updated?.revision).toBe(3);
+  });
+
+  it('removes only the selected scoped answer', async () => {
+    const profile = await service.create({ alias: 'Example' });
+    await service.upsertAnswer(profile.id, {
+      practiceId: 'bondage', roleId: 'receive', scope: { counterpartSex: 'female' }, preference: 'like',
+    }, 2);
+    await service.upsertAnswer(profile.id, {
+      practiceId: 'bondage', roleId: 'receive', scope: { counterpartSex: 'male' }, preference: 'like',
+    }, 2);
+
+    const updated = await service.removeAnswer(profile.id, 'bondage', 'receive', { counterpartSex: 'female' });
+    expect(updated?.answers[createAnswerKey('bondage', 'receive', { counterpartSex: 'female' })]).toBeUndefined();
+    expect(updated?.answers[createAnswerKey('bondage', 'receive', { counterpartSex: 'male' })]).toBeDefined();
+  });
+
   it('upserts optional answer details and records the catalogue version used for the answer', async () => {
     const profile = await service.create({ alias: 'Example' });
-    const updated = await service.upsertAnswer(
-      profile.id,
-      {
-        practiceId: 'bondage',
-        roleId: 'receive',
-        preference: 'like',
-        details: { desiredFrequency: 'regularly', initiative: 'prefer-partner' },
-      },
-      2,
-    );
-
+    const updated = await service.upsertAnswer(profile.id, {
+      practiceId: 'bondage', roleId: 'receive', preference: 'like',
+      details: { desiredFrequency: 'regularly', initiative: 'prefer-partner' },
+    }, 2);
     expect(updated?.answers['bondage::receive']?.details?.desiredFrequency).toBe('regularly');
     expect(updated?.revision).toBe(2);
     expect(updated?.catalogueVersion).toBe(2);
@@ -98,13 +118,11 @@ describe('ProfileService', () => {
     const profile = await service.create({ alias: 'Example' });
     const future = { ...profile, catalogueVersion: 4 };
     await repository.save(future, profile.revision);
-
     const updated = await service.upsertAnswer(
       profile.id,
       { practiceId: 'bondage', roleId: 'receive', preference: 'like' },
       1,
     );
-
     expect(updated?.catalogueVersion).toBe(4);
   });
 });

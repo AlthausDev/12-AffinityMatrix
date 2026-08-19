@@ -1,10 +1,10 @@
 import { ProfileValidator, profileValidator } from '../../domain/profile/profile.validator';
 import { ValidationIssue, Validator } from '../../domain/shared/validator';
-import { MAX_STORED_PROFILES, PROFILE_STORE_VERSION, StoredProfilesV3 } from './profile-store';
+import { MAX_STORED_PROFILES, PROFILE_STORE_VERSION, StoredProfilesV4 } from './profile-store';
 
 const STORE_KEYS = ['version', 'profiles'] as const;
 
-export class StoredProfilesValidator extends Validator<StoredProfilesV3> {
+export class StoredProfilesValidator extends Validator<StoredProfilesV4> {
   constructor(private readonly profileValidatorInstance: ProfileValidator = profileValidator) {
     super();
   }
@@ -36,10 +36,7 @@ export class StoredProfilesValidator extends Validator<StoredProfilesV3> {
     const ids = new Set<string>();
     profiles.forEach((profile, index) => {
       for (const issue of this.profileValidatorInstance.validate(profile)) {
-        issues.push({
-          ...issue,
-          path: issue.path ? `profiles.${index}.${issue.path}` : `profiles.${index}`,
-        });
+        issues.push({ ...issue, path: issue.path ? `profiles.${index}.${issue.path}` : `profiles.${index}` });
       }
 
       if (this.isRecord(profile) && typeof profile['id'] === 'string') {

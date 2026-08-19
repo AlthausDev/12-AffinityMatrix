@@ -1,4 +1,5 @@
 import { ProfileConcurrencyError } from '../../application/profile/profile-repository';
+import { createAnswerKey } from '../../domain/profile/profile-answer';
 import { createProfile } from '../../domain/profile/profile';
 import {
   DEFAULT_PROFILE_STORAGE_KEY,
@@ -25,6 +26,28 @@ describe('LocalStorageProfileRepository', () => {
     await expect(new LocalStorageProfileRepository(new MemoryStorage()).findAll()).resolves.toEqual([]);
   });
 
+  it('persists scoped answers without collapsing counterpart variants', async () => {
+    const storage = new MemoryStorage();
+    const repository = new LocalStorageProfileRepository(storage);
+    const base = profile('one', 'Example');
+    const femaleScope = { counterpartSex: 'female' as const };
+    const maleScope = { counterpartSex: 'male' as const };
+    const candidate = {
+      ...base,
+      answers: {
+        [createAnswerKey('bondage', 'receive', femaleScope)]: {
+          practiceId: 'bondage', roleId: 'receive', scope: femaleScope, preference: 'favorite' as const,
+        },
+        [createAnswerKey('bondage', 'receive', maleScope)]: {
+          practiceId: 'bondage', roleId: 'receive', scope: maleScope, preference: 'neutral' as const,
+        },
+      },
+    };
+    await repository.save(candidate);
+    const restored = await repository.findById('one');
+    expect(Object.keys(restored?.answers ?? {})).toHaveLength(2);
+  });
+
   it('persists, updates, and deletes profiles by stable local id and expected revision', async () => {
     const storage = new MemoryStorage();
     const repository = new LocalStorageProfileRepository(storage);
@@ -46,42 +69,37 @@ describe('LocalStorageProfileRepository', () => {
     const repository = new LocalStorageProfileRepository(new MemoryStorage());
     await repository.save(profile('one', 'Original'));
     await repository.save({ ...profile('one', 'First update'), revision: 2 }, 1);
-
-    await expect(
-      repository.save({ ...profile('one', 'Stale update'), revision: 2 }, 1),
-    ).rejects.toBeInstanceOf(ProfileConcurrencyError);
+    await expect(repository.save({ ...profile('one', 'Stale update'), revision: 2 }, 1)).rejects.toBeInstanceOf(ProfileConcurrencyError);
   });
 
-  it('migrates the legacy v1 store through v2 to v3 and moves it to the stable storage key', async () => {
+  it('migrates the legacy v1 store through v4 without inventing counterpart scope', async () => {
     const storage = new MemoryStorage();
     storage.setItem(
       'profiles.v1',
       JSON.stringify({
         version: 1,
-        profiles: [
-          {
-            schemaVersion: 1,
-            id: 'legacy',
-            metadata: {
-              alias: 'Legacy',
-              sex: 'female',
-              orientation: 'bisexual',
-              filterByProfileMetadata: false,
-            },
-            answers: {},
-            createdAt: '2026-08-17T12:00:00.000Z',
-            updatedAt: '2026-08-17T12:00:00.000Z',
+        profiles: [{
+          schemaVersion: 1,
+          id: 'legacy',
+          metadata: {
+            alias: 'Legacy', sex: 'female', orientation: 'bisexual', filterByProfileMetadata: false,
           },
-        ],
+          answers: {
+            'kissing::mutual': { practiceId: 'kissing', roleId: 'mutual', preference: 'like' },
+          },
+          createdAt: '2026-08-17T12:00:00.000Z',
+          updatedAt: '2026-08-17T12:00:00.000Z',
+        }],
       }),
     );
 
     const repository = new LocalStorageProfileRepository(storage);
     const migrated = await repository.findById('legacy');
 
-    expect(migrated?.schemaVersion).toBe(3);
+    expect(migrated?.schemaVersion).toBe(4);
     expect(migrated?.revision).toBe(1);
     expect(migrated?.catalogueVersion).toBe(1);
+    expect(migrated?.answers['kissing::mutual']?.scope).toBeUndefined();
     expect(migrated?.metadata.alias).toBe('Legacy');
     expect(migrated?.settings.filterQuestionnaireByMetadata).toBe(false);
     expect(storage.getItem('profiles.v1')).toBeNull();
@@ -98,27 +116,20 @@ describe('LocalStorageProfileRepository', () => {
     await expect(new LocalStorageProfileRepository(future).findAll()).rejects.toBeInstanceOf(ProfileStorageError);
 
     const unknown = new MemoryStorage();
-    unknown.setItem(DEFAULT_PROFILE_STORAGE_KEY, JSON.stringify({ version: 3, profiles: [], extra: true }));
+    unknown.setItem(DEFAULT_PROFILE_STORAGE_KEY, JSON.stringify({ version: 4, profiles: [], extra: true }));
     await expect(new LocalStorageProfileRepository(unknown).findAll()).rejects.toBeInstanceOf(ProfileStorageError);
 
     const duplicate = new MemoryStorage();
-    duplicate.setItem(
-      DEFAULT_PROFILE_STORAGE_KEY,
-      JSON.stringify({ version: 3, profiles: [profile('same', 'One'), profile('same', 'Two')] }),
-    );
+    duplicate.setItem(DEFAULT_PROFILE_STORAGE_KEY, JSON.stringify({ version: 4, profiles: [profile('same', 'One'), profile('same', 'Two')] }));
     await expect(new LocalStorageProfileRepository(duplicate).findAll()).rejects.toBeInstanceOf(ProfileStorageError);
   });
 
   it('runs full domain validation before accepting locally stored profiles', async () => {
     const storage = new MemoryStorage();
-    storage.setItem(
-      DEFAULT_PROFILE_STORAGE_KEY,
-      JSON.stringify({
-        version: 3,
-        profiles: [{ ...profile('one', 'Valid'), settings: { filterQuestionnaireByMetadata: 'yes' } }],
-      }),
-    );
-
+    storage.setItem(DEFAULT_PROFILE_STORAGE_KEY, JSON.stringify({
+      version: 4,
+      profiles: [{ ...profile('one', 'Valid'), settings: { filterQuestionnaireByMetadata: 'yes' } }],
+    }));
     await expect(new LocalStorageProfileRepository(storage).findAll()).rejects.toBeInstanceOf(ProfileStorageError);
   });
 });

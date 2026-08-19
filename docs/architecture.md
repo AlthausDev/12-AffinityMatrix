@@ -5,34 +5,11 @@ This document defines the dependency boundaries for the MVP and the extension po
 ## Dependency direction
 
 ```text
-               ┌────────────────────┐
-               │        app         │
-               │ Angular UI + state │
-               └─────────┬──────────┘
-                         │
-                         ▼
-               ┌────────────────────┐
-               │    application     │
-               │ use cases + ports  │
-               └─────────┬──────────┘
-                         │
-                         ▼
-               ┌────────────────────┐
-               │       domain       │
-               │ rules + invariants │
-               └────────────────────┘
-
-               ┌────────────────────┐
-               │   infrastructure   │
-               │ browser adapters   │
-               └─────────┬──────────┘
-                         │ implements
-                         ▼
-                    application
-                       ports
+app -> application -> domain
+infrastructure -> application/domain
 ```
 
-The domain must not depend on Angular, browser APIs, persistence, routing, or presentation details. The application layer may depend on the domain and defines use cases and ports. Infrastructure implements those ports. Angular is the composition and presentation layer; pages should consume application-facing abstractions instead of calling browser infrastructure directly.
+The domain must not depend on Angular, browser APIs, persistence, routing, or presentation details. The application layer defines use cases and ports. Infrastructure implements those ports. Angular is the composition and presentation layer.
 
 `npm run architecture:check` enforces these layer dependencies and rejects direct browser-global access from domain/application code. CI runs this check before unit tests and the production build.
 
@@ -40,92 +17,79 @@ The domain must not depend on Angular, browser APIs, persistence, routing, or pr
 
 ### Repository
 
-`ProfileRepository` isolates persistence and is asynchronous by contract. The MVP adapter uses local storage, but callers already model persistence as an operation that can take time. This keeps IndexedDB, file-backed storage, or another asynchronous local adapter substitutable without rewriting application use cases or UI flows.
+`ProfileRepository` is asynchronous by contract. The current local-storage adapter can therefore be replaced by IndexedDB or another asynchronous local adapter without rewriting use cases. Writes use optimistic concurrency through the profile `revision`. UI-originated mutations are serialized in `ProfileStore` so rapid local interactions do not create artificial stale writes.
 
-Writes use optimistic concurrency. A local `revision` is incremented on every mutation and repositories receive the expected previous revision. Stale writes fail with `ProfileConcurrencyError` instead of silently replacing newer state. A future transactional repository can enforce the same contract atomically.
+### Application services
 
-### Application Service
-
-`ProfileService` owns profile use cases such as creation, metadata/settings updates, answer upserts, import, and deletion. UI stores adapt those asynchronous use cases to Angular Signals; they are not domain services.
+`ProfileService` owns profile use cases. `QuestionnaireService` projects a versioned catalogue and profile into category and question views. UI stores adapt these use cases to Angular Signals.
 
 ### Factory and ports
 
-`ProfileFactory` creates and restores profiles using `IdGenerator` and `Clock` ports and an explicit catalogue version. This removes direct dependencies on `crypto` and system time from application rules and keeps tests deterministic.
+`ProfileFactory` creates and restores profiles through explicit `IdGenerator`, `Clock`, and catalogue-version inputs, keeping application rules deterministic and browser-independent.
 
 ### Strategy
 
-Question visibility and role compatibility are policies, not hard-coded UI branches:
+Question visibility, question-scope expansion, and role compatibility are policies:
 
 - `QuestionVisibilityPolicy`
+- `QuestionScopePolicy`
 - `RoleCompatibilityPolicy`
 
-A new filtering or matching rule can therefore be introduced without rewriting questionnaire or comparison components.
+`QuestionScopePolicy` expands context axes declared by a catalogue role into answer scopes. The current real axis is `counterpartSex`. New axes should be added only for demonstrated product cases, and should extend this policy rather than duplicate practices or add component-specific branching.
 
-### Template Method / validator inheritance
+### Validation and migrations
 
-`Validator<T>` defines common validation behavior. `ProfileDataValidator<T>` adds the shared profile-data rules, while concrete validators add local-profile or portable-profile invariants. Catalogue and persistence-envelope validators use the same validation contract.
+`Validator<T>` supplies the common validation contract. `ProfileDataValidator<T>` supplies shared profile-data invariants. Persisted and imported data are validated at boundaries.
 
-External and persisted data are validated at boundaries. Version numbers are not a substitute for validating the payload.
-
-### Version migration
-
-Local storage and portable profile formats are independently versioned. Historical migrations use explicit historical version constants so a future schema bump cannot silently change the meaning of an old migration.
-
-Portable code decoding uses version-specific decoder strategies. Current codes are P3; P1 and P2 remain explicit migration inputs. Adding another format should add a decoder/migration path instead of expanding one large conditional codec.
+Local storage and portable formats are independently versioned. Current portable codes are P4; P1, P2, and P3 remain migration inputs. P3 answers are preserved without inventing a relational scope that the old data did not contain.
 
 ## Aggregate boundaries
 
 ### Profile
 
-A profile contains:
+A profile contains local identity, optimistic-concurrency revision, profile schema version, catalogue version, metadata, local settings, explicit answers, and timestamps.
 
-- local identity;
-- local optimistic-concurrency revision;
-- profile schema version;
-- catalogue version against which its answers are interpreted;
-- portable metadata describing the profile;
-- local presentation settings;
-- explicit answers keyed by stable practice/role identifiers;
-- timestamps.
+A `PracticeAnswer` separates these concepts:
 
-Local settings, identity, revision, and timestamps are excluded from portable profile representations.
+```text
+practice + semantic role + relational scope -> preference + optional details
+```
 
-Sex and orientation are local filtering metadata and are excluded from exports by default. They may only be included through an explicit export option. Portable transport is Base64URL plus an integrity checksum; it is not encryption.
+The role describes what the profile owner does or experiences. `AnswerScope` qualifies the relational context in which the same role is valued. For example, `counterpartSex` can hold different preferences for restraining a man and restraining a woman without creating duplicate bondage practices or role ids.
+
+Canonical answer keys are produced only by `createAnswerKey()`. Callers must not construct scoped keys directly. Scope fields are serialized in a stable order so persistence, export, questionnaire progress, and comparison share one identity rule.
+
+Local settings, identity, revision, and timestamps are excluded from portable profiles. Sex and orientation are excluded from exports by default and require an explicit export option. Portable transport is encoded and checksummed, not encrypted.
 
 ### Catalogue
 
-The practice catalogue is treated as a coherent aggregate. Stable practice and role identifiers must survive label changes. Profiles record `catalogueVersion` independently of their schema version so unanswered data can later be distinguished from practices that did not exist in an older catalogue.
+Stable practice and role ids survive label-only changes. A semantic split may retire an old role id, but it must never silently reinterpret that id. Historical answers then remain preserved as unknown data until an explicit migration exists.
 
-The comparison engine should consume catalogue compatibility rules. It must not infer compatibility solely from generic labels such as `active` and `receptive`.
+Profiles record `catalogueVersion` independently of schema version. Catalogue snapshots are historical: once shipped, their question semantics and version numbers must not change.
+
+Catalogue v2 introduces role-declared `counterpartSex` axes. Most v1 semantic role ids are retained. The coarse v1 `kissing::mutual` role is deliberately retired and replaced by directional `kissing::give` and `kissing::receive` roles, because the product now needs independent giving and receiving preferences. Existing `kissing::mutual` answers remain historical rather than being guessed into four new answers.
+
+A future comparison engine must evaluate each scoped answer against the other profile's own sex; the two profiles' `counterpartSex` values are not expected to equal each other. For example, a woman's `counterpartSex: male` answer can complement a man's `counterpartSex: female` answer.
 
 ## Versioning rules
 
 Five concepts evolve independently:
 
-1. **Profile schema version** — shape and invariants of a local profile.
-2. **Profile revision** — optimistic-concurrency revision of one local document.
-3. **Catalogue version** — question/role catalogue against which answers are interpreted.
-4. **Store version** — browser persistence envelope and migration sequence.
-5. **Portable format version** — representation exchanged between devices.
+1. Profile schema version.
+2. Profile revision.
+3. Catalogue version.
+4. Store version.
+5. Portable format version.
 
-Do not reuse a mutable `CURRENT_VERSION` constant inside historical DTOs or migrations. A historical V2 type or migration must continue to mean V2 after V3 exists.
+Historical DTOs, snapshots, and migrations must use historical constants rather than mutable current-version constants.
 
 ## Scalability boundaries
 
-The MVP intentionally avoids a backend. Scalability here means being able to grow the local product without coupling unrelated responsibilities.
-
-Expected extension points include:
-
-- replacing local storage with IndexedDB behind the asynchronous `ProfileRepository`;
-- loading a larger versioned catalogue from static data without changing profile rules;
-- adding comparison policies and category statistics;
-- adding compression or optional client-side encryption around the portable transport;
-- adding new optional answer dimensions through versioned migrations;
-- adding richer local summaries and visualizations.
+The MVP intentionally avoids a backend. Expected extension points include IndexedDB persistence, larger static catalogues, comparison policies, category statistics, optional encryption/compression, new answer details, justified relational scope axes, and richer local summaries.
 
 ## Non-goals
 
-The architecture must not reserve infrastructure for chat, public profiles, discovery, feeds, followers, social graphs, or other social-network features. Those are outside the product direction. Avoid abstractions whose only justification is a hypothetical backend or social layer.
+Do not reserve infrastructure for chat, public profiles, discovery, feeds, followers, social graphs, or other social-network features.
 
 ## Design rule
 

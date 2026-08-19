@@ -1,8 +1,8 @@
 import { CatalogueSnapshot } from '../../domain/catalogue/catalogue-snapshot';
-import { CURRENT_CATALOGUE_VERSION } from '../../domain/catalogue/catalogue-version';
+import { CATALOGUE_VERSION_V1 } from '../../domain/catalogue/catalogue-version';
 
 export const CURRENT_CATALOGUE_SNAPSHOT: CatalogueSnapshot = {
-  version: CURRENT_CATALOGUE_VERSION,
+  version: CATALOGUE_VERSION_V1,
   catalogue: {
     categories: [
       { id: 'general', label: 'General', description: 'Broad shared intimacy and sexual interaction.', order: 0 },

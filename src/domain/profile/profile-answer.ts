@@ -1,3 +1,4 @@
+import { Sex } from './profile-metadata';
 import { Preference } from './preference';
 
 export const EXPERIENCE_CONTEXT_VALUES = [
@@ -31,22 +32,39 @@ export interface AnswerDetails {
   readonly dependsOn?: string;
 }
 
+/** Relational dimensions that qualify an answer without changing its semantic role. */
+export interface AnswerScope {
+  readonly counterpartSex?: Sex;
+}
+
 export interface PracticeAnswer {
   readonly practiceId: string;
   readonly roleId: string;
+  readonly scope?: AnswerScope;
   readonly preference: Preference;
   readonly details?: AnswerDetails;
 }
 
-export type AnswerKey = `${string}::${string}`;
+export type UnscopedAnswerKey = `${string}::${string}`;
+export type CounterpartSexAnswerKey = `${string}::${string}::counterpart-sex=${Sex}`;
+export type AnswerKey = UnscopedAnswerKey | CounterpartSexAnswerKey;
 
-export function createAnswerKey(practiceId: string, roleId: string): AnswerKey {
+/** Canonical answer identity. Scope fields are serialized in a stable order here only. */
+export function createAnswerKey(
+  practiceId: string,
+  roleId: string,
+  scope?: AnswerScope,
+): AnswerKey {
+  if (scope?.counterpartSex) {
+    return `${practiceId}::${roleId}::counterpart-sex=${scope.counterpartSex}`;
+  }
   return `${practiceId}::${roleId}`;
 }
 
 export function clonePracticeAnswer(answer: PracticeAnswer): PracticeAnswer {
   return {
     ...answer,
+    ...(answer.scope ? { scope: { ...answer.scope } } : {}),
     ...(answer.details ? { details: { ...answer.details } } : {}),
   };
 }

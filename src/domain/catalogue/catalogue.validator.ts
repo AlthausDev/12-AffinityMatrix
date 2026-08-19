@@ -13,11 +13,12 @@ const PRACTICE_KEYS = [
   'compatibleRolePairs',
 ] as const;
 const CATEGORY_KEYS = ['id', 'label', 'description', 'order'] as const;
-const ROLE_KEYS = ['id', 'label', 'perspective', 'applicability'] as const;
+const ROLE_KEYS = ['id', 'label', 'perspective', 'applicability', 'contextAxes'] as const;
 const APPLICABILITY_KEYS = ['selfSex', 'partnerSex'] as const;
 const COMPATIBILITY_PAIR_KEYS = ['leftRoleId', 'rightRoleId'] as const;
 const CATALOGUE_KEYS = ['categories', 'practices'] as const;
 const ROLE_PERSPECTIVES = ['active', 'receptive', 'neutral'] as const;
+const ROLE_CONTEXT_AXES = ['counterpartSex'] as const;
 const LABEL_MAX_LENGTH = 160;
 const DESCRIPTION_MAX_LENGTH = 1_000;
 const MAX_ROLES_PER_PRACTICE = 32;
@@ -43,12 +44,7 @@ export class PracticeCategoryValidator extends Validator<PracticeCategory> {
     return issues;
   }
 
-  private validateStableId(
-    value: unknown,
-    path: string,
-    subject: string,
-    issues: ValidationIssue[],
-  ): void {
+  private validateStableId(value: unknown, path: string, subject: string, issues: ValidationIssue[]): void {
     if (!isStableId(value)) {
       issues.push({ path, message: `${subject} id must be a stable lowercase identifier.` });
     }
@@ -147,6 +143,11 @@ export class PracticeValidator extends Validator<Practice> {
       issues.push(...this.validateApplicability(applicability, `${path}.applicability`));
     }
 
+    const contextAxes = value['contextAxes'];
+    if (contextAxes !== undefined) {
+      issues.push(...this.validateContextAxes(contextAxes, `${path}.contextAxes`));
+    }
+
     return issues;
   }
 
@@ -175,6 +176,23 @@ export class PracticeValidator extends Validator<Practice> {
       if (!sexes.every((sex) => SEX_VALUES.includes(sex as (typeof SEX_VALUES)[number]))) {
         issues.push({ path: `${path}.${key}`, message: 'Sex applicability contains an unsupported value.' });
       }
+    }
+
+    return issues;
+  }
+
+  private validateContextAxes(value: unknown, path: string): ValidationIssue[] {
+    if (!Array.isArray(value) || value.length === 0) {
+      return [{ path, message: 'Role context axes must be a non-empty array when provided.' }];
+    }
+
+    const issues: ValidationIssue[] = [];
+    if (new Set(value).size !== value.length) {
+      issues.push({ path, message: 'Role context axes cannot contain duplicates.' });
+    }
+
+    if (!value.every((axis) => ROLE_CONTEXT_AXES.includes(axis as (typeof ROLE_CONTEXT_AXES)[number]))) {
+      issues.push({ path, message: 'Role context axes contain an unsupported value.' });
     }
 
     return issues;
