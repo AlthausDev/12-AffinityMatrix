@@ -32,7 +32,10 @@ const ORIENTATION_LABELS: Record<SexualOrientation, string> = {
         }
 
         <section class="action-grid" aria-label="Profile actions">
-          <article class="action-card disabled-card"><div><p class="eyebrow">Questionnaire</p><h2>Answer or modify</h2><p class="muted">Questionnaire navigation is the next MVP slice.</p></div><button class="button secondary" type="button" disabled>Coming next</button></article>
+          <article class="action-card">
+            <div><p class="eyebrow">Questionnaire</p><h2>{{ answeredCount() > 0 ? 'Continue or modify' : 'Start questionnaire' }}</h2><p class="muted">Work category by category. Answers are saved locally as you go.</p></div>
+            <a class="button" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']">{{ answeredCount() > 0 ? 'Continue' : 'Start' }}</a>
+          </article>
           <article class="action-card disabled-card"><div><p class="eyebrow">Comparison</p><h2>Compare profiles</h2><p class="muted">Find complementary answers and category-level affinity.</p></div><button class="button secondary" type="button" disabled>Not available yet</button></article>
           <article class="action-card"><div><p class="eyebrow">Profile data</p><h2>Edit profile</h2><p class="muted">Change alias, optional filtering data, or filter behavior.</p></div><a class="button" [routerLink]="['/profiles', currentProfile.id, 'edit']">Edit</a></article>
           <article class="action-card"><div><p class="eyebrow">Portability</p><h2>Export or share</h2><p class="muted">Generate a versioned code that can be copied to another device.</p></div><a class="button" [routerLink]="['/profiles', currentProfile.id, 'export']">Export</a></article>

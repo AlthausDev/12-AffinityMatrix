@@ -4,6 +4,7 @@ import { PracticeAnswer } from '../../domain/profile/profile-answer';
 import { Profile, ProfileId } from '../../domain/profile/profile';
 import { ProfileMetadata } from '../../domain/profile/profile-metadata';
 import { DEFAULT_PROFILE_SETTINGS, ProfileSettings } from '../../domain/profile/profile-settings';
+import { CatalogueVersion } from '../../domain/catalogue/catalogue-version';
 import { PROFILE_SERVICE } from './profile-service.token';
 
 @Injectable({ providedIn: 'root' })
@@ -14,6 +15,8 @@ export class ProfileStore {
   private readonly loadingState = signal(false);
   private readonly savingState = signal(false);
   private initialization?: Promise<void>;
+  private mutationTail: Promise<void> = Promise.resolve();
+  private pendingMutations = 0;
 
   readonly profiles = this.profilesState.asReadonly();
   readonly error = this.errorState.asReadonly();
@@ -33,11 +36,11 @@ export class ProfileStore {
     metadata: ProfileMetadata,
     settings: Partial<ProfileSettings> = DEFAULT_PROFILE_SETTINGS,
   ): Promise<Profile | undefined> {
-    return this.execute(() => this.service.create(metadata, settings));
+    return this.enqueueProfileMutation(() => this.service.create(metadata, settings));
   }
 
   importPortable(portable: PortableProfile): Promise<Profile | undefined> {
-    return this.execute(() => this.service.importPortable(portable));
+    return this.enqueueProfileMutation(() => this.service.importPortable(portable));
   }
 
   updateProfile(
@@ -45,47 +48,71 @@ export class ProfileStore {
     metadata: ProfileMetadata,
     settings: ProfileSettings,
   ): Promise<Profile | undefined> {
-    return this.execute(() => this.service.updateProfile(id, metadata, settings));
+    return this.enqueueProfileMutation(() => this.service.updateProfile(id, metadata, settings));
   }
 
-  upsertAnswer(id: ProfileId, answer: PracticeAnswer): Promise<Profile | undefined> {
-    return this.execute(() => this.service.upsertAnswer(id, answer));
+  upsertAnswer(
+    id: ProfileId,
+    answer: PracticeAnswer,
+    catalogueVersion?: CatalogueVersion,
+  ): Promise<Profile | undefined> {
+    return this.enqueueProfileMutation(() => this.service.upsertAnswer(id, answer, catalogueVersion));
   }
 
   removeAnswer(id: ProfileId, practiceId: string, roleId: string): Promise<Profile | undefined> {
-    return this.execute(() => this.service.removeAnswer(id, practiceId, roleId));
+    return this.enqueueProfileMutation(() => this.service.removeAnswer(id, practiceId, roleId));
   }
 
-  async delete(id: ProfileId): Promise<boolean> {
-    this.savingState.set(true);
-    try {
-      await this.service.delete(id);
-      await this.reload();
-      return true;
-    } catch (error: unknown) {
-      this.captureError(error);
-      return false;
-    } finally {
-      this.savingState.set(false);
-    }
+  delete(id: ProfileId): Promise<boolean> {
+    this.markMutationQueued();
+    const task = this.mutationTail.then(async () => {
+      try {
+        await this.service.delete(id);
+        await this.reload();
+        return true;
+      } catch (error: unknown) {
+        this.captureError(error);
+        return false;
+      } finally {
+        this.markMutationFinished();
+      }
+    });
+    this.mutationTail = task.then(() => undefined, () => undefined);
+    return task;
   }
 
   clearError(): void {
     this.errorState.set(null);
   }
 
-  private async execute(operation: () => Promise<Profile | undefined>): Promise<Profile | undefined> {
+  private enqueueProfileMutation(
+    operation: () => Promise<Profile | undefined>,
+  ): Promise<Profile | undefined> {
+    this.markMutationQueued();
+    const task = this.mutationTail.then(async () => {
+      try {
+        const profile = await operation();
+        await this.reload();
+        return profile;
+      } catch (error: unknown) {
+        this.captureError(error);
+        return undefined;
+      } finally {
+        this.markMutationFinished();
+      }
+    });
+    this.mutationTail = task.then(() => undefined, () => undefined);
+    return task;
+  }
+
+  private markMutationQueued(): void {
+    this.pendingMutations += 1;
     this.savingState.set(true);
-    try {
-      const profile = await operation();
-      await this.reload();
-      return profile;
-    } catch (error: unknown) {
-      this.captureError(error);
-      return undefined;
-    } finally {
-      this.savingState.set(false);
-    }
+  }
+
+  private markMutationFinished(): void {
+    this.pendingMutations = Math.max(0, this.pendingMutations - 1);
+    this.savingState.set(this.pendingMutations > 0);
   }
 
   private async reload(): Promise<void> {

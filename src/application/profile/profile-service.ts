@@ -1,3 +1,4 @@
+import { CatalogueVersion } from '../../domain/catalogue/catalogue-version';
 import { clonePracticeAnswer, createAnswerKey, PracticeAnswer } from '../../domain/profile/profile-answer';
 import { Profile, ProfileId } from '../../domain/profile/profile';
 import { ProfileMetadata } from '../../domain/profile/profile-metadata';
@@ -55,7 +56,11 @@ export class ProfileService {
     });
   }
 
-  async upsertAnswer(id: ProfileId, answer: PracticeAnswer): Promise<Profile | undefined> {
+  async upsertAnswer(
+    id: ProfileId,
+    answer: PracticeAnswer,
+    catalogueVersion?: CatalogueVersion,
+  ): Promise<Profile | undefined> {
     const current = await this.repository.findById(id);
     if (!current) {
       return undefined;
@@ -64,6 +69,7 @@ export class ProfileService {
     const key = createAnswerKey(answer.practiceId, answer.roleId);
     return this.saveNextRevision(current, {
       ...current,
+      catalogueVersion: Math.max(current.catalogueVersion, catalogueVersion ?? current.catalogueVersion),
       answers: {
         ...current.answers,
         [key]: clonePracticeAnswer(answer),

@@ -32,6 +32,20 @@ export const routes: Routes = [
     title: 'Edit profile',
   },
   {
+    path: 'profiles/:id/questionnaire',
+    loadComponent: () =>
+      import('./pages/questionnaire-categories/questionnaire-categories-page.component')
+        .then((module) => module.QuestionnaireCategoriesPageComponent),
+    title: 'Questionnaire categories',
+  },
+  {
+    path: 'profiles/:id/questionnaire/:category',
+    loadComponent: () =>
+      import('./pages/questionnaire-category/questionnaire-category-page.component')
+        .then((module) => module.QuestionnaireCategoryPageComponent),
+    title: 'Questionnaire',
+  },
+  {
     path: 'profiles/:id/export',
     component: ProfileExportPageComponent,
     title: 'Export profile',

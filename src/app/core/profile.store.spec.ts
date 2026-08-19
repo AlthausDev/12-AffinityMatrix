@@ -67,4 +67,27 @@ describe('ProfileStore', () => {
     expect(updated?.metadata.alias).toBe('Updated');
     expect(updated?.settings.filterQuestionnaireByMetadata).toBe(false);
   });
+
+  it('serializes rapid questionnaire writes so one browser interaction cannot create a stale revision', async () => {
+    const created = await store.create({ alias: 'Example' });
+
+    const first = store.upsertAnswer(
+      created!.id,
+      { practiceId: 'kissing', roleId: 'mutual', preference: 'like' },
+      1,
+    );
+    const second = store.upsertAnswer(
+      created!.id,
+      { practiceId: 'kissing', roleId: 'mutual', preference: 'favorite' },
+      1,
+    );
+
+    await Promise.all([first, second]);
+
+    const current = store.findById(created!.id);
+    expect(current?.revision).toBe(3);
+    expect(current?.answers['kissing::mutual']?.preference).toBe('favorite');
+    expect(store.error()).toBeNull();
+    expect(store.saving()).toBe(false);
+  });
 });
