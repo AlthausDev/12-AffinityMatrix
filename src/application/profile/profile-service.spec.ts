@@ -76,16 +76,35 @@ describe('ProfileService', () => {
     expect(updated?.updatedAt).toBe('2026-08-17T13:00:00.000Z');
   });
 
-  it('upserts optional answer detail dimensions behind the application service', async () => {
+  it('upserts optional answer details and records the catalogue version used for the answer', async () => {
     const profile = await service.create({ alias: 'Example' });
-    const updated = await service.upsertAnswer(profile.id, {
-      practiceId: 'bondage',
-      roleId: 'receive',
-      preference: 'like',
-      details: { desiredFrequency: 'regularly', initiative: 'prefer-partner' },
-    });
+    const updated = await service.upsertAnswer(
+      profile.id,
+      {
+        practiceId: 'bondage',
+        roleId: 'receive',
+        preference: 'like',
+        details: { desiredFrequency: 'regularly', initiative: 'prefer-partner' },
+      },
+      2,
+    );
 
     expect(updated?.answers['bondage::receive']?.details?.desiredFrequency).toBe('regularly');
     expect(updated?.revision).toBe(2);
+    expect(updated?.catalogueVersion).toBe(2);
+  });
+
+  it('never downgrades a profile catalogue version when editing through an older catalogue', async () => {
+    const profile = await service.create({ alias: 'Example' });
+    const future = { ...profile, catalogueVersion: 4 };
+    await repository.save(future, profile.revision);
+
+    const updated = await service.upsertAnswer(
+      profile.id,
+      { practiceId: 'bondage', roleId: 'receive', preference: 'like' },
+      1,
+    );
+
+    expect(updated?.catalogueVersion).toBe(4);
   });
 });
