@@ -1,17 +1,16 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { PracticeRole } from '../../domain/catalogue/practice';
 import {
   AnswerDetails,
+  AnswerScope,
   DEPENDS_ON_MAX_LENGTH,
   DesiredFrequency,
   ExperienceContext,
   InitiativePreference,
   PracticeAnswer,
 } from '../../domain/profile/profile-answer';
-import {
-  DETAIL_CAPABLE_PREFERENCES,
-  Preference,
-} from '../../domain/profile/preference';
+import { Sex } from '../../domain/profile/profile-metadata';
+import { DETAIL_CAPABLE_PREFERENCES, Preference } from '../../domain/profile/preference';
 
 const PREFERENCE_OPTIONS: readonly { readonly value: Preference; readonly label: string; readonly symbol: string }[] = [
   { value: 'favorite', label: 'Favorite', symbol: '★' },
@@ -23,6 +22,8 @@ const PREFERENCE_OPTIONS: readonly { readonly value: Preference; readonly label:
   { value: 'boundary', label: 'Boundary', symbol: '!' },
 ];
 
+const SEX_LABELS: Record<Sex, string> = { male: 'Man', female: 'Woman' };
+
 @Component({
   selector: 'app-questionnaire-role',
   template: `
@@ -30,6 +31,9 @@ const PREFERENCE_OPTIONS: readonly { readonly value: Preference; readonly label:
       <div class="role-heading">
         <div>
           <h3>{{ role().label }}</h3>
+          @if (counterpartSex(); as sex) {
+            <p class="scope-note">Counterpart: {{ sexLabel(sex) }}</p>
+          }
           @if (filtered()) {
             <p class="filtered-note">Filtered by profile data · shown manually</p>
           }
@@ -39,7 +43,7 @@ const PREFERENCE_OPTIONS: readonly { readonly value: Preference; readonly label:
         }
       </div>
 
-      <div class="preference-scale" role="group" [attr.aria-label]="role().label + ' preference'">
+      <div class="preference-scale" role="group" [attr.aria-label]="ariaLabel()">
         @for (option of preferenceOptions; track option.value) {
           <button
             type="button"
@@ -114,7 +118,8 @@ const PREFERENCE_OPTIONS: readonly { readonly value: Preference; readonly label:
     .filtered-role { opacity: 0.82; }
     .role-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
     .role-heading h3 { margin: 0; font-size: 1rem; }
-    .filtered-note { margin: 0.25rem 0 0; color: var(--text-secondary); font-size: 0.78rem; }
+    .scope-note, .filtered-note { margin: 0.25rem 0 0; color: var(--text-secondary); font-size: 0.78rem; }
+    .scope-note { font-weight: 700; }
     .text-button { padding: 0; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; text-decoration: underline; }
     .preference-scale { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.4rem; }
     .preference-option { min-height: 3.25rem; padding: 0.45rem; border: 1px solid var(--border-subtle); border-radius: 0.45rem; background: var(--surface-elevated); color: var(--text-primary); cursor: pointer; font-size: 0.78rem; }
@@ -138,13 +143,25 @@ const PREFERENCE_OPTIONS: readonly { readonly value: Preference; readonly label:
 export class QuestionnaireRoleComponent {
   readonly practiceId = input.required<string>();
   readonly role = input.required<PracticeRole>();
+  readonly scope = input<AnswerScope | undefined>();
   readonly answer = input<PracticeAnswer | undefined>();
   readonly filtered = input(false);
   readonly answerChange = output<PracticeAnswer>();
-  readonly answerRemove = output<{ readonly practiceId: string; readonly roleId: string }>();
+  readonly answerRemove = output<{
+    readonly practiceId: string;
+    readonly roleId: string;
+    readonly scope?: AnswerScope;
+  }>();
 
+  readonly counterpartSex = computed(() => this.scope()?.counterpartSex);
+  readonly ariaLabel = computed(() => {
+    const sex = this.counterpartSex();
+    return `${this.role().label}${sex ? ` with ${this.sexLabel(sex)}` : ''} preference`;
+  });
   readonly preferenceOptions = PREFERENCE_OPTIONS;
   readonly dependsOnMaxLength = DEPENDS_ON_MAX_LENGTH;
+
+  sexLabel(sex: Sex): string { return SEX_LABELS[sex]; }
 
   supportsDetails(preference: Preference): boolean {
     return DETAIL_CAPABLE_PREFERENCES.includes(preference);
@@ -161,16 +178,23 @@ export class QuestionnaireRoleComponent {
       details = Object.keys(remaining).length > 0 ? remaining : undefined;
     }
 
+    const scope = this.scope();
     this.answerChange.emit({
       practiceId: this.practiceId(),
       roleId: this.role().id,
+      ...(scope ? { scope: { ...scope } } : {}),
       preference,
       ...(details ? { details } : {}),
     });
   }
 
   clearAnswer(): void {
-    this.answerRemove.emit({ practiceId: this.practiceId(), roleId: this.role().id });
+    const scope = this.scope();
+    this.answerRemove.emit({
+      practiceId: this.practiceId(),
+      roleId: this.role().id,
+      ...(scope ? { scope: { ...scope } } : {}),
+    });
   }
 
   updateContext(event: Event): void {
@@ -195,16 +219,11 @@ export class QuestionnaireRoleComponent {
 
   private updateDetail(key: keyof AnswerDetails, value: AnswerDetails[keyof AnswerDetails] | undefined): void {
     const answer = this.answer();
-    if (!answer || !this.supportsDetails(answer.preference)) {
-      return;
-    }
+    if (!answer || !this.supportsDetails(answer.preference)) return;
 
     const details = { ...(answer.details ?? {}) } as Record<keyof AnswerDetails, unknown>;
-    if (value === undefined) {
-      delete details[key];
-    } else {
-      details[key] = value;
-    }
+    if (value === undefined) delete details[key];
+    else details[key] = value;
 
     const { details: _previousDetails, ...base } = answer;
     this.answerChange.emit({

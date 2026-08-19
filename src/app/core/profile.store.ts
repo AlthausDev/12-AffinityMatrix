@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { PortableProfile } from '../../application/profile/portable-profile';
-import { PracticeAnswer } from '../../domain/profile/profile-answer';
+import { AnswerScope, PracticeAnswer } from '../../domain/profile/profile-answer';
 import { Profile, ProfileId } from '../../domain/profile/profile';
 import { ProfileMetadata } from '../../domain/profile/profile-metadata';
 import { DEFAULT_PROFILE_SETTINGS, ProfileSettings } from '../../domain/profile/profile-settings';
@@ -59,8 +59,13 @@ export class ProfileStore {
     return this.enqueueProfileMutation(() => this.service.upsertAnswer(id, answer, catalogueVersion));
   }
 
-  removeAnswer(id: ProfileId, practiceId: string, roleId: string): Promise<Profile | undefined> {
-    return this.enqueueProfileMutation(() => this.service.removeAnswer(id, practiceId, roleId));
+  removeAnswer(
+    id: ProfileId,
+    practiceId: string,
+    roleId: string,
+    scope?: AnswerScope,
+  ): Promise<Profile | undefined> {
+    return this.enqueueProfileMutation(() => this.service.removeAnswer(id, practiceId, roleId, scope));
   }
 
   delete(id: ProfileId): Promise<boolean> {

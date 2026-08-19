@@ -1,3 +1,4 @@
+import { Sex } from './profile-metadata';
 import { Preference } from './preference';
 
 export const EXPERIENCE_CONTEXT_VALUES = [
@@ -31,22 +32,48 @@ export interface AnswerDetails {
   readonly dependsOn?: string;
 }
 
+/**
+ * Relational dimensions that qualify an answer without changing the semantic role itself.
+ * Keep this object small and extend it only when a real questionnaire axis requires it.
+ */
+export interface AnswerScope {
+  readonly counterpartSex?: Sex;
+}
+
 export interface PracticeAnswer {
   readonly practiceId: string;
   readonly roleId: string;
+  readonly scope?: AnswerScope;
   readonly preference: Preference;
   readonly details?: AnswerDetails;
 }
 
-export type AnswerKey = `${string}::${string}`;
+export type AnswerKey = string;
 
-export function createAnswerKey(practiceId: string, roleId: string): AnswerKey {
-  return `${practiceId}::${roleId}`;
+/**
+ * Canonical answer identity. Scope fields are serialized here in a stable order so callers
+ * never construct persistence keys themselves.
+ */
+export function createAnswerKey(
+  practiceId: string,
+  roleId: string,
+  scope?: AnswerScope,
+): AnswerKey {
+  const parts = [practiceId, roleId];
+  if (scope?.counterpartSex) {
+    parts.push(`counterpart-sex=${scope.counterpartSex}`);
+  }
+  return parts.join('::');
+}
+
+export function cloneAnswerScope(scope: AnswerScope | undefined): AnswerScope | undefined {
+  return scope ? { ...scope } : undefined;
 }
 
 export function clonePracticeAnswer(answer: PracticeAnswer): PracticeAnswer {
   return {
     ...answer,
+    ...(answer.scope ? { scope: { ...answer.scope } } : {}),
     ...(answer.details ? { details: { ...answer.details } } : {}),
   };
 }

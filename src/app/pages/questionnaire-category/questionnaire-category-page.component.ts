@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { PracticeAnswer } from '../../../domain/profile/profile-answer';
+import { AnswerScope, PracticeAnswer } from '../../../domain/profile/profile-answer';
 import { CatalogueStore } from '../../core/catalogue.store';
 import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
@@ -30,23 +30,24 @@ import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-ro
             @if (filteredCount() > 0) {
               <label class="check-field compact-toggle">
                 <input type="checkbox" [checked]="includeFiltered()" (change)="toggleFiltered($event)" />
-                <span><strong>Show filtered roles</strong><small>{{ filteredCount() }} hidden in this category</small></span>
+                <span><strong>Show filtered questions</strong><small>{{ filteredCount() }} hidden in this category</small></span>
               </label>
             }
             <p class="save-state muted" role="status">{{ profileStore.saving() ? 'Saving locally…' : 'Saved locally' }}</p>
           </div>
 
           @if (currentCategory.practices.length === 0) {
-            <section class="panel"><h2>No visible questions</h2><p class="muted">Show filtered roles above or disable filtering in Profile data.</p></section>
+            <section class="panel"><h2>No visible questions</h2><p class="muted">Show filtered questions above or disable filtering in Profile data.</p></section>
           } @else {
             <section class="question-list">
               @for (item of currentCategory.practices; track item.practice.id) {
                 <article class="panel question-card">
                   <header class="question-card-header"><h2>{{ item.practice.label }}</h2><p class="muted">{{ item.practice.description }}</p></header>
-                  @for (roleView of item.roles; track roleView.role.id) {
+                  @for (roleView of item.roles; track roleView.answerKey) {
                     <app-questionnaire-role
                       [practiceId]="item.practice.id"
                       [role]="roleView.role"
+                      [scope]="roleView.scope"
                       [answer]="roleView.answer"
                       [filtered]="roleView.filtered"
                       (answerChange)="saveAnswer($event)"
@@ -121,7 +122,7 @@ export class QuestionnaireCategoryPageComponent {
     const snapshot = this.snapshot();
     if (snapshot) void this.profileStore.upsertAnswer(this.profileId(), answer, snapshot.version);
   }
-  removeAnswer(target: { readonly practiceId: string; readonly roleId: string }): void {
-    void this.profileStore.removeAnswer(this.profileId(), target.practiceId, target.roleId);
+  removeAnswer(target: { readonly practiceId: string; readonly roleId: string; readonly scope?: AnswerScope }): void {
+    void this.profileStore.removeAnswer(this.profileId(), target.practiceId, target.roleId, target.scope);
   }
 }

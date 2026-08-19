@@ -1,5 +1,10 @@
 import { CatalogueVersion } from '../../domain/catalogue/catalogue-version';
-import { clonePracticeAnswer, createAnswerKey, PracticeAnswer } from '../../domain/profile/profile-answer';
+import {
+  AnswerScope,
+  clonePracticeAnswer,
+  createAnswerKey,
+  PracticeAnswer,
+} from '../../domain/profile/profile-answer';
 import { Profile, ProfileId } from '../../domain/profile/profile';
 import { ProfileMetadata } from '../../domain/profile/profile-metadata';
 import { DEFAULT_PROFILE_SETTINGS, ProfileSettings } from '../../domain/profile/profile-settings';
@@ -44,9 +49,7 @@ export class ProfileService {
     settings: ProfileSettings,
   ): Promise<Profile | undefined> {
     const current = await this.repository.findById(id);
-    if (!current) {
-      return undefined;
-    }
+    if (!current) return undefined;
 
     return this.saveNextRevision(current, {
       ...current,
@@ -62,11 +65,9 @@ export class ProfileService {
     catalogueVersion?: CatalogueVersion,
   ): Promise<Profile | undefined> {
     const current = await this.repository.findById(id);
-    if (!current) {
-      return undefined;
-    }
+    if (!current) return undefined;
 
-    const key = createAnswerKey(answer.practiceId, answer.roleId);
+    const key = createAnswerKey(answer.practiceId, answer.roleId, answer.scope);
     return this.saveNextRevision(current, {
       ...current,
       catalogueVersion: Math.max(current.catalogueVersion, catalogueVersion ?? current.catalogueVersion),
@@ -78,16 +79,17 @@ export class ProfileService {
     });
   }
 
-  async removeAnswer(id: ProfileId, practiceId: string, roleId: string): Promise<Profile | undefined> {
+  async removeAnswer(
+    id: ProfileId,
+    practiceId: string,
+    roleId: string,
+    scope?: AnswerScope,
+  ): Promise<Profile | undefined> {
     const current = await this.repository.findById(id);
-    if (!current) {
-      return undefined;
-    }
+    if (!current) return undefined;
 
-    const key = createAnswerKey(practiceId, roleId);
-    if (!(key in current.answers)) {
-      return current;
-    }
+    const key = createAnswerKey(practiceId, roleId, scope);
+    if (!(key in current.answers)) return current;
 
     const answers = { ...current.answers };
     delete answers[key];
@@ -101,17 +103,12 @@ export class ProfileService {
 
   async delete(id: ProfileId): Promise<void> {
     const current = await this.repository.findById(id);
-    if (!current) {
-      return;
-    }
+    if (!current) return;
     await this.repository.delete(id, current.revision);
   }
 
   private async saveNextRevision(current: Profile, candidate: Profile): Promise<Profile> {
-    const next: Profile = {
-      ...candidate,
-      revision: current.revision + 1,
-    };
+    const next: Profile = { ...candidate, revision: current.revision + 1 };
     await this.repository.save(next, current.revision);
     return next;
   }

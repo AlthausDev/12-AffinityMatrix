@@ -5,7 +5,7 @@ import {
 import { Profile, ProfileId } from '../../domain/profile/profile';
 import { DomainValidationError } from '../../domain/shared/validator';
 import { ProfileStoreMigrator } from './profile-store-migration';
-import { PROFILE_STORE_VERSION, StoredProfilesV3 } from './profile-store';
+import { PROFILE_STORE_VERSION, StoredProfilesV4 } from './profile-store';
 import { StoredProfilesValidator, storedProfilesValidator } from './stored-profiles.validator';
 
 export const DEFAULT_PROFILE_STORAGE_KEY = 'preference-profile-store';
@@ -63,9 +63,7 @@ export class LocalStorageProfileRepository implements ProfileRepository {
   async delete(id: ProfileId, expectedRevision?: number): Promise<void> {
     const store = this.readStore();
     const existing = store.profiles.find((profile) => profile.id === id);
-    if (!existing) {
-      return;
-    }
+    if (!existing) return;
 
     if (expectedRevision === undefined || existing.revision !== expectedRevision) {
       throw new ProfileConcurrencyError();
@@ -77,7 +75,7 @@ export class LocalStorageProfileRepository implements ProfileRepository {
     });
   }
 
-  private readStore(): StoredProfilesV3 {
+  private readStore(): StoredProfilesV4 {
     let source: { readonly key: string; readonly raw: string } | undefined;
     try {
       source = this.findStoredValue();
@@ -85,9 +83,7 @@ export class LocalStorageProfileRepository implements ProfileRepository {
       throw new ProfileStorageError('Unable to read profile data from browser storage.', { cause: error });
     }
 
-    if (!source) {
-      return { version: PROFILE_STORE_VERSION, profiles: [] };
-    }
+    if (!source) return { version: PROFILE_STORE_VERSION, profiles: [] };
 
     let parsed: unknown;
     try {
@@ -117,21 +113,17 @@ export class LocalStorageProfileRepository implements ProfileRepository {
 
   private findStoredValue(): { readonly key: string; readonly raw: string } | undefined {
     const current = this.storage.getItem(this.storageKey);
-    if (current !== null) {
-      return { key: this.storageKey, raw: current };
-    }
+    if (current !== null) return { key: this.storageKey, raw: current };
 
     for (const key of this.legacyStorageKeys) {
       const raw = this.storage.getItem(key);
-      if (raw !== null) {
-        return { key, raw };
-      }
+      if (raw !== null) return { key, raw };
     }
 
     return undefined;
   }
 
-  private assertValidStore(value: unknown): StoredProfilesV3 {
+  private assertValidStore(value: unknown): StoredProfilesV4 {
     try {
       return this.validator.assert(value, 'Stored profile data failed validation.');
     } catch (error: unknown) {
@@ -148,7 +140,7 @@ export class LocalStorageProfileRepository implements ProfileRepository {
     }
   }
 
-  private writeStore(store: StoredProfilesV3): void {
+  private writeStore(store: StoredProfilesV4): void {
     this.assertValidStore(store);
     try {
       this.storage.setItem(this.storageKey, JSON.stringify(store));

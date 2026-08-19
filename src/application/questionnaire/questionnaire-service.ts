@@ -5,7 +5,17 @@ import {
   QuestionVisibilityPolicy,
 } from '../../domain/catalogue/profile-filter';
 import { Practice, PracticeCategory, PracticeRole } from '../../domain/catalogue/practice';
-import { createAnswerKey, PracticeAnswer } from '../../domain/profile/profile-answer';
+import {
+  defaultQuestionScopePolicy,
+  QuestionScopePolicy,
+} from '../../domain/catalogue/question-scope-policy';
+import {
+  AnswerKey,
+  AnswerScope,
+  createAnswerKey,
+  PracticeAnswer,
+} from '../../domain/profile/profile-answer';
+import { Sex } from '../../domain/profile/profile-metadata';
 import { Profile } from '../../domain/profile/profile';
 
 export interface QuestionnaireCategorySummary {
@@ -18,6 +28,9 @@ export interface QuestionnaireCategorySummary {
 
 export interface QuestionnaireRoleView {
   readonly role: PracticeRole;
+  readonly answerKey: AnswerKey;
+  readonly scope?: AnswerScope;
+  readonly counterpartSex?: Sex;
   readonly answer?: PracticeAnswer;
   readonly filtered: boolean;
 }
@@ -41,6 +54,7 @@ export type CatalogueRelationship = 'current' | 'profile-older' | 'profile-newer
 export class QuestionnaireService {
   constructor(
     private readonly visibilityPolicy: QuestionVisibilityPolicy = defaultQuestionVisibilityPolicy,
+    private readonly scopePolicy: QuestionScopePolicy = defaultQuestionScopePolicy,
   ) {}
 
   getCategorySummaries(
@@ -60,9 +74,7 @@ export class QuestionnaireService {
     includeFiltered = false,
   ): QuestionnaireCategoryView | undefined {
     const category = snapshot.catalogue.categories.find((candidate) => candidate.id === categoryId);
-    if (!category) {
-      return undefined;
-    }
+    if (!category) return undefined;
 
     const context = this.context(profile);
     const practices = snapshot.catalogue.practices
@@ -79,10 +91,7 @@ export class QuestionnaireService {
   getNeighbours(snapshot: CatalogueSnapshot, categoryId: string): QuestionnaireNeighbours {
     const categories = this.sortedCategories(snapshot);
     const index = categories.findIndex((category) => category.id === categoryId);
-    if (index < 0) {
-      return {};
-    }
-
+    if (index < 0) return {};
     return {
       ...(index > 0 ? { previousCategoryId: categories[index - 1]?.id } : {}),
       ...(index < categories.length - 1 ? { nextCategoryId: categories[index + 1]?.id } : {}),
@@ -90,23 +99,23 @@ export class QuestionnaireService {
   }
 
   getCatalogueRelationship(snapshot: CatalogueSnapshot, profile: Profile): CatalogueRelationship {
-    if (profile.catalogueVersion < snapshot.version) {
-      return 'profile-older';
-    }
-    if (profile.catalogueVersion > snapshot.version) {
-      return 'profile-newer';
-    }
+    if (profile.catalogueVersion < snapshot.version) return 'profile-older';
+    if (profile.catalogueVersion > snapshot.version) return 'profile-newer';
     return 'current';
   }
 
   countUnknownAnswers(snapshot: CatalogueSnapshot, profile: Profile): number {
     const knownKeys = new Set(
       snapshot.catalogue.practices.flatMap((practice) =>
-        practice.roles.map((role) => createAnswerKey(practice.id, role.id)),
+        practice.roles.flatMap((role) =>
+          this.scopePolicy.getScopes(role).map((candidateScope) => {
+            const scope = this.nonEmptyScope(candidateScope);
+            return createAnswerKey(practice.id, role.id, scope);
+          }),
+        ),
       ),
     );
-
-    return Object.keys(profile.answers).filter((key) => !knownKeys.has(key as ReturnType<typeof createAnswerKey>)).length;
+    return Object.keys(profile.answers).filter((key) => !knownKeys.has(key)).length;
   }
 
   private summarizeCategory(
@@ -121,22 +130,15 @@ export class QuestionnaireService {
     let filtered = 0;
 
     for (const practice of snapshot.catalogue.practices) {
-      if (practice.categoryId !== category.id) {
-        continue;
-      }
-
+      if (practice.categoryId !== category.id) continue;
       for (const role of practice.roles) {
-        const visible = this.visibilityPolicy.isRoleVisible(role, context);
-        if (!visible) {
-          filtered += 1;
-        }
-        if (!visible && !includeFiltered) {
-          continue;
-        }
-
-        total += 1;
-        if (profile.answers[createAnswerKey(practice.id, role.id)]) {
-          answered += 1;
+        for (const candidateScope of this.scopePolicy.getScopes(role)) {
+          const scope = this.nonEmptyScope(candidateScope);
+          const visible = this.visibilityPolicy.isRoleVisible(role, context, scope);
+          if (!visible) filtered += 1;
+          if (!visible && !includeFiltered) continue;
+          total += 1;
+          if (profile.answers[createAnswerKey(practice.id, role.id, scope)]) answered += 1;
         }
       }
     }
@@ -156,20 +158,23 @@ export class QuestionnaireService {
     context: ProfileQuestionContext,
     includeFiltered: boolean,
   ): QuestionnairePracticeView | undefined {
-    const roles = practice.roles.flatMap((role): QuestionnaireRoleView[] => {
-      const visible = this.visibilityPolicy.isRoleVisible(role, context);
-      if (!visible && !includeFiltered) {
-        return [];
-      }
-
-      const answer = profile.answers[createAnswerKey(practice.id, role.id)];
-      return [{
-        role,
-        ...(answer ? { answer } : {}),
-        filtered: !visible,
-      }];
-    });
-
+    const roles = practice.roles.flatMap((role): QuestionnaireRoleView[] =>
+      this.scopePolicy.getScopes(role).flatMap((candidateScope): QuestionnaireRoleView[] => {
+        const scope = this.nonEmptyScope(candidateScope);
+        const visible = this.visibilityPolicy.isRoleVisible(role, context, scope);
+        if (!visible && !includeFiltered) return [];
+        const answerKey = createAnswerKey(practice.id, role.id, scope);
+        const answer = profile.answers[answerKey];
+        return [{
+          role,
+          answerKey,
+          ...(scope ? { scope } : {}),
+          ...(scope?.counterpartSex ? { counterpartSex: scope.counterpartSex } : {}),
+          ...(answer ? { answer } : {}),
+          filtered: !visible,
+        }];
+      }),
+    );
     return roles.length > 0 ? { practice, roles } : undefined;
   }
 
@@ -178,9 +183,10 @@ export class QuestionnaireService {
   }
 
   private context(profile: Profile): ProfileQuestionContext {
-    return {
-      metadata: profile.metadata,
-      settings: profile.settings,
-    };
+    return { metadata: profile.metadata, settings: profile.settings };
+  }
+
+  private nonEmptyScope(scope: AnswerScope): AnswerScope | undefined {
+    return scope.counterpartSex ? scope : undefined;
   }
 }

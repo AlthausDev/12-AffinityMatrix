@@ -3,6 +3,7 @@ import { Sex } from '../profile/profile-metadata';
 export type PracticeId = string;
 export type RoleId = string;
 export type RolePerspective = 'active' | 'receptive' | 'neutral';
+export type RoleContextAxis = 'counterpartSex';
 
 export interface RoleApplicability {
   readonly selfSex?: readonly Sex[];
@@ -14,6 +15,7 @@ export interface PracticeRole {
   readonly label: string;
   readonly perspective: RolePerspective;
   readonly applicability?: RoleApplicability;
+  readonly contextAxes?: readonly RoleContextAxis[];
 }
 
 export interface RoleCompatibilityPair {

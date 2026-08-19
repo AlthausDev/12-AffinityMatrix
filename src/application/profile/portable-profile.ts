@@ -3,25 +3,25 @@ import { AnswerKey, cloneAnswers, PracticeAnswer } from '../../domain/profile/pr
 import { createProfile, Profile } from '../../domain/profile/profile';
 import { ProfileMetadata } from '../../domain/profile/profile-metadata';
 
-export const PORTABLE_PROFILE_V3_FORMAT_VERSION = 3 as const;
-export const PORTABLE_PROFILE_V3_PROFILE_SCHEMA_VERSION = 3 as const;
+export const PORTABLE_PROFILE_V4_FORMAT_VERSION = 4 as const;
+export const PORTABLE_PROFILE_V4_PROFILE_SCHEMA_VERSION = 4 as const;
 
-export const PORTABLE_PROFILE_FORMAT_VERSION = PORTABLE_PROFILE_V3_FORMAT_VERSION;
-export const PORTABLE_PROFILE_PROFILE_SCHEMA_VERSION = PORTABLE_PROFILE_V3_PROFILE_SCHEMA_VERSION;
+export const PORTABLE_PROFILE_FORMAT_VERSION = PORTABLE_PROFILE_V4_FORMAT_VERSION;
+export const PORTABLE_PROFILE_PROFILE_SCHEMA_VERSION = PORTABLE_PROFILE_V4_PROFILE_SCHEMA_VERSION;
 
 export interface ProfileExportOptions {
   readonly includeSensitiveMetadata?: boolean;
 }
 
-export interface PortableProfileV3 {
-  readonly formatVersion: typeof PORTABLE_PROFILE_V3_FORMAT_VERSION;
-  readonly profileSchemaVersion: typeof PORTABLE_PROFILE_V3_PROFILE_SCHEMA_VERSION;
+export interface PortableProfileV4 {
+  readonly formatVersion: typeof PORTABLE_PROFILE_V4_FORMAT_VERSION;
+  readonly profileSchemaVersion: typeof PORTABLE_PROFILE_V4_PROFILE_SCHEMA_VERSION;
   readonly catalogueVersion: CatalogueVersion;
   readonly metadata: ProfileMetadata;
   readonly answers: Readonly<Record<AnswerKey, PracticeAnswer>>;
 }
 
-export type PortableProfile = PortableProfileV3;
+export type PortableProfile = PortableProfileV4;
 
 export function toPortableProfile(
   profile: Profile,
@@ -36,8 +36,8 @@ export function toPortableProfile(
   };
 
   return {
-    formatVersion: PORTABLE_PROFILE_V3_FORMAT_VERSION,
-    profileSchemaVersion: PORTABLE_PROFILE_V3_PROFILE_SCHEMA_VERSION,
+    formatVersion: PORTABLE_PROFILE_V4_FORMAT_VERSION,
+    profileSchemaVersion: PORTABLE_PROFILE_V4_PROFILE_SCHEMA_VERSION,
     catalogueVersion: profile.catalogueVersion,
     metadata,
     answers: cloneAnswers(profile.answers),
