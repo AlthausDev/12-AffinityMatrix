@@ -105,7 +105,7 @@ export class QuestionnaireService {
   }
 
   countUnknownAnswers(snapshot: CatalogueSnapshot, profile: Profile): number {
-    const knownKeys = new Set(
+    const knownKeys = new Set<string>(
       snapshot.catalogue.practices.flatMap((practice) =>
         practice.roles.flatMap((role) =>
           this.scopePolicy.getScopes(role).map((candidateScope) => {
