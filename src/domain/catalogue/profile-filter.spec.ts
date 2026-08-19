@@ -12,10 +12,7 @@ function context(
   metadata: ProfileMetadata = {},
   filterQuestionnaireByMetadata = true,
 ): ProfileQuestionContext {
-  return {
-    metadata,
-    settings: { filterQuestionnaireByMetadata },
-  };
+  return { metadata, settings: { filterQuestionnaireByMetadata } };
 }
 
 describe('profile filtering', () => {
@@ -32,36 +29,38 @@ describe('profile filtering', () => {
 
   it('filters roles by the profile sex when the role constrains the subject', () => {
     const role: PracticeRole = {
-      id: 'receive',
-      label: 'Receive',
-      perspective: 'receptive',
-      applicability: { selfSex: ['female'] },
+      id: 'receive', label: 'Receive', perspective: 'receptive', applicability: { selfSex: ['female'] },
     };
-
     expect(policy.isRoleVisible(role, context({ sex: 'male' }))).toBe(false);
     expect(policy.isRoleVisible(role, context({ sex: 'female' }))).toBe(true);
   });
 
   it('filters roles by relevant partner sex when orientation can be applied', () => {
     const role: PracticeRole = {
-      id: 'give',
-      label: 'Give',
-      perspective: 'active',
-      applicability: { partnerSex: ['female'] },
+      id: 'give', label: 'Give', perspective: 'active', applicability: { partnerSex: ['female'] },
     };
-
     expect(policy.isRoleVisible(role, context({ sex: 'male', orientation: 'heterosexual' }))).toBe(true);
     expect(policy.isRoleVisible(role, context({ sex: 'male', orientation: 'homosexual' }))).toBe(false);
   });
 
-  it('keeps all roles visible when filtering is disabled', () => {
+  it('filters counterpart-scoped variants independently', () => {
     const role: PracticeRole = {
-      id: 'receive',
-      label: 'Receive',
-      perspective: 'receptive',
-      applicability: { selfSex: ['female'] },
+      id: 'restrain', label: 'Restrain partner', perspective: 'active', contextAxes: ['counterpartSex'],
     };
+    const heterosexualWoman = context({ sex: 'female', orientation: 'heterosexual' });
+    expect(policy.isRoleVisible(role, heterosexualWoman, { counterpartSex: 'male' })).toBe(true);
+    expect(policy.isRoleVisible(role, heterosexualWoman, { counterpartSex: 'female' })).toBe(false);
 
-    expect(policy.isRoleVisible(role, context({ sex: 'male' }, false))).toBe(true);
+    const bisexualWoman = context({ sex: 'female', orientation: 'bisexual' });
+    expect(policy.isRoleVisible(role, bisexualWoman, { counterpartSex: 'male' })).toBe(true);
+    expect(policy.isRoleVisible(role, bisexualWoman, { counterpartSex: 'female' })).toBe(true);
+  });
+
+  it('keeps all roles and counterpart variants visible when filtering is disabled', () => {
+    const role: PracticeRole = {
+      id: 'receive', label: 'Receive', perspective: 'receptive', applicability: { selfSex: ['female'] },
+      contextAxes: ['counterpartSex'],
+    };
+    expect(policy.isRoleVisible(role, context({ sex: 'male' }, false), { counterpartSex: 'female' })).toBe(true);
   });
 });

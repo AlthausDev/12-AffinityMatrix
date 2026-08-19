@@ -4,33 +4,40 @@ import { createAnswerKey } from '../../domain/profile/profile-answer';
 import { QuestionnaireService } from './questionnaire-service';
 
 const snapshot: CatalogueSnapshot = {
-  version: 1,
+  version: 2,
   catalogue: {
     categories: [
       { id: 'general', label: 'General', order: 0 },
       { id: 'oral', label: 'Oral', order: 1 },
-      { id: 'penetration', label: 'Penetration', order: 2 },
+      { id: 'restraint', label: 'Restraint', order: 2 },
     ],
     practices: [
+      {
+        id: 'kissing',
+        categoryId: 'general',
+        label: 'Kissing',
+        roles: [{ id: 'mutual', label: 'Participate', perspective: 'neutral', contextAxes: ['counterpartSex'] }],
+        compatibleRolePairs: [{ leftRoleId: 'mutual', rightRoleId: 'mutual' }],
+      },
       {
         id: 'cunnilingus',
         categoryId: 'oral',
         label: 'Cunnilingus',
         roles: [
           { id: 'give', label: 'Give', perspective: 'active', applicability: { partnerSex: ['female'] } },
-          { id: 'receive', label: 'Receive', perspective: 'receptive', applicability: { selfSex: ['female'] } },
+          { id: 'receive', label: 'Receive', perspective: 'receptive', applicability: { selfSex: ['female'] }, contextAxes: ['counterpartSex'] },
         ],
         compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
       },
       {
-        id: 'fellatio',
-        categoryId: 'oral',
-        label: 'Fellatio',
+        id: 'bondage',
+        categoryId: 'restraint',
+        label: 'Bondage',
         roles: [
-          { id: 'give', label: 'Give', perspective: 'active', applicability: { partnerSex: ['male'] } },
-          { id: 'receive', label: 'Receive', perspective: 'receptive', applicability: { selfSex: ['male'] } },
+          { id: 'restrain', label: 'Restrain', perspective: 'active', contextAxes: ['counterpartSex'] },
+          { id: 'be-restrained', label: 'Be restrained', perspective: 'receptive', contextAxes: ['counterpartSex'] },
         ],
-        compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
+        compatibleRolePairs: [{ leftRoleId: 'restrain', rightRoleId: 'be-restrained' }],
       },
     ],
   },
@@ -38,78 +45,96 @@ const snapshot: CatalogueSnapshot = {
 
 const service = new QuestionnaireService();
 
-function heterosexualMaleProfile() {
+function profile(
+  sex: 'male' | 'female',
+  orientation: 'heterosexual' | 'homosexual' | 'bisexual',
+) {
   return createProfile({
     id: 'profile-1',
     now: '2026-08-19T08:00:00.000Z',
-    metadata: { sex: 'male', orientation: 'heterosexual' },
+    metadata: { sex, orientation },
   });
 }
 
 describe('QuestionnaireService', () => {
-  it('projects only applicable role questions by default', () => {
-    const profile = heterosexualMaleProfile();
-    const oral = service.getCategory(snapshot, profile, 'oral');
+  it('expands a bisexual role into independently answerable counterpart-sex variants', () => {
+    const current = profile('female', 'bisexual');
+    const general = service.getCategory(snapshot, current, 'general');
+    const roles = general?.practices[0]?.roles ?? [];
 
-    const cunnilingus = oral?.practices.find((item) => item.practice.id === 'cunnilingus');
-    const fellatio = oral?.practices.find((item) => item.practice.id === 'fellatio');
-
-    expect(cunnilingus?.roles.map((item) => item.role.id)).toEqual(['give']);
-    expect(fellatio?.roles.map((item) => item.role.id)).toEqual(['receive']);
-    expect(oral?.filtered).toBe(2);
+    expect(roles.map((item) => item.counterpartSex)).toEqual(['male', 'female']);
+    expect(roles.map((item) => item.answerKey)).toEqual([
+      createAnswerKey('kissing', 'mutual', { counterpartSex: 'male' }),
+      createAnswerKey('kissing', 'mutual', { counterpartSex: 'female' }),
+    ]);
+    expect(general?.total).toBe(2);
+    expect(general?.filtered).toBe(0);
   });
 
-  it('can include filtered roles without losing their filtered marker', () => {
-    const profile = heterosexualMaleProfile();
-    const oral = service.getCategory(snapshot, profile, 'oral', true);
-    const cunnilingus = oral?.practices.find((item) => item.practice.id === 'cunnilingus');
+  it('shows only the relevant counterpart variant for heterosexual and homosexual profiles by default', () => {
+    const heterosexualWoman = service.getCategory(snapshot, profile('female', 'heterosexual'), 'restraint');
+    expect(heterosexualWoman?.practices[0]?.roles.map((item) => `${item.role.id}:${item.counterpartSex}`)).toEqual([
+      'restrain:male',
+      'be-restrained:male',
+    ]);
+    expect(heterosexualWoman?.filtered).toBe(2);
 
-    expect(cunnilingus?.roles).toHaveLength(2);
-    expect(cunnilingus?.roles.find((item) => item.role.id === 'receive')?.filtered).toBe(true);
+    const homosexualWoman = service.getCategory(snapshot, profile('female', 'homosexual'), 'restraint');
+    expect(homosexualWoman?.practices[0]?.roles.map((item) => item.counterpartSex)).toEqual(['female', 'female']);
   });
 
-  it('keeps unanswered distinct from neutral when calculating progress', () => {
-    const profile = heterosexualMaleProfile();
-    const key = createAnswerKey('cunnilingus', 'give');
+  it('can reveal filtered counterpart variants without merging their identities', () => {
+    const current = profile('female', 'heterosexual');
+    const restraint = service.getCategory(snapshot, current, 'restraint', true);
+    const roles = restraint?.practices[0]?.roles ?? [];
+
+    expect(roles).toHaveLength(4);
+    expect(roles.filter((item) => item.filtered).map((item) => item.counterpartSex)).toEqual(['female', 'female']);
+    expect(new Set(roles.map((item) => item.answerKey)).size).toBe(4);
+  });
+
+  it('keeps preferences for men and women independent in progress calculation', () => {
+    const current = profile('female', 'bisexual');
+    const maleKey = createAnswerKey('kissing', 'mutual', { counterpartSex: 'male' });
     const answered = {
-      ...profile,
+      ...current,
       answers: {
-        [key]: {
-          practiceId: 'cunnilingus',
-          roleId: 'give',
+        [maleKey]: {
+          practiceId: 'kissing',
+          roleId: 'mutual',
+          scope: { counterpartSex: 'male' as const },
           preference: 'neutral' as const,
         },
       },
     };
 
-    const oral = service.getCategory(snapshot, answered, 'oral');
-    expect(oral?.answered).toBe(1);
-    expect(oral?.total).toBe(2);
-    expect(oral?.completionPercentage).toBe(50);
+    const general = service.getCategory(snapshot, answered, 'general');
+    expect(general?.answered).toBe(1);
+    expect(general?.total).toBe(2);
+    expect(general?.completionPercentage).toBe(50);
+    expect(general?.practices[0]?.roles.find((item) => item.counterpartSex === 'female')?.answer).toBeUndefined();
   });
 
-  it('returns deterministic category navigation and catalogue relationship', () => {
-    const profile = heterosexualMaleProfile();
-    expect(service.getNeighbours(snapshot, 'oral')).toEqual({
-      previousCategoryId: 'general',
-      nextCategoryId: 'penetration',
-    });
-    expect(service.getCatalogueRelationship(snapshot, profile)).toBe('current');
+  it('still applies anatomy-related role applicability before counterpart context', () => {
+    const oral = service.getCategory(snapshot, profile('male', 'heterosexual'), 'oral');
+    expect(oral?.practices[0]?.roles.map((item) => item.role.id)).toEqual(['give']);
+    expect(oral?.filtered).toBe(2);
   });
 
-  it('detects answers whose practice or role is not present in the current catalogue', () => {
-    const profile = heterosexualMaleProfile();
+  it('treats a legacy unscoped answer to a newly scoped role as preserved unknown data', () => {
+    const current = profile('female', 'bisexual');
+    const legacyKey = createAnswerKey('kissing', 'mutual');
     const candidate = {
-      ...profile,
+      ...current,
+      catalogueVersion: 1,
       answers: {
-        'legacy-practice::legacy-role': {
-          practiceId: 'legacy-practice',
-          roleId: 'legacy-role',
-          preference: 'like' as const,
+        [legacyKey]: {
+          practiceId: 'kissing', roleId: 'mutual', preference: 'like' as const,
         },
       },
     };
 
     expect(service.countUnknownAnswers(snapshot, candidate)).toBe(1);
+    expect(service.getCatalogueRelationship(snapshot, candidate)).toBe('profile-older');
   });
 });

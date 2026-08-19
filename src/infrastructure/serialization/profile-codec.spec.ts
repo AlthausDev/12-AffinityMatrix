@@ -13,13 +13,15 @@ function sampleProfile() {
     settings: { filterQuestionnaireByMetadata: false },
   });
 
-  const key = createAnswerKey('example-practice', 'receive');
+  const scope = { counterpartSex: 'male' as const };
+  const key = createAnswerKey('example-practice', 'receive', scope);
   return {
     ...profile,
     answers: {
       [key]: {
         practiceId: 'example-practice',
         roleId: 'receive',
+        scope,
         preference: 'depends' as const,
         details: {
           context: 'want-to-try' as const,
@@ -33,19 +35,22 @@ function sampleProfile() {
 }
 
 describe('VersionedProfileCodeCodec', () => {
-  it('round-trips portable profile data including unicode, catalogue version, and optional details', () => {
+  it('round-trips scoped portable profile data including unicode and optional details', () => {
     const decoded = codec.decode(codec.encode(sampleProfile()));
+    const answer = Object.values(decoded.answers)[0];
 
+    expect(decoded.formatVersion).toBe(4);
+    expect(decoded.profileSchemaVersion).toBe(4);
     expect(decoded.metadata.alias).toBe('Ána ✓');
-    expect(decoded.catalogueVersion).toBe(1);
-    expect(Object.values(decoded.answers)[0]?.preference).toBe('depends');
-    expect(Object.values(decoded.answers)[0]?.details?.desiredFrequency).toBe('occasionally');
+    expect(decoded.catalogueVersion).toBe(2);
+    expect(answer?.scope?.counterpartSex).toBe('male');
+    expect(answer?.preference).toBe('depends');
+    expect(answer?.details?.desiredFrequency).toBe('occasionally');
   });
 
   it('minimizes sensitive metadata by default and includes it only when explicitly requested', () => {
     const minimized = codec.decode(codec.encode(sampleProfile()));
     const explicit = codec.decode(codec.encode(sampleProfile(), { includeSensitiveMetadata: true }));
-
     expect(minimized.metadata.sex).toBeUndefined();
     expect(minimized.metadata.orientation).toBeUndefined();
     expect(explicit.metadata.sex).toBe('female');
@@ -54,7 +59,6 @@ describe('VersionedProfileCodeCodec', () => {
 
   it('does not expose local identity, revision, timestamps, or presentation settings', () => {
     const decoded = codec.decode(codec.encode(sampleProfile()));
-
     expect('id' in decoded).toBe(false);
     expect('revision' in decoded).toBe(false);
     expect('createdAt' in decoded).toBe(false);
@@ -73,6 +77,25 @@ describe('VersionedProfileCodeCodec', () => {
     expect(() => tinyCodec.encode(sampleProfile())).toThrow(ProfileCodeError);
   });
 
+  it('migrates P3 without inventing relational scope and keeps its catalogue version', () => {
+    const v3 = {
+      formatVersion: 3,
+      profileSchemaVersion: 3,
+      catalogueVersion: 1,
+      metadata: { alias: 'Legacy V3' },
+      answers: {
+        'kissing::mutual': {
+          practiceId: 'kissing', roleId: 'mutual', preference: 'like',
+        },
+      },
+    };
+    const decoded = codec.decode(legacyCode('P3', v3));
+    expect(decoded.formatVersion).toBe(4);
+    expect(decoded.profileSchemaVersion).toBe(4);
+    expect(decoded.catalogueVersion).toBe(1);
+    expect(decoded.answers['kissing::mutual']?.scope).toBeUndefined();
+  });
+
   it('migrates valid P2 and P1 codes to the current portable model', () => {
     const v2 = {
       formatVersion: 2,
@@ -84,10 +107,7 @@ describe('VersionedProfileCodeCodec', () => {
       formatVersion: 1,
       profileSchemaVersion: 1,
       metadata: {
-        alias: 'Legacy V1',
-        sex: 'female',
-        orientation: 'heterosexual',
-        filterByProfileMetadata: true,
+        alias: 'Legacy V1', sex: 'female', orientation: 'heterosexual', filterByProfileMetadata: true,
       },
       answers: {},
     };
@@ -95,8 +115,8 @@ describe('VersionedProfileCodeCodec', () => {
     const decodedV2 = codec.decode(legacyCode('P2', v2));
     const decodedV1 = codec.decode(legacyCode('P1', v1));
 
-    expect(decodedV2.formatVersion).toBe(3);
-    expect(decodedV2.profileSchemaVersion).toBe(3);
+    expect(decodedV2.formatVersion).toBe(4);
+    expect(decodedV2.profileSchemaVersion).toBe(4);
     expect(decodedV2.catalogueVersion).toBe(1);
     expect(decodedV2.metadata.alias).toBe('Legacy V2');
     expect(decodedV1.metadata.alias).toBe('Legacy V1');
@@ -104,7 +124,7 @@ describe('VersionedProfileCodeCodec', () => {
   });
 });
 
-function legacyCode(prefix: 'P1' | 'P2', value: unknown): string {
+function legacyCode(prefix: 'P1' | 'P2' | 'P3', value: unknown): string {
   const json = JSON.stringify(value);
   const bytes = new TextEncoder().encode(json);
   const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
