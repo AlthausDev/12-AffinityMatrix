@@ -36,7 +36,10 @@ const ORIENTATION_LABELS: Record<SexualOrientation, string> = {
             <div><p class="eyebrow">Questionnaire</p><h2>{{ answeredCount() > 0 ? 'Continue or modify' : 'Start questionnaire' }}</h2><p class="muted">Work category by category. Answers are saved locally as you go.</p></div>
             <a class="button" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']">{{ answeredCount() > 0 ? 'Continue' : 'Start' }}</a>
           </article>
-          <article class="action-card disabled-card"><div><p class="eyebrow">Comparison</p><h2>Compare profiles</h2><p class="muted">Find complementary answers and category-level affinity.</p></div><button class="button secondary" type="button" disabled>Not available yet</button></article>
+          <article class="action-card">
+            <div><p class="eyebrow">Comparison</p><h2>Compare profiles</h2><p class="muted">Find complementary answered interactions and category-level affinity using the current catalogue.</p></div>
+            <a class="button" [routerLink]="['/profiles', currentProfile.id, 'compare']">Compare</a>
+          </article>
           <article class="action-card"><div><p class="eyebrow">Profile data</p><h2>Edit profile</h2><p class="muted">Change alias, optional filtering data, or filter behavior.</p></div><a class="button" [routerLink]="['/profiles', currentProfile.id, 'edit']">Edit</a></article>
           <article class="action-card"><div><p class="eyebrow">Portability</p><h2>Export or share</h2><p class="muted">Generate a versioned code that can be copied to another device.</p></div><a class="button" [routerLink]="['/profiles', currentProfile.id, 'export']">Export</a></article>
         </section>
@@ -45,7 +48,7 @@ const ORIENTATION_LABELS: Record<SexualOrientation, string> = {
           <div><p class="eyebrow">MVP status</p><h2 id="profile-status-title">Profile data</h2></div>
           <dl class="status-list">
             <div><dt>Question filter</dt><dd>{{ currentProfile.settings.filterQuestionnaireByMetadata ? 'Enabled' : 'Disabled' }}</dd></div>
-            <div><dt>Answered roles</dt><dd>{{ answeredCount() }}</dd></div>
+            <div><dt>Answered questions</dt><dd>{{ answeredCount() }}</dd></div>
             <div><dt>Revision</dt><dd>{{ currentProfile.revision }}</dd></div>
             <div><dt>Catalogue</dt><dd>v{{ currentProfile.catalogueVersion }}</dd></div>
             <div><dt>Storage</dt><dd>Local browser · not encrypted</dd></div>
