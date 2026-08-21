@@ -44,11 +44,11 @@ import {
           <section class="panel comparison-selector" aria-labelledby="comparison-target-title">
             <div>
               <p class="eyebrow">Profiles</p>
-              <h2 id="comparison-target-title">{{ leftProfile.metadata.alias || 'Untitled profile' }} + {{ selectedProfile()?.metadata?.alias || 'Untitled profile' }}</h2>
+              <h2 id="comparison-target-title">{{ leftProfile.metadata.alias || 'Untitled profile' }} + {{ selectedProfile().metadata.alias || 'Untitled profile' }}</h2>
             </div>
             <label class="select-field">
               <span>Compare with</span>
-              <select [value]="selectedProfile()?.id ?? ''" (change)="selectProfile($event)">
+              <select [value]="selectedProfile().id" (change)="selectProfile($event)">
                 @for (candidate of otherProfiles(); track candidate.id) {
                   <option [value]="candidate.id">{{ candidate.metadata.alias || 'Untitled profile' }}</option>
                 }
@@ -121,7 +121,7 @@ import {
                             </div>
                             <span class="pair-arrow" aria-hidden="true">↔</span>
                             <div>
-                              <span class="profile-name">{{ selectedProfile()?.metadata?.alias || 'Second profile' }}</span>
+                              <span class="profile-name">{{ selectedProfile().metadata.alias || 'Second profile' }}</span>
                               <strong>{{ interaction.right.roleLabel }}</strong>
                               <span>{{ preferenceLabel(interaction.right.answer.preference) }}</span>
                             </div>
