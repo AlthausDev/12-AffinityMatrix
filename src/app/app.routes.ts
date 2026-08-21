@@ -46,6 +46,13 @@ export const routes: Routes = [
     title: 'Questionnaire',
   },
   {
+    path: 'profiles/:id/compare',
+    loadComponent: () =>
+      import('./pages/profile-comparison/profile-comparison-page.component')
+        .then((module) => module.ProfileComparisonPageComponent),
+    title: 'Compare profiles',
+  },
+  {
     path: 'profiles/:id/export',
     component: ProfileExportPageComponent,
     title: 'Export profile',

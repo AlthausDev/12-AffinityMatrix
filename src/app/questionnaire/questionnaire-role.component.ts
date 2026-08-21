@@ -10,17 +10,13 @@ import {
   PracticeAnswer,
 } from '../../domain/profile/profile-answer';
 import { Sex } from '../../domain/profile/profile-metadata';
-import { DETAIL_CAPABLE_PREFERENCES, Preference } from '../../domain/profile/preference';
+import { DETAIL_CAPABLE_PREFERENCES, PREFERENCE_VALUES, Preference } from '../../domain/profile/preference';
+import { PREFERENCE_PRESENTATION } from '../shared/comparison-presentation';
 
-const PREFERENCE_OPTIONS: readonly { readonly value: Preference; readonly label: string; readonly symbol: string }[] = [
-  { value: 'favorite', label: 'Favorite', symbol: '★' },
-  { value: 'like', label: 'Like', symbol: '●' },
-  { value: 'depends', label: 'Depends', symbol: '?' },
-  { value: 'curious', label: 'Curious', symbol: '◇' },
-  { value: 'neutral', label: 'Neutral', symbol: '—' },
-  { value: 'not-interested', label: 'Not interested', symbol: '×' },
-  { value: 'boundary', label: 'Boundary', symbol: '!' },
-];
+const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
+  value,
+  ...PREFERENCE_PRESENTATION[value],
+}));
 
 const SEX_LABELS: Record<Sex, string> = { male: 'Man', female: 'Woman' };
 
