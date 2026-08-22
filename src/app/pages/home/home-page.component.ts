@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProfileStore } from '../../core/profile.store';
 import { TranslationService } from '../../i18n/translation.service';
+import { APP_VERSION } from '../../shared/app-version';
 
 @Component({
   selector: 'app-home-page',
@@ -10,7 +11,7 @@ import { TranslationService } from '../../i18n/translation.service';
     <main class="page">
       <header class="page-header home-header">
         <div>
-          <p class="eyebrow">MVP · 0.1.0.0</p>
+          <p class="eyebrow">MVP · {{ appVersion }}</p>
           <h1>Affinity Matrix</h1>
           <p class="muted lead">{{ i18n.t('home.lead') }}</p>
         </div>
@@ -62,6 +63,7 @@ import { TranslationService } from '../../i18n/translation.service';
 export class HomePageComponent {
   readonly profileStore = inject(ProfileStore);
   readonly i18n = inject(TranslationService);
+  readonly appVersion = APP_VERSION;
 
   answerCount(answers: object): number {
     return Object.keys(answers).length;
