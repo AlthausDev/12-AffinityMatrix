@@ -7,6 +7,11 @@ import {
   LOCALE_STORAGE_KEY,
   SUPPORTED_LOCALES,
 } from './locale';
+import {
+  DashboardUxTranslationKey,
+  EN_DASHBOARD_UX_TRANSLATIONS,
+  ES_DASHBOARD_UX_TRANSLATIONS,
+} from './ui/dashboard-ux.translations';
 import { EN_UI_TRANSLATIONS } from './ui/en-ui.translations';
 import { ES_UI_TRANSLATIONS, TranslationKey as BaseTranslationKey } from './ui/es-ui.translations';
 import {
@@ -24,18 +29,21 @@ export type TranslationParameters = Readonly<Record<string, string | number>>;
 export type TranslationKey =
   | BaseTranslationKey
   | QuestionnaireUxTranslationKey
-  | PreferenceScaleTranslationKey;
+  | PreferenceScaleTranslationKey
+  | DashboardUxTranslationKey;
 
 const TRANSLATIONS: Readonly<Record<Locale, Readonly<Record<TranslationKey, string>>>> = {
   es: {
     ...ES_UI_TRANSLATIONS,
     ...ES_QUESTIONNAIRE_UX_TRANSLATIONS,
     ...ES_PREFERENCE_SCALE_TRANSLATIONS,
+    ...ES_DASHBOARD_UX_TRANSLATIONS,
   },
   en: {
     ...EN_UI_TRANSLATIONS,
     ...EN_QUESTIONNAIRE_UX_TRANSLATIONS,
     ...EN_PREFERENCE_SCALE_TRANSLATIONS,
+    ...EN_DASHBOARD_UX_TRANSLATIONS,
   },
 };
 
