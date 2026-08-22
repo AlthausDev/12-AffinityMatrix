@@ -68,6 +68,19 @@ describe('ProfileStore', () => {
     expect(updated?.settings.filterQuestionnaireByMetadata).toBe(false);
   });
 
+  it('removes a deleted profile from the published local state', async () => {
+    const first = await store.create({ alias: 'First' });
+    const second = await store.create({ alias: 'Second' });
+
+    expect(await store.delete(first!.id)).toBe(true);
+
+    expect(store.findById(first!.id)).toBeUndefined();
+    expect(store.findById(second!.id)).toBeDefined();
+    expect(store.profiles()).toHaveLength(1);
+    expect(store.error()).toBeNull();
+    expect(store.saving()).toBe(false);
+  });
+
   it('serializes rapid questionnaire writes so one browser interaction cannot create a stale revision', async () => {
     const created = await store.create({ alias: 'Example' });
 
