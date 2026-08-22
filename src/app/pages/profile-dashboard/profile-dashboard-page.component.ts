@@ -22,7 +22,7 @@ import { TranslationService } from '../../i18n/translation.service';
         </header>
 
         @if (profileStore.error()) {
-          <p class="alert" role="alert">{{ profileStore.error() }}</p>
+          <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p>
         }
 
         <section class="action-grid" [attr.aria-label]="i18n.t('dashboard.actionsLabel')">
