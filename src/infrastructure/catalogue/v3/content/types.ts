@@ -1,5 +1,6 @@
+import { RoleApplicability, RolePerspective } from '../../../../domain/catalogue/practice';
 import { TargetSite } from '../../../../domain/profile/profile-answer';
-import { RolePerspective } from '../../../../domain/catalogue/practice';
+import { Sex } from '../../../../domain/profile/profile-metadata';
 
 export type CataloguePracticeKind =
   | 'mutual'
@@ -13,6 +14,8 @@ export type CataloguePracticeKind =
   | 'group'
   | 'focus'
   | 'toy';
+
+export type CatalogueToyRoleId = 'use-on-self' | 'use-on-partner' | 'partner-uses-on-me';
 
 export interface CataloguePairedRoleSeed {
   readonly id: string;
@@ -69,6 +72,14 @@ export interface CataloguePracticeSeed {
    * from anatomySex: e.g. ejaculation has a male actor while the receiving body may be either sex.
    */
   readonly actorSex?: 'male' | 'female';
+  /** Fixed participant composition for group variants such as MMF/MFF/MMM/FFF. */
+  readonly groupComposition?: readonly Sex[];
+  /** Encounter requires at least one participant of one of these sexes. */
+  readonly requiresAnyParticipantSex?: readonly Sex[];
+  /** Extra applicability constraints for individual semantic roles. */
+  readonly roleApplicability?: Readonly<Record<string, RoleApplicability | undefined>>;
+  /** Optional subset of the standard toy roles. */
+  readonly toyRoles?: readonly CatalogueToyRoleId[];
   readonly targetSites?: readonly TargetSite[];
 }
 

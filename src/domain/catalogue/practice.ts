@@ -10,6 +10,10 @@ export type TargetOwner = 'self' | 'partner';
 export interface RoleApplicability {
   readonly selfSex?: readonly Sex[];
   readonly partnerSex?: readonly Sex[];
+  /** Exact participant composition for fixed-composition group practices. */
+  readonly groupComposition?: readonly Sex[];
+  /** At least one participant in the relevant encounter must have one of these sexes. */
+  readonly requiresAnyParticipantSex?: readonly Sex[];
 }
 
 export interface RoleContextValues {

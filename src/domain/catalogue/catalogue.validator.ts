@@ -10,7 +10,10 @@ const CATEGORY_KEYS = ['id', 'label', 'description', 'order'] as const;
 const ROLE_KEYS = [
   'id', 'label', 'perspective', 'applicability', 'contextAxes', 'contextValues', 'targetOwner',
 ] as const;
-const APPLICABILITY_KEYS = ['selfSex', 'partnerSex'] as const;
+const APPLICABILITY_KEYS = [
+  'selfSex', 'partnerSex', 'groupComposition', 'requiresAnyParticipantSex',
+] as const;
+const SEX_SET_APPLICABILITY_KEYS = ['selfSex', 'partnerSex', 'requiresAnyParticipantSex'] as const;
 const CONTEXT_VALUE_KEYS = ['targetSite'] as const;
 const COMPATIBILITY_PAIR_KEYS = ['leftRoleId', 'rightRoleId'] as const;
 const CATALOGUE_KEYS = ['categories', 'practices'] as const;
@@ -20,6 +23,7 @@ const TARGET_OWNERS = ['self', 'partner'] as const;
 const LABEL_MAX_LENGTH = 160;
 const DESCRIPTION_MAX_LENGTH = 1_000;
 const MAX_ROLES_PER_PRACTICE = 32;
+const MAX_GROUP_PARTICIPANTS = 32;
 const MAX_CATEGORIES = 200;
 const MAX_PRACTICES = 10_000;
 
@@ -125,7 +129,8 @@ export class PracticeValidator extends Validator<Practice> {
   private validateApplicability(value: unknown, path: string): ValidationIssue[] {
     if (!this.isRecord(value)) return [{ path, message: 'Role applicability must be an object.' }];
     const issues = this.validateAllowedKeys(value, APPLICABILITY_KEYS, path);
-    for (const key of APPLICABILITY_KEYS) {
+
+    for (const key of SEX_SET_APPLICABILITY_KEYS) {
       const sexes = value[key];
       if (sexes === undefined) continue;
       if (!Array.isArray(sexes) || sexes.length === 0) {
@@ -137,6 +142,19 @@ export class PracticeValidator extends Validator<Practice> {
         issues.push({ path: `${path}.${key}`, message: 'Sex applicability contains an unsupported value.' });
       }
     }
+
+    const composition = value['groupComposition'];
+    if (composition !== undefined) {
+      if (!Array.isArray(composition) || composition.length === 0 || composition.length > MAX_GROUP_PARTICIPANTS) {
+        issues.push({
+          path: `${path}.groupComposition`,
+          message: `Group composition must contain between 1 and ${MAX_GROUP_PARTICIPANTS} participants.`,
+        });
+      } else if (!composition.every((sex) => SEX_VALUES.includes(sex as (typeof SEX_VALUES)[number]))) {
+        issues.push({ path: `${path}.groupComposition`, message: 'Group composition contains an unsupported sex value.' });
+      }
+    }
+
     return issues;
   }
 

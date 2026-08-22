@@ -84,7 +84,12 @@ const TOYS_FINAL_ORDER = insertAfter(
   ['special-material-dildo', 'fantasy-shaped-dildo'],
 );
 
-const ROLEPLAY_WITH_TABOO = insertAfter(base('roleplay'), 'roleplay-general', [
+const ROLEPLAY_WITH_MEDICAL = insertAfter(
+  without(base('roleplay'), ['doctor-patient-roleplay', 'nurse-patient-roleplay']),
+  'teacher-student-adult-roleplay',
+  ['medical-professional-patient-roleplay', 'doctor-nurse-roleplay'],
+);
+const ROLEPLAY_WITH_TABOO = insertAfter(ROLEPLAY_WITH_MEDICAL, 'roleplay-general', [
   'adult-taboo-fantasy',
   'surreal-fantasy-roleplay',
 ]);
