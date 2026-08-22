@@ -1,13 +1,14 @@
 import {
-  PORTABLE_PROFILE_V4_FORMAT_VERSION,
-  PORTABLE_PROFILE_V4_PROFILE_SCHEMA_VERSION,
+  PORTABLE_PROFILE_V5_FORMAT_VERSION,
+  PORTABLE_PROFILE_V5_PROFILE_SCHEMA_VERSION,
   PortableProfile,
 } from '../../application/profile/portable-profile';
 import { portableProfileValidator } from '../../application/profile/portable-profile.validator';
 import { CATALOGUE_VERSION_V1 } from '../../domain/catalogue/catalogue-version';
 import { ORIENTATION_VALUES, SEX_VALUES } from '../../domain/profile/profile-metadata';
 
-export const CURRENT_PROFILE_CODE_PREFIX = 'P4';
+export const CURRENT_PROFILE_CODE_PREFIX = 'P5';
+export const LEGACY_PROFILE_CODE_PREFIX_V4 = 'P4';
 export const LEGACY_PROFILE_CODE_PREFIX_V3 = 'P3';
 export const LEGACY_PROFILE_CODE_PREFIX_V2 = 'P2';
 export const LEGACY_PROFILE_CODE_PREFIX_V1 = 'P1';
@@ -32,6 +33,22 @@ export class CurrentProfilePayloadDecoder extends ProfilePayloadDecoder {
   }
 }
 
+export class LegacyProfilePayloadV4Decoder extends ProfilePayloadDecoder {
+  readonly prefix = LEGACY_PROFILE_CODE_PREFIX_V4;
+
+  override decode(value: unknown): PortableProfile {
+    if (!isRecord(value)) {
+      throw new ProfilePayloadDecodeError('Legacy V4 portable profile must be an object.');
+    }
+    assertAllowedKeys(value, ['formatVersion', 'profileSchemaVersion', 'catalogueVersion', 'metadata', 'answers']);
+    if (value['formatVersion'] !== 4 || value['profileSchemaVersion'] !== 4) {
+      throw new ProfilePayloadDecodeError('The legacy V4 profile code uses an unsupported version.');
+    }
+
+    return migrateLegacyPortableProfile(value['catalogueVersion'], value['metadata'], value['answers'], 'Legacy V4');
+  }
+}
+
 export class LegacyProfilePayloadV3Decoder extends ProfilePayloadDecoder {
   readonly prefix = LEGACY_PROFILE_CODE_PREFIX_V3;
 
@@ -44,16 +61,7 @@ export class LegacyProfilePayloadV3Decoder extends ProfilePayloadDecoder {
       throw new ProfilePayloadDecodeError('The legacy V3 profile code uses an unsupported version.');
     }
 
-    return portableProfileValidator.assert(
-      {
-        formatVersion: PORTABLE_PROFILE_V4_FORMAT_VERSION,
-        profileSchemaVersion: PORTABLE_PROFILE_V4_PROFILE_SCHEMA_VERSION,
-        catalogueVersion: value['catalogueVersion'],
-        metadata: value['metadata'],
-        answers: value['answers'],
-      },
-      'Legacy V3 portable profile migration failed.',
-    );
+    return migrateLegacyPortableProfile(value['catalogueVersion'], value['metadata'], value['answers'], 'Legacy V3');
   }
 }
 
@@ -69,16 +77,7 @@ export class LegacyProfilePayloadV2Decoder extends ProfilePayloadDecoder {
       throw new ProfilePayloadDecodeError('The legacy V2 profile code uses an unsupported version.');
     }
 
-    return portableProfileValidator.assert(
-      {
-        formatVersion: PORTABLE_PROFILE_V4_FORMAT_VERSION,
-        profileSchemaVersion: PORTABLE_PROFILE_V4_PROFILE_SCHEMA_VERSION,
-        catalogueVersion: CATALOGUE_VERSION_V1,
-        metadata: value['metadata'],
-        answers: value['answers'],
-      },
-      'Legacy V2 portable profile migration failed.',
-    );
+    return migrateLegacyPortableProfile(CATALOGUE_VERSION_V1, value['metadata'], value['answers'], 'Legacy V2');
   }
 }
 
@@ -133,16 +132,7 @@ export class LegacyProfilePayloadV1Decoder extends ProfilePayloadDecoder {
       if (legacyMetadata[key] !== undefined) metadata[key] = legacyMetadata[key];
     }
 
-    return portableProfileValidator.assert(
-      {
-        formatVersion: PORTABLE_PROFILE_V4_FORMAT_VERSION,
-        profileSchemaVersion: PORTABLE_PROFILE_V4_PROFILE_SCHEMA_VERSION,
-        catalogueVersion: CATALOGUE_VERSION_V1,
-        metadata,
-        answers: value['answers'],
-      },
-      'Legacy V1 portable profile migration failed.',
-    );
+    return migrateLegacyPortableProfile(CATALOGUE_VERSION_V1, metadata, value['answers'], 'Legacy V1');
   }
 }
 
@@ -152,6 +142,7 @@ export class ProfilePayloadDecoderRegistry {
   constructor(
     decoders: readonly ProfilePayloadDecoder[] = [
       new CurrentProfilePayloadDecoder(),
+      new LegacyProfilePayloadV4Decoder(),
       new LegacyProfilePayloadV3Decoder(),
       new LegacyProfilePayloadV2Decoder(),
       new LegacyProfilePayloadV1Decoder(),
@@ -178,6 +169,33 @@ export class ProfilePayloadDecoderRegistry {
     }
     return decoder.decode(value);
   }
+}
+
+function migrateLegacyPortableProfile(
+  catalogueVersion: unknown,
+  metadata: unknown,
+  answers: unknown,
+  sourceName: string,
+): PortableProfile {
+  return portableProfileValidator.assert(
+    {
+      formatVersion: PORTABLE_PROFILE_V5_FORMAT_VERSION,
+      profileSchemaVersion: PORTABLE_PROFILE_V5_PROFILE_SCHEMA_VERSION,
+      catalogueVersion,
+      metadata,
+      answers: removeLegacyNeutralAnswers(answers),
+    },
+    `${sourceName} portable profile migration failed.`,
+  );
+}
+
+function removeLegacyNeutralAnswers(value: unknown): unknown {
+  if (!isRecord(value)) return value;
+  return Object.fromEntries(
+    Object.entries(value).filter(([, answer]) =>
+      !(isRecord(answer) && answer['preference'] === 'neutral'),
+    ),
+  );
 }
 
 function assertAllowedKeys(value: Record<string, unknown>, allowedKeys: readonly string[]): void {

@@ -44,7 +44,7 @@ Preference comparison semantics are centralized in `PREFERENCE_COMPARISON_DESCRI
 
 `Validator<T>` supplies the common validation contract. `ProfileDataValidator<T>` supplies shared profile-data invariants. Persisted and imported data are validated at boundaries.
 
-Local storage and portable formats are independently versioned. Current portable codes are P4; P1, P2, and P3 remain migration inputs. P3 answers are preserved without inventing a relational scope that the old data did not contain.
+Local storage and portable formats are independently versioned. Current portable codes are P5; P1, P2, P3, and P4 remain migration inputs. P3 answers are preserved without inventing a relational scope that the old data did not contain. P4 is the last seven-state preference format: its legacy `neutral` answers migrate to unanswered because no remaining preference can be inferred without changing the user's meaning.
 
 ## Aggregate boundaries
 
@@ -57,6 +57,8 @@ A `PracticeAnswer` separates these concepts:
 ```text
 practice + semantic role + relational scope -> preference + optional details
 ```
+
+The current preference model contains six explicit states: `favorite`, `like`, `depends`, `curious`, `not-interested`, and `boundary`. Unanswered is deliberately not a preference value. `not-interested` means lack of interest without declaring a boundary; `boundary` is a firm no and is handled separately by comparison.
 
 The role describes what the profile owner does or experiences. `AnswerScope` qualifies the relational context in which the same role is valued. For example, `counterpartSex` can hold different preferences for restraining a man and restraining a woman without creating duplicate bondage practices or role ids.
 
@@ -78,7 +80,7 @@ The comparator is catalogue-driven. It iterates the catalogue's `compatibleRoleP
 
 For scoped roles, each answer is resolved against the other profile's own sex. The two answers' `counterpartSex` values are therefore not expected to equal each other. For example, a woman's `counterpartSex: male` answer complements a man's `counterpartSex: female` answer.
 
-The engine compares only explicit answers. Missing answers are excluded rather than treated as Neutral. Mutual role pairs are evaluated once; directional role pairs are evaluated in both orientations so reciprocal preferences remain independent.
+The engine compares only explicit answers. Missing answers are excluded rather than coerced into a preference. Mutual role pairs are evaluated once; directional role pairs are evaluated in both orientations so reciprocal preferences remain independent.
 
 Category affinity is the arithmetic mean of centralized preference-alignment scores for answered catalogue-compatible interactions in that category. There is deliberately no overall relationship percentage. Hard boundaries are reported separately and are excluded from the affinity denominator rather than being represented as a compatibility penalty. `not-interested` remains a scored lack of shared interest because it is not equivalent to a hard boundary.
 
@@ -107,6 +109,8 @@ catalogue.practice.<practiceId>.role.<roleId>
 If a translation is unavailable, the snapshot text is a defensive fallback. Tests require every current category, practice, description, and role to have both Spanish and English resources. Therefore normal catalogue growth requires adding catalogue data plus its two localized resource entries, not modifying questionnaire or comparison components.
 
 Human-readable validation and UI messages belong in localization resources. Lower layers should expose stable states, ids, classifications, or typed errors whenever presentation needs to explain a result.
+
+Preference presentation metadata is centralized separately from comparison semantics. Labels, hints, symbols, and semantic visual tones are mapped once and reused by questionnaire/comparison presentation. Color is never the only indicator of a preference state.
 
 ## Versioning rules
 

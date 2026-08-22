@@ -10,7 +10,7 @@ describe('profile domain', () => {
       metadata: { alias: 'Example' },
     });
 
-    expect(profile.schemaVersion).toBe(4);
+    expect(profile.schemaVersion).toBe(5);
     expect(profile.schemaVersion).toBe(PROFILE_SCHEMA_VERSION);
     expect(profile.revision).toBe(INITIAL_PROFILE_REVISION);
     expect(profile.catalogueVersion).toBe(CURRENT_CATALOGUE_VERSION);

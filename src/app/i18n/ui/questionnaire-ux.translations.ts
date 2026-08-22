@@ -1,0 +1,53 @@
+export const ES_QUESTIONNAIRE_UX_TRANSLATIONS = {
+  'questionnaire.windowAria': 'Cuestionario',
+  'questionnaire.pending.complete': 'No quedan preguntas visibles pendientes',
+  'questionnaire.pending.one': 'Queda {count} pregunta visible pendiente',
+  'questionnaire.pending.other': 'Quedan {count} preguntas visibles pendientes',
+  'questionnaire.finish.action': 'Terminar',
+  'questionnaire.finish.eyebrow': 'Salir del cuestionario',
+  'questionnaire.finish.title': '¿Quieres terminar por ahora?',
+  'questionnaire.finish.saved': 'Todo lo que has respondido ya está guardado localmente.',
+  'questionnaire.finish.continue': 'Seguir respondiendo',
+  'questionnaire.finish.exit': 'Salir al perfil',
+  'questionnaire.finish.complete': 'Has respondido todas las preguntas visibles del cuestionario.',
+  'questionnaire.finish.remaining.one': 'Todavía queda {count} pregunta visible sin responder.',
+  'questionnaire.finish.remaining.other': 'Todavía quedan {count} preguntas visibles sin responder.',
+  'questionnaire.finish.dontAskAgain': 'No volver a preguntar',
+  'questionnaire.finish.dontAskAgainHint': 'Podrás volver a activar esta confirmación desde Ajustes.',
+  'questionnaire.categories.description': 'Responde a tu ritmo. Las preguntas sin responder no expresan ninguna preferencia y cada respuesta se guarda inmediatamente.',
+
+  'questionnaireRole.counterpart': 'Pareja: {sex}',
+  'comparison.description': 'La comparación se calcula a partir del catálogo actual, las parejas de roles explícitas y las preferencias respondidas. Las preguntas sin responder se excluyen del cálculo.',
+  'comparison.missingSex.left': 'Algunas respuestas dependientes de la pareja no pueden compararse porque el primer perfil no tiene sexo especificado. Las respuestas sin ese contexto se siguen comparando normalmente.',
+  'comparison.missingSex.right': 'Algunas respuestas dependientes de la pareja no pueden compararse porque el segundo perfil no tiene sexo especificado. Las respuestas sin ese contexto se siguen comparando normalmente.',
+  'comparison.missingSex.both': 'Algunas respuestas dependientes de la pareja no pueden compararse porque ninguno de los dos perfiles tiene sexo especificado. Las respuestas sin ese contexto se siguen comparando normalmente.',
+  'comparison.noComparable.description': 'Puede que los perfiles necesiten más respuestas del cuestionario o que falten datos de sexo para respuestas dependientes de la pareja.',
+} as const;
+
+export type QuestionnaireUxTranslationKey = keyof typeof ES_QUESTIONNAIRE_UX_TRANSLATIONS;
+
+export const EN_QUESTIONNAIRE_UX_TRANSLATIONS = {
+  'questionnaire.windowAria': 'Questionnaire',
+  'questionnaire.pending.complete': 'No visible questions remain unanswered',
+  'questionnaire.pending.one': '{count} visible question remains unanswered',
+  'questionnaire.pending.other': '{count} visible questions remain unanswered',
+  'questionnaire.finish.action': 'Finish',
+  'questionnaire.finish.eyebrow': 'Leave questionnaire',
+  'questionnaire.finish.title': 'Finish for now?',
+  'questionnaire.finish.saved': 'Everything you have answered is already saved locally.',
+  'questionnaire.finish.continue': 'Keep answering',
+  'questionnaire.finish.exit': 'Return to profile',
+  'questionnaire.finish.complete': 'You have answered every visible questionnaire item.',
+  'questionnaire.finish.remaining.one': '{count} visible question is still unanswered.',
+  'questionnaire.finish.remaining.other': '{count} visible questions are still unanswered.',
+  'questionnaire.finish.dontAskAgain': 'Do not ask again',
+  'questionnaire.finish.dontAskAgainHint': 'You can enable this confirmation again from Settings.',
+  'questionnaire.categories.description': 'Answer at your own pace. Unanswered questions do not express a preference, and every answer is saved immediately.',
+
+  'questionnaireRole.counterpart': 'Partner: {sex}',
+  'comparison.description': 'Comparison uses the current catalogue, explicit compatible role pairs, and answered preferences. Unanswered questions are excluded from the calculation.',
+  'comparison.missingSex.left': 'Some partner-scoped answers cannot be compared because the first profile has no sex specified. Answers without that context are still compared normally.',
+  'comparison.missingSex.right': 'Some partner-scoped answers cannot be compared because the second profile has no sex specified. Answers without that context are still compared normally.',
+  'comparison.missingSex.both': 'Some partner-scoped answers cannot be compared because neither profile has sex specified. Answers without that context are still compared normally.',
+  'comparison.noComparable.description': 'The profiles may need more questionnaire answers, or sex metadata may be missing for partner-scoped answers.',
+} satisfies Readonly<Record<QuestionnaireUxTranslationKey, string>>;

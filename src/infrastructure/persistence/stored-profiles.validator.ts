@@ -1,10 +1,10 @@
 import { ProfileValidator, profileValidator } from '../../domain/profile/profile.validator';
 import { ValidationIssue, Validator } from '../../domain/shared/validator';
-import { MAX_STORED_PROFILES, PROFILE_STORE_VERSION, StoredProfilesV4 } from './profile-store';
+import { MAX_STORED_PROFILES, PROFILE_STORE_VERSION, StoredProfilesV5 } from './profile-store';
 
 const STORE_KEYS = ['version', 'profiles'] as const;
 
-export class StoredProfilesValidator extends Validator<StoredProfilesV4> {
+export class StoredProfilesValidator extends Validator<StoredProfilesV5> {
   constructor(private readonly profileValidatorInstance: ProfileValidator = profileValidator) {
     super();
   }

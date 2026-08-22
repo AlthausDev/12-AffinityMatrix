@@ -39,7 +39,7 @@ describe('LocalStorageProfileRepository', () => {
           practiceId: 'bondage', roleId: 'receive', scope: femaleScope, preference: 'favorite' as const,
         },
         [createAnswerKey('bondage', 'receive', maleScope)]: {
-          practiceId: 'bondage', roleId: 'receive', scope: maleScope, preference: 'neutral' as const,
+          practiceId: 'bondage', roleId: 'receive', scope: maleScope, preference: 'not-interested' as const,
         },
       },
     };
@@ -72,7 +72,7 @@ describe('LocalStorageProfileRepository', () => {
     await expect(repository.save({ ...profile('one', 'Stale update'), revision: 2 }, 1)).rejects.toBeInstanceOf(ProfileConcurrencyError);
   });
 
-  it('migrates the legacy v1 store through v4 without inventing counterpart scope', async () => {
+  it('migrates the legacy v1 store through v5 without inventing counterpart scope', async () => {
     const storage = new MemoryStorage();
     storage.setItem(
       'profiles.v1',
@@ -96,7 +96,7 @@ describe('LocalStorageProfileRepository', () => {
     const repository = new LocalStorageProfileRepository(storage);
     const migrated = await repository.findById('legacy');
 
-    expect(migrated?.schemaVersion).toBe(4);
+    expect(migrated?.schemaVersion).toBe(5);
     expect(migrated?.revision).toBe(1);
     expect(migrated?.catalogueVersion).toBe(1);
     expect(migrated?.answers['kissing::mutual']?.scope).toBeUndefined();
@@ -104,6 +104,30 @@ describe('LocalStorageProfileRepository', () => {
     expect(migrated?.settings.filterQuestionnaireByMetadata).toBe(false);
     expect(storage.getItem('profiles.v1')).toBeNull();
     expect(storage.getItem(DEFAULT_PROFILE_STORAGE_KEY)).not.toBeNull();
+  });
+
+  it('turns legacy v4 Neutral answers into unanswered without changing explicit choices', async () => {
+    const storage = new MemoryStorage();
+    const base = profile('legacy-neutral', 'Legacy Neutral');
+    storage.setItem(DEFAULT_PROFILE_STORAGE_KEY, JSON.stringify({
+      version: 4,
+      profiles: [{
+        ...base,
+        schemaVersion: 4,
+        answers: {
+          'cuddling::mutual': { practiceId: 'cuddling', roleId: 'mutual', preference: 'neutral' },
+          'kissing::give': { practiceId: 'kissing', roleId: 'give', preference: 'like' },
+        },
+      }],
+    }));
+
+    const repository = new LocalStorageProfileRepository(storage);
+    const migrated = await repository.findById('legacy-neutral');
+
+    expect(migrated?.schemaVersion).toBe(5);
+    expect(migrated?.answers['cuddling::mutual']).toBeUndefined();
+    expect(migrated?.answers['kissing::give']?.preference).toBe('like');
+    expect(JSON.parse(storage.getItem(DEFAULT_PROFILE_STORAGE_KEY) ?? '{}').version).toBe(5);
   });
 
   it('rejects malformed JSON, future versions, unknown envelope fields, and duplicate ids', async () => {
@@ -116,18 +140,18 @@ describe('LocalStorageProfileRepository', () => {
     await expect(new LocalStorageProfileRepository(future).findAll()).rejects.toBeInstanceOf(ProfileStorageError);
 
     const unknown = new MemoryStorage();
-    unknown.setItem(DEFAULT_PROFILE_STORAGE_KEY, JSON.stringify({ version: 4, profiles: [], extra: true }));
+    unknown.setItem(DEFAULT_PROFILE_STORAGE_KEY, JSON.stringify({ version: 5, profiles: [], extra: true }));
     await expect(new LocalStorageProfileRepository(unknown).findAll()).rejects.toBeInstanceOf(ProfileStorageError);
 
     const duplicate = new MemoryStorage();
-    duplicate.setItem(DEFAULT_PROFILE_STORAGE_KEY, JSON.stringify({ version: 4, profiles: [profile('same', 'One'), profile('same', 'Two')] }));
+    duplicate.setItem(DEFAULT_PROFILE_STORAGE_KEY, JSON.stringify({ version: 5, profiles: [profile('same', 'One'), profile('same', 'Two')] }));
     await expect(new LocalStorageProfileRepository(duplicate).findAll()).rejects.toBeInstanceOf(ProfileStorageError);
   });
 
   it('runs full domain validation before accepting locally stored profiles', async () => {
     const storage = new MemoryStorage();
     storage.setItem(DEFAULT_PROFILE_STORAGE_KEY, JSON.stringify({
-      version: 4,
+      version: 5,
       profiles: [{ ...profile('one', 'Valid'), settings: { filterQuestionnaireByMetadata: 'yes' } }],
     }));
     await expect(new LocalStorageProfileRepository(storage).findAll()).rejects.toBeInstanceOf(ProfileStorageError);
