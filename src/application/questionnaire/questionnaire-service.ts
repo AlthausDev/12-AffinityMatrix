@@ -141,6 +141,8 @@ export class QuestionnaireService {
       for (const role of practice.roles) {
         for (const candidateScope of this.scopePolicy.getScopes(role)) {
           const scope = this.nonEmptyScope(candidateScope);
+          if (!this.visibilityPolicy.isRoleApplicable(role, context, scope)) continue;
+
           const visible = this.visibilityPolicy.isRoleVisible(role, context, scope);
           if (!visible) filtered += 1;
           if (!visible && !includeFiltered) continue;
@@ -168,6 +170,8 @@ export class QuestionnaireService {
     const roles = practice.roles.flatMap((role): QuestionnaireRoleView[] =>
       this.scopePolicy.getScopes(role).flatMap((candidateScope): QuestionnaireRoleView[] => {
         const scope = this.nonEmptyScope(candidateScope);
+        if (!this.visibilityPolicy.isRoleApplicable(role, context, scope)) return [];
+
         const visible = this.visibilityPolicy.isRoleVisible(role, context, scope);
         if (!visible && !includeFiltered) return [];
         const answerKey = createAnswerKey(practice.id, role.id, scope);

@@ -32,6 +32,8 @@ import { findRouteParam } from '../../shared/route-param';
             </div>
           </header>
 
+          <p class="consent-note">{{ i18n.t('questionnaire.categories.consentNotice') }}</p>
+
           @if (profileStore.error()) { <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p> }
           @if (catalogueRelationship() === 'profile-older') { <p class="alert">{{ i18n.t('questionnaire.profileOlder') }}</p> }
           @else if (catalogueRelationship() === 'profile-newer') { <p class="alert">{{ i18n.t('questionnaire.profileNewer') }}</p> }
@@ -111,6 +113,7 @@ import { findRouteParam } from '../../shared/route-param';
     .overall-progress { display: grid; gap: 0.45rem; text-align: right; }
     .overall-progress strong { font-size: 1.65rem; }
     .overall-progress span, .hidden-count { font-size: 0.82rem; }
+    .consent-note { margin: -0.35rem 0 1.25rem; padding: 0.75rem 0.9rem; border-left: 2px solid var(--focus-ring); background: color-mix(in srgb, var(--surface-elevated) 52%, transparent); color: var(--text-secondary); font-size: 0.82rem; line-height: 1.5; }
     .questionnaire-filter-toggle { margin-bottom: 1.5rem; }
     .category-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
     .category-card { position: relative; display: grid; border: 1px solid transparent; border-radius: 10px; background: linear-gradient(color-mix(in srgb, var(--surface-panel) 92%, transparent), color-mix(in srgb, var(--surface-panel) 92%, transparent)) padding-box, var(--window-border-gradient-soft) border-box; transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease; }

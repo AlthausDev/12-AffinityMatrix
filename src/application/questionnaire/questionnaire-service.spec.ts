@@ -25,8 +25,14 @@ const snapshot: CatalogueSnapshot = {
         categoryId: 'oral',
         label: 'Cunnilingus',
         roles: [
-          { id: 'give', label: 'Give', perspective: 'active', applicability: { partnerSex: ['female'] } },
-          { id: 'receive', label: 'Receive', perspective: 'receptive', applicability: { selfSex: ['female'] }, contextAxes: ['counterpartSex'] },
+          {
+            id: 'give', label: 'Give', perspective: 'active',
+            applicability: { partnerSex: ['female'] }, contextAxes: ['counterpartSex'],
+          },
+          {
+            id: 'receive', label: 'Receive', perspective: 'receptive',
+            applicability: { selfSex: ['female'] }, contextAxes: ['counterpartSex'],
+          },
         ],
         compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
       },
@@ -145,7 +151,7 @@ describe('QuestionnaireService', () => {
     expect(general?.practices[0]?.roles.find((item) => item.counterpartSex === 'female')?.answer).toBeUndefined();
   });
 
-  it('expands target-site scopes and applies anatomy to the actual target owner', () => {
+  it('expands target-site scopes and excludes impossible anatomy variants', () => {
     const woman = profile('female', 'bisexual');
     const toys = service.getCategory(snapshot, woman, 'toys');
     const dildo = toys?.practices.find((item) => item.practice.id === 'dildo');
@@ -166,6 +172,16 @@ describe('QuestionnaireService', () => {
       .toEqual(['mouth', 'vaginal', 'anal']);
   });
 
+  it('never reveals anatomically impossible variants through includeFiltered', () => {
+    const oral = service.getCategory(snapshot, profile('male', 'heterosexual'), 'oral', true);
+    const cunnilingus = oral?.practices.find((item) => item.practice.id === 'cunnilingus');
+
+    expect(cunnilingus?.roles.map((item) => `${item.role.id}:${item.counterpartSex ?? 'none'}`))
+      .toEqual(['give:female']);
+    expect(oral?.filtered).toBe(0);
+    expect(oral?.total).toBe(1);
+  });
+
   it('excludes hidden categories only from summaries and neighbours, not direct category lookup', () => {
     const current = profile('female', 'bisexual');
     const summaries = service.getCategorySummaries(snapshot, current, false, ['oral', 'restraint']);
@@ -173,12 +189,6 @@ describe('QuestionnaireService', () => {
     expect(summaries.map((item) => item.category.id)).toEqual(['general', 'toys']);
     expect(service.getNeighbours(snapshot, 'general', ['oral', 'restraint'])).toEqual({ nextCategoryId: 'toys' });
     expect(service.getCategory(snapshot, current, 'oral')).toBeDefined();
-  });
-
-  it('still applies anatomy-related role applicability before counterpart context', () => {
-    const oral = service.getCategory(snapshot, profile('male', 'heterosexual'), 'oral');
-    expect(oral?.practices[0]?.roles.map((item) => item.role.id)).toEqual(['give']);
-    expect(oral?.filtered).toBe(2);
   });
 
   it('treats a legacy unscoped answer to a newly scoped role as preserved unknown data', () => {

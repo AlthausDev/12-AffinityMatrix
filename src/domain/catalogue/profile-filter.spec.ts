@@ -27,33 +27,39 @@ describe('profile filtering', () => {
     expect(getRelevantPartnerSexes({ sex: 'male', orientation: 'bisexual' })).toEqual(['male', 'female']);
   });
 
-  it('filters roles by the profile sex when the role constrains the subject', () => {
+  it('treats self-anatomy constraints as hard applicability', () => {
     const role: PracticeRole = {
       id: 'receive', label: 'Receive', perspective: 'receptive', applicability: { selfSex: ['female'] },
     };
+    expect(policy.isRoleApplicable(role, context({ sex: 'male' }))).toBe(false);
     expect(policy.isRoleVisible(role, context({ sex: 'male' }))).toBe(false);
-    expect(policy.isRoleVisible(role, context({ sex: 'female' }))).toBe(true);
+    expect(policy.isRoleApplicable(role, context({ sex: 'female' }))).toBe(true);
   });
 
-  it('filters roles by relevant partner sex when orientation can be applied', () => {
+  it('uses partner anatomy as soft relevance until a counterpart variant identifies the actual partner', () => {
     const role: PracticeRole = {
       id: 'give', label: 'Give', perspective: 'active', applicability: { partnerSex: ['female'] },
     };
+    expect(policy.isRoleApplicable(role, context({ sex: 'male', orientation: 'homosexual' }))).toBe(true);
     expect(policy.isRoleVisible(role, context({ sex: 'male', orientation: 'heterosexual' }))).toBe(true);
     expect(policy.isRoleVisible(role, context({ sex: 'male', orientation: 'homosexual' }))).toBe(false);
   });
 
-  it('filters counterpart-scoped variants independently', () => {
-    const role: PracticeRole = {
+  it('filters relevant counterpart variants while rejecting anatomically impossible variants', () => {
+    const ordinaryRole: PracticeRole = {
       id: 'restrain', label: 'Restrain partner', perspective: 'active', contextAxes: ['counterpartSex'],
     };
     const heterosexualWoman = context({ sex: 'female', orientation: 'heterosexual' });
-    expect(policy.isRoleVisible(role, heterosexualWoman, { counterpartSex: 'male' })).toBe(true);
-    expect(policy.isRoleVisible(role, heterosexualWoman, { counterpartSex: 'female' })).toBe(false);
+    expect(policy.isRoleApplicable(ordinaryRole, heterosexualWoman, { counterpartSex: 'female' })).toBe(true);
+    expect(policy.isRoleVisible(ordinaryRole, heterosexualWoman, { counterpartSex: 'male' })).toBe(true);
+    expect(policy.isRoleVisible(ordinaryRole, heterosexualWoman, { counterpartSex: 'female' })).toBe(false);
 
-    const bisexualWoman = context({ sex: 'female', orientation: 'bisexual' });
-    expect(policy.isRoleVisible(role, bisexualWoman, { counterpartSex: 'male' })).toBe(true);
-    expect(policy.isRoleVisible(role, bisexualWoman, { counterpartSex: 'female' })).toBe(true);
+    const femaleAnatomyRole: PracticeRole = {
+      id: 'give', label: 'Give', perspective: 'active',
+      applicability: { partnerSex: ['female'] }, contextAxes: ['counterpartSex'],
+    };
+    expect(policy.isRoleApplicable(femaleAnatomyRole, heterosexualWoman, { counterpartSex: 'male' })).toBe(false);
+    expect(policy.isRoleApplicable(femaleAnatomyRole, heterosexualWoman, { counterpartSex: 'female' })).toBe(true);
   });
 
   it('applies target-site anatomy to the role target rather than always to the profile owner', () => {
@@ -74,25 +80,32 @@ describe('profile filtering', () => {
       targetOwner: 'partner',
     };
 
-    expect(policy.isRoleVisible(selfRole, context({ sex: 'female' }), { targetSite: 'vaginal' })).toBe(true);
-    expect(policy.isRoleVisible(selfRole, context({ sex: 'female' }), { targetSite: 'penis' })).toBe(false);
-    expect(policy.isRoleVisible(selfRole, context({ sex: 'male' }), { targetSite: 'vaginal' })).toBe(false);
-    expect(policy.isRoleVisible(selfRole, context({ sex: 'male' }), { targetSite: 'penis' })).toBe(true);
+    expect(policy.isRoleApplicable(selfRole, context({ sex: 'female' }), { targetSite: 'vaginal' })).toBe(true);
+    expect(policy.isRoleApplicable(selfRole, context({ sex: 'female' }), { targetSite: 'penis' })).toBe(false);
+    expect(policy.isRoleApplicable(selfRole, context({ sex: 'male' }), { targetSite: 'vaginal' })).toBe(false);
+    expect(policy.isRoleApplicable(selfRole, context({ sex: 'male' }), { targetSite: 'penis' })).toBe(true);
 
     const bisexualWoman = context({ sex: 'female', orientation: 'bisexual' });
-    expect(policy.isRoleVisible(partnerRole, bisexualWoman, { counterpartSex: 'male', targetSite: 'vaginal' })).toBe(false);
-    expect(policy.isRoleVisible(partnerRole, bisexualWoman, { counterpartSex: 'male', targetSite: 'penis' })).toBe(true);
-    expect(policy.isRoleVisible(partnerRole, bisexualWoman, { counterpartSex: 'female', targetSite: 'vaginal' })).toBe(true);
-    expect(policy.isRoleVisible(partnerRole, bisexualWoman, { counterpartSex: 'female', targetSite: 'penis' })).toBe(false);
-    expect(policy.isRoleVisible(partnerRole, bisexualWoman, { counterpartSex: 'male', targetSite: 'anal' })).toBe(true);
+    expect(policy.isRoleApplicable(partnerRole, bisexualWoman, { counterpartSex: 'male', targetSite: 'vaginal' })).toBe(false);
+    expect(policy.isRoleApplicable(partnerRole, bisexualWoman, { counterpartSex: 'male', targetSite: 'penis' })).toBe(true);
+    expect(policy.isRoleApplicable(partnerRole, bisexualWoman, { counterpartSex: 'female', targetSite: 'vaginal' })).toBe(true);
+    expect(policy.isRoleApplicable(partnerRole, bisexualWoman, { counterpartSex: 'female', targetSite: 'penis' })).toBe(false);
+    expect(policy.isRoleApplicable(partnerRole, bisexualWoman, { counterpartSex: 'male', targetSite: 'anal' })).toBe(true);
   });
 
-  it('keeps all roles, counterpart variants, and anatomy variants visible when filtering is disabled', () => {
-    const role: PracticeRole = {
-      id: 'use-on-self', label: 'Use on self', perspective: 'neutral',
-      applicability: { selfSex: ['female'] }, contextAxes: ['targetSite'],
-      contextValues: { targetSite: ['vaginal'] }, targetOwner: 'self',
+  it('disabling metadata filtering reveals irrelevant variants but never impossible anatomy', () => {
+    const ordinaryRole: PracticeRole = {
+      id: 'give', label: 'Give', perspective: 'active', contextAxes: ['counterpartSex'],
     };
-    expect(policy.isRoleVisible(role, context({ sex: 'male' }, false), { targetSite: 'vaginal' })).toBe(true);
+    expect(policy.isRoleVisible(
+      ordinaryRole,
+      context({ sex: 'male', orientation: 'heterosexual' }, false),
+      { counterpartSex: 'male' },
+    )).toBe(true);
+
+    const impossibleRole: PracticeRole = {
+      id: 'receive', label: 'Receive', perspective: 'receptive', applicability: { selfSex: ['female'] },
+    };
+    expect(policy.isRoleVisible(impossibleRole, context({ sex: 'male' }, false))).toBe(false);
   });
 });
