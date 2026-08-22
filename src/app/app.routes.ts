@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { HomePageComponent } from './pages/home/home-page.component';
-import { ProfileDashboardPageComponent } from './pages/profile-dashboard/profile-dashboard-page.component';
 import { ProfileEditorPageComponent } from './pages/profile-editor/profile-editor-page.component';
 import { ProfileExportPageComponent } from './pages/profile-export/profile-export-page.component';
 import { ProfileImportPageComponent } from './pages/profile-import/profile-import-page.component';
@@ -27,6 +26,13 @@ export const routes: Routes = [
     title: 'Edit profile',
   },
   {
+    path: 'profiles/:id/settings',
+    loadComponent: () =>
+      import('./pages/settings/settings-page.component')
+        .then((module) => module.SettingsPageComponent),
+    title: 'Settings',
+  },
+  {
     path: 'profiles/:id/compare',
     loadComponent: () =>
       import('./pages/profile-comparison/profile-comparison-page.component')
@@ -40,7 +46,9 @@ export const routes: Routes = [
   },
   {
     path: 'profiles/:id',
-    component: ProfileDashboardPageComponent,
+    loadComponent: () =>
+      import('./pages/profile-dashboard/profile-dashboard-page.component')
+        .then((module) => module.ProfileDashboardPageComponent),
     title: 'Profile',
     children: [
       {
