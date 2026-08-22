@@ -14,9 +14,12 @@ describe('Catalogue V3 semantic regressions', () => {
     expect(practice('glory-hole')?.categoryId).toBe('places-settings');
     expect(practice('voyeurism')?.categoryId).toBe('exhibitionism');
     expect(practice('creampie-vaginal')?.categoryId).toBe('fluids');
-    expect(practice('pet-play')?.categoryId).toBe('roleplay');
+    expect(practice('pet-play-soft')?.categoryId).toBe('roleplay');
+    expect(practice('pet-play-intense')?.categoryId).toBe('roleplay');
     expect(practice('brat-dynamic')?.categoryId).toBe('power');
     expect(practice('missionary')?.categoryId).toBe('sexual-positions');
+    expect(practice('adult-taboo-fantasy')?.categoryId).toBe('taboo-fantasies');
+    expect(practice('tentacle-fantasy')?.categoryId).toBe('surrealism');
   });
 
   it('keeps directed affection roles compatible without collapsing them into mutual participation', () => {
@@ -137,6 +140,6 @@ describe('Catalogue V3 semantic regressions', () => {
     expect(summaries.some((summary) => summary.category.id === 'edge')).toBe(false);
     expect(CURRENT_CATALOGUE_SNAPSHOT.catalogue.categories.some((category) => category.id === 'edge')).toBe(true);
     expect(questionnaire.getNeighbours(CURRENT_CATALOGUE_SNAPSHOT, 'sensation', ['fluids']))
-      .toEqual({ previousCategoryId: 'psychological', nextCategoryId: 'edge' });
+      .toEqual({ previousCategoryId: 'psychological', nextCategoryId: 'taboo-fantasies' });
   });
 });
