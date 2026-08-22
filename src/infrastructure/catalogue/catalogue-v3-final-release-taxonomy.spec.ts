@@ -32,7 +32,7 @@ describe('Catalogue V3 final release taxonomy', () => {
     expect(practice('adult-ageplay-roleplay')?.descriptionEs).toContain('todas las personas reales participantes son adultas');
     expect(practice('death-corpse-roleplay')?.descriptionEs).toContain('ninguna persona realmente fallecida');
     expect(practice('free-use-unaware-roleplay')?.descriptionEs).toContain('se acuerdan de antemano');
-    expect(practice('public-use-fantasy')?.descriptionEs).toContain('sin implicar a terceros ajenos');
+    expect(practice('public-use-fantasy')?.descriptionEs).toContain('no implicar a terceros ajenos');
   });
 
   it('keeps extremist symbolism as a neutral taboo-fantasy descriptor rather than endorsement', () => {
