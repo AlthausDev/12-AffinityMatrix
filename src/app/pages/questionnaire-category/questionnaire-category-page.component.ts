@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AnswerScope, PracticeAnswer } from '../../../domain/profile/profile-answer';
 import { CatalogueStore } from '../../core/catalogue.store';
 import { ProfileStore } from '../../core/profile.store';
@@ -120,6 +120,7 @@ export class QuestionnaireCategoryPageComponent {
   readonly catalogueText = inject(CatalogueTextService);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly params = toSignal(this.route.paramMap, { initialValue: this.route.snapshot.paramMap });
 
   readonly profileId = findRouteParam(this.route, 'id') ?? '';
@@ -142,7 +143,16 @@ export class QuestionnaireCategoryPageComponent {
 
   constructor() { void this.catalogueStore.initialize(); }
 
-  toggleFiltered(event: Event): void { this.includeFiltered.set((event.target as HTMLInputElement).checked); }
+  toggleFiltered(event: Event): void {
+    const include = (event.target as HTMLInputElement).checked;
+    this.includeFiltered.set(include);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { filtered: include ? '1' : null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
 
   filteredInCategoryLabel(count: number): string {
     return this.i18n.plural(count, 'questionnaire.category.filtered.one', 'questionnaire.category.filtered.other');
