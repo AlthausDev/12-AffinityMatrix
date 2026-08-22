@@ -8,14 +8,26 @@ import {
   SUPPORTED_LOCALES,
 } from './locale';
 import { EN_UI_TRANSLATIONS } from './ui/en-ui.translations';
-import { ES_UI_TRANSLATIONS, TranslationKey } from './ui/es-ui.translations';
+import { ES_UI_TRANSLATIONS, TranslationKey as BaseTranslationKey } from './ui/es-ui.translations';
+import {
+  EN_QUESTIONNAIRE_UX_TRANSLATIONS,
+  ES_QUESTIONNAIRE_UX_TRANSLATIONS,
+  QuestionnaireUxTranslationKey,
+} from './ui/questionnaire-ux.translations';
 
 export type TranslationParameters = Readonly<Record<string, string | number>>;
+export type TranslationKey = BaseTranslationKey | QuestionnaireUxTranslationKey;
 
-const TRANSLATIONS: Readonly<Record<Locale, Readonly<Record<TranslationKey, string>>>> = {
-  es: ES_UI_TRANSLATIONS,
-  en: EN_UI_TRANSLATIONS,
-};
+const TRANSLATIONS = {
+  es: {
+    ...ES_UI_TRANSLATIONS,
+    ...ES_QUESTIONNAIRE_UX_TRANSLATIONS,
+  },
+  en: {
+    ...EN_UI_TRANSLATIONS,
+    ...EN_QUESTIONNAIRE_UX_TRANSLATIONS,
+  },
+} satisfies Readonly<Record<Locale, Readonly<Record<TranslationKey, string>>>>;
 
 @Injectable({ providedIn: 'root' })
 export class TranslationService {
