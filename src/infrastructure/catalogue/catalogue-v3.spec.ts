@@ -165,18 +165,19 @@ describe('catalogue v3 snapshot', () => {
     expect(snapshotPractice('vaginal-penetration')?.categoryId).toBe('penetration');
   });
 
-  it('reduces toy target sites to anatomically and practically useful choices', () => {
+  it('keeps toy target sites anatomically and practically useful without excluding valid oral use', () => {
     const sites = (id: string) => seed(id)?.targetSites;
 
-    expect(sites('vibrator')).toEqual(['external-genitals', 'vaginal', 'anal']);
+    expect(sites('vibrator')).toEqual(['external-genitals', 'mouth', 'vaginal', 'anal']);
     expect(sites('wand-vibrator')).toEqual(['external-genitals', 'nipples']);
     expect(sites('rabbit-vibrator')).toEqual(['external-genitals', 'vaginal']);
-    expect(sites('clitoral-suction-toy')).toEqual(['external-genitals']);
+    expect(sites('clitoral-suction-toy')).toEqual(['external-genitals', 'nipples']);
     expect(sites('kegel-balls')).toEqual(['vaginal']);
     expect(sites('remote-control-toy')).toEqual(['external-genitals', 'vaginal', 'anal']);
     expect(sites('wearable-vibrator')).toEqual(['external-genitals', 'vaginal', 'anal']);
-    expect(sites('sex-machine')).toEqual(['vaginal', 'anal']);
-    expect(sites('vacuum-cup-toys')).toEqual(['vaginal', 'anal']);
+    expect(sites('strapless-strap-on')).toEqual(['mouth', 'vaginal', 'anal']);
+    expect(sites('sex-machine')).toEqual(['mouth', 'vaginal', 'anal']);
+    expect(sites('vacuum-cup-toys')).toEqual(['mouth', 'vaginal', 'anal']);
     expect(sites('pinwheel')).toEqual(['body']);
   });
 
