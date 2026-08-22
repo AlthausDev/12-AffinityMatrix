@@ -2,6 +2,7 @@ import {
   CATALOGUE_V3_CONTENT as CURATED_CONTENT,
   RETIRED_V3_PRACTICE_IDS as CURATED_RETIRED_V3_PRACTICE_IDS,
 } from './curated';
+import { applyFinalCategoryCopy } from './category-copy-overrides';
 import { polishCatalogue } from './content-polish';
 import { materializeContextualDescriptions } from './contextual-description';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
@@ -31,5 +32,6 @@ const ACTIVE_CONTENT = POLISHED_CONTENT.map((category) => ({
   ...category,
   practices: category.practices.filter((practice) => !FINAL_CONTENT_RETIRED_PRACTICE_IDS.has(practice.id)),
 }));
+const GROUPED_CONTENT = groupCataloguePractices(ACTIVE_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = groupCataloguePractices(ACTIVE_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyFinalCategoryCopy(GROUPED_CONTENT);
