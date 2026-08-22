@@ -7,16 +7,26 @@ import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
 import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
+import { QuestionnaireCategoryNavigationComponent } from '../../questionnaire/questionnaire-category-navigation.component';
 import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-role.component';
+import { findRouteParam } from '../../shared/route-param';
 
 @Component({
   selector: 'app-questionnaire-category-page',
-  imports: [RouterLink, QuestionnaireRoleComponent],
+  imports: [RouterLink, QuestionnaireCategoryNavigationComponent, QuestionnaireRoleComponent],
   template: `
-    <main class="page questionnaire-page">
-      @if (profile(); as currentProfile) {
-        <a class="back-link" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']" [queryParams]="includeFiltered() ? { filtered: '1' } : null">{{ i18n.t('questionnaire.backCategories') }}</a>
+    <main class="questionnaire-modal-page questionnaire-page">
+      @if (profile()) {
         @if (category(); as currentCategory) {
+          <div class="top-navigation">
+            <app-questionnaire-category-navigation
+              [profileId]="profileId"
+              [previousCategoryId]="neighbours().previousCategoryId"
+              [nextCategoryId]="neighbours().nextCategoryId"
+              [includeFiltered]="includeFiltered()"
+            />
+          </div>
+
           <header class="page-header dashboard-header">
             <div>
               <p class="eyebrow">{{ i18n.t('questionnaire.category.eyebrow', { answered: currentCategory.answered, total: currentCategory.total }) }}</p>
@@ -61,34 +71,37 @@ import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-ro
             </section>
           }
 
-          <nav class="questionnaire-nav" [attr.aria-label]="i18n.t('questionnaire.navigationAria')">
-            <div>@if (neighbours().previousCategoryId; as previousId) { <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', previousId]" [queryParams]="includeFiltered() ? { filtered: '1' } : null">{{ i18n.t('questionnaire.previous') }}</a> }</div>
-            <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']" [queryParams]="includeFiltered() ? { filtered: '1' } : null">{{ i18n.t('common.categories') }}</a>
-            <div>@if (neighbours().nextCategoryId; as nextId) { <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', nextId]" [queryParams]="includeFiltered() ? { filtered: '1' } : null">{{ i18n.t('questionnaire.next') }}</a> }</div>
-          </nav>
+          <div class="bottom-navigation">
+            <app-questionnaire-category-navigation
+              [profileId]="profileId"
+              [previousCategoryId]="neighbours().previousCategoryId"
+              [nextCategoryId]="neighbours().nextCategoryId"
+              [includeFiltered]="includeFiltered()"
+            />
+          </div>
         } @else if (catalogueStore.loading()) {
           <section class="panel"><h1>{{ i18n.t('common.questionnaire.loading.title') }}</h1><p class="muted">{{ i18n.t('common.questionnaire.loading.description') }}</p></section>
         } @else if (!snapshot()) {
           <section class="panel"><h1>{{ i18n.t('common.questionnaire.unavailable.title') }}</h1><p class="muted">{{ i18n.t('common.questionnaire.unavailable.description') }}</p></section>
         } @else {
-          <section class="panel"><h1>{{ i18n.t('questionnaire.categoryNotFound') }}</h1><a class="button" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']">{{ i18n.t('questionnaire.returnCategories') }}</a></section>
+          <section class="panel"><h1>{{ i18n.t('questionnaire.categoryNotFound') }}</h1><a class="button" [routerLink]="['/profiles', profileId, 'questionnaire']">{{ i18n.t('questionnaire.returnCategories') }}</a></section>
         }
       } @else {
-        <a class="back-link" routerLink="/">{{ i18n.t('dashboard.backProfiles') }}</a><section class="panel"><h1>{{ i18n.t('common.profileNotFound.title') }}</h1></section>
+        <section class="panel"><h1>{{ i18n.t('common.profileNotFound.title') }}</h1></section>
       }
     </main>
   `,
   styles: `
-    .questionnaire-page { max-width: 64rem; }
+    .questionnaire-page { max-width: 72rem; }
+    .top-navigation { margin-bottom: 1.75rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); }
+    .bottom-navigation { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); }
     .questionnaire-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
     .compact-toggle { min-width: min(100%, 24rem); padding: 0.75rem; }
     .save-state { margin: 0; font-size: 0.85rem; }
     .question-list { display: grid; gap: 1rem; }
-    .question-card-header { margin-bottom: 1rem; }
+    .question-card-header { margin-bottom: 0.65rem; }
     .question-card-header p { margin-bottom: 0; }
-    .questionnaire-nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.75rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); }
-    .questionnaire-nav > div:last-child { text-align: right; }
-    @media (max-width: 720px) { .questionnaire-toolbar { align-items: stretch; flex-direction: column; } .questionnaire-nav { grid-template-columns: 1fr; } .questionnaire-nav .button { width: 100%; } }
+    @media (max-width: 720px) { .questionnaire-toolbar { align-items: stretch; flex-direction: column; } }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -101,10 +114,10 @@ export class QuestionnaireCategoryPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly params = toSignal(this.route.paramMap, { initialValue: this.route.snapshot.paramMap });
 
+  readonly profileId = findRouteParam(this.route, 'id') ?? '';
   readonly includeFiltered = signal(this.route.snapshot.queryParamMap.get('filtered') === '1');
-  readonly profileId = computed(() => this.params().get('id') ?? '');
   readonly categoryId = computed(() => this.params().get('category') ?? '');
-  readonly profile = computed(() => this.profileStore.findById(this.profileId()));
+  readonly profile = computed(() => this.profileStore.findById(this.profileId));
   readonly snapshot = computed(() => this.catalogueStore.snapshot());
   readonly category = computed(() => {
     const profile = this.profile(); const snapshot = this.snapshot();
@@ -129,10 +142,10 @@ export class QuestionnaireCategoryPageComponent {
 
   saveAnswer(answer: PracticeAnswer): void {
     const snapshot = this.snapshot();
-    if (snapshot) void this.profileStore.upsertAnswer(this.profileId(), answer, snapshot.version);
+    if (snapshot) void this.profileStore.upsertAnswer(this.profileId, answer, snapshot.version);
   }
 
   removeAnswer(target: { readonly practiceId: string; readonly roleId: string; readonly scope?: AnswerScope }): void {
-    void this.profileStore.removeAnswer(this.profileId(), target.practiceId, target.roleId, target.scope);
+    void this.profileStore.removeAnswer(this.profileId, target.practiceId, target.roleId, target.scope);
   }
 }
