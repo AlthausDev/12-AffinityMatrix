@@ -28,16 +28,17 @@ export interface PreferenceCompatibility {
 export interface ComparedAnswer {
   readonly answerKey: AnswerKey;
   readonly roleId: string;
-  readonly roleLabel: string;
   readonly answer: PracticeAnswer;
 }
 
+/**
+ * Language-neutral comparison interaction. Human-readable catalogue text is resolved by the UI
+ * from the stable category/practice/role ids so the domain never owns localized presentation.
+ */
 export interface ComparisonInteraction {
   readonly id: string;
   readonly categoryId: string;
-  readonly categoryLabel: string;
   readonly practiceId: string;
-  readonly practiceLabel: string;
   readonly roleRelation: RoleRelation;
   readonly left: ComparedAnswer;
   readonly right: ComparedAnswer;
@@ -48,7 +49,6 @@ export type ComparisonClassificationCounts = Readonly<Record<ComparisonClassific
 
 export interface CategoryComparison {
   readonly categoryId: string;
-  readonly categoryLabel: string;
   readonly answeredInteractionCount: number;
   readonly affinityBasisCount: number;
   readonly commonGroundCount: number;
