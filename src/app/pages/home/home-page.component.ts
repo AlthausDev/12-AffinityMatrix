@@ -1,12 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Profile } from '../../../domain/profile/profile';
 import { ProfileStore } from '../../core/profile.store';
 import { TranslationService } from '../../i18n/translation.service';
+import { ProfileDeleteDialogComponent } from '../../profile/profile-delete-dialog.component';
 import { APP_VERSION } from '../../shared/app-version';
 
 @Component({
   selector: 'app-home-page',
-  imports: [RouterLink],
+  imports: [RouterLink, ProfileDeleteDialogComponent],
   template: `
     <main class="page">
       <header class="page-header home-header">
@@ -40,13 +42,23 @@ import { APP_VERSION } from '../../shared/app-version';
         } @else {
           <div class="profile-list">
             @for (profile of profileStore.profiles(); track profile.id) {
-              <a class="profile-row" [routerLink]="['/profiles', profile.id]">
-                <div>
-                  <strong>{{ profile.metadata.alias || i18n.t('common.untitledProfile') }}</strong>
-                  <span class="muted">{{ profileSummary(answerCount(profile.answers), profile.settings.filterQuestionnaireByMetadata) }}</span>
-                </div>
-                <span aria-hidden="true">→</span>
-              </a>
+              <div class="profile-row">
+                <a class="profile-row-main" [routerLink]="['/profiles', profile.id]">
+                  <div>
+                    <strong>{{ profile.metadata.alias || i18n.t('common.untitledProfile') }}</strong>
+                    <span class="muted">{{ profileSummary(answerCount(profile.answers), profile.settings.filterQuestionnaireByMetadata) }}</span>
+                  </div>
+                  <span class="profile-arrow" aria-hidden="true">→</span>
+                </a>
+                <button
+                  class="profile-delete-button"
+                  type="button"
+                  [attr.aria-label]="i18n.t('profileDeletion.homeAria', { alias: profile.metadata.alias || i18n.t('common.untitledProfile') })"
+                  (click)="requestDeletion(profile)"
+                >
+                  {{ i18n.t('profileDeletion.homeAction') }}
+                </button>
+              </div>
             }
           </div>
         }
@@ -57,6 +69,52 @@ import { APP_VERSION } from '../../shared/app-version';
         <span class="muted">{{ i18n.t('home.privacy.description') }}</span>
       </footer>
     </main>
+
+    @if (pendingDeletion(); as profile) {
+      <app-profile-delete-dialog
+        [profileId]="profile.id"
+        [alias]="profile.metadata.alias ?? ''"
+        (cancelled)="pendingDeletion.set(null)"
+        (deleted)="pendingDeletion.set(null)"
+      />
+    }
+  `,
+  styles: `
+    .profile-row { padding: 0; gap: 0; overflow: hidden; }
+    .profile-row-main {
+      display: flex;
+      min-width: 0;
+      flex: 1 1 auto;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      text-decoration: none;
+    }
+    .profile-arrow { flex: 0 0 auto; }
+    .profile-delete-button {
+      align-self: stretch;
+      flex: 0 0 auto;
+      min-width: 4.8rem;
+      padding: 0.5rem 0.9rem;
+      border: 0;
+      border-left: 1px solid var(--border-subtle);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+    }
+    .profile-delete-button:hover {
+      background: color-mix(in srgb, var(--preference-boundary) 16%, transparent);
+      color: #ffe5e8;
+      box-shadow: inset 0 0 1rem color-mix(in srgb, var(--preference-boundary) 12%, transparent);
+    }
+    @media (max-width: 520px) {
+      .profile-row-main { padding-inline: 1rem; }
+      .profile-delete-button { min-width: 4.35rem; padding-inline: 0.65rem; }
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -64,6 +122,7 @@ export class HomePageComponent {
   readonly profileStore = inject(ProfileStore);
   readonly i18n = inject(TranslationService);
   readonly appVersion = APP_VERSION;
+  readonly pendingDeletion = signal<Profile | null>(null);
 
   answerCount(answers: object): number {
     return Object.keys(answers).length;
@@ -71,5 +130,9 @@ export class HomePageComponent {
 
   profileSummary(count: number, filtered: boolean): string {
     return this.i18n.t(filtered ? 'home.profileSummary.filtered' : 'home.profileSummary.full', { count });
+  }
+
+  requestDeletion(profile: Profile): void {
+    this.pendingDeletion.set(profile);
   }
 }
