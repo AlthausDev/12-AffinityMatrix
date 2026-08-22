@@ -209,7 +209,7 @@ export class QuestionnaireShellComponent {
 
   constructor() {
     this.lockBackgroundScroll();
-    this.syncRouteState();
+    this.syncRouteState(this.router.url);
     this.lastRoutePath = this.routePath(this.router.url);
     void this.catalogueStore.initialize();
 
@@ -222,7 +222,7 @@ export class QuestionnaireShellComponent {
         const nextPath = this.routePath(event.urlAfterRedirects);
         const routeChanged = nextPath !== this.lastRoutePath;
         this.lastRoutePath = nextPath;
-        this.syncRouteState();
+        this.syncRouteState(event.urlAfterRedirects);
         if (routeChanged) queueMicrotask(() => this.scrollToTop());
       });
   }
@@ -267,19 +267,14 @@ export class QuestionnaireShellComponent {
     void this.router.navigate(['/profiles', this.profileId]);
   }
 
-  private syncRouteState(): void {
-    let current: ActivatedRoute | null = this.route;
-    let categoryId: string | null = null;
-    let includeFiltered = false;
-
-    while (current) {
-      categoryId = current.snapshot.paramMap.get('category') ?? categoryId;
-      includeFiltered = current.snapshot.queryParamMap.get('filtered') === '1' || includeFiltered;
-      current = current.firstChild;
-    }
+  private syncRouteState(url: string): void {
+    const tree = this.router.parseUrl(url);
+    const segments = tree.root.children['primary']?.segments.map((segment) => segment.path) ?? [];
+    const questionnaireIndex = segments.indexOf('questionnaire');
+    const categoryId = questionnaireIndex >= 0 ? segments[questionnaireIndex + 1] ?? null : null;
 
     this.currentCategoryId.set(categoryId);
-    this.includeFiltered.set(includeFiltered);
+    this.includeFiltered.set(tree.queryParams['filtered'] === '1');
   }
 
   private lockBackgroundScroll(): void {
