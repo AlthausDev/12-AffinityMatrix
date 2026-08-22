@@ -62,6 +62,12 @@ export class MetadataQuestionVisibilityPolicy extends QuestionVisibilityPolicy {
       !applicability.partnerSex.includes(counterpartSex)
     ) return false;
 
+    if (
+      context.metadata.sex &&
+      applicability?.groupComposition &&
+      !applicability.groupComposition.includes(context.metadata.sex)
+    ) return false;
+
     return this.isTargetSiteApplicable(role, context.metadata, scope);
   }
 
@@ -83,7 +89,50 @@ export class MetadataQuestionVisibilityPolicy extends QuestionVisibilityPolicy {
       if (!role.applicability.partnerSex.some((sex) => relevantPartnerSexes.includes(sex))) return false;
     }
 
+    if (
+      relevantPartnerSexes &&
+      context.metadata.sex &&
+      role.applicability?.groupComposition &&
+      !this.isGroupCompositionRelevant(
+        role.applicability.groupComposition,
+        context.metadata.sex,
+        relevantPartnerSexes,
+      )
+    ) return false;
+
+    if (
+      relevantPartnerSexes &&
+      context.metadata.sex &&
+      role.applicability?.requiresAnyParticipantSex &&
+      !this.hasRelevantRequiredParticipant(
+        role.applicability.requiresAnyParticipantSex,
+        context.metadata.sex,
+        relevantPartnerSexes,
+      )
+    ) return false;
+
     return true;
+  }
+
+  private isGroupCompositionRelevant(
+    composition: readonly Sex[],
+    selfSex: Sex,
+    relevantPartnerSexes: readonly Sex[],
+  ): boolean {
+    const remaining = [...composition];
+    const selfIndex = remaining.indexOf(selfSex);
+    if (selfIndex < 0) return false;
+    remaining.splice(selfIndex, 1);
+    return remaining.every((sex) => relevantPartnerSexes.includes(sex));
+  }
+
+  private hasRelevantRequiredParticipant(
+    requiredSexes: readonly Sex[],
+    selfSex: Sex,
+    relevantPartnerSexes: readonly Sex[],
+  ): boolean {
+    return requiredSexes.includes(selfSex)
+      || requiredSexes.some((sex) => relevantPartnerSexes.includes(sex));
   }
 
   private isTargetSiteApplicable(
