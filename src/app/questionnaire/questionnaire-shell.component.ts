@@ -187,6 +187,7 @@ export class QuestionnaireShellComponent {
   private readonly router = inject(Router);
   private readonly document = inject(DOCUMENT);
   private readonly destroyRef = inject(DestroyRef);
+  private lastRoutePath = '';
 
   readonly profileId = findRouteParam(this.route, 'id') ?? '';
   readonly finishDialogOpen = signal(false);
@@ -212,6 +213,7 @@ export class QuestionnaireShellComponent {
   constructor() {
     this.lockBackgroundScroll();
     this.syncRouteState();
+    this.lastRoutePath = this.routePath(this.router.url);
     void this.catalogueStore.initialize();
 
     this.router.events
@@ -219,9 +221,12 @@ export class QuestionnaireShellComponent {
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
         takeUntilDestroyed(),
       )
-      .subscribe(() => {
+      .subscribe((event) => {
+        const nextPath = this.routePath(event.urlAfterRedirects);
+        const routeChanged = nextPath !== this.lastRoutePath;
+        this.lastRoutePath = nextPath;
         this.syncRouteState();
-        queueMicrotask(() => this.scrollToTop());
+        if (routeChanged) queueMicrotask(() => this.scrollToTop());
       });
   }
 
@@ -293,6 +298,10 @@ export class QuestionnaireShellComponent {
       body.style.overflow = previousBodyOverflow;
       root.style.overflow = previousRootOverflow;
     });
+  }
+
+  private routePath(url: string): string {
+    return url.split('?')[0] ?? url;
   }
 
   private scrollToTop(): void {
