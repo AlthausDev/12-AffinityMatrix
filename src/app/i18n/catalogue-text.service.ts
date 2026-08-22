@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { CATALOGUE_V3_CONTENT } from '../../content/catalogue/v3';
-import { CataloguePracticeSeed } from '../../content/catalogue/v3/types';
 import { Practice, PracticeCategory, PracticeRole } from '../../domain/catalogue/practice';
+import { CATALOGUE_V3_CONTENT } from '../../infrastructure/catalogue/v3/content';
+import { CataloguePracticeSeed } from '../../infrastructure/catalogue/v3/content/types';
 import { EN_CATALOGUE_TRANSLATIONS } from './catalogue/en-catalogue.translations';
 import {
   CatalogueTranslationKey,
