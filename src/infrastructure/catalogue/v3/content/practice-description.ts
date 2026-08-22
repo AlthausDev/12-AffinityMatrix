@@ -1,11 +1,15 @@
 import { CataloguePracticeSeed } from './types';
+import { PRACTICE_DESCRIPTION_OVERRIDES } from './practice-description-overrides';
 
 export type CatalogueLocale = 'es' | 'en';
 
 /** Returns concise explanatory copy for every current practice, with explicit overrides where needed. */
 export function describeCataloguePractice(seed: CataloguePracticeSeed, locale: CatalogueLocale): string {
   const explicit = locale === 'es' ? seed.descriptionEs : seed.descriptionEn;
-  if (explicit) return explicit;
+  if (explicit) return cleanConsentWording(explicit, locale);
+
+  const definition = PRACTICE_DESCRIPTION_OVERRIDES[seed.id];
+  if (definition) return cleanConsentWording(locale === 'es' ? definition.es : definition.en, locale);
 
   if (locale === 'es') {
     switch (seed.kind) {
@@ -54,4 +58,11 @@ export function describeCataloguePractice(seed: CataloguePracticeSeed, locale: C
     case 'toy':
       return 'An object or accessory rated for self-use, partner use and body site where relevant.';
   }
+}
+
+function cleanConsentWording(value: string, locale: CatalogueLocale): string {
+  const cleaned = locale === 'es'
+    ? value.replace(/\b(?:consensuad[oa]s?|consentid[oa]s?)\s+/gi, '').replace(/\s+(?:consensuad[oa]s?|consentid[oa]s?)\b/gi, '')
+    : value.replace(/\bconsensual\s+/gi, '').replace(/\s+consensual\b/gi, '');
+  return cleaned.replace(/\s{2,}/g, ' ').replace(/\s+([,.;:])/g, '$1').trim();
 }
