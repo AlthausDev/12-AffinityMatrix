@@ -1,8 +1,23 @@
+import {
+  RoleApplicability,
+  SelfProfileApplicabilityExclusion,
+} from '../../../../domain/catalogue/practice';
 import { CatalogueCategorySeed, CataloguePracticeSeed } from './types';
 
 export const FINAL_APPLICABILITY_RETIRED_PRACTICE_IDS = new Set<string>([
   'doctor-patient-roleplay',
   'nurse-patient-roleplay',
+]);
+
+const HETEROSEXUAL_MALE_EXCLUSION: readonly SelfProfileApplicabilityExclusion[] = [
+  { sex: 'male', orientation: 'heterosexual' },
+];
+const HETEROSEXUAL_MALE_ORIFICE_EXCLUSION: readonly SelfProfileApplicabilityExclusion[] = [
+  { sex: 'male', orientation: 'heterosexual', targetSites: ['mouth', 'anal'] },
+];
+const EXTRA_PENETRATIVE_RECEIVER_IDS = new Set<string>([
+  'fingering-anal',
+  'prostate-massage-manual',
 ]);
 
 const PRACTICE_OVERRIDES: Readonly<Record<string, Partial<CataloguePracticeSeed>>> = {
@@ -49,6 +64,31 @@ const PRACTICE_OVERRIDES: Readonly<Record<string, Partial<CataloguePracticeSeed>
   },
   snowballing: { requiresAnyParticipantSex: ['male'] },
   'creampie-cleanup': { requiresAnyParticipantSex: ['male'] },
+
+  'glory-hole': {
+    kind: 'paired',
+    counterpartScoped: true,
+    descriptionEn: 'A glory-hole encounter with two explicit sides: one adult presents their penis through the opening, while the other adult remains on the opposite side and stimulates it orally or manually.',
+    descriptionEs: 'Encuentro de glory hole con dos lados explícitos: una persona adulta introduce su pene por la abertura y la otra permanece al lado opuesto para estimularlo oral o manualmente.',
+    pairedRoles: [
+      {
+        id: 'present-penis',
+        en: 'Put my penis through the glory hole',
+        es: 'Introducir mi pene por el glory hole',
+        perspective: 'receptive',
+      },
+      {
+        id: 'stimulate-other-side',
+        en: 'Stimulate the penis from the other side',
+        es: 'Estimular el pene desde el otro lado',
+        perspective: 'active',
+      },
+    ],
+    roleApplicability: {
+      'present-penis': { selfSex: ['male'] },
+      'stimulate-other-side': { partnerSex: ['male'] },
+    },
+  },
 };
 
 const MEDICAL_ROLEPLAY: readonly CataloguePracticeSeed[] = [
@@ -89,10 +129,75 @@ export function applyFinalApplicabilityReview(
       .map((practice) => ({
         ...practice,
         ...(PRACTICE_OVERRIDES[practice.id] ?? {}),
-      }));
+      }))
+      .map((practice) => applyProfileAwareExclusions(category.id, practice));
 
     return category.id === 'roleplay'
       ? { ...category, practices: [...practices, ...MEDICAL_ROLEPLAY] }
       : { ...category, practices };
   });
+}
+
+function applyProfileAwareExclusions(
+  categoryId: string,
+  practice: CataloguePracticeSeed,
+): CataloguePracticeSeed {
+  let result = practice;
+
+  if (categoryId === 'penetration' && result.kind === 'directed') {
+    result = addRoleApplicability(result, 'receive', {
+      selfProfileExclusions: HETEROSEXUAL_MALE_EXCLUSION,
+    });
+  }
+
+  if (EXTRA_PENETRATIVE_RECEIVER_IDS.has(result.id)) {
+    result = addRoleApplicability(result, 'receive', {
+      selfProfileExclusions: HETEROSEXUAL_MALE_EXCLUSION,
+    });
+  }
+
+  if (result.kind === 'toy') {
+    result = addRoleApplicability(result, 'use-on-self', {
+      selfProfileExclusions: HETEROSEXUAL_MALE_ORIFICE_EXCLUSION,
+    });
+    result = addRoleApplicability(result, 'partner-uses-on-me', {
+      selfProfileExclusions: HETEROSEXUAL_MALE_ORIFICE_EXCLUSION,
+    });
+  }
+
+  if (result.id === 'swallowing') {
+    result = addRoleApplicability(result, 'self-state', {
+      selfProfileExclusions: HETEROSEXUAL_MALE_EXCLUSION,
+    });
+  }
+
+  return result;
+}
+
+function addRoleApplicability(
+  practice: CataloguePracticeSeed,
+  roleId: string,
+  additional: RoleApplicability,
+): CataloguePracticeSeed {
+  const current = practice.roleApplicability?.[roleId];
+  const merged: RoleApplicability = {
+    ...(current ?? {}),
+    ...additional,
+    ...(current?.selfProfileExclusions || additional.selfProfileExclusions
+      ? {
+          selfProfileExclusions: [
+            ...(current?.selfProfileExclusions ?? []),
+            ...(additional.selfProfileExclusions ?? []),
+          ],
+        }
+      : {}),
+  };
+
+  return {
+    ...practice,
+    roleApplicability: {
+      ...practice.roleApplicability,
+      [roleId]: merged,
+    },
+  };
 }
