@@ -73,7 +73,7 @@ import { APP_VERSION } from '../../shared/app-version';
     @if (pendingDeletion(); as profile) {
       <app-profile-delete-dialog
         [profileId]="profile.id"
-        [alias]="profile.metadata.alias"
+        [alias]="profile.metadata.alias ?? ''"
         (cancelled)="pendingDeletion.set(null)"
         (deleted)="pendingDeletion.set(null)"
       />
