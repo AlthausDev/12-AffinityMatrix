@@ -58,7 +58,7 @@ import { findRouteParam } from '../../shared/route-param';
                       </div>
                       <strong>{{ summary.completionPercentage }}%</strong>
                     </div>
-                    @if (summary.category.description) { <p class="muted">{{ catalogueText.categoryDescription(summary.category) }}</p> }
+                    @if (summary.category.description) { <p class="muted category-card-description">{{ catalogueText.categoryDescription(summary.category) }}</p> }
                     <app-completion-progress [value]="summary.completionPercentage" />
                     @if (summary.filtered > 0 && !includeFiltered()) { <small class="muted">{{ filteredCountLabel(summary.filtered) }}</small> }
                   </a>
@@ -115,12 +115,13 @@ import { findRouteParam } from '../../shared/route-param';
     .overall-progress span, .hidden-count { font-size: 0.82rem; }
     .consent-note { margin: -0.35rem 0 1.25rem; padding: 0.75rem 0.9rem; border-left: 2px solid var(--focus-ring); background: color-mix(in srgb, var(--surface-elevated) 52%, transparent); color: var(--text-secondary); font-size: 0.82rem; line-height: 1.5; }
     .questionnaire-filter-toggle { margin-bottom: 1.5rem; }
-    .category-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .category-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem; }
     .category-card { position: relative; display: grid; border: 1px solid transparent; border-radius: 10px; background: linear-gradient(color-mix(in srgb, var(--surface-panel) 92%, transparent), color-mix(in srgb, var(--surface-panel) 92%, transparent)) padding-box, var(--window-border-gradient-soft) border-box; transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease; }
     .category-card:hover { background: linear-gradient(var(--surface-elevated), var(--surface-elevated)) padding-box, var(--window-border-gradient) border-box; box-shadow: 0 0.8rem 2rem rgba(5, 10, 28, 0.2); transform: translateY(-1px); }
-    .category-main-link { display: grid; gap: 0.9rem; padding: 1.35rem 1.35rem 3.2rem; text-decoration: none; }
+    .category-main-link { display: grid; gap: 0.7rem; padding: 1.1rem 1.2rem 2.9rem; text-decoration: none; }
     .category-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
     .category-card-heading h2, .category-card p, .category-card small { margin: 0; }
+    .category-card-description { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; font-size: 0.86rem; line-height: 1.4; }
     .category-visibility-action { position: absolute; right: 1.1rem; bottom: 0.9rem; padding: 0.3rem 0.5rem; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.75rem; text-decoration: underline; }
     .category-visibility-action:hover, .text-action:hover { color: var(--text-primary); }
     .hidden-categories { margin-top: 1.5rem; }
