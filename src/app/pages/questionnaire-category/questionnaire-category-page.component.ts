@@ -26,7 +26,7 @@ import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-ro
             <p class="profile-count">{{ currentCategory.completionPercentage }}%</p>
           </header>
 
-          @if (profileStore.error()) { <p class="alert" role="alert">{{ profileStore.error() }}</p> }
+          @if (profileStore.error()) { <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p> }
 
           <div class="questionnaire-toolbar">
             @if (filteredCount() > 0) {
@@ -69,7 +69,7 @@ import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-ro
         } @else if (catalogueStore.loading()) {
           <section class="panel"><h1>{{ i18n.t('common.questionnaire.loading.title') }}</h1><p class="muted">{{ i18n.t('common.questionnaire.loading.description') }}</p></section>
         } @else if (!snapshot()) {
-          <section class="panel"><h1>{{ i18n.t('common.questionnaire.unavailable.title') }}</h1><p class="muted">{{ catalogueStore.error() || i18n.t('common.questionnaire.unavailable.description') }}</p></section>
+          <section class="panel"><h1>{{ i18n.t('common.questionnaire.unavailable.title') }}</h1><p class="muted">{{ i18n.t('common.questionnaire.unavailable.description') }}</p></section>
         } @else {
           <section class="panel"><h1>{{ i18n.t('questionnaire.categoryNotFound') }}</h1><a class="button" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']">{{ i18n.t('questionnaire.returnCategories') }}</a></section>
         }
