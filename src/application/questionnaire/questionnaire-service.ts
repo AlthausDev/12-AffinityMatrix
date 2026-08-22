@@ -61,10 +61,12 @@ export class QuestionnaireService {
     snapshot: CatalogueSnapshot,
     profile: Profile,
     includeFiltered = false,
+    excludedCategoryIds: readonly string[] = [],
   ): readonly QuestionnaireCategorySummary[] {
-    return this.sortedCategories(snapshot).map((category) =>
-      this.summarizeCategory(snapshot, profile, category, includeFiltered),
-    );
+    const excluded = new Set(excludedCategoryIds);
+    return this.sortedCategories(snapshot)
+      .filter((category) => !excluded.has(category.id))
+      .map((category) => this.summarizeCategory(snapshot, profile, category, includeFiltered));
   }
 
   getCategory(
@@ -88,8 +90,13 @@ export class QuestionnaireService {
     };
   }
 
-  getNeighbours(snapshot: CatalogueSnapshot, categoryId: string): QuestionnaireNeighbours {
-    const categories = this.sortedCategories(snapshot);
+  getNeighbours(
+    snapshot: CatalogueSnapshot,
+    categoryId: string,
+    excludedCategoryIds: readonly string[] = [],
+  ): QuestionnaireNeighbours {
+    const excluded = new Set(excludedCategoryIds);
+    const categories = this.sortedCategories(snapshot).filter((category) => !excluded.has(category.id));
     const index = categories.findIndex((category) => category.id === categoryId);
     if (index < 0) return {};
     return {
@@ -187,6 +194,6 @@ export class QuestionnaireService {
   }
 
   private nonEmptyScope(scope: AnswerScope): AnswerScope | undefined {
-    return scope.counterpartSex ? scope : undefined;
+    return scope.counterpartSex || scope.targetSite ? scope : undefined;
   }
 }
