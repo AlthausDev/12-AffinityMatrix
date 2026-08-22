@@ -1,31 +1,47 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { PortableProfile } from '../../../application/profile/portable-profile';
+import { Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
 import { ProfileStore } from '../../core/profile.store';
 import { PROFILE_CODE_CODEC } from '../../core/profile-codec.token';
+import { TranslationService } from '../../i18n/translation.service';
 
 @Component({
   selector: 'app-profile-import-page',
   imports: [RouterLink],
   template: `
     <main class="page narrow-page">
-      <a class="back-link" routerLink="/">← Profiles</a>
-      <header class="page-header"><p class="eyebrow">Portability</p><h1>Import profile</h1><p class="muted">Paste a profile code to inspect it before deciding whether to save it in this browser.</p></header>
+      <a class="back-link" routerLink="/">{{ i18n.t('import.backProfiles') }}</a>
+      <header class="page-header">
+        <p class="eyebrow">{{ i18n.t('import.eyebrow') }}</p>
+        <h1>{{ i18n.t('import.title') }}</h1>
+        <p class="muted">{{ i18n.t('import.description') }}</p>
+      </header>
       <section class="panel form-grid">
-        <label class="field"><span>Profile code</span><textarea class="code-box" placeholder="Paste profile code" [value]="code()" (input)="updateCode($event)"></textarea></label>
+        <label class="field">
+          <span>{{ i18n.t('import.codeLabel') }}</span>
+          <textarea class="code-box" [placeholder]="i18n.t('import.codePlaceholder')" [value]="code()" (input)="updateCode($event)"></textarea>
+        </label>
         @if (codeError()) { <p class="alert" role="alert">{{ codeError() }}</p> }
-        <div class="form-actions"><button class="button" type="button" [disabled]="!code().trim()" (click)="inspectCode()">Inspect profile</button></div>
+        <div class="form-actions"><button class="button" type="button" [disabled]="!code().trim()" (click)="inspectCode()">{{ i18n.t('import.inspect') }}</button></div>
       </section>
 
       @if (preview(); as portable) {
         <section class="panel import-preview" aria-labelledby="import-preview-title">
-          <div><p class="eyebrow">Valid profile</p><h2 id="import-preview-title">{{ portable.metadata.alias || 'Untitled profile' }}</h2><p class="muted">{{ answerCount(portable) }} answered roles · catalogue v{{ portable.catalogueVersion }}</p></div>
+          <div>
+            <p class="eyebrow">{{ i18n.t('import.validProfile') }}</p>
+            <h2 id="import-preview-title">{{ portable.metadata.alias || i18n.t('common.untitledProfile') }}</h2>
+            <p class="muted">{{ answerSummary(portable) }}</p>
+          </div>
           <dl class="status-list">
-            <div><dt>Sex</dt><dd>{{ portable.metadata.sex || 'Not shared' }}</dd></div>
-            <div><dt>Orientation</dt><dd>{{ portable.metadata.orientation || 'Not shared' }}</dd></div>
-            <div><dt>Local settings</dt><dd>Reset on import</dd></div>
+            <div><dt>{{ i18n.t('import.sex') }}</dt><dd>{{ sexLabel(portable.metadata.sex) }}</dd></div>
+            <div><dt>{{ i18n.t('import.orientation') }}</dt><dd>{{ orientationLabel(portable.metadata.orientation) }}</dd></div>
+            <div><dt>{{ i18n.t('import.localSettings') }}</dt><dd>{{ i18n.t('import.localSettingsReset') }}</dd></div>
           </dl>
-          <div class="form-actions import-actions"><button class="button secondary" type="button" disabled>Compare without saving</button><button class="button" type="button" [disabled]="profileStore.saving()" (click)="saveProfile()">{{ profileStore.saving() ? 'Saving…' : 'Save in this browser' }}</button></div>
+          <div class="form-actions import-actions">
+            <button class="button secondary" type="button" disabled>{{ i18n.t('import.compareWithoutSaving') }}</button>
+            <button class="button" type="button" [disabled]="profileStore.saving()" (click)="saveProfile()">{{ profileStore.saving() ? i18n.t('common.saving') : i18n.t('import.saveBrowser') }}</button>
+          </div>
         </section>
       }
     </main>
@@ -39,6 +55,7 @@ import { PROFILE_CODE_CODEC } from '../../core/profile-codec.token';
 })
 export class ProfileImportPageComponent {
   readonly profileStore = inject(ProfileStore);
+  readonly i18n = inject(TranslationService);
   private readonly codec = inject(PROFILE_CODE_CODEC);
   private readonly router = inject(Router);
 
@@ -56,9 +73,9 @@ export class ProfileImportPageComponent {
     try {
       this.preview.set(this.codec.decode(this.code()));
       this.codeError.set('');
-    } catch (error: unknown) {
+    } catch {
       this.preview.set(null);
-      this.codeError.set(error instanceof Error ? error.message : 'The profile code could not be read.');
+      this.codeError.set(this.i18n.t('import.error.read'));
     }
   }
 
@@ -70,8 +87,25 @@ export class ProfileImportPageComponent {
       await this.router.navigate(['/profiles', saved.id]);
       return;
     }
-    this.codeError.set(this.profileStore.error() ?? 'The profile could not be saved.');
+    this.codeError.set(this.profileStore.error() ?? this.i18n.t('import.error.save'));
   }
 
-  answerCount(portable: PortableProfile): number { return Object.keys(portable.answers).length; }
+  answerSummary(portable: PortableProfile): string {
+    const count = Object.keys(portable.answers).length;
+    return this.i18n.plural(count, 'import.answerCount.one', 'import.answerCount.other', {
+      version: portable.catalogueVersion,
+    });
+  }
+
+  sexLabel(sex: Sex | undefined): string {
+    if (!sex) return this.i18n.t('common.notShared');
+    return this.i18n.t(sex === 'male' ? 'profileEditor.sex.male' : 'profileEditor.sex.female');
+  }
+
+  orientationLabel(orientation: SexualOrientation | undefined): string {
+    if (!orientation) return this.i18n.t('common.notShared');
+    if (orientation === 'heterosexual') return this.i18n.t('profileEditor.orientation.heterosexual');
+    if (orientation === 'homosexual') return this.i18n.t('profileEditor.orientation.homosexual');
+    return this.i18n.t('profileEditor.orientation.bisexual');
+  }
 }
