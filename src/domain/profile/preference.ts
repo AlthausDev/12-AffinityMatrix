@@ -3,7 +3,6 @@ export const PREFERENCE_VALUES = [
   'like',
   'depends',
   'curious',
-  'neutral',
   'not-interested',
   'boundary',
 ] as const;

@@ -3,7 +3,7 @@ import { AnswerKey, cloneAnswers, PracticeAnswer } from './profile-answer';
 import { ProfileMetadata } from './profile-metadata';
 import { DEFAULT_PROFILE_SETTINGS, ProfileSettings } from './profile-settings';
 
-export const PROFILE_SCHEMA_VERSION = 4 as const;
+export const PROFILE_SCHEMA_VERSION = 5 as const;
 export const INITIAL_PROFILE_REVISION = 1 as const;
 
 export type ProfileId = string;

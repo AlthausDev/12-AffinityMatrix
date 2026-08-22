@@ -6,7 +6,6 @@ export type ComparisonClassification =
   | 'explorable'
   | 'conditioned'
   | 'intensity-mismatch'
-  | 'neutral'
   | 'not-shared'
   | 'boundary';
 
@@ -79,7 +78,6 @@ export function emptyClassificationCounts(): Record<ComparisonClassification, nu
     explorable: 0,
     conditioned: 0,
     'intensity-mismatch': 0,
-    neutral: 0,
     'not-shared': 0,
     boundary: 0,
   };

@@ -5,7 +5,6 @@ type PreferenceDisposition =
   | 'positive'
   | 'exploratory'
   | 'conditional'
-  | 'neutral'
   | 'negative'
   | 'boundary';
 
@@ -24,7 +23,6 @@ export const PREFERENCE_COMPARISON_DESCRIPTORS: Readonly<Record<Preference, Pref
   like: { intensity: 3, disposition: 'positive' },
   curious: { intensity: 2, disposition: 'exploratory' },
   depends: { intensity: 2, disposition: 'conditional' },
-  neutral: { intensity: 1, disposition: 'neutral' },
   'not-interested': { intensity: 0, disposition: 'negative' },
   boundary: { intensity: 0, disposition: 'boundary' },
 };
@@ -60,29 +58,9 @@ export class DefaultPreferenceCompatibilityPolicy extends PreferenceCompatibilit
     if (dispositions.includes('conditional')) {
       const bothConditional = leftDescriptor.disposition === 'conditional' && rightDescriptor.disposition === 'conditional';
       const other = leftDescriptor.disposition === 'conditional' ? rightDescriptor : leftDescriptor;
-      const score = bothConditional ? 60 : other.disposition === 'neutral' ? 45 : other.disposition === 'exploratory' ? 60 : 70;
+      const score = bothConditional ? 60 : other.disposition === 'exploratory' ? 60 : 70;
       return {
         classification: 'conditioned',
-        score,
-        commonGround: true,
-        requiresConversation: true,
-      };
-    }
-
-    if (leftDescriptor.disposition === 'neutral' && rightDescriptor.disposition === 'neutral') {
-      return {
-        classification: 'neutral',
-        score: 50,
-        commonGround: true,
-        requiresConversation: false,
-      };
-    }
-
-    if (dispositions.includes('neutral')) {
-      const interested = leftDescriptor.disposition === 'neutral' ? rightDescriptor : leftDescriptor;
-      const score = interested.intensity >= 4 ? 35 : interested.intensity === 3 ? 40 : 50;
-      return {
-        classification: 'intensity-mismatch',
         score,
         commonGround: true,
         requiresConversation: true,

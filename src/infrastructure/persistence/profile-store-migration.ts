@@ -1,6 +1,7 @@
 const PROFILE_SCHEMA_VERSION_V2 = 2 as const;
 const PROFILE_SCHEMA_VERSION_V3 = 3 as const;
 const PROFILE_SCHEMA_VERSION_V4 = 4 as const;
+const PROFILE_SCHEMA_VERSION_V5 = 5 as const;
 const CATALOGUE_VERSION_V1 = 1 as const;
 
 export abstract class ProfileStoreMigration {
@@ -99,12 +100,47 @@ export class ProfilesV3ToV4Migration extends ProfileStoreMigration {
   }
 }
 
+/**
+ * V5 removes Neutral from the active preference scale. A legacy Neutral answer cannot be safely
+ * interpreted as Depends, Curious, Not interested, or a boundary, so it becomes unanswered.
+ */
+export class ProfilesV4ToV5Migration extends ProfileStoreMigration {
+  constructor() { super(4, 5); }
+
+  override migrate(value: unknown): unknown {
+    if (!this.isRecord(value) || !Array.isArray(value['profiles'])) return value;
+    return {
+      version: this.toVersion,
+      profiles: value['profiles'].map((profile) => this.migrateProfile(profile)),
+    };
+  }
+
+  private migrateProfile(value: unknown): unknown {
+    if (!this.isRecord(value)) return value;
+    return {
+      ...value,
+      schemaVersion: PROFILE_SCHEMA_VERSION_V5,
+      answers: this.removeLegacyNeutralAnswers(value['answers']),
+    };
+  }
+
+  private removeLegacyNeutralAnswers(value: unknown): unknown {
+    if (!this.isRecord(value)) return value;
+    return Object.fromEntries(
+      Object.entries(value).filter(([, answer]) =>
+        !(this.isRecord(answer) && answer['preference'] === 'neutral'),
+      ),
+    );
+  }
+}
+
 export class ProfileStoreMigrator {
   constructor(
     private readonly migrations: readonly ProfileStoreMigration[] = [
       new ProfilesV1ToV2Migration(),
       new ProfilesV2ToV3Migration(),
       new ProfilesV3ToV4Migration(),
+      new ProfilesV4ToV5Migration(),
     ],
   ) {}
 

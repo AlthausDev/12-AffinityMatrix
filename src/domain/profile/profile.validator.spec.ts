@@ -38,6 +38,22 @@ describe('ProfileValidator', () => {
     expect(validator.validate(candidate)).toEqual([]);
   });
 
+  it('rejects legacy Neutral as a current preference state', () => {
+    const key = createAnswerKey('cuddling', 'mutual');
+    const candidate = {
+      ...validProfile(),
+      answers: {
+        [key]: {
+          practiceId: 'cuddling',
+          roleId: 'mutual',
+          preference: 'neutral',
+        },
+      },
+    };
+
+    expect(validator.validate(candidate).some((issue) => issue.path.endsWith('.preference'))).toBe(true);
+  });
+
   it('rejects a relational scope when the canonical answer key does not include it', () => {
     const candidate = {
       ...validProfile(),

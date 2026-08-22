@@ -39,8 +39,8 @@ describe('VersionedProfileCodeCodec', () => {
     const decoded = codec.decode(codec.encode(sampleProfile()));
     const answer = Object.values(decoded.answers)[0];
 
-    expect(decoded.formatVersion).toBe(4);
-    expect(decoded.profileSchemaVersion).toBe(4);
+    expect(decoded.formatVersion).toBe(5);
+    expect(decoded.profileSchemaVersion).toBe(5);
     expect(decoded.metadata.alias).toBe('Ána ✓');
     expect(decoded.catalogueVersion).toBe(2);
     expect(answer?.scope?.counterpartSex).toBe('male');
@@ -77,6 +77,26 @@ describe('VersionedProfileCodeCodec', () => {
     expect(() => tinyCodec.encode(sampleProfile())).toThrow(ProfileCodeError);
   });
 
+  it('migrates P4 Neutral answers to unanswered while preserving explicit choices', () => {
+    const v4 = {
+      formatVersion: 4,
+      profileSchemaVersion: 4,
+      catalogueVersion: 2,
+      metadata: { alias: 'Legacy V4' },
+      answers: {
+        'cuddling::mutual': { practiceId: 'cuddling', roleId: 'mutual', preference: 'neutral' },
+        'kissing::give': { practiceId: 'kissing', roleId: 'give', preference: 'like' },
+      },
+    };
+
+    const decoded = codec.decode(legacyCode('P4', v4));
+
+    expect(decoded.formatVersion).toBe(5);
+    expect(decoded.profileSchemaVersion).toBe(5);
+    expect(decoded.answers['cuddling::mutual']).toBeUndefined();
+    expect(decoded.answers['kissing::give']?.preference).toBe('like');
+  });
+
   it('migrates P3 without inventing relational scope and keeps its catalogue version', () => {
     const v3 = {
       formatVersion: 3,
@@ -90,8 +110,8 @@ describe('VersionedProfileCodeCodec', () => {
       },
     };
     const decoded = codec.decode(legacyCode('P3', v3));
-    expect(decoded.formatVersion).toBe(4);
-    expect(decoded.profileSchemaVersion).toBe(4);
+    expect(decoded.formatVersion).toBe(5);
+    expect(decoded.profileSchemaVersion).toBe(5);
     expect(decoded.catalogueVersion).toBe(1);
     expect(decoded.answers['kissing::mutual']?.scope).toBeUndefined();
   });
@@ -115,8 +135,8 @@ describe('VersionedProfileCodeCodec', () => {
     const decodedV2 = codec.decode(legacyCode('P2', v2));
     const decodedV1 = codec.decode(legacyCode('P1', v1));
 
-    expect(decodedV2.formatVersion).toBe(4);
-    expect(decodedV2.profileSchemaVersion).toBe(4);
+    expect(decodedV2.formatVersion).toBe(5);
+    expect(decodedV2.profileSchemaVersion).toBe(5);
     expect(decodedV2.catalogueVersion).toBe(1);
     expect(decodedV2.metadata.alias).toBe('Legacy V2');
     expect(decodedV1.metadata.alias).toBe('Legacy V1');
@@ -124,7 +144,7 @@ describe('VersionedProfileCodeCodec', () => {
   });
 });
 
-function legacyCode(prefix: 'P1' | 'P2' | 'P3', value: unknown): string {
+function legacyCode(prefix: 'P1' | 'P2' | 'P3' | 'P4', value: unknown): string {
   const json = JSON.stringify(value);
   const bytes = new TextEncoder().encode(json);
   const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
