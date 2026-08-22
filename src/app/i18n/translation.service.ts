@@ -1,7 +1,5 @@
 import { DOCUMENT } from '@angular/common';
 import { Injectable, inject, signal } from '@angular/core';
-import { EN_TRANSLATIONS } from './en.translations';
-import { ES_TRANSLATIONS, TranslationKey } from './es.translations';
 import {
   DEFAULT_LOCALE,
   isLocale,
@@ -9,12 +7,14 @@ import {
   LOCALE_STORAGE_KEY,
   SUPPORTED_LOCALES,
 } from './locale';
+import { EN_UI_TRANSLATIONS } from './ui/en-ui.translations';
+import { ES_UI_TRANSLATIONS, TranslationKey } from './ui/es-ui.translations';
 
 export type TranslationParameters = Readonly<Record<string, string | number>>;
 
 const TRANSLATIONS: Readonly<Record<Locale, Readonly<Record<TranslationKey, string>>>> = {
-  es: ES_TRANSLATIONS,
-  en: EN_TRANSLATIONS,
+  es: ES_UI_TRANSLATIONS,
+  en: EN_UI_TRANSLATIONS,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -55,16 +55,6 @@ export class TranslationService {
     const rule = new Intl.PluralRules(this.localeState()).select(count);
     const key = rule === 'one' ? oneKey : otherKey;
     return this.t(key, { count, ...parameters });
-  }
-
-  dynamic(
-    key: string,
-    fallback: string,
-    parameters: TranslationParameters = {},
-  ): string {
-    const translations = TRANSLATIONS[this.localeState()] as Readonly<Record<string, string>>;
-    const template = translations[key] ?? fallback;
-    return this.interpolate(template, parameters);
   }
 
   hasTranslation(key: string, locale: Locale = this.localeState()): boolean {
