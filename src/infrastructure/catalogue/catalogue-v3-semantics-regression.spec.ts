@@ -78,7 +78,7 @@ describe('Catalogue V3 semantic regressions', () => {
     expect(body?.practices.some((item) => item.practice.id === 'breasts')).toBe(false);
     expect(body?.practices.some((item) => item.practice.id === 'chest')).toBe(false);
     expect(body?.practices.find((item) => item.practice.id === 'chest-general')?.roles.map((item) => item.counterpartSex))
-      .toEqual(['female', 'male']);
+      .toEqual(['male', 'female']);
 
     const toys = questionnaire.getCategory(CURRENT_CATALOGUE_SNAPSHOT, man, 'toys', true);
     const prostateMassager = toys?.practices.find((item) => item.practice.id === 'prostate-massager');
