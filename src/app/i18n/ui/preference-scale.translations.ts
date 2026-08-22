@@ -11,6 +11,9 @@ export const ES_PREFERENCE_SCALE_TRANSLATIONS = {
   'preference.notInterested.hint': 'No te atrae ni lo buscas, pero no lo defines como un límite.',
   'preference.boundary': 'No rotundo',
   'preference.boundary.hint': 'No quieres hacerlo. Es un límite que debe respetarse.',
+  'questionnaire.categories.description': 'Responde a tu ritmo. Dejar una pregunta sin responder no equivale a elegir una preferencia y cada respuesta se guarda inmediatamente.',
+  'comparison.description': 'La comparación se calcula a partir del catálogo actual, las parejas de roles explícitas y las preferencias respondidas. Las preguntas sin responder se excluyen del cálculo.',
+  'comparison.classification.boundary': 'No rotundo',
 } as const;
 
 export type PreferenceScaleTranslationKey = keyof typeof ES_PREFERENCE_SCALE_TRANSLATIONS;
@@ -30,4 +33,7 @@ export const EN_PREFERENCE_SCALE_TRANSLATIONS: Readonly<
   'preference.notInterested.hint': 'It does not appeal to you, but you do not define it as a boundary.',
   'preference.boundary': 'Hard no',
   'preference.boundary.hint': 'You do not want to do it. This is a boundary that must be respected.',
+  'questionnaire.categories.description': 'Answer at your own pace. Leaving a question unanswered is not the same as choosing a preference, and every answer is saved immediately.',
+  'comparison.description': 'Comparison uses the current catalogue, explicit compatible role pairs, and answered preferences. Unanswered questions are excluded from the calculation.',
+  'comparison.classification.boundary': 'Hard no',
 };
