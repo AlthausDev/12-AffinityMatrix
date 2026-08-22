@@ -44,6 +44,9 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
           <button
             type="button"
             class="preference-option"
+            [attr.data-tone]="option.tone"
+            [attr.title]="i18n.t(option.hintKey)"
+            [attr.aria-label]="i18n.t(option.labelKey) + '. ' + i18n.t(option.hintKey)"
             [class.selected]="answer()?.preference === option.value"
             [attr.aria-pressed]="answer()?.preference === option.value"
             (click)="selectPreference(option.value)"
@@ -127,25 +130,45 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     .scope-note, .filtered-note { margin: 0.18rem 0 0; color: var(--text-secondary); font-size: 0.72rem; }
     .scope-note { font-weight: 700; }
     .text-button { padding: 0; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.72rem; text-decoration: underline; }
-    .preference-scale { grid-area: scale; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.3rem; }
+    .preference-scale { grid-area: scale; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.35rem; }
     .preference-option {
+      --preference-accent: var(--border-strong);
       display: flex;
-      min-height: 2.45rem;
+      min-height: 2.55rem;
       align-items: center;
       justify-content: center;
-      gap: 0.25rem;
-      padding: 0.3rem;
-      border: 1px solid var(--border-subtle);
-      border-radius: 0.4rem;
-      background: var(--surface-elevated);
+      gap: 0.28rem;
+      padding: 0.35rem;
+      border: 1px solid color-mix(in srgb, var(--preference-accent) 45%, var(--border-subtle));
+      border-radius: 0.45rem;
+      background: color-mix(in srgb, var(--preference-accent) 7%, var(--surface-elevated));
       color: var(--text-primary);
       cursor: pointer;
       font-size: 0.7rem;
       line-height: 1.15;
+      transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease, transform 140ms ease;
     }
+    .preference-option[data-tone='favorite'] { --preference-accent: var(--preference-favorite); }
+    .preference-option[data-tone='positive'] { --preference-accent: var(--preference-positive); }
+    .preference-option[data-tone='conditional'] { --preference-accent: var(--preference-conditional); }
+    .preference-option[data-tone='curious'] { --preference-accent: var(--preference-curious); }
+    .preference-option[data-tone='negative'] { --preference-accent: var(--preference-negative); }
+    .preference-option[data-tone='boundary'] { --preference-accent: var(--preference-boundary); }
     .preference-option span { display: inline; }
-    .preference-option span:first-child { font-size: 0.9rem; }
-    .preference-option.selected { border-color: var(--text-primary); box-shadow: inset 0 0 0 1px var(--text-primary); }
+    .preference-option span:first-child { color: var(--preference-accent); font-size: 0.95rem; font-weight: 800; }
+    .preference-option:hover {
+      border-color: var(--preference-accent);
+      background: color-mix(in srgb, var(--preference-accent) 13%, var(--surface-elevated));
+      box-shadow: 0 0 0.85rem color-mix(in srgb, var(--preference-accent) 28%, transparent);
+      transform: translateY(-1px);
+    }
+    .preference-option.selected {
+      border-color: var(--preference-accent);
+      background: color-mix(in srgb, var(--preference-accent) 18%, var(--surface-elevated));
+      box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--preference-accent) 72%, white),
+        0 0 1rem color-mix(in srgb, var(--preference-accent) 32%, transparent);
+    }
     .answer-details { grid-area: details; margin-top: 0.2rem; }
     .answer-details summary { color: var(--text-secondary); cursor: pointer; font-size: 0.82rem; }
     .detail-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; margin-top: 0.75rem; }
@@ -160,7 +183,7 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     }
     @media (max-width: 760px) {
       .preference-scale { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .preference-option { min-height: 2.75rem; }
+      .preference-option { min-height: 2.85rem; }
       .detail-grid { grid-template-columns: 1fr; }
       .full-width { grid-column: auto; }
     }
