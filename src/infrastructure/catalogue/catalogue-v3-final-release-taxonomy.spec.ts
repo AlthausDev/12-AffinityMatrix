@@ -35,6 +35,17 @@ describe('Catalogue V3 final release taxonomy', () => {
     expect(practice('public-use-fantasy')?.descriptionEs).toContain('no implicar a terceros ajenos');
   });
 
+  it('keeps nearby taboo concepts explicitly distinct', () => {
+    expect(practice('caregiver-little-adult-roleplay')?.descriptionEs)
+      .toContain('no exige fingir otra edad');
+    expect(practice('caregiver-little-adult-roleplay')?.descriptionEs)
+      .toContain('se valora aparte en Ageplay');
+    expect(practice('consensual-non-consent-roleplay')?.descriptionEs)
+      .toContain('A diferencia de free-use/unaware');
+    expect(practice('sleep-roleplay')?.descriptionEs)
+      .toContain('forma parte de la simulación');
+  });
+
   it('keeps extremist symbolism as a neutral taboo-fantasy descriptor rather than endorsement', () => {
     const symbolism = practice('extremist-war-symbolism-fantasy');
     expect(categoryOf(symbolism?.id ?? '')).toBe('taboo-fantasies');
@@ -62,6 +73,8 @@ describe('Catalogue V3 final release taxonomy', () => {
     expect(practice('tentacle-fantasy')?.descriptionEs).toContain('tentáculos');
     expect(practice('furry-anthro-fantasy')?.descriptionEs).toContain('no a actividad sexual con animales reales');
     expect(practice('futanari-fantasy')?.descriptionEs).toContain('no pretende etiquetar a personas intersexuales reales');
+    expect(practice('monster-roleplay')?.descriptionEs).toContain('más propia de criaturas que la fantasía furry');
+    expect(practice('monster-roleplay')?.descriptionEs).toContain('no a actividad sexual con animales reales');
   });
 
   it('replaces generic pet play with soft and immersive paired-role variants', () => {
