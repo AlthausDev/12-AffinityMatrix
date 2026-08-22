@@ -18,7 +18,7 @@ import {
 export type TranslationParameters = Readonly<Record<string, string | number>>;
 export type TranslationKey = BaseTranslationKey | QuestionnaireUxTranslationKey;
 
-const TRANSLATIONS = {
+const TRANSLATIONS: Readonly<Record<Locale, Readonly<Record<TranslationKey, string>>>> = {
   es: {
     ...ES_UI_TRANSLATIONS,
     ...ES_QUESTIONNAIRE_UX_TRANSLATIONS,
@@ -27,7 +27,7 @@ const TRANSLATIONS = {
     ...EN_UI_TRANSLATIONS,
     ...EN_QUESTIONNAIRE_UX_TRANSLATIONS,
   },
-} satisfies Readonly<Record<Locale, Readonly<Record<TranslationKey, string>>>>;
+};
 
 @Injectable({ providedIn: 'root' })
 export class TranslationService {
