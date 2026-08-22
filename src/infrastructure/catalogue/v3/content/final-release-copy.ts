@@ -8,8 +8,8 @@ const RELEASE_COPY_OVERRIDES: Readonly<Record<string, Partial<CataloguePracticeS
     descriptionEs: 'Atracción general por escenarios ficticios entre adultos cuyo atractivo procede de sentirse prohibidos, impropios o socialmente transgresores. Si importa el tabú concreto, conviene valorar también las entradas específicas de esta categoría.',
   },
   'caregiver-little-adult-roleplay': {
-    descriptionEn: 'An adult-only Caregiver/Little dynamic where one adult takes a caring, guiding or authority-flavoured Daddy/Mommy/Caregiver role and the other takes a Little role. It can involve comfort, rules, praise or dependency themes, but it does not require pretending to be a different age; explicit age portrayal is rated separately under Ageplay.',
-    descriptionEs: 'Dinámica Caregiver/Little exclusivamente entre adultos en la que una persona adopta un rol Daddy/Mommy/Caregiver de cuidado, guía o autoridad y la otra un rol Little. Puede incluir cuidados, reglas, elogios o dependencia, pero no exige fingir otra edad; representar explícitamente una edad distinta se valora aparte en Ageplay.',
+    descriptionEn: 'An adult-only Caregiver/Little dynamic where one adult takes a caring, guiding or authority-flavoured Daddy/Mommy/Caregiver role and the other takes a Little role. “Little” always means a role portrayed by an adult. It can involve comfort, rules, praise or dependency themes, but it does not require pretending to be a different age; explicit age portrayal is rated separately under Ageplay.',
+    descriptionEs: 'Dinámica Caregiver/Little exclusivamente entre adultos en la que una persona adopta un rol Daddy/Mommy/Caregiver de cuidado, guía o autoridad y la otra un rol Little. «Little» significa siempre un rol interpretado por una persona adulta. Puede incluir cuidados, reglas, elogios o dependencia, pero no exige fingir otra edad; representar explícitamente una edad distinta se valora aparte en Ageplay.',
   },
   'consensual-non-consent-roleplay': {
     en: 'Non-consent roleplay (CNC)',
