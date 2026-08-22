@@ -1,4 +1,5 @@
 import { TargetSite } from '../../../../domain/profile/profile-answer';
+import { RolePerspective } from '../../../../domain/catalogue/practice';
 
 export type CataloguePracticeKind =
   | 'mutual'
@@ -8,9 +9,17 @@ export type CataloguePracticeKind =
   | 'wear'
   | 'watch'
   | 'power'
+  | 'paired'
   | 'group'
   | 'focus'
   | 'toy';
+
+export interface CataloguePairedRoleSeed {
+  readonly id: string;
+  readonly en: string;
+  readonly es: string;
+  readonly perspective: RolePerspective;
+}
 
 export interface CataloguePracticeSeed {
   readonly id: string;
@@ -20,6 +29,8 @@ export interface CataloguePracticeSeed {
   readonly descriptionEs?: string;
   readonly kind: CataloguePracticeKind;
   readonly counterpartScoped?: boolean;
+  /** Two complementary semantic roles used by `paired` practices. */
+  readonly pairedRoles?: readonly [CataloguePairedRoleSeed, CataloguePairedRoleSeed];
   /**
    * Sex of the person whose body is acted on or whose anatomy is the subject of the preference.
    * Builders map this to the receiver/target for directed practices and to the subject for
