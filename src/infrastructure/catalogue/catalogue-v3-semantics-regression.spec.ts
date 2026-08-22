@@ -63,7 +63,7 @@ describe('Catalogue V3 semantic regressions', () => {
     ]);
   });
 
-  it('keeps anatomy metadata on body focus and anatomy-specific toys', () => {
+  it('keeps anatomy metadata on body focus and anatomy-specific toys while using one unified chest preference', () => {
     const man = createProfile({
       id: 'man',
       now: '2026-08-22T16:00:00.000Z',
@@ -75,10 +75,10 @@ describe('Catalogue V3 semantic regressions', () => {
       .toEqual(['male']);
     expect(body?.practices.find((item) => item.practice.id === 'vulva')?.roles.map((item) => item.counterpartSex))
       .toEqual(['female']);
-    expect(body?.practices.find((item) => item.practice.id === 'breasts')?.roles.map((item) => item.counterpartSex))
-      .toEqual(['female']);
-    expect(body?.practices.find((item) => item.practice.id === 'chest')?.roles.map((item) => item.counterpartSex))
-      .toEqual(['male']);
+    expect(body?.practices.some((item) => item.practice.id === 'breasts')).toBe(false);
+    expect(body?.practices.some((item) => item.practice.id === 'chest')).toBe(false);
+    expect(body?.practices.find((item) => item.practice.id === 'chest-general')?.roles.map((item) => item.counterpartSex))
+      .toEqual(['female', 'male']);
 
     const toys = questionnaire.getCategory(CURRENT_CATALOGUE_SNAPSHOT, man, 'toys', true);
     const prostateMassager = toys?.practices.find((item) => item.practice.id === 'prostate-massager');
