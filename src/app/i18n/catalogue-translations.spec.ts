@@ -6,12 +6,12 @@ import {
   practiceLabelKey,
   roleLabelKey,
 } from './catalogue-text.service';
-import { EN_TRANSLATIONS } from './en.translations';
-import { ES_TRANSLATIONS } from './es.translations';
+import { EN_CATALOGUE_TRANSLATIONS } from './catalogue/en-catalogue.translations';
+import { ES_CATALOGUE_TRANSLATIONS } from './catalogue/es-catalogue.translations';
 
 const resources: Readonly<Record<string, Readonly<Record<string, string>>>> = {
-  es: ES_TRANSLATIONS,
-  en: EN_TRANSLATIONS,
+  es: ES_CATALOGUE_TRANSLATIONS,
+  en: EN_CATALOGUE_TRANSLATIONS,
 };
 
 describe('current catalogue translations', () => {
