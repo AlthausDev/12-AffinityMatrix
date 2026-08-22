@@ -27,6 +27,8 @@ export function describeCataloguePractice(seed: CataloguePracticeSeed, locale: C
         return 'Se distinguen las preferencias por observar y por ser observado/a en este contexto.';
       case 'power':
         return 'Dinámica con preferencias separadas para el rol de control y el rol receptivo.';
+      case 'paired':
+        return 'Escenario con dos roles diferentes que se valoran por separado.';
       case 'group':
         return 'Dinámica grupal que distingue entre ser la persona central y participar alrededor.';
       case 'focus':
@@ -51,6 +53,8 @@ export function describeCataloguePractice(seed: CataloguePracticeSeed, locale: C
       return 'Watching and being watched in this context are rated separately.';
     case 'power':
       return 'A dynamic with separate preferences for the controlling and receptive roles.';
+    case 'paired':
+      return 'A scenario with two distinct roles that are rated separately.';
     case 'group':
       return 'A group dynamic distinguishing being the central person from participating around them.';
     case 'focus':
