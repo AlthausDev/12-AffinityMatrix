@@ -40,8 +40,8 @@ const CATEGORY_COPY: Readonly<Record<string, Partial<CatalogueCategorySeed>>> = 
     descriptionEs: 'Situaciones sexuales con más de dos personas o con una pareja estable interactuando con otras. Se separan composición, ser la persona central, intercambio de parejas y dinámica pareja + invitado/a porque pueden sentirse muy distintas en la práctica.',
   },
   roleplay: {
-    descriptionEn: 'Roles, fictional scenarios and fantasies where the identity or premise changes the experience. This includes adult-only caregiver/little dynamics, taboo framing between adults and deliberately impossible or surreal fantasy; specific power dynamics may also appear in their own category.',
-    descriptionEs: 'Roles, escenarios ficticios y fantasías donde la identidad o la premisa cambia la experiencia. Incluye dinámicas Caregiver/Little sólo entre adultos, componentes tabú entre adultos y fantasías deliberadamente imposibles o surrealistas; algunas dinámicas de poder también tienen su propia categoría.',
+    descriptionEn: 'Adult characters, occupations, archetypes and scene-based roleplay. Pet play is separated into soft and immersive forms; taboo premises and impossible/surreal fantasies have their own categories near the end of the questionnaire.',
+    descriptionEs: 'Personajes adultos, profesiones, arquetipos y roleplay basado en escenas. El pet play se separa en modalidad suave e inmersiva; las premisas tabú y las fantasías imposibles o surrealistas tienen categorías propias hacia el final del cuestionario.',
   },
   exhibitionism: {
     descriptionEn: 'Preferences about seeing, being seen, recording or feeling exposed during sexual activity. A controlled risk of being seen is separate from actual voyeurism, and uninvolved bystanders are not treated as participants.',
