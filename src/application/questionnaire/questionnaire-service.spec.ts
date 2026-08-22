@@ -103,7 +103,7 @@ describe('QuestionnaireService', () => {
           practiceId: 'kissing',
           roleId: 'mutual',
           scope: { counterpartSex: 'male' as const },
-          preference: 'neutral' as const,
+          preference: 'curious' as const,
         },
       },
     };
