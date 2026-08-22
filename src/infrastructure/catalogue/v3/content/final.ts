@@ -6,6 +6,7 @@ import { polishCatalogue } from './content-polish';
 import { materializeContextualDescriptions } from './contextual-description';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
+import { groupCataloguePractices } from './practice-group-order';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
 import { CatalogueCategorySeed } from './types';
 
@@ -26,8 +27,9 @@ const SEMANTIC_CONTENT: readonly CatalogueCategorySeed[] = CURATED_CONTENT.map((
 const ROLE_POLISHED_CONTENT = applyRoleWordingOverrides(SEMANTIC_CONTENT);
 const DESCRIBED_CONTENT = materializeContextualDescriptions(ROLE_POLISHED_CONTENT);
 const POLISHED_CONTENT = polishCatalogue(DESCRIBED_CONTENT);
-
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = POLISHED_CONTENT.map((category) => ({
+const ACTIVE_CONTENT = POLISHED_CONTENT.map((category) => ({
   ...category,
   practices: category.practices.filter((practice) => !FINAL_CONTENT_RETIRED_PRACTICE_IDS.has(practice.id)),
 }));
+
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = groupCataloguePractices(ACTIVE_CONTENT);
