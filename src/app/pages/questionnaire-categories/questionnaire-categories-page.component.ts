@@ -25,7 +25,7 @@ import { TranslationService } from '../../i18n/translation.service';
             <p class="profile-count">{{ i18n.t('questionnaire.progress', { answered: totalAnswered(), total: totalQuestions() }) }}</p>
           </header>
 
-          @if (profileStore.error()) { <p class="alert" role="alert">{{ profileStore.error() }}</p> }
+          @if (profileStore.error()) { <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p> }
 
           @if (catalogueRelationship() === 'profile-older') {
             <p class="alert">{{ i18n.t('questionnaire.profileOlder') }}</p>
@@ -66,7 +66,7 @@ import { TranslationService } from '../../i18n/translation.service';
         } @else if (catalogueStore.loading()) {
           <section class="panel"><h1>{{ i18n.t('common.questionnaire.loading.title') }}</h1><p class="muted">{{ i18n.t('common.questionnaire.loading.description') }}</p></section>
         } @else {
-          <section class="panel"><h1>{{ i18n.t('common.questionnaire.unavailable.title') }}</h1><p class="muted">{{ catalogueStore.error() || i18n.t('common.questionnaire.unavailable.description') }}</p></section>
+          <section class="panel"><h1>{{ i18n.t('common.questionnaire.unavailable.title') }}</h1><p class="muted">{{ i18n.t('common.questionnaire.unavailable.description') }}</p></section>
         }
       } @else {
         <a class="back-link" routerLink="/">{{ i18n.t('dashboard.backProfiles') }}</a>
