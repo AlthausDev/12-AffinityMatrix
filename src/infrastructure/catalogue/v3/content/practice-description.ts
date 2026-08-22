@@ -3,7 +3,7 @@ import { PRACTICE_DESCRIPTION_OVERRIDES } from './practice-description-overrides
 
 export type CatalogueLocale = 'es' | 'en';
 
-/** Returns concise explanatory copy for every current practice, with explicit overrides where needed. */
+/** Returns concise explanatory copy for every current practice, with explicit definitions where needed. */
 export function describeCataloguePractice(seed: CataloguePracticeSeed, locale: CatalogueLocale): string {
   const explicit = locale === 'es' ? seed.descriptionEs : seed.descriptionEn;
   if (explicit) return cleanConsentWording(explicit, locale);
@@ -11,56 +11,62 @@ export function describeCataloguePractice(seed: CataloguePracticeSeed, locale: C
   const definition = PRACTICE_DESCRIPTION_OVERRIDES[seed.id];
   if (definition) return cleanConsentWording(locale === 'es' ? definition.es : definition.en, locale);
 
-  if (locale === 'es') {
-    switch (seed.kind) {
-      case 'directed':
-        return 'Se valora por separado hacerlo a la pareja y recibirlo de ella.';
-      case 'mutual':
-        return 'Práctica compartida cuya preferencia se valora como participación conjunta.';
-      case 'self':
-        return 'Actividad individual que se valora como preferencia propia, no como acción sobre la pareja.';
-      case 'state':
-        return 'Se valora por separado que se dé en ti y que se dé en tu pareja.';
-      case 'wear':
-        return 'Se valora por separado llevarlo tú y que lo lleve tu pareja.';
-      case 'watch':
-        return 'Se distinguen las preferencias por observar y por ser observado/a en este contexto.';
-      case 'power':
-        return 'Dinámica con preferencias separadas para el rol de control y el rol receptivo.';
-      case 'paired':
-        return 'Escenario con dos roles diferentes que se valoran por separado.';
-      case 'group':
-        return 'Dinámica grupal que distingue entre ser la persona central y participar alrededor.';
-      case 'focus':
-        return 'Atracción o interés erótico centrado en este rasgo o parte del cuerpo de la pareja.';
-      case 'toy':
-        return 'Objeto o accesorio cuyo uso se valora en uno mismo, en la pareja y por zona corporal cuando procede.';
-    }
-  }
+  return locale === 'es' ? describeObviousPracticeEs(seed) : describeObviousPracticeEn(seed);
+}
 
+function describeObviousPracticeEs(seed: CataloguePracticeSeed): string {
+  const label = seed.es;
   switch (seed.kind) {
     case 'directed':
-      return 'Giving this to a partner and receiving it from them are rated separately.';
+      return `Preferencia por «${label}», diferenciando hacerlo a la pareja de recibirlo de ella.`;
     case 'mutual':
-      return 'A shared practice rated as joint participation.';
+      return `Interés por «${label}» como actividad compartida entre las personas participantes.`;
     case 'self':
-      return 'An individual activity rated as a personal preference rather than an action on a partner.';
+      return `Interés personal por «${label}» como actividad o experiencia propia.`;
     case 'state':
-      return 'Rated separately for yourself and for your partner.';
+      return `Preferencia por «${label}», valorada por separado cuando se da en ti y cuando se da en tu pareja.`;
     case 'wear':
-      return 'Rated separately for wearing it yourself and for a partner wearing it.';
+      return `Interés por «${label}», distinguiendo llevarlo tú de que lo lleve tu pareja.`;
     case 'watch':
-      return 'Watching and being watched in this context are rated separately.';
+      return `Interés por «${label}», distinguiendo observar de ser observado/a en ese contexto.`;
     case 'power':
-      return 'A dynamic with separate preferences for the controlling and receptive roles.';
+      return `Interés por «${label}», diferenciando ejercer el control de ocupar el rol receptivo.`;
     case 'paired':
-      return 'A scenario with two distinct roles that are rated separately.';
+      return `Interés por «${label}», con sus dos roles complementarios valorados de forma independiente.`;
     case 'group':
-      return 'A group dynamic distinguishing being the central person from participating around them.';
+      return `Interés por «${label}», diferenciando ser la persona central de participar alrededor de ella.`;
     case 'focus':
-      return 'Erotic attraction or interest focused on this feature or body part of a partner.';
+      return `Atracción o interés erótico por «${label}» como rasgo, parte corporal o elemento de la pareja.`;
     case 'toy':
-      return 'An object or accessory rated for self-use, partner use and body site where relevant.';
+      return `Interés por usar «${label}», diferenciando uso propio, uso con la pareja y las zonas compatibles cuando corresponde.`;
+  }
+}
+
+function describeObviousPracticeEn(seed: CataloguePracticeSeed): string {
+  const label = seed.en;
+  switch (seed.kind) {
+    case 'directed':
+      return `Interest in “${label}”, rating doing it to a partner separately from receiving it.`;
+    case 'mutual':
+      return `Interest in “${label}” as a shared activity between the people involved.`;
+    case 'self':
+      return `Personal interest in “${label}” as an individual activity or experience.`;
+    case 'state':
+      return `Preference for “${label}”, rated separately when it applies to you and when it applies to a partner.`;
+    case 'wear':
+      return `Interest in “${label}”, distinguishing wearing it yourself from a partner wearing it.`;
+    case 'watch':
+      return `Interest in “${label}”, distinguishing watching from being watched in that context.`;
+    case 'power':
+      return `Interest in “${label}”, distinguishing the controlling role from the receptive role.`;
+    case 'paired':
+      return `Interest in “${label}”, with its two complementary roles rated independently.`;
+    case 'group':
+      return `Interest in “${label}”, distinguishing being the central person from participating around them.`;
+    case 'focus':
+      return `Erotic attraction or interest in “${label}” as a feature, body part or element of a partner.`;
+    case 'toy':
+      return `Interest in using “${label}”, distinguishing self-use, partnered use and compatible body sites where relevant.`;
   }
 }
 
