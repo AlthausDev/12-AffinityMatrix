@@ -1,6 +1,19 @@
 import { Injectable, inject } from '@angular/core';
 import { Practice, PracticeCategory, PracticeRole } from '../../domain/catalogue/practice';
+import { EN_CATALOGUE_TRANSLATIONS } from './catalogue/en-catalogue.translations';
+import {
+  CatalogueTranslationKey,
+  ES_CATALOGUE_TRANSLATIONS,
+} from './catalogue/es-catalogue.translations';
+import { Locale } from './locale';
 import { TranslationService } from './translation.service';
+
+const CATALOGUE_TRANSLATIONS: Readonly<
+  Record<Locale, Readonly<Record<CatalogueTranslationKey, string>>>
+> = {
+  es: ES_CATALOGUE_TRANSLATIONS,
+  en: EN_CATALOGUE_TRANSLATIONS,
+};
 
 export function categoryLabelKey(categoryId: string): string {
   return `catalogue.category.${categoryId}.label`;
@@ -27,26 +40,31 @@ export class CatalogueTextService {
   private readonly translations = inject(TranslationService);
 
   categoryLabel(category: PracticeCategory): string {
-    return this.translations.dynamic(categoryLabelKey(category.id), category.label);
+    return this.translate(categoryLabelKey(category.id), category.label);
   }
 
   categoryDescription(category: PracticeCategory): string {
     return category.description
-      ? this.translations.dynamic(categoryDescriptionKey(category.id), category.description)
+      ? this.translate(categoryDescriptionKey(category.id), category.description)
       : '';
   }
 
   practiceLabel(practice: Practice): string {
-    return this.translations.dynamic(practiceLabelKey(practice.id), practice.label);
+    return this.translate(practiceLabelKey(practice.id), practice.label);
   }
 
   practiceDescription(practice: Practice): string {
     return practice.description
-      ? this.translations.dynamic(practiceDescriptionKey(practice.id), practice.description)
+      ? this.translate(practiceDescriptionKey(practice.id), practice.description)
       : '';
   }
 
   roleLabel(practiceId: string, role: PracticeRole): string {
-    return this.translations.dynamic(roleLabelKey(practiceId, role.id), role.label);
+    return this.translate(roleLabelKey(practiceId, role.id), role.label);
+  }
+
+  private translate(key: string, fallback: string): string {
+    const resource = CATALOGUE_TRANSLATIONS[this.translations.locale()] as Readonly<Record<string, string>>;
+    return resource[key] ?? fallback;
   }
 }
