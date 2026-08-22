@@ -1,5 +1,5 @@
 import { AnswerScope, TargetSite } from '../profile/profile-answer';
-import { Practice, PracticeRole } from './practice';
+import { Practice, PracticeRole, SelfProfileApplicabilityExclusion } from './practice';
 import { ProfileMetadata, Sex } from '../profile/profile-metadata';
 import { ProfileSettings } from '../profile/profile-settings';
 
@@ -111,6 +111,12 @@ export class MetadataQuestionVisibilityPolicy extends QuestionVisibilityPolicy {
       )
     ) return false;
 
+    if (
+      role.applicability?.selfProfileExclusions?.some((exclusion) =>
+        this.matchesSelfProfileExclusion(exclusion, context.metadata, scope)
+      )
+    ) return false;
+
     return true;
   }
 
@@ -123,7 +129,7 @@ export class MetadataQuestionVisibilityPolicy extends QuestionVisibilityPolicy {
     const selfIndex = remaining.indexOf(selfSex);
     if (selfIndex < 0) return false;
     remaining.splice(selfIndex, 1);
-    return remaining.every((sex) => relevantPartnerSexes.includes(sex));
+    return remaining.some((sex) => relevantPartnerSexes.includes(sex));
   }
 
   private hasRelevantRequiredParticipant(
@@ -133,6 +139,20 @@ export class MetadataQuestionVisibilityPolicy extends QuestionVisibilityPolicy {
   ): boolean {
     return requiredSexes.includes(selfSex)
       || requiredSexes.some((sex) => relevantPartnerSexes.includes(sex));
+  }
+
+  private matchesSelfProfileExclusion(
+    exclusion: SelfProfileApplicabilityExclusion,
+    metadata: ProfileMetadata,
+    scope?: AnswerScope,
+  ): boolean {
+    if (exclusion.sex !== undefined && metadata.sex !== exclusion.sex) return false;
+    if (exclusion.orientation !== undefined && metadata.orientation !== exclusion.orientation) return false;
+    if (exclusion.targetSites !== undefined) {
+      const targetSite = scope?.targetSite;
+      if (!targetSite || !exclusion.targetSites.includes(targetSite)) return false;
+    }
+    return true;
   }
 
   private isTargetSiteApplicable(
