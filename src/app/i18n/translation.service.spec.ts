@@ -50,4 +50,17 @@ describe('TranslationService', () => {
       '2 answered',
     );
   });
+
+  it('uses partner terminology and questionnaire exit resources in both locales', () => {
+    const service = TestBed.inject(TranslationService);
+
+    expect(service.t('questionnaireRole.counterpart', { sex: 'Mujer' })).toBe('Pareja: Mujer');
+    expect(service.plural(3, 'questionnaire.pending.one', 'questionnaire.pending.other')).toBe(
+      'Quedan 3 preguntas visibles pendientes',
+    );
+
+    service.setLocale('en');
+    expect(service.t('questionnaireRole.counterpart', { sex: 'Woman' })).toBe('Partner: Woman');
+    expect(service.t('questionnaire.finish.action')).toBe('Finish');
+  });
 });
