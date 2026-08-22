@@ -1,7 +1,7 @@
 import { Practice, PracticeRole } from '../../../domain/catalogue/practice';
 import { TargetSite } from '../../../domain/profile/profile-answer';
 import { Sex } from '../../../domain/profile/profile-metadata';
-import { CataloguePracticeSeed } from '../../../content/catalogue/v3/types';
+import { CataloguePracticeSeed } from './content/types';
 
 export function buildPractice(seed: CataloguePracticeSeed, categoryId: string): Practice {
   switch (seed.kind) {
