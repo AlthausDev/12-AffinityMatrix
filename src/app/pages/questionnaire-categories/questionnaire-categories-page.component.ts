@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CatalogueStore } from '../../core/catalogue.store';
 import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
@@ -122,6 +122,7 @@ export class QuestionnaireCategoriesPageComponent {
   readonly catalogueText = inject(CatalogueTextService);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   readonly profileId = findRouteParam(this.route, 'id') ?? '';
   readonly includeFiltered = signal(this.route.snapshot.queryParamMap.get('filtered') === '1');
@@ -152,7 +153,16 @@ export class QuestionnaireCategoriesPageComponent {
 
   constructor() { void this.catalogueStore.initialize(); }
 
-  toggleFiltered(event: Event): void { this.includeFiltered.set((event.target as HTMLInputElement).checked); }
+  toggleFiltered(event: Event): void {
+    const include = (event.target as HTMLInputElement).checked;
+    this.includeFiltered.set(include);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { filtered: include ? '1' : null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
 
   unknownAnswersLabel(count: number): string {
     return this.i18n.plural(count, 'questionnaire.unknownAnswers.one', 'questionnaire.unknownAnswers.other');
