@@ -99,15 +99,15 @@ import { findRouteParam } from '../shared/route-param';
     }
   `,
   styles: `
+    :host { position: relative; z-index: 30; }
     .questionnaire-overlay {
       position: fixed;
       inset: 0;
-      z-index: 10;
+      z-index: 30;
       overflow-y: auto;
       overscroll-behavior: contain;
       padding: clamp(1rem, 4vw, 3rem);
-      background: rgba(11, 15, 28, 0.62);
-      backdrop-filter: blur(6px) saturate(115%);
+      background: rgba(10, 14, 29, 0.78);
     }
     .questionnaire-window {
       width: min(100%, 76rem);
@@ -117,10 +117,9 @@ import { findRouteParam } from '../shared/route-param';
       border: 2px solid transparent;
       border-radius: 10px;
       background:
-        linear-gradient(rgba(24, 31, 49, 0.88), rgba(26, 29, 48, 0.9)) padding-box,
+        linear-gradient(rgba(24, 31, 49, 0.97), rgba(30, 29, 49, 0.97)) padding-box,
         var(--window-border-gradient) border-box;
-      box-shadow: 0 1.5rem 5rem rgba(4, 6, 16, 0.46);
-      backdrop-filter: blur(14px);
+      box-shadow: 0 1.25rem 3.5rem rgba(4, 6, 16, 0.42);
     }
     .questionnaire-window-toolbar {
       position: sticky;
@@ -132,8 +131,7 @@ import { findRouteParam } from '../shared/route-param';
       gap: 1rem;
       padding: 0.72rem clamp(1rem, 3vw, 2rem);
       border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 72%, transparent);
-      background: rgba(25, 32, 52, 0.88);
-      backdrop-filter: blur(12px);
+      background: rgba(25, 32, 52, 0.98);
       font-size: 0.85rem;
     }
     .pending-label { color: var(--text-secondary); white-space: nowrap; }
@@ -143,12 +141,11 @@ import { findRouteParam } from '../shared/route-param';
     .questionnaire-exit-backdrop {
       position: fixed;
       inset: 0;
-      z-index: 40;
+      z-index: 60;
       display: grid;
       place-items: center;
       padding: 1rem;
-      background: rgba(5, 7, 16, 0.76);
-      backdrop-filter: blur(7px);
+      background: rgba(5, 7, 16, 0.86);
     }
     .questionnaire-exit-dialog {
       width: min(100%, 34rem);
@@ -156,12 +153,12 @@ import { findRouteParam } from '../shared/route-param';
       border: 2px solid transparent;
       border-radius: 10px;
       background:
-        linear-gradient(rgba(27, 34, 54, 0.96), rgba(30, 27, 49, 0.96)) padding-box,
+        linear-gradient(rgba(27, 34, 54, 0.99), rgba(30, 27, 49, 0.99)) padding-box,
         var(--window-border-gradient) border-box;
       box-shadow: 0 1.25rem 4rem rgba(0, 0, 0, 0.5);
     }
     .questionnaire-exit-dialog p { line-height: 1.55; }
-    .exit-preference { margin: 1.25rem 0; background: color-mix(in srgb, var(--surface-elevated) 72%, transparent); }
+    .exit-preference { margin: 1.25rem 0; background: rgba(39, 49, 74, 0.88); }
     @media (max-width: 820px) {
       .questionnaire-window-toolbar { align-items: flex-start; flex-direction: column; }
       .questionnaire-toolbar-actions { width: 100%; justify-content: flex-start; }
@@ -212,7 +209,7 @@ export class QuestionnaireShellComponent {
 
   constructor() {
     this.lockBackgroundScroll();
-    this.syncRouteState();
+    this.syncRouteState(this.router.url);
     this.lastRoutePath = this.routePath(this.router.url);
     void this.catalogueStore.initialize();
 
@@ -225,7 +222,7 @@ export class QuestionnaireShellComponent {
         const nextPath = this.routePath(event.urlAfterRedirects);
         const routeChanged = nextPath !== this.lastRoutePath;
         this.lastRoutePath = nextPath;
-        this.syncRouteState();
+        this.syncRouteState(event.urlAfterRedirects);
         if (routeChanged) queueMicrotask(() => this.scrollToTop());
       });
   }
@@ -270,33 +267,27 @@ export class QuestionnaireShellComponent {
     void this.router.navigate(['/profiles', this.profileId]);
   }
 
-  private syncRouteState(): void {
-    let current: ActivatedRoute | null = this.route;
-    let categoryId: string | null = null;
-    let includeFiltered = false;
-
-    while (current) {
-      categoryId = current.snapshot.paramMap.get('category') ?? categoryId;
-      includeFiltered = current.snapshot.queryParamMap.get('filtered') === '1' || includeFiltered;
-      current = current.firstChild;
-    }
+  private syncRouteState(url: string): void {
+    const tree = this.router.parseUrl(url);
+    const segments = tree.root.children['primary']?.segments.map((segment) => segment.path) ?? [];
+    const questionnaireIndex = segments.indexOf('questionnaire');
+    const categoryId = questionnaireIndex >= 0 ? segments[questionnaireIndex + 1] ?? null : null;
 
     this.currentCategoryId.set(categoryId);
-    this.includeFiltered.set(includeFiltered);
+    this.includeFiltered.set(tree.queryParams['filtered'] === '1');
   }
 
   private lockBackgroundScroll(): void {
     const body = this.document.body;
-    const root = this.document.documentElement;
     const previousBodyOverflow = body.style.overflow;
-    const previousRootOverflow = root.style.overflow;
+    const previousBodyOverscroll = body.style.overscrollBehavior;
 
     body.style.overflow = 'hidden';
-    root.style.overflow = 'hidden';
+    body.style.overscrollBehavior = 'none';
 
     this.destroyRef.onDestroy(() => {
       body.style.overflow = previousBodyOverflow;
-      root.style.overflow = previousRootOverflow;
+      body.style.overscrollBehavior = previousBodyOverscroll;
     });
   }
 
