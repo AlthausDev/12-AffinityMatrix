@@ -21,26 +21,50 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
       position: absolute;
       inset: 0 auto 0 0;
       border-radius: inherit;
-      transition: width 180ms ease, background-color 120ms linear, box-shadow 120ms linear;
+      transition: width 180ms ease, background 140ms linear, box-shadow 140ms linear;
     }
     .progress-danger {
-      background: var(--completion-danger);
+      background: linear-gradient(
+        90deg,
+        var(--completion-danger) 0%,
+        color-mix(in srgb, var(--completion-danger) 72%, var(--completion-low)) 100%
+      );
       box-shadow: 0 0 0.55rem color-mix(in srgb, var(--completion-danger) 30%, transparent);
     }
     .progress-low {
-      background: var(--completion-low);
+      background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--completion-low) 82%, var(--completion-danger)) 0%,
+        var(--completion-low) 62%,
+        color-mix(in srgb, var(--completion-low) 72%, var(--completion-mid)) 100%
+      );
       box-shadow: 0 0 0.55rem color-mix(in srgb, var(--completion-low) 28%, transparent);
     }
     .progress-mid {
-      background: var(--completion-mid);
+      background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--completion-mid) 82%, var(--completion-low)) 0%,
+        var(--completion-mid) 62%,
+        color-mix(in srgb, var(--completion-mid) 74%, var(--completion-high)) 100%
+      );
       box-shadow: 0 0 0.55rem color-mix(in srgb, var(--completion-mid) 26%, transparent);
     }
     .progress-high {
-      background: var(--completion-high);
+      background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--completion-high) 84%, var(--completion-mid)) 0%,
+        var(--completion-high) 62%,
+        color-mix(in srgb, var(--completion-high) 74%, var(--completion-complete)) 100%
+      );
       box-shadow: 0 0 0.55rem color-mix(in srgb, var(--completion-high) 26%, transparent);
     }
     .progress-complete {
-      background: var(--completion-complete);
+      background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--completion-complete) 84%, var(--completion-high)) 0%,
+        var(--completion-complete) 70%,
+        color-mix(in srgb, var(--completion-complete) 84%, white) 100%
+      );
       box-shadow: 0 0 0.65rem color-mix(in srgb, var(--completion-complete) 34%, transparent);
     }
   `,
