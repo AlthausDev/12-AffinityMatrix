@@ -27,6 +27,8 @@ const CATEGORY_IDS = [
   'psychological',
   'sensation',
   'fluids',
+  'taboo-fantasies',
+  'surrealism',
   'edge',
 ] as const;
 
@@ -109,6 +111,9 @@ describe('catalogue v3 snapshot', () => {
     expect(ids.has('masturbation-in-front-of-partner')).toBe(false);
     expect(ids.has('remote-control-toy')).toBe(true);
     expect(ids.has('app-controlled-toy')).toBe(false);
+    expect(ids.has('pet-play')).toBe(false);
+    expect(ids.has('pet-play-soft')).toBe(true);
+    expect(ids.has('pet-play-intense')).toBe(true);
   });
 
   it('groups affection and intimacy by related forms of contact', () => {
