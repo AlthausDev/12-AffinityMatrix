@@ -1,5 +1,5 @@
 import { TARGET_SITE_VALUES } from '../profile/profile-answer';
-import { SEX_VALUES } from '../profile/profile-metadata';
+import { ORIENTATION_VALUES, SEX_VALUES } from '../profile/profile-metadata';
 import { isStableId } from '../shared/stable-id';
 import { ValidationIssue, Validator } from '../shared/validator';
 import { PracticeCatalogue } from './catalogue';
@@ -11,9 +11,10 @@ const ROLE_KEYS = [
   'id', 'label', 'perspective', 'applicability', 'contextAxes', 'contextValues', 'targetOwner',
 ] as const;
 const APPLICABILITY_KEYS = [
-  'selfSex', 'partnerSex', 'groupComposition', 'requiresAnyParticipantSex',
+  'selfSex', 'partnerSex', 'groupComposition', 'requiresAnyParticipantSex', 'selfProfileExclusions',
 ] as const;
 const SEX_SET_APPLICABILITY_KEYS = ['selfSex', 'partnerSex', 'requiresAnyParticipantSex'] as const;
+const SELF_PROFILE_EXCLUSION_KEYS = ['sex', 'orientation', 'targetSites'] as const;
 const CONTEXT_VALUE_KEYS = ['targetSite'] as const;
 const COMPATIBILITY_PAIR_KEYS = ['leftRoleId', 'rightRoleId'] as const;
 const CATALOGUE_KEYS = ['categories', 'practices'] as const;
@@ -24,6 +25,7 @@ const LABEL_MAX_LENGTH = 160;
 const DESCRIPTION_MAX_LENGTH = 1_000;
 const MAX_ROLES_PER_PRACTICE = 32;
 const MAX_GROUP_PARTICIPANTS = 32;
+const MAX_PROFILE_EXCLUSIONS = 32;
 const MAX_CATEGORIES = 200;
 const MAX_PRACTICES = 10_000;
 
@@ -155,6 +157,54 @@ export class PracticeValidator extends Validator<Practice> {
       }
     }
 
+    const exclusions = value['selfProfileExclusions'];
+    if (exclusions !== undefined) {
+      if (!Array.isArray(exclusions) || exclusions.length === 0 || exclusions.length > MAX_PROFILE_EXCLUSIONS) {
+        issues.push({
+          path: `${path}.selfProfileExclusions`,
+          message: `Self-profile exclusions must contain between 1 and ${MAX_PROFILE_EXCLUSIONS} entries.`,
+        });
+      } else {
+        exclusions.forEach((exclusion, index) => {
+          issues.push(...this.validateSelfProfileExclusion(
+            exclusion,
+            `${path}.selfProfileExclusions.${index}`,
+          ));
+        });
+      }
+    }
+
+    return issues;
+  }
+
+  private validateSelfProfileExclusion(value: unknown, path: string): ValidationIssue[] {
+    if (!this.isRecord(value)) return [{ path, message: 'Self-profile exclusion must be an object.' }];
+    const issues = this.validateAllowedKeys(value, SELF_PROFILE_EXCLUSION_KEYS, path);
+    const sex = value['sex'];
+    const orientation = value['orientation'];
+    const targetSites = value['targetSites'];
+
+    if (sex !== undefined && !SEX_VALUES.includes(sex as (typeof SEX_VALUES)[number])) {
+      issues.push({ path: `${path}.sex`, message: 'Self-profile exclusion contains an unsupported sex.' });
+    }
+    if (orientation !== undefined && !ORIENTATION_VALUES.includes(orientation as (typeof ORIENTATION_VALUES)[number])) {
+      issues.push({ path: `${path}.orientation`, message: 'Self-profile exclusion contains an unsupported orientation.' });
+    }
+    if (targetSites !== undefined) {
+      if (!Array.isArray(targetSites) || targetSites.length === 0) {
+        issues.push({ path: `${path}.targetSites`, message: 'Excluded target sites must be a non-empty array.' });
+      } else {
+        if (new Set(targetSites).size !== targetSites.length) {
+          issues.push({ path: `${path}.targetSites`, message: 'Excluded target sites cannot contain duplicates.' });
+        }
+        if (!targetSites.every((site) => TARGET_SITE_VALUES.includes(site as (typeof TARGET_SITE_VALUES)[number]))) {
+          issues.push({ path: `${path}.targetSites`, message: 'Excluded target sites contain an unsupported value.' });
+        }
+      }
+    }
+    if (sex === undefined && orientation === undefined && targetSites === undefined) {
+      issues.push({ path, message: 'Self-profile exclusion must declare at least one criterion.' });
+    }
     return issues;
   }
 
