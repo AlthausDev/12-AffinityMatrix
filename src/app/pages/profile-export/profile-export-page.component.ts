@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProfileStore } from '../../core/profile.store';
 import { PROFILE_CODE_CODEC } from '../../core/profile-codec.token';
+import { TranslationKey } from '../../i18n/es.translations';
+import { TranslationService } from '../../i18n/translation.service';
 
 @Component({
   selector: 'app-profile-export-page',
@@ -9,27 +11,28 @@ import { PROFILE_CODE_CODEC } from '../../core/profile-codec.token';
   template: `
     <main class="page narrow-page">
       @if (profile(); as currentProfile) {
-        <a class="back-link" [routerLink]="['/profiles', currentProfile.id]">← Profile</a>
+        <a class="back-link" [routerLink]="['/profiles', currentProfile.id]">{{ i18n.t('export.backProfile') }}</a>
         <header class="page-header">
-          <p class="eyebrow">Portability</p>
-          <h1>Export profile</h1>
-          <p class="muted">Answers and the optional alias are included. Sex and orientation stay local unless you explicitly include them below.</p>
+          <p class="eyebrow">{{ i18n.t('export.eyebrow') }}</p>
+          <h1>{{ i18n.t('export.title') }}</h1>
+          <p class="muted">{{ i18n.t('export.description') }}</p>
         </header>
         <section class="panel form-grid">
           @if (currentProfile.metadata.sex || currentProfile.metadata.orientation) {
             <label class="check-field">
               <input type="checkbox" [checked]="includeSensitiveMetadata()" (change)="toggleSensitiveMetadata($event)" />
-              <span><strong>Include sex and orientation</strong><small>Only enable this when the recipient needs those profile details.</small></span>
+              <span><strong>{{ i18n.t('export.includeMetadata.title') }}</strong><small>{{ i18n.t('export.includeMetadata.description') }}</small></span>
             </label>
           }
-          <label class="field"><span>Profile code</span><textarea class="code-box" readonly [value]="exportResult().code"></textarea></label>
+          <label class="field"><span>{{ i18n.t('export.codeLabel') }}</span><textarea class="code-box" readonly [value]="exportResult().code"></textarea></label>
           @if (exportResult().error) { <p class="alert" role="alert">{{ exportResult().error }}</p> }
-          @if (copyStatus()) { <p class="muted form-note" role="status">{{ copyStatus() }}</p> }
-          <div class="form-actions"><button class="button" type="button" [disabled]="!exportResult().code" (click)="copyCode()">Copy code</button></div>
+          @if (copyStatus(); as status) { <p class="muted form-note" role="status">{{ i18n.t(status) }}</p> }
+          <div class="form-actions"><button class="button" type="button" [disabled]="!exportResult().code" (click)="copyCode()">{{ i18n.t('export.copyCode') }}</button></div>
         </section>
-        <p class="privacy-note"><strong>Nothing is uploaded.</strong><span class="muted">The code is generated entirely in this browser, but Base64URL encoding and its checksum are not encryption.</span></p>
+        <p class="privacy-note"><strong>{{ i18n.t('export.privacy.title') }}</strong><span class="muted">{{ i18n.t('export.privacy.description') }}</span></p>
       } @else {
-        <a class="back-link" routerLink="/">← Profiles</a><section class="panel"><h1>Profile not found</h1><p class="muted">The requested profile is not available in local storage.</p></section>
+        <a class="back-link" routerLink="/">{{ i18n.t('dashboard.backProfiles') }}</a>
+        <section class="panel"><h1>{{ i18n.t('common.profileNotFound.title') }}</h1><p class="muted">{{ i18n.t('common.profileNotFound.description') }}</p></section>
       }
     </main>
   `,
@@ -39,6 +42,7 @@ import { PROFILE_CODE_CODEC } from '../../core/profile-codec.token';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileExportPageComponent {
+  readonly i18n = inject(TranslationService);
   private readonly profileStore = inject(ProfileStore);
   private readonly codec = inject(PROFILE_CODE_CODEC);
   private readonly route = inject(ActivatedRoute);
@@ -46,7 +50,7 @@ export class ProfileExportPageComponent {
 
   readonly profile = computed(() => this.profileStore.findById(this.profileId));
   readonly includeSensitiveMetadata = signal(false);
-  readonly copyStatus = signal('');
+  readonly copyStatus = signal<TranslationKey | null>(null);
   readonly exportResult = computed(() => {
     const profile = this.profile();
     if (!profile) {
@@ -59,17 +63,17 @@ export class ProfileExportPageComponent {
         }),
         error: '',
       };
-    } catch (error: unknown) {
+    } catch {
       return {
         code: '',
-        error: error instanceof Error ? error.message : 'The profile could not be exported.',
+        error: this.i18n.t('export.error.generic'),
       };
     }
   });
 
   toggleSensitiveMetadata(event: Event): void {
     this.includeSensitiveMetadata.set((event.target as HTMLInputElement).checked);
-    this.copyStatus.set('');
+    this.copyStatus.set(null);
   }
 
   async copyCode(): Promise<void> {
@@ -77,13 +81,13 @@ export class ProfileExportPageComponent {
     if (!code) return;
     try {
       if (!navigator.clipboard) {
-        this.copyStatus.set('Clipboard access is unavailable. Select and copy the code manually.');
+        this.copyStatus.set('export.clipboard.unavailable');
         return;
       }
       await navigator.clipboard.writeText(code);
-      this.copyStatus.set('Profile code copied.');
+      this.copyStatus.set('export.clipboard.copied');
     } catch {
-      this.copyStatus.set('Could not access the clipboard. Select and copy the code manually.');
+      this.copyStatus.set('export.clipboard.error');
     }
   }
 }
