@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { PracticeRole } from '../../domain/catalogue/practice';
 import {
   AnswerDetails,
@@ -11,6 +11,8 @@ import {
 } from '../../domain/profile/profile-answer';
 import { Sex } from '../../domain/profile/profile-metadata';
 import { DETAIL_CAPABLE_PREFERENCES, PREFERENCE_VALUES, Preference } from '../../domain/profile/preference';
+import { CatalogueTextService } from '../i18n/catalogue-text.service';
+import { TranslationService } from '../i18n/translation.service';
 import { PREFERENCE_PRESENTATION } from '../shared/comparison-presentation';
 
 const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
@@ -18,24 +20,22 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
   ...PREFERENCE_PRESENTATION[value],
 }));
 
-const SEX_LABELS: Record<Sex, string> = { male: 'Man', female: 'Woman' };
-
 @Component({
   selector: 'app-questionnaire-role',
   template: `
     <section class="role-block" [class.filtered-role]="filtered()">
       <div class="role-heading">
         <div>
-          <h3>{{ role().label }}</h3>
+          <h3>{{ roleLabel() }}</h3>
           @if (counterpartSex(); as sex) {
-            <p class="scope-note">Counterpart: {{ sexLabel(sex) }}</p>
+            <p class="scope-note">{{ i18n.t('questionnaireRole.counterpart', { sex: sexLabel(sex) }) }}</p>
           }
           @if (filtered()) {
-            <p class="filtered-note">Filtered by profile data · shown manually</p>
+            <p class="filtered-note">{{ i18n.t('questionnaireRole.filtered') }}</p>
           }
         </div>
         @if (answer()) {
-          <button class="text-button" type="button" (click)="clearAnswer()">Clear</button>
+          <button class="text-button" type="button" (click)="clearAnswer()">{{ i18n.t('questionnaireRole.clear') }}</button>
         }
       </div>
 
@@ -49,7 +49,7 @@ const SEX_LABELS: Record<Sex, string> = { male: 'Man', female: 'Woman' };
             (click)="selectPreference(option.value)"
           >
             <span aria-hidden="true">{{ option.symbol }}</span>
-            <span>{{ option.label }}</span>
+            <span>{{ i18n.t(option.labelKey) }}</span>
           </button>
         }
       </div>
@@ -57,47 +57,47 @@ const SEX_LABELS: Record<Sex, string> = { male: 'Man', female: 'Woman' };
       @if (answer(); as currentAnswer) {
         @if (supportsDetails(currentAnswer.preference)) {
           <details class="answer-details">
-            <summary>Optional details</summary>
+            <summary>{{ i18n.t('questionnaireRole.optionalDetails') }}</summary>
             <div class="detail-grid">
               <label class="detail-field">
-                <span>Context</span>
+                <span>{{ i18n.t('questionnaireRole.context') }}</span>
                 <select [value]="currentAnswer.details?.context ?? ''" (change)="updateContext($event)">
-                  <option value="">Not specified</option>
-                  <option value="fantasy-only">Fantasy only</option>
-                  <option value="want-to-try">Would like to try</option>
-                  <option value="current">Current practice</option>
+                  <option value="">{{ i18n.t('common.notSpecified') }}</option>
+                  <option value="fantasy-only">{{ i18n.t('questionnaireRole.context.fantasyOnly') }}</option>
+                  <option value="want-to-try">{{ i18n.t('questionnaireRole.context.wantToTry') }}</option>
+                  <option value="current">{{ i18n.t('questionnaireRole.context.current') }}</option>
                 </select>
               </label>
 
               <label class="detail-field">
-                <span>Desired frequency</span>
+                <span>{{ i18n.t('questionnaireRole.frequency') }}</span>
                 <select [value]="currentAnswer.details?.desiredFrequency ?? ''" (change)="updateFrequency($event)">
-                  <option value="">Not specified</option>
-                  <option value="rarely">Rarely</option>
-                  <option value="occasionally">Occasionally</option>
-                  <option value="regularly">Regularly</option>
-                  <option value="frequently">Frequently</option>
+                  <option value="">{{ i18n.t('common.notSpecified') }}</option>
+                  <option value="rarely">{{ i18n.t('questionnaireRole.frequency.rarely') }}</option>
+                  <option value="occasionally">{{ i18n.t('questionnaireRole.frequency.occasionally') }}</option>
+                  <option value="regularly">{{ i18n.t('questionnaireRole.frequency.regularly') }}</option>
+                  <option value="frequently">{{ i18n.t('questionnaireRole.frequency.frequently') }}</option>
                 </select>
               </label>
 
               <label class="detail-field">
-                <span>Initiative</span>
+                <span>{{ i18n.t('questionnaireRole.initiative') }}</span>
                 <select [value]="currentAnswer.details?.initiative ?? ''" (change)="updateInitiative($event)">
-                  <option value="">Not specified</option>
-                  <option value="prefer-partner">Prefer my partner to propose it</option>
-                  <option value="either">Either</option>
-                  <option value="prefer-initiate">I tend to propose it</option>
+                  <option value="">{{ i18n.t('common.notSpecified') }}</option>
+                  <option value="prefer-partner">{{ i18n.t('questionnaireRole.initiative.preferPartner') }}</option>
+                  <option value="either">{{ i18n.t('questionnaireRole.initiative.either') }}</option>
+                  <option value="prefer-initiate">{{ i18n.t('questionnaireRole.initiative.preferInitiate') }}</option>
                 </select>
               </label>
 
               @if (currentAnswer.preference === 'depends') {
                 <label class="detail-field full-width">
-                  <span>Depends on…</span>
+                  <span>{{ i18n.t('questionnaireRole.dependsOn') }}</span>
                   <textarea
                     rows="3"
                     [maxLength]="dependsOnMaxLength"
                     [value]="currentAnswer.details?.dependsOn ?? ''"
-                    placeholder="Optional context, intensity, conditions…"
+                    [placeholder]="i18n.t('questionnaireRole.dependsPlaceholder')"
                     (change)="updateDependsOn($event)"
                   ></textarea>
                 </label>
@@ -137,6 +137,9 @@ const SEX_LABELS: Record<Sex, string> = { male: 'Man', female: 'Woman' };
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuestionnaireRoleComponent {
+  readonly i18n = inject(TranslationService);
+  private readonly catalogueText = inject(CatalogueTextService);
+
   readonly practiceId = input.required<string>();
   readonly role = input.required<PracticeRole>();
   readonly scope = input<AnswerScope | undefined>();
@@ -150,14 +153,20 @@ export class QuestionnaireRoleComponent {
   }>();
 
   readonly counterpartSex = computed(() => this.scope()?.counterpartSex);
+  readonly roleLabel = computed(() => this.catalogueText.roleLabel(this.practiceId(), this.role()));
   readonly ariaLabel = computed(() => {
+    const role = this.roleLabel();
     const sex = this.counterpartSex();
-    return `${this.role().label}${sex ? ` with ${this.sexLabel(sex)}` : ''} preference`;
+    return sex
+      ? this.i18n.t('questionnaireRole.preferenceWithSexAria', { role, sex: this.sexLabel(sex) })
+      : this.i18n.t('questionnaireRole.preferenceAria', { role });
   });
   readonly preferenceOptions = PREFERENCE_OPTIONS;
   readonly dependsOnMaxLength = DEPENDS_ON_MAX_LENGTH;
 
-  sexLabel(sex: Sex): string { return SEX_LABELS[sex]; }
+  sexLabel(sex: Sex): string {
+    return this.i18n.t(sex === 'male' ? 'questionnaireRole.sex.male' : 'questionnaireRole.sex.female');
+  }
 
   supportsDetails(preference: Preference): boolean {
     return DETAIL_CAPABLE_PREFERENCES.includes(preference);

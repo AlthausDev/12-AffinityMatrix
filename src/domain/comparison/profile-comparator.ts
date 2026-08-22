@@ -28,7 +28,7 @@ export class ProfileComparator {
     right: ComparisonSubject,
   ): ProfileComparisonResult {
     const interactions = snapshot.catalogue.practices.flatMap((practice) =>
-      this.comparePractice(snapshot, practice, left, right),
+      this.comparePractice(practice, left, right),
     );
 
     const categories = [...snapshot.catalogue.categories]
@@ -45,7 +45,6 @@ export class ProfileComparator {
 
         return {
           categoryId: category.id,
-          categoryLabel: category.label,
           answeredInteractionCount: categoryInteractions.length,
           affinityBasisCount: affinityBasis.length,
           commonGroundCount,
@@ -73,14 +72,10 @@ export class ProfileComparator {
   }
 
   private comparePractice(
-    snapshot: CatalogueSnapshot,
     practice: Practice,
     left: ComparisonSubject,
     right: ComparisonSubject,
   ): readonly ComparisonInteraction[] {
-    const category = snapshot.catalogue.categories.find((candidate) => candidate.id === practice.categoryId);
-    if (!category) return [];
-
     const interactions: ComparisonInteraction[] = [];
 
     for (const pair of practice.compatibleRolePairs) {
@@ -88,27 +83,11 @@ export class ProfileComparator {
       const rightRole = practice.roles.find((role) => role.id === pair.rightRoleId);
       if (!leftRole || !rightRole) continue;
 
-      const first = this.compareOrientation(
-        category.id,
-        category.label,
-        practice,
-        leftRole,
-        rightRole,
-        left,
-        right,
-      );
+      const first = this.compareOrientation(practice, leftRole, rightRole, left, right);
       if (first) interactions.push(first);
 
       if (leftRole.id !== rightRole.id) {
-        const reverse = this.compareOrientation(
-          category.id,
-          category.label,
-          practice,
-          rightRole,
-          leftRole,
-          left,
-          right,
-        );
+        const reverse = this.compareOrientation(practice, rightRole, leftRole, left, right);
         if (reverse) interactions.push(reverse);
       }
     }
@@ -117,8 +96,6 @@ export class ProfileComparator {
   }
 
   private compareOrientation(
-    categoryId: string,
-    categoryLabel: string,
     practice: Practice,
     leftRole: PracticeRole,
     rightRole: PracticeRole,
@@ -137,10 +114,8 @@ export class ProfileComparator {
 
     return {
       id: `${practice.id}::${leftAnswer.answerKey}=>${rightAnswer.answerKey}`,
-      categoryId,
-      categoryLabel,
+      categoryId: practice.categoryId,
       practiceId: practice.id,
-      practiceLabel: practice.label,
       roleRelation,
       left: leftAnswer,
       right: rightAnswer,
@@ -165,7 +140,6 @@ export class ProfileComparator {
     return {
       answerKey,
       roleId: role.id,
-      roleLabel: role.label,
       answer,
     };
   }

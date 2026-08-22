@@ -1,14 +1,20 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ComparisonClassification, RoleRelation } from '../../../domain/comparison/comparison';
+import {
+  ComparisonClassification,
+  ComparisonContextIssues,
+  RoleRelation,
+} from '../../../domain/comparison/comparison';
 import { Preference } from '../../../domain/profile/preference';
 import { CatalogueStore } from '../../core/catalogue.store';
 import { COMPARISON_SERVICE } from '../../core/comparison-service.token';
 import { ProfileStore } from '../../core/profile.store';
+import { CatalogueTextService } from '../../i18n/catalogue-text.service';
+import { TranslationService } from '../../i18n/translation.service';
 import {
-  COMPARISON_CLASSIFICATION_LABELS,
-  PREFERENCE_LABELS,
-  ROLE_RELATION_LABELS,
+  COMPARISON_CLASSIFICATION_LABEL_KEYS,
+  PREFERENCE_LABEL_KEYS,
+  ROLE_RELATION_LABEL_KEYS,
 } from '../../shared/comparison-presentation';
 
 @Component({
@@ -17,112 +23,106 @@ import {
   template: `
     <main class="page comparison-page">
       @if (profile(); as leftProfile) {
-        <a class="back-link" [routerLink]="['/profiles', leftProfile.id]">← Profile</a>
+        <a class="back-link" [routerLink]="['/profiles', leftProfile.id]">{{ i18n.t('comparison.backProfile') }}</a>
 
         <header class="page-header dashboard-header">
           <div>
-            <p class="eyebrow">Comparison</p>
-            <h1>Compare profiles</h1>
-            <p class="muted lead">Comparison is calculated from the current catalogue, explicit role pairs, and answered preferences. Unanswered questions are never treated as Neutral.</p>
+            <p class="eyebrow">{{ i18n.t('comparison.eyebrow') }}</p>
+            <h1>{{ i18n.t('comparison.title') }}</h1>
+            <p class="muted lead">{{ i18n.t('comparison.description') }}</p>
           </div>
         </header>
 
         @if (catalogueStore.error()) {
-          <p class="alert" role="alert">{{ catalogueStore.error() }}</p>
+          <p class="alert" role="alert">{{ i18n.t('common.questionnaire.unavailable.description') }}</p>
         }
 
         @if (otherProfiles().length === 0) {
           <section class="panel empty-state">
-            <h2>No second local profile yet</h2>
-            <p class="muted">Create or import another profile first. The comparison engine is already independent of local persistence, so a future compare-without-saving flow can reuse the same calculation.</p>
+            <h2>{{ i18n.t('comparison.noSecond.title') }}</h2>
+            <p class="muted">{{ i18n.t('comparison.noSecond.description') }}</p>
             <div class="button-row">
-              <a class="button" routerLink="/profiles/new">Create profile</a>
-              <a class="button secondary" routerLink="/profiles/import">Import profile</a>
+              <a class="button" routerLink="/profiles/new">{{ i18n.t('common.createProfile') }}</a>
+              <a class="button secondary" routerLink="/profiles/import">{{ i18n.t('common.importProfile') }}</a>
             </div>
           </section>
-        } @else {
+        } @else if (selectedProfile(); as rightProfile) {
           <section class="panel comparison-selector" aria-labelledby="comparison-target-title">
             <div>
-              <p class="eyebrow">Profiles</p>
-              <h2 id="comparison-target-title">{{ leftProfile.metadata.alias || 'Untitled profile' }} + {{ selectedProfile().metadata.alias || 'Untitled profile' }}</h2>
+              <p class="eyebrow">{{ i18n.t('comparison.profiles') }}</p>
+              <h2 id="comparison-target-title">{{ leftProfile.metadata.alias || i18n.t('common.untitledProfile') }} + {{ rightProfile.metadata.alias || i18n.t('common.untitledProfile') }}</h2>
             </div>
             <label class="select-field">
-              <span>Compare with</span>
-              <select [value]="selectedProfile().id" (change)="selectProfile($event)">
+              <span>{{ i18n.t('comparison.compareWith') }}</span>
+              <select [value]="rightProfile.id" (change)="selectProfile($event)">
                 @for (candidate of otherProfiles(); track candidate.id) {
-                  <option [value]="candidate.id">{{ candidate.metadata.alias || 'Untitled profile' }}</option>
+                  <option [value]="candidate.id">{{ candidate.metadata.alias || i18n.t('common.untitledProfile') }}</option>
                 }
               </select>
             </label>
           </section>
 
           @if (comparison(); as result) {
-            @if (result.contextIssues.leftSexMissing || result.contextIssues.rightSexMissing) {
-              <p class="alert" role="alert">
-                Some counterpart-scoped answers cannot be matched because
-                @if (result.contextIssues.leftSexMissing) { the first profile has no sex specified }
-                @if (result.contextIssues.leftSexMissing && result.contextIssues.rightSexMissing) { and }
-                @if (result.contextIssues.rightSexMissing) { the second profile has no sex specified }.
-                Unscoped answers are still compared normally.
-              </p>
+            @if (contextIssueMessage(result.contextIssues); as issueMessage) {
+              <p class="alert" role="alert">{{ issueMessage }}</p>
             }
 
-            <section class="comparison-summary" aria-label="Comparison summary">
-              <article class="summary-card"><strong>{{ result.answeredInteractionCount }}</strong><span>answered interactions</span></article>
-              <article class="summary-card"><strong>{{ result.commonGroundCount }}</strong><span>with common ground</span></article>
-              <article class="summary-card"><strong>{{ result.classifications['conditioned'] + result.classifications['intensity-mismatch'] + result.classifications['explorable'] }}</strong><span>worth discussing</span></article>
-              <article class="summary-card"><strong>{{ result.boundaryCount }}</strong><span>boundaries shown separately</span></article>
+            <section class="comparison-summary" [attr.aria-label]="i18n.t('comparison.summaryAria')">
+              <article class="summary-card"><strong>{{ result.answeredInteractionCount }}</strong><span>{{ i18n.t('comparison.summary.answered') }}</span></article>
+              <article class="summary-card"><strong>{{ result.commonGroundCount }}</strong><span>{{ i18n.t('comparison.summary.commonGround') }}</span></article>
+              <article class="summary-card"><strong>{{ result.classifications['conditioned'] + result.classifications['intensity-mismatch'] + result.classifications['explorable'] }}</strong><span>{{ i18n.t('comparison.summary.discuss') }}</span></article>
+              <article class="summary-card"><strong>{{ result.boundaryCount }}</strong><span>{{ i18n.t('comparison.summary.boundaries') }}</span></article>
             </section>
 
             <section class="comparison-explanation panel">
-              <p><strong>Category affinity</strong> is the average preference-alignment score for explicitly answered, catalogue-compatible interactions in that category. Unanswered questions are excluded. Hard boundaries are displayed but deliberately excluded from the percentage rather than being treated as a compatibility penalty.</p>
+              <p>{{ i18n.t('comparison.explanation') }}</p>
             </section>
 
             @if (comparableCategories().length === 0) {
               <section class="panel empty-state">
-                <h2>No comparable answered interactions yet</h2>
-                <p class="muted">The profiles may need more questionnaire answers, or counterpart metadata may be missing for scoped answers.</p>
+                <h2>{{ i18n.t('comparison.noComparable.title') }}</h2>
+                <p class="muted">{{ i18n.t('comparison.noComparable.description') }}</p>
               </section>
             } @else {
-              <section class="category-comparisons" aria-label="Category comparison">
+              <section class="category-comparisons" [attr.aria-label]="i18n.t('comparison.categoryAria')">
                 @for (category of comparableCategories(); track category.categoryId) {
                   <article class="panel category-comparison">
                     <header class="category-heading">
                       <div>
-                        <p class="eyebrow">{{ category.answeredInteractionCount }} answered interaction{{ category.answeredInteractionCount === 1 ? '' : 's' }}</p>
-                        <h2>{{ category.categoryLabel }}</h2>
+                        <p class="eyebrow">{{ categoryAnsweredLabel(category.answeredInteractionCount) }}</p>
+                        <h2>{{ categoryLabel(category.categoryId) }}</h2>
                       </div>
                       <div class="affinity-value">
                         <strong>{{ category.affinityPercentage === null ? '—' : category.affinityPercentage + '%' }}</strong>
-                        <span>affinity</span>
+                        <span>{{ i18n.t('comparison.affinity') }}</span>
                       </div>
                     </header>
 
                     @if (category.affinityPercentage !== null) {
                       <div class="progress-track" aria-hidden="true"><span [style.width.%]="category.affinityPercentage"></span></div>
-                      <p class="muted category-note">Based on {{ category.affinityBasisCount }} scored interaction{{ category.affinityBasisCount === 1 ? '' : 's' }}. {{ category.boundaryCount }} boundar{{ category.boundaryCount === 1 ? 'y' : 'ies' }} outside the score.</p>
+                      <p class="muted category-note">{{ categoryBasisLabel(category.affinityBasisCount, category.boundaryCount) }}</p>
                     } @else if (category.boundaryCount > 0) {
-                      <p class="muted category-note">Only hard boundaries are present among the comparable answered interactions, so no affinity percentage is calculated.</p>
+                      <p class="muted category-note">{{ i18n.t('comparison.categoryOnlyBoundaries') }}</p>
                     }
 
                     <div class="interaction-list">
                       @for (interaction of category.interactions; track interaction.id) {
                         <article class="interaction-row">
                           <div class="interaction-title">
-                            <strong>{{ interaction.practiceLabel }}</strong>
+                            <strong>{{ practiceLabel(interaction.practiceId) }}</strong>
                             <span class="comparison-badge">{{ roleRelationLabel(interaction.roleRelation) }}</span>
                             <span class="comparison-badge">{{ classificationLabel(interaction.compatibility.classification) }}</span>
                           </div>
                           <div class="answer-pair">
                             <div>
-                              <span class="profile-name">{{ leftProfile.metadata.alias || 'First profile' }}</span>
-                              <strong>{{ interaction.left.roleLabel }}</strong>
+                              <span class="profile-name">{{ leftProfile.metadata.alias || i18n.t('common.firstProfile') }}</span>
+                              <strong>{{ roleLabel(interaction.practiceId, interaction.left.roleId) }}</strong>
                               <span>{{ preferenceLabel(interaction.left.answer.preference) }}</span>
                             </div>
                             <span class="pair-arrow" aria-hidden="true">↔</span>
                             <div>
-                              <span class="profile-name">{{ selectedProfile().metadata.alias || 'Second profile' }}</span>
-                              <strong>{{ interaction.right.roleLabel }}</strong>
+                              <span class="profile-name">{{ rightProfile.metadata.alias || i18n.t('common.secondProfile') }}</span>
+                              <strong>{{ roleLabel(interaction.practiceId, interaction.right.roleId) }}</strong>
                               <span>{{ preferenceLabel(interaction.right.answer.preference) }}</span>
                             </div>
                           </div>
@@ -134,16 +134,16 @@ import {
               </section>
 
               @if (categoriesWithoutComparableAnswers() > 0) {
-                <p class="muted omitted-note">{{ categoriesWithoutComparableAnswers() }} catalogue categor{{ categoriesWithoutComparableAnswers() === 1 ? 'y has' : 'ies have' }} no comparable answered interactions and {{ categoriesWithoutComparableAnswers() === 1 ? 'is' : 'are' }} omitted from the detailed view.</p>
+                <p class="muted omitted-note">{{ omittedCategoriesLabel(categoriesWithoutComparableAnswers()) }}</p>
               }
             }
           } @else if (catalogueStore.loading()) {
-            <section class="panel"><h2>Loading comparison…</h2><p class="muted">Loading the current local catalogue.</p></section>
+            <section class="panel"><h2>{{ i18n.t('comparison.loading.title') }}</h2><p class="muted">{{ i18n.t('comparison.loading.description') }}</p></section>
           }
         }
       } @else {
-        <a class="back-link" routerLink="/">← Profiles</a>
-        <section class="panel"><h1>Profile not found</h1><p class="muted">The requested profile is not available in local storage.</p></section>
+        <a class="back-link" routerLink="/">{{ i18n.t('dashboard.backProfiles') }}</a>
+        <section class="panel"><h1>{{ i18n.t('common.profileNotFound.title') }}</h1><p class="muted">{{ i18n.t('common.profileNotFound.description') }}</p></section>
       }
     </main>
   `,
@@ -196,6 +196,8 @@ import {
 export class ProfileComparisonPageComponent {
   readonly profileStore = inject(ProfileStore);
   readonly catalogueStore = inject(CatalogueStore);
+  readonly i18n = inject(TranslationService);
+  private readonly catalogueText = inject(CatalogueTextService);
   private readonly comparisonService = inject(COMPARISON_SERVICE);
   private readonly route = inject(ActivatedRoute);
   private readonly profileId = this.route.snapshot.paramMap.get('id') ?? '';
@@ -229,15 +231,50 @@ export class ProfileComparisonPageComponent {
     this.selectedProfileId.set((event.target as HTMLSelectElement).value);
   }
 
+  contextIssueMessage(issues: ComparisonContextIssues): string {
+    if (issues.leftSexMissing && issues.rightSexMissing) return this.i18n.t('comparison.missingSex.both');
+    if (issues.leftSexMissing) return this.i18n.t('comparison.missingSex.left');
+    if (issues.rightSexMissing) return this.i18n.t('comparison.missingSex.right');
+    return '';
+  }
+
+  categoryAnsweredLabel(count: number): string {
+    return this.i18n.plural(count, 'comparison.categoryAnswered.one', 'comparison.categoryAnswered.other');
+  }
+
+  categoryBasisLabel(count: number, boundaries: number): string {
+    return this.i18n.plural(count, 'comparison.categoryBasis.one', 'comparison.categoryBasis.other', { boundaries });
+  }
+
+  omittedCategoriesLabel(count: number): string {
+    return this.i18n.plural(count, 'comparison.omitted.one', 'comparison.omitted.other');
+  }
+
+  categoryLabel(categoryId: string): string {
+    const category = this.catalogueStore.snapshot()?.catalogue.categories.find((candidate) => candidate.id === categoryId);
+    return category ? this.catalogueText.categoryLabel(category) : categoryId;
+  }
+
+  practiceLabel(practiceId: string): string {
+    const practice = this.catalogueStore.snapshot()?.catalogue.practices.find((candidate) => candidate.id === practiceId);
+    return practice ? this.catalogueText.practiceLabel(practice) : practiceId;
+  }
+
+  roleLabel(practiceId: string, roleId: string): string {
+    const practice = this.catalogueStore.snapshot()?.catalogue.practices.find((candidate) => candidate.id === practiceId);
+    const role = practice?.roles.find((candidate) => candidate.id === roleId);
+    return role ? this.catalogueText.roleLabel(practiceId, role) : roleId;
+  }
+
   preferenceLabel(preference: Preference): string {
-    return PREFERENCE_LABELS[preference];
+    return this.i18n.t(PREFERENCE_LABEL_KEYS[preference]);
   }
 
   classificationLabel(classification: ComparisonClassification): string {
-    return COMPARISON_CLASSIFICATION_LABELS[classification];
+    return this.i18n.t(COMPARISON_CLASSIFICATION_LABEL_KEYS[classification]);
   }
 
   roleRelationLabel(relation: RoleRelation): string {
-    return ROLE_RELATION_LABELS[relation];
+    return this.i18n.t(ROLE_RELATION_LABEL_KEYS[relation]);
   }
 }

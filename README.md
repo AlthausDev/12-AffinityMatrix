@@ -20,6 +20,7 @@ The first milestone focuses on validating the core workflow before investing in 
 - Export and import profiles through a portable, versioned representation.
 - Compare two profiles by matching explicitly compatible roles and responses.
 - Show category-level affinity based on comparable answered pairs.
+- Ship the interface and catalogue in Spanish and English.
 
 ## Privacy model
 
@@ -38,10 +39,11 @@ The project keeps domain rules independent from Angular and browser APIs. The cu
 - Inherited validators for shared profile invariants.
 - Versioned migrations for local persistence and portable profile formats.
 - Angular stores as UI state adapters rather than domain services.
+- Typed presentation resources for Spanish/English localization, with catalogue translations derived from stable ids.
 
-The detailed dependency rules, aggregate boundaries, versioning rules, and extension points are documented in [docs/architecture.md](docs/architecture.md).
+The detailed dependency rules, aggregate boundaries, versioning rules, localization rules, and extension points are documented in [docs/architecture.md](docs/architecture.md).
 
-The model is intended to remain extensible for richer questionnaires, comparison rules, visual summaries, and additional local transports. Chat, public discovery, feeds, and social-network features are intentionally outside the product direction.
+The model is intended to remain extensible for richer questionnaires, comparison rules, visual summaries, additional languages, and additional local transports. Chat, public discovery, feeds, and social-network features are intentionally outside the product direction.
 
 ## Planned stack
 
@@ -55,7 +57,7 @@ The model is intended to remain extensible for richer questionnaires, comparison
 
 ## Development approach
 
-The project is developed incrementally: validate domain and questionnaire behavior first, then persistence/portability, comparison, UX/accessibility, and finally richer visual summaries.
+The project is developed incrementally: validate domain and questionnaire behavior first, then persistence/portability, comparison, localization/UX/accessibility, and finally richer visual summaries.
 
 ## License
 

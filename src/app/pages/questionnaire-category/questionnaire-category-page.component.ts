@@ -5,6 +5,8 @@ import { AnswerScope, PracticeAnswer } from '../../../domain/profile/profile-ans
 import { CatalogueStore } from '../../core/catalogue.store';
 import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
+import { CatalogueTextService } from '../../i18n/catalogue-text.service';
+import { TranslationService } from '../../i18n/translation.service';
 import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-role.component';
 
 @Component({
@@ -13,36 +15,36 @@ import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-ro
   template: `
     <main class="page questionnaire-page">
       @if (profile(); as currentProfile) {
-        <a class="back-link" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']" [queryParams]="includeFiltered() ? { filtered: '1' } : null">← Categories</a>
+        <a class="back-link" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']" [queryParams]="includeFiltered() ? { filtered: '1' } : null">{{ i18n.t('questionnaire.backCategories') }}</a>
         @if (category(); as currentCategory) {
           <header class="page-header dashboard-header">
             <div>
-              <p class="eyebrow">Questionnaire · {{ currentCategory.answered }} of {{ currentCategory.total }} answered</p>
-              <h1>{{ currentCategory.category.label }}</h1>
-              <p class="muted lead">{{ currentCategory.category.description }}</p>
+              <p class="eyebrow">{{ i18n.t('questionnaire.category.eyebrow', { answered: currentCategory.answered, total: currentCategory.total }) }}</p>
+              <h1>{{ catalogueText.categoryLabel(currentCategory.category) }}</h1>
+              <p class="muted lead">{{ catalogueText.categoryDescription(currentCategory.category) }}</p>
             </div>
             <p class="profile-count">{{ currentCategory.completionPercentage }}%</p>
           </header>
 
-          @if (profileStore.error()) { <p class="alert" role="alert">{{ profileStore.error() }}</p> }
+          @if (profileStore.error()) { <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p> }
 
           <div class="questionnaire-toolbar">
             @if (filteredCount() > 0) {
               <label class="check-field compact-toggle">
                 <input type="checkbox" [checked]="includeFiltered()" (change)="toggleFiltered($event)" />
-                <span><strong>Show filtered questions</strong><small>{{ filteredCount() }} hidden in this category</small></span>
+                <span><strong>{{ i18n.t('questionnaire.showFiltered') }}</strong><small>{{ filteredInCategoryLabel(filteredCount()) }}</small></span>
               </label>
             }
-            <p class="save-state muted" role="status">{{ profileStore.saving() ? 'Saving locally…' : 'Saved locally' }}</p>
+            <p class="save-state muted" role="status">{{ i18n.t(profileStore.saving() ? 'questionnaire.category.saving' : 'questionnaire.category.saved') }}</p>
           </div>
 
           @if (currentCategory.practices.length === 0) {
-            <section class="panel"><h2>No visible questions</h2><p class="muted">Show filtered questions above or disable filtering in Profile data.</p></section>
+            <section class="panel"><h2>{{ i18n.t('questionnaire.category.empty.title') }}</h2><p class="muted">{{ i18n.t('questionnaire.category.empty.description') }}</p></section>
           } @else {
             <section class="question-list">
               @for (item of currentCategory.practices; track item.practice.id) {
                 <article class="panel question-card">
-                  <header class="question-card-header"><h2>{{ item.practice.label }}</h2><p class="muted">{{ item.practice.description }}</p></header>
+                  <header class="question-card-header"><h2>{{ catalogueText.practiceLabel(item.practice) }}</h2><p class="muted">{{ catalogueText.practiceDescription(item.practice) }}</p></header>
                   @for (roleView of item.roles; track roleView.answerKey) {
                     <app-questionnaire-role
                       [practiceId]="item.practice.id"
@@ -59,20 +61,20 @@ import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-ro
             </section>
           }
 
-          <nav class="questionnaire-nav" aria-label="Questionnaire navigation">
-            <div>@if (neighbours().previousCategoryId; as previousId) { <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', previousId]" [queryParams]="includeFiltered() ? { filtered: '1' } : null">← Previous</a> }</div>
-            <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']" [queryParams]="includeFiltered() ? { filtered: '1' } : null">Categories</a>
-            <div>@if (neighbours().nextCategoryId; as nextId) { <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', nextId]" [queryParams]="includeFiltered() ? { filtered: '1' } : null">Next →</a> }</div>
+          <nav class="questionnaire-nav" [attr.aria-label]="i18n.t('questionnaire.navigationAria')">
+            <div>@if (neighbours().previousCategoryId; as previousId) { <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', previousId]" [queryParams]="includeFiltered() ? { filtered: '1' } : null">{{ i18n.t('questionnaire.previous') }}</a> }</div>
+            <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']" [queryParams]="includeFiltered() ? { filtered: '1' } : null">{{ i18n.t('common.categories') }}</a>
+            <div>@if (neighbours().nextCategoryId; as nextId) { <a class="button secondary" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', nextId]" [queryParams]="includeFiltered() ? { filtered: '1' } : null">{{ i18n.t('questionnaire.next') }}</a> }</div>
           </nav>
         } @else if (catalogueStore.loading()) {
-          <section class="panel"><h1>Loading questionnaire…</h1><p class="muted">Loading the local catalogue.</p></section>
+          <section class="panel"><h1>{{ i18n.t('common.questionnaire.loading.title') }}</h1><p class="muted">{{ i18n.t('common.questionnaire.loading.description') }}</p></section>
         } @else if (!snapshot()) {
-          <section class="panel"><h1>Questionnaire unavailable</h1><p class="muted">{{ catalogueStore.error() || 'The questionnaire catalogue could not be loaded.' }}</p></section>
+          <section class="panel"><h1>{{ i18n.t('common.questionnaire.unavailable.title') }}</h1><p class="muted">{{ i18n.t('common.questionnaire.unavailable.description') }}</p></section>
         } @else {
-          <section class="panel"><h1>Category not found</h1><a class="button" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']">Return to categories</a></section>
+          <section class="panel"><h1>{{ i18n.t('questionnaire.categoryNotFound') }}</h1><a class="button" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']">{{ i18n.t('questionnaire.returnCategories') }}</a></section>
         }
       } @else {
-        <a class="back-link" routerLink="/">← Profiles</a><section class="panel"><h1>Profile not found</h1></section>
+        <a class="back-link" routerLink="/">{{ i18n.t('dashboard.backProfiles') }}</a><section class="panel"><h1>{{ i18n.t('common.profileNotFound.title') }}</h1></section>
       }
     </main>
   `,
@@ -93,6 +95,8 @@ import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-ro
 export class QuestionnaireCategoryPageComponent {
   readonly profileStore = inject(ProfileStore);
   readonly catalogueStore = inject(CatalogueStore);
+  readonly i18n = inject(TranslationService);
+  readonly catalogueText = inject(CatalogueTextService);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
   private readonly route = inject(ActivatedRoute);
   private readonly params = toSignal(this.route.paramMap, { initialValue: this.route.snapshot.paramMap });
@@ -118,10 +122,16 @@ export class QuestionnaireCategoryPageComponent {
   constructor() { void this.catalogueStore.initialize(); }
 
   toggleFiltered(event: Event): void { this.includeFiltered.set((event.target as HTMLInputElement).checked); }
+
+  filteredInCategoryLabel(count: number): string {
+    return this.i18n.plural(count, 'questionnaire.category.filtered.one', 'questionnaire.category.filtered.other');
+  }
+
   saveAnswer(answer: PracticeAnswer): void {
     const snapshot = this.snapshot();
     if (snapshot) void this.profileStore.upsertAnswer(this.profileId(), answer, snapshot.version);
   }
+
   removeAnswer(target: { readonly practiceId: string; readonly roleId: string; readonly scope?: AnswerScope }): void {
     void this.profileStore.removeAnswer(this.profileId(), target.practiceId, target.roleId, target.scope);
   }

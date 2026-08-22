@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProfileStore } from '../../core/profile.store';
+import { TranslationService } from '../../i18n/translation.service';
 
 @Component({
   selector: 'app-home-page',
@@ -11,37 +12,37 @@ import { ProfileStore } from '../../core/profile.store';
         <div>
           <p class="eyebrow">MVP · 0.1.0.0</p>
           <h1>Affinity Matrix</h1>
-          <p class="muted lead">Create portable preference profiles and compare them locally. The working title may change as the product evolves.</p>
+          <p class="muted lead">{{ i18n.t('home.lead') }}</p>
         </div>
         <div class="header-actions">
-          <a class="button" routerLink="/profiles/new">Create profile</a>
-          <a class="button secondary" routerLink="/profiles/import">Import profile</a>
+          <a class="button" routerLink="/profiles/new">{{ i18n.t('common.createProfile') }}</a>
+          <a class="button secondary" routerLink="/profiles/import">{{ i18n.t('common.importProfile') }}</a>
         </div>
       </header>
 
       @if (profileStore.error()) {
-        <p class="alert" role="alert">{{ profileStore.error() }}</p>
+        <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p>
       }
 
       <section aria-labelledby="local-profiles-title">
         <div class="section-heading">
-          <div><p class="eyebrow">This browser</p><h2 id="local-profiles-title">Local profiles</h2></div>
+          <div><p class="eyebrow">{{ i18n.t('home.thisBrowser') }}</p><h2 id="local-profiles-title">{{ i18n.t('home.localProfiles') }}</h2></div>
           <span class="count-badge">{{ profileStore.profiles().length }}</span>
         </div>
 
         @if (profileStore.profiles().length === 0) {
           <div class="panel empty-state">
-            <h3>No profiles yet</h3>
-            <p class="muted">Create the first profile. It will be stored only in this browser until you explicitly export or share it.</p>
-            <a class="button" routerLink="/profiles/new">Create profile</a>
+            <h3>{{ i18n.t('home.empty.title') }}</h3>
+            <p class="muted">{{ i18n.t('home.empty.description') }}</p>
+            <a class="button" routerLink="/profiles/new">{{ i18n.t('common.createProfile') }}</a>
           </div>
         } @else {
           <div class="profile-list">
             @for (profile of profileStore.profiles(); track profile.id) {
               <a class="profile-row" [routerLink]="['/profiles', profile.id]">
                 <div>
-                  <strong>{{ profile.metadata.alias || 'Untitled profile' }}</strong>
-                  <span class="muted">{{ answerCount(profile.answers) }} answered · {{ profile.settings.filterQuestionnaireByMetadata ? 'filter enabled' : 'full questionnaire' }}</span>
+                  <strong>{{ profile.metadata.alias || i18n.t('common.untitledProfile') }}</strong>
+                  <span class="muted">{{ profileSummary(answerCount(profile.answers), profile.settings.filterQuestionnaireByMetadata) }}</span>
                 </div>
                 <span aria-hidden="true">→</span>
               </a>
@@ -51,8 +52,8 @@ import { ProfileStore } from '../../core/profile.store';
       </section>
 
       <footer class="privacy-note">
-        <strong>Local by default.</strong>
-        <span class="muted">Profiles are not uploaded, but browser storage is not encrypted. Anyone with access to this browser profile may be able to read them.</span>
+        <strong>{{ i18n.t('home.privacy.title') }}</strong>
+        <span class="muted">{{ i18n.t('home.privacy.description') }}</span>
       </footer>
     </main>
   `,
@@ -60,8 +61,13 @@ import { ProfileStore } from '../../core/profile.store';
 })
 export class HomePageComponent {
   readonly profileStore = inject(ProfileStore);
+  readonly i18n = inject(TranslationService);
 
   answerCount(answers: object): number {
     return Object.keys(answers).length;
+  }
+
+  profileSummary(count: number, filtered: boolean): string {
+    return this.i18n.t(filtered ? 'home.profileSummary.filtered' : 'home.profileSummary.full', { count });
   }
 }

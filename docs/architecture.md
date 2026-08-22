@@ -84,6 +84,30 @@ Category affinity is the arithmetic mean of centralized preference-alignment sco
 
 `ComparisonSubject` is deliberately smaller than the local `Profile` aggregate. A local profile satisfies it structurally, and a future in-memory portable/imported profile can also satisfy it without being persisted. This keeps compare-without-saving as a presentation/input concern rather than a second comparison engine.
 
+Comparison results are language-neutral. They expose stable category, practice, and role ids plus comparison classifications; they do not carry localized labels. The presentation layer resolves those ids through the current catalogue and localization resources.
+
+## Localization
+
+Localization is an Angular/presentation concern. Domain, application, persistence, portable formats, and comparison rules must not depend on a language or produce localized labels as part of their contracts.
+
+The MVP supports Spanish and English. Spanish is the default development/runtime locale, while the language selector can switch locale at runtime. The selected locale is a local UI preference only; it is not part of `Profile`, local profile schema, comparison data, or portable exports.
+
+UI text uses semantic, typed translation keys. Spanish defines the canonical `TranslationKey` set and the English resource must satisfy the same key set at compile time. Interpolated values use named parameters, and plural-sensitive messages go through the localization service instead of manual string concatenation.
+
+Catalogue snapshots deliberately keep their historical fallback labels and descriptions. Localization does not mutate or version old snapshots. `CatalogueTextService` derives presentation keys from stable ids:
+
+```text
+catalogue.category.<categoryId>.label
+catalogue.category.<categoryId>.description
+catalogue.practice.<practiceId>.label
+catalogue.practice.<practiceId>.description
+catalogue.practice.<practiceId>.role.<roleId>
+```
+
+If a translation is unavailable, the snapshot text is a defensive fallback. Tests require every current category, practice, description, and role to have both Spanish and English resources. Therefore normal catalogue growth requires adding catalogue data plus its two localized resource entries, not modifying questionnaire or comparison components.
+
+Human-readable validation and UI messages belong in localization resources. Lower layers should expose stable states, ids, classifications, or typed errors whenever presentation needs to explain a result.
+
 ## Versioning rules
 
 Five concepts evolve independently:
@@ -98,9 +122,9 @@ Historical DTOs, snapshots, and migrations must use historical constants rather 
 
 ## Scalability boundaries
 
-The MVP intentionally avoids a backend. Expected extension points include IndexedDB persistence, larger static catalogues, additional comparison policies, category statistics, optional encryption/compression, new answer details, justified relational scope axes, and richer local summaries.
+The MVP intentionally avoids a backend. Expected extension points include IndexedDB persistence, larger static catalogues, additional comparison policies, category statistics, optional encryption/compression, new answer details, justified relational scope axes, richer local summaries, and additional presentation locales.
 
-A catalogue expansion should normally require changes only to catalogue data and its validation/tests. Comparison code should change only when a new semantic concept is introduced, such as a new preference state, a new relational scope axis, or a genuinely different compatibility rule.
+A catalogue expansion should normally require changes only to catalogue data, localized resources, and their validation/tests. Comparison code should change only when a new semantic concept is introduced, such as a new preference state, a new relational scope axis, or a genuinely different compatibility rule.
 
 ## Non-goals
 
