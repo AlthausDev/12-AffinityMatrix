@@ -19,6 +19,14 @@ export function getRelevantPartnerSexes(metadata: ProfileMetadata): readonly Sex
 }
 
 export abstract class QuestionVisibilityPolicy {
+  /** Hard applicability: impossible anatomy/context variants must never become questionnaire items. */
+  abstract isRoleApplicable(
+    role: PracticeRole,
+    context: ProfileQuestionContext,
+    scope?: AnswerScope,
+  ): boolean;
+
+  /** Soft visibility: applicable variants can still be hidden by the user's metadata filters. */
   abstract isRoleVisible(
     role: PracticeRole,
     context: ProfileQuestionContext,
@@ -35,13 +43,11 @@ export abstract class QuestionVisibilityPolicy {
 }
 
 export class MetadataQuestionVisibilityPolicy extends QuestionVisibilityPolicy {
-  override isRoleVisible(
+  override isRoleApplicable(
     role: PracticeRole,
     context: ProfileQuestionContext,
     scope?: AnswerScope,
   ): boolean {
-    if (!context.settings.filterQuestionnaireByMetadata) return true;
-
     const applicability = role.applicability;
     if (
       context.metadata.sex &&
@@ -50,21 +56,37 @@ export class MetadataQuestionVisibilityPolicy extends QuestionVisibilityPolicy {
     ) return false;
 
     const counterpartSex = scope?.counterpartSex;
-    if (counterpartSex) {
-      if (applicability?.partnerSex && !applicability.partnerSex.includes(counterpartSex)) return false;
-      const relevantPartnerSexes = getRelevantPartnerSexes(context.metadata);
-      if (relevantPartnerSexes && !relevantPartnerSexes.includes(counterpartSex)) return false;
-    } else {
-      const relevantPartnerSexes = getRelevantPartnerSexes(context.metadata);
-      if (relevantPartnerSexes && applicability?.partnerSex) {
-        if (!applicability.partnerSex.some((sex) => relevantPartnerSexes.includes(sex))) return false;
-      }
-    }
+    if (
+      counterpartSex &&
+      applicability?.partnerSex &&
+      !applicability.partnerSex.includes(counterpartSex)
+    ) return false;
 
-    return this.isTargetSiteVisible(role, context.metadata, scope);
+    return this.isTargetSiteApplicable(role, context.metadata, scope);
   }
 
-  private isTargetSiteVisible(
+  override isRoleVisible(
+    role: PracticeRole,
+    context: ProfileQuestionContext,
+    scope?: AnswerScope,
+  ): boolean {
+    if (!this.isRoleApplicable(role, context, scope)) return false;
+    if (!context.settings.filterQuestionnaireByMetadata) return true;
+
+    const relevantPartnerSexes = getRelevantPartnerSexes(context.metadata);
+    const counterpartSex = scope?.counterpartSex;
+    if (counterpartSex && relevantPartnerSexes && !relevantPartnerSexes.includes(counterpartSex)) {
+      return false;
+    }
+
+    if (!counterpartSex && relevantPartnerSexes && role.applicability?.partnerSex) {
+      if (!role.applicability.partnerSex.some((sex) => relevantPartnerSexes.includes(sex))) return false;
+    }
+
+    return true;
+  }
+
+  private isTargetSiteApplicable(
     role: PracticeRole,
     metadata: ProfileMetadata,
     scope?: AnswerScope,
