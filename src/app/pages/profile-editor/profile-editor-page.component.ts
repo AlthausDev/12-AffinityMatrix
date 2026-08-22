@@ -47,7 +47,7 @@ interface ProfileFormModel {
             <span>{{ i18n.t('profileEditor.alias') }}</span>
             <input type="text" autocomplete="off" [placeholder]="i18n.t('common.optional')" [formField]="profileForm.alias" />
             @if (profileForm.alias().touched() && profileForm.alias().invalid()) {
-              <small class="field-error">{{ profileForm.alias().errors()[0].message }}</small>
+              <small class="field-error">{{ i18n.t('validation.alias.maxLength', { max: aliasMaxLength }) }}</small>
             }
           </label>
 
@@ -98,6 +98,7 @@ export class ProfileEditorPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
+  readonly aliasMaxLength = PROFILE_ALIAS_MAX_LENGTH;
   readonly profileId = this.route.snapshot.paramMap.get('id');
   readonly existingProfile = this.profileId ? this.profileStore.findById(this.profileId) : undefined;
   readonly isEditing = this.profileId !== null;
@@ -113,7 +114,7 @@ export class ProfileEditorPageComponent {
 
   readonly profileForm = form(this.model, (schemaPath) => {
     maxLength(schemaPath.alias, PROFILE_ALIAS_MAX_LENGTH, {
-      message: this.i18n.t('validation.alias.maxLength', { max: PROFILE_ALIAS_MAX_LENGTH }),
+      message: 'profile.alias.maxLength',
     });
   });
 
