@@ -9,11 +9,13 @@ export type FontScale = (typeof FONT_SCALE_VALUES)[number];
 export interface UiPreferences {
   readonly confirmQuestionnaireExit: boolean;
   readonly fontScale: FontScale;
+  readonly hiddenCategoriesByProfile: Readonly<Record<string, readonly string[]>>;
 }
 
 export const DEFAULT_UI_PREFERENCES: UiPreferences = {
   confirmQuestionnaireExit: true,
   fontScale: 'normal',
+  hiddenCategoriesByProfile: {},
 };
 
 @Injectable({ providedIn: 'root' })
@@ -35,6 +37,14 @@ export class UiPreferencesService {
     return this.state().fontScale;
   }
 
+  hiddenCategoryIds(profileId: string): readonly string[] {
+    return this.state().hiddenCategoriesByProfile[profileId] ?? [];
+  }
+
+  isCategoryHidden(profileId: string, categoryId: string): boolean {
+    return this.hiddenCategoryIds(profileId).includes(categoryId);
+  }
+
   setConfirmQuestionnaireExit(value: boolean): void {
     this.update({ confirmQuestionnaireExit: value });
   }
@@ -42,6 +52,25 @@ export class UiPreferencesService {
   setFontScale(value: FontScale): void {
     this.update({ fontScale: value });
     this.applyFontScale(value);
+  }
+
+  setCategoryHidden(profileId: string, categoryId: string, hidden: boolean): void {
+    if (!profileId || !categoryId) return;
+    const current = new Set(this.hiddenCategoryIds(profileId));
+    if (hidden) current.add(categoryId);
+    else current.delete(categoryId);
+
+    const hiddenCategoriesByProfile = { ...this.state().hiddenCategoriesByProfile };
+    if (current.size === 0) delete hiddenCategoriesByProfile[profileId];
+    else hiddenCategoriesByProfile[profileId] = [...current].sort();
+    this.update({ hiddenCategoriesByProfile });
+  }
+
+  showAllCategories(profileId: string): void {
+    const hiddenCategoriesByProfile = { ...this.state().hiddenCategoriesByProfile };
+    if (!(profileId in hiddenCategoriesByProfile)) return;
+    delete hiddenCategoriesByProfile[profileId];
+    this.update({ hiddenCategoriesByProfile });
   }
 
   private update(patch: Partial<UiPreferences>): void {
@@ -66,10 +95,24 @@ export class UiPreferencesService {
         fontScale: this.isFontScale(parsed['fontScale'])
           ? parsed['fontScale']
           : DEFAULT_UI_PREFERENCES.fontScale,
+        hiddenCategoriesByProfile: this.readHiddenCategories(parsed['hiddenCategoriesByProfile']),
       };
     } catch {
       return DEFAULT_UI_PREFERENCES;
     }
+  }
+
+  private readHiddenCategories(value: unknown): Readonly<Record<string, readonly string[]>> {
+    if (!this.isRecord(value)) return {};
+    const result: Record<string, readonly string[]> = {};
+    for (const [profileId, categoryIds] of Object.entries(value)) {
+      if (!profileId || !Array.isArray(categoryIds)) continue;
+      const clean = [...new Set(categoryIds.filter(
+        (categoryId): categoryId is string => typeof categoryId === 'string' && categoryId.length > 0,
+      ))].sort();
+      if (clean.length > 0) result[profileId] = clean;
+    }
+    return result;
   }
 
   private persist(value: UiPreferences): void {
