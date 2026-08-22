@@ -9,6 +9,7 @@ import {
 } from '../../../domain/profile/profile-metadata';
 import { ProfileSettings } from '../../../domain/profile/profile-settings';
 import { ProfileStore } from '../../core/profile.store';
+import { TranslationService } from '../../i18n/translation.service';
 
 interface ProfileFormModel {
   alias: string;
@@ -22,19 +23,19 @@ interface ProfileFormModel {
   imports: [FormField, RouterLink],
   template: `
     <main class="page narrow-page">
-      <a class="back-link" [routerLink]="backLink">← Back</a>
+      <a class="back-link" [routerLink]="backLink">{{ isEditing ? i18n.t('export.backProfile') : i18n.t('dashboard.backProfiles') }}</a>
 
       @if (profileId && !existingProfile) {
         <section class="panel">
-          <h1>Profile not found</h1>
-          <p class="muted">This profile is not available in local storage.</p>
-          <a class="button" routerLink="/">Return to profiles</a>
+          <h1>{{ i18n.t('common.profileNotFound.title') }}</h1>
+          <p class="muted">{{ i18n.t('common.profileNotFound.description') }}</p>
+          <a class="button" routerLink="/">{{ i18n.t('common.returnToProfiles') }}</a>
         </section>
       } @else {
         <header class="page-header">
-          <p class="eyebrow">Profile</p>
-          <h1>{{ isEditing ? 'Edit profile' : 'Create profile' }}</h1>
-          <p class="muted">These details are optional. Sex and orientation are used locally for questionnaire filtering and are excluded from exports unless you explicitly include them.</p>
+          <p class="eyebrow">{{ i18n.t('profileEditor.eyebrow') }}</p>
+          <h1>{{ i18n.t(isEditing ? 'profileEditor.editTitle' : 'profileEditor.createTitle') }}</h1>
+          <p class="muted">{{ i18n.t('profileEditor.description') }}</p>
         </header>
 
         @if (profileStore.error()) {
@@ -43,45 +44,47 @@ interface ProfileFormModel {
 
         <form class="panel form-grid" (submit)="save($event)">
           <label class="field">
-            <span>Alias</span>
-            <input type="text" autocomplete="off" placeholder="Optional" [formField]="profileForm.alias" />
+            <span>{{ i18n.t('profileEditor.alias') }}</span>
+            <input type="text" autocomplete="off" [placeholder]="i18n.t('common.optional')" [formField]="profileForm.alias" />
             @if (profileForm.alias().touched() && profileForm.alias().invalid()) {
               <small class="field-error">{{ profileForm.alias().errors()[0].message }}</small>
             }
           </label>
 
           <label class="field">
-            <span>Sex</span>
+            <span>{{ i18n.t('profileEditor.sex') }}</span>
             <select [formField]="profileForm.sex">
-              <option value="">Prefer not to specify</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
+              <option value="">{{ i18n.t('profileEditor.preferNotSpecify') }}</option>
+              <option value="male">{{ i18n.t('profileEditor.sex.male') }}</option>
+              <option value="female">{{ i18n.t('profileEditor.sex.female') }}</option>
             </select>
           </label>
 
           <label class="field">
-            <span>Orientation</span>
+            <span>{{ i18n.t('profileEditor.orientation') }}</span>
             <select [formField]="profileForm.orientation">
-              <option value="">Prefer not to specify</option>
-              <option value="heterosexual">Heterosexual</option>
-              <option value="homosexual">Homosexual</option>
-              <option value="bisexual">Bisexual</option>
+              <option value="">{{ i18n.t('profileEditor.preferNotSpecify') }}</option>
+              <option value="heterosexual">{{ i18n.t('profileEditor.orientation.heterosexual') }}</option>
+              <option value="homosexual">{{ i18n.t('profileEditor.orientation.homosexual') }}</option>
+              <option value="bisexual">{{ i18n.t('profileEditor.orientation.bisexual') }}</option>
             </select>
           </label>
 
           <label class="check-field">
             <input type="checkbox" [formField]="profileForm.filterQuestionnaireByMetadata" />
             <span>
-              <strong>Filter questionnaire</strong>
-              <small>Hide roles that do not match the optional profile data above.</small>
+              <strong>{{ i18n.t('profileEditor.filter.title') }}</strong>
+              <small>{{ i18n.t('profileEditor.filter.description') }}</small>
             </span>
           </label>
 
-          <p class="muted form-note">Changing these values never removes existing answers. Filtered questions remain part of the profile and can be shown again later.</p>
+          <p class="muted form-note">{{ i18n.t('profileEditor.filter.note') }}</p>
 
           <div class="form-actions">
-            <a class="button secondary" [routerLink]="backLink">Cancel</a>
-            <button class="button" type="submit" [disabled]="profileStore.saving()">{{ profileStore.saving() ? 'Saving…' : (isEditing ? 'Save changes' : 'Create profile') }}</button>
+            <a class="button secondary" [routerLink]="backLink">{{ i18n.t('common.cancel') }}</a>
+            <button class="button" type="submit" [disabled]="profileStore.saving()">
+              {{ profileStore.saving() ? i18n.t('common.saving') : i18n.t(isEditing ? 'profileEditor.saveChanges' : 'common.createProfile') }}
+            </button>
           </div>
         </form>
       }
@@ -91,6 +94,7 @@ interface ProfileFormModel {
 })
 export class ProfileEditorPageComponent {
   readonly profileStore = inject(ProfileStore);
+  readonly i18n = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -109,7 +113,7 @@ export class ProfileEditorPageComponent {
 
   readonly profileForm = form(this.model, (schemaPath) => {
     maxLength(schemaPath.alias, PROFILE_ALIAS_MAX_LENGTH, {
-      message: `Alias cannot exceed ${PROFILE_ALIAS_MAX_LENGTH} characters.`,
+      message: this.i18n.t('validation.alias.maxLength', { max: PROFILE_ALIAS_MAX_LENGTH }),
     });
   });
 
