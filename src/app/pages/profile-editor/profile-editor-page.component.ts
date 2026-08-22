@@ -39,7 +39,7 @@ interface ProfileFormModel {
         </header>
 
         @if (profileStore.error()) {
-          <p class="alert" role="alert">{{ profileStore.error() }}</p>
+          <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p>
         }
 
         <form class="panel form-grid" (submit)="save($event)">
