@@ -22,6 +22,42 @@ describe('PracticeValidator', () => {
     expect(validator.validate(validPractice())).toEqual([]);
   });
 
+  it('accepts fixed group composition and required participant-sex applicability', () => {
+    const practice: Practice = {
+      ...validPractice(),
+      roles: [
+        {
+          ...validPractice().roles[0],
+          applicability: {
+            groupComposition: ['male', 'male', 'female'],
+            requiresAnyParticipantSex: ['male'],
+          },
+        },
+        validPractice().roles[1],
+      ],
+    };
+    expect(validator.validate(practice)).toEqual([]);
+  });
+
+  it('rejects unsupported sex values in extended applicability', () => {
+    const candidate = {
+      ...validPractice(),
+      roles: [
+        {
+          ...validPractice().roles[0],
+          applicability: {
+            groupComposition: ['male', 'unsupported'],
+            requiresAnyParticipantSex: ['unsupported'],
+          },
+        },
+        validPractice().roles[1],
+      ],
+    };
+    const issues = validator.validate(candidate);
+    expect(issues.some((issue) => issue.path.endsWith('groupComposition'))).toBe(true);
+    expect(issues.some((issue) => issue.path.endsWith('requiresAnyParticipantSex'))).toBe(true);
+  });
+
   it('rejects duplicate role ids', () => {
     const practice = validPractice();
     const candidate = { ...practice, roles: [practice.roles[0], { ...practice.roles[1], id: 'tie' }] };
