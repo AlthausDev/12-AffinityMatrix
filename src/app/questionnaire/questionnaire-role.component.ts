@@ -139,13 +139,14 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
       justify-content: center;
       gap: 0.28rem;
       padding: 0.35rem;
-      border: 1px solid var(--border-subtle);
+      border: 1px solid color-mix(in srgb, var(--border-strong) 74%, white);
       border-radius: 0.45rem;
-      background: color-mix(in srgb, var(--surface-elevated) 88%, transparent);
-      color: var(--text-primary);
+      background: color-mix(in srgb, var(--surface-elevated) 86%, #f3f5ff 6%);
+      color: #fafbff;
       cursor: pointer;
       font-size: 0.7rem;
       line-height: 1.15;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
       transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease, transform 140ms ease;
     }
     .preference-option[data-tone='favorite'] { --preference-accent: var(--preference-favorite); }
@@ -155,22 +156,36 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     .preference-option[data-tone='negative'] { --preference-accent: var(--preference-negative); }
     .preference-option[data-tone='boundary'] { --preference-accent: var(--preference-boundary); }
     .preference-option span { display: inline; }
-    .preference-option span:first-child { color: var(--text-secondary); font-size: 0.95rem; font-weight: 800; transition: color 140ms ease; }
+    .preference-option span:first-child {
+      color: color-mix(in srgb, var(--text-primary) 74%, var(--text-secondary));
+      font-size: 0.95rem;
+      font-weight: 800;
+      transition: color 140ms ease, text-shadow 140ms ease;
+    }
     .preference-option:hover {
-      border-color: var(--preference-accent);
-      background: color-mix(in srgb, var(--preference-accent) 9%, var(--surface-elevated));
-      box-shadow: 0 0 0.9rem color-mix(in srgb, var(--preference-accent) 24%, transparent);
+      border-color: color-mix(in srgb, var(--preference-accent) 82%, white);
+      background: color-mix(in srgb, var(--preference-accent) 16%, var(--surface-elevated));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 0 1.05rem color-mix(in srgb, var(--preference-accent) 34%, transparent);
       transform: translateY(-1px);
     }
-    .preference-option:hover span:first-child { color: var(--preference-accent); }
-    .preference-option.selected {
-      border-color: var(--preference-accent);
-      background: color-mix(in srgb, var(--preference-accent) 15%, var(--surface-elevated));
-      box-shadow:
-        inset 0 0 0 1px color-mix(in srgb, var(--preference-accent) 68%, white),
-        0 0 1rem color-mix(in srgb, var(--preference-accent) 30%, transparent);
+    .preference-option:hover span:first-child {
+      color: color-mix(in srgb, var(--preference-accent) 82%, white);
+      text-shadow: 0 0 0.55rem color-mix(in srgb, var(--preference-accent) 40%, transparent);
     }
-    .preference-option.selected span:first-child { color: var(--preference-accent); }
+    .preference-option.selected {
+      border-color: color-mix(in srgb, var(--preference-accent) 86%, white);
+      background: color-mix(in srgb, var(--preference-accent) 24%, var(--surface-elevated));
+      box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--preference-accent) 72%, white),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 1.15rem color-mix(in srgb, var(--preference-accent) 40%, transparent);
+    }
+    .preference-option.selected span:first-child {
+      color: color-mix(in srgb, var(--preference-accent) 84%, white);
+      text-shadow: 0 0 0.65rem color-mix(in srgb, var(--preference-accent) 46%, transparent);
+    }
     .answer-details { grid-area: details; margin-top: 0.2rem; }
     .answer-details summary { color: var(--text-secondary); cursor: pointer; font-size: 0.82rem; }
     .detail-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; margin-top: 0.75rem; }
@@ -230,6 +245,11 @@ export class QuestionnaireRoleComponent {
 
   selectPreference(preference: Preference): void {
     const current = this.answer();
+    if (current?.preference === preference) {
+      this.clearAnswer();
+      return;
+    }
+
     let details = current?.details ? { ...current.details } : undefined;
 
     if (!this.supportsDetails(preference)) {
