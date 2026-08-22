@@ -3,12 +3,17 @@ import { Injectable, inject, signal } from '@angular/core';
 
 export const UI_PREFERENCES_STORAGE_KEY = 'preference-profile.ui-preferences.v1';
 
+export const FONT_SCALE_VALUES = ['normal', 'large', 'extra-large'] as const;
+export type FontScale = (typeof FONT_SCALE_VALUES)[number];
+
 export interface UiPreferences {
   readonly confirmQuestionnaireExit: boolean;
+  readonly fontScale: FontScale;
 }
 
 export const DEFAULT_UI_PREFERENCES: UiPreferences = {
   confirmQuestionnaireExit: true,
+  fontScale: 'normal',
 };
 
 @Injectable({ providedIn: 'root' })
@@ -18,12 +23,25 @@ export class UiPreferencesService {
 
   readonly preferences = this.state.asReadonly();
 
+  initialize(): void {
+    this.applyFontScale(this.state().fontScale);
+  }
+
   confirmQuestionnaireExit(): boolean {
     return this.state().confirmQuestionnaireExit;
   }
 
+  fontScale(): FontScale {
+    return this.state().fontScale;
+  }
+
   setConfirmQuestionnaireExit(value: boolean): void {
     this.update({ confirmQuestionnaireExit: value });
+  }
+
+  setFontScale(value: FontScale): void {
+    this.update({ fontScale: value });
+    this.applyFontScale(value);
   }
 
   private update(patch: Partial<UiPreferences>): void {
@@ -45,6 +63,9 @@ export class UiPreferencesService {
           typeof parsed['confirmQuestionnaireExit'] === 'boolean'
             ? parsed['confirmQuestionnaireExit']
             : DEFAULT_UI_PREFERENCES.confirmQuestionnaireExit,
+        fontScale: this.isFontScale(parsed['fontScale'])
+          ? parsed['fontScale']
+          : DEFAULT_UI_PREFERENCES.fontScale,
       };
     } catch {
       return DEFAULT_UI_PREFERENCES;
@@ -57,6 +78,14 @@ export class UiPreferencesService {
     } catch {
       // UI preferences remain valid for this session when browser storage is unavailable.
     }
+  }
+
+  private applyFontScale(value: FontScale): void {
+    this.document.documentElement.dataset['fontScale'] = value;
+  }
+
+  private isFontScale(value: unknown): value is FontScale {
+    return typeof value === 'string' && FONT_SCALE_VALUES.includes(value as FontScale);
   }
 
   private isRecord(value: unknown): value is Record<string, unknown> {
