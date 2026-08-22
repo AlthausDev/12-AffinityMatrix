@@ -1,6 +1,8 @@
 import { CatalogueCategorySeed, CatalogueRoleLabelsSeed } from './types';
 
-const DIRECTED_ROLE_WORDING: Readonly<Record<string, CatalogueRoleLabelsSeed>> = {
+const PRACTICE_ROLE_WORDING: Readonly<Record<string, CatalogueRoleLabelsSeed>> = {
+  'solo-masturbation': selfRole('Masturbate on my own', 'Masturbarme en solitario'),
+  'hands-free-masturbation': selfRole('Masturbate without using my hands', 'Masturbarme sin usar las manos'),
   handjob: roles('Stimulate my partner’s penis by hand', 'Estimular manualmente el pene de mi pareja', 'Have my penis stimulated by hand', 'Que estimulen manualmente mi pene'),
   'vulva-hand-stimulation': roles('Stimulate my partner’s vulva by hand', 'Estimular manualmente la vulva de mi pareja', 'Have my vulva stimulated by hand', 'Que estimulen manualmente mi vulva'),
   'clitoral-stimulation': roles('Stimulate my partner’s clitoris', 'Estimular el clítoris de mi pareja', 'Have my clitoris stimulated', 'Que estimulen mi clítoris'),
@@ -35,6 +37,16 @@ const DIRECTED_ROLE_WORDING: Readonly<Record<string, CatalogueRoleLabelsSeed>> =
   'prostate-penetration': roles('Use prostate-focused penetration on my partner', 'Penetrar a mi pareja buscando estimular la próstata', 'Receive prostate-focused penetration', 'Recibir penetración orientada a la próstata'),
   'cervix-contact': roles('Use deep penetration with cervical contact', 'Penetrar profundamente buscando contacto cervical', 'Receive penetration with cervical contact', 'Recibir penetración con contacto cervical'),
 
+  'clothed-sex': stateRoles('Be fully clothed', 'Estar completamente vestido/a', 'My partner is fully clothed', 'Que mi pareja esté completamente vestida'),
+  'partial-nudity': stateRoles('Keep some clothing on', 'Mantener parte de la ropa puesta', 'My partner keeps some clothing on', 'Que mi pareja mantenga parte de la ropa puesta'),
+  'full-nudity': stateRoles('Be fully nude', 'Estar completamente desnudo/a', 'My partner is fully nude', 'Que mi pareja esté completamente desnuda'),
+
+  'hands-free-orgasm': selfRole('Have an orgasm without using my hands', 'Tener un orgasmo sin usar las manos'),
+  swallowing: stateRoles('Swallow semen', 'Tragar semen', 'My partner swallows semen', 'Que mi pareja trague semen'),
+  'spitting-semen': stateRoles('Spit semen out', 'Escupir semen', 'My partner spits semen out', 'Que mi pareja escupa semen'),
+  'urine-drinking': stateRoles('Drink urine', 'Beber orina', 'My partner drinks urine', 'Que mi pareja beba orina'),
+  'female-ejaculation': stateRoles('Experience squirting / female ejaculation', 'Experimentar squirting / eyaculación femenina', 'My partner experiences squirting / female ejaculation', 'Que mi pareja experimente squirting / eyaculación femenina'),
+
   'spitting-on-body': roles('Spit on my partner’s body', 'Escupir sobre el cuerpo de mi pareja', 'Be spat on', 'Que escupan sobre mi cuerpo'),
   'spitting-in-mouth': roles('Spit into my partner’s mouth', 'Escupir en la boca de mi pareja', 'Receive saliva in my mouth', 'Recibir saliva en mi boca'),
   drooling: roles('Drool onto my partner', 'Babear sobre mi pareja', 'Have my partner drool on me', 'Que mi pareja babee sobre mí'),
@@ -42,9 +54,7 @@ const DIRECTED_ROLE_WORDING: Readonly<Record<string, CatalogueRoleLabelsSeed>> =
   'semen-on-breasts': roles('Ejaculate on my partner’s chest', 'Eyacular sobre el pecho de mi pareja', 'Receive semen on my chest', 'Recibir semen en el pecho'),
   'semen-on-buttocks': roles('Ejaculate on my partner’s buttocks', 'Eyacular sobre los glúteos de mi pareja', 'Receive semen on my buttocks', 'Recibir semen en los glúteos'),
   'semen-in-mouth': roles('Ejaculate into my partner’s mouth', 'Eyacular en la boca de mi pareja', 'Receive semen in my mouth', 'Recibir semen en mi boca'),
-  swallowing: roles('Swallow my partner’s semen', 'Tragar semen de mi pareja', 'Have my partner swallow my semen', 'Que mi pareja trague mi semen'),
   'urine-play': roles('Urinate on my partner', 'Orinar sobre mi pareja', 'Be urinated on', 'Que orinen sobre mí'),
-  'urine-drinking': roles('Drink my partner’s urine', 'Beber la orina de mi pareja', 'Have my partner drink my urine', 'Que mi pareja beba mi orina'),
   'blood-play': roles('Use blood with my partner', 'Usar sangre con mi pareja', 'Have blood used with me', 'Que usen sangre conmigo'),
   'sweat-licking': roles('Lick sweat from my partner', 'Lamer el sudor de mi pareja', 'Have my sweat licked', 'Que laman mi sudor'),
   'food-body-play': roles('Put food on my partner’s body', 'Poner comida sobre el cuerpo de mi pareja', 'Have food used on my body', 'Que usen comida sobre mi cuerpo'),
@@ -58,8 +68,8 @@ export function applyRoleWordingOverrides(
     ...category,
     practices: category.practices.map((practice) => ({
       ...practice,
-      ...(DIRECTED_ROLE_WORDING[practice.id]
-        ? { roleLabels: { ...practice.roleLabels, ...DIRECTED_ROLE_WORDING[practice.id] } }
+      ...(PRACTICE_ROLE_WORDING[practice.id]
+        ? { roleLabels: { ...practice.roleLabels, ...PRACTICE_ROLE_WORDING[practice.id] } }
         : {}),
     })),
   }));
@@ -75,4 +85,20 @@ function roles(
     give: { en: giveEn, es: giveEs },
     receive: { en: receiveEn, es: receiveEs },
   };
+}
+
+function stateRoles(
+  selfEn: string,
+  selfEs: string,
+  partnerEn: string,
+  partnerEs: string,
+): CatalogueRoleLabelsSeed {
+  return {
+    'self-state': { en: selfEn, es: selfEs },
+    'partner-state': { en: partnerEn, es: partnerEs },
+  };
+}
+
+function selfRole(en: string, es: string): CatalogueRoleLabelsSeed {
+  return { self: { en, es } };
 }
