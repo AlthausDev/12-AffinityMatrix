@@ -13,8 +13,8 @@ describe('portable profile mapping', () => {
     const minimized = toPortableProfile(profile);
     const explicit = toPortableProfile(profile, { includeSensitiveMetadata: true });
 
-    expect(minimized.formatVersion).toBe(4);
-    expect(minimized.profileSchemaVersion).toBe(4);
+    expect(minimized.formatVersion).toBe(5);
+    expect(minimized.profileSchemaVersion).toBe(5);
     expect(minimized.metadata).toEqual({ alias: 'Example' });
     expect(explicit.metadata.sex).toBe('female');
     expect(explicit.metadata.orientation).toBe('bisexual');
