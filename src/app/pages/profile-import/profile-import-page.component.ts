@@ -87,7 +87,7 @@ export class ProfileImportPageComponent {
       await this.router.navigate(['/profiles', saved.id]);
       return;
     }
-    this.codeError.set(this.profileStore.error() ?? this.i18n.t('import.error.save'));
+    this.codeError.set(this.i18n.t('import.error.save'));
   }
 
   answerSummary(portable: PortableProfile): string {
