@@ -1,0 +1,104 @@
+import { Practice, PracticeRole } from '../../../domain/catalogue/practice';
+import { TargetSite } from '../../../domain/profile/profile-answer';
+import { Sex } from '../../../domain/profile/profile-metadata';
+import { CataloguePracticeSeed } from '../../../content/catalogue/v3/types';
+
+export function buildPractice(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  switch (seed.kind) {
+    case 'mutual': return mutual(seed, categoryId);
+    case 'directed': return directed(seed, categoryId);
+    case 'wear': return wear(seed, categoryId);
+    case 'watch': return watch(seed, categoryId);
+    case 'power': return power(seed, categoryId);
+    case 'group': return group(seed, categoryId);
+    case 'focus': return focus(seed, categoryId);
+    case 'toy': return toy(seed, categoryId);
+  }
+}
+
+function mutual(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  const role: PracticeRole = {
+    id: 'participate', label: 'Participate', perspective: 'neutral',
+    ...(seed.counterpartScoped ? { contextAxes: ['counterpartSex'] as const } : {}),
+  };
+  return practice(seed, categoryId, [role], [{ leftRoleId: 'participate', rightRoleId: 'participate' }]);
+}
+
+function directed(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  const axes = seed.counterpartScoped ? (['counterpartSex'] as const) : undefined;
+  const give: PracticeRole = {
+    id: 'give', label: 'Do it to my partner', perspective: 'active',
+    ...(seed.anatomySex ? { applicability: { partnerSex: [seed.anatomySex] as readonly Sex[] } } : {}),
+    ...(axes ? { contextAxes: axes } : {}),
+  };
+  const receive: PracticeRole = {
+    id: 'receive', label: 'Have my partner do it to me', perspective: 'receptive',
+    ...(seed.anatomySex ? { applicability: { selfSex: [seed.anatomySex] as readonly Sex[] } } : {}),
+    ...(axes ? { contextAxes: axes } : {}),
+  };
+  return practice(seed, categoryId, [give, receive], [{ leftRoleId: 'give', rightRoleId: 'receive' }]);
+}
+
+function wear(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  return practice(seed, categoryId, [
+    { id: 'wear', label: 'Wear it myself', perspective: 'neutral' },
+    { id: 'partner-wears', label: 'Have my partner wear it', perspective: 'neutral', contextAxes: ['counterpartSex'] },
+  ], [{ leftRoleId: 'wear', rightRoleId: 'partner-wears' }]);
+}
+
+function watch(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  return practice(seed, categoryId, [
+    { id: 'watch', label: 'Watch', perspective: 'active', contextAxes: ['counterpartSex'] },
+    { id: 'be-watched', label: 'Be watched', perspective: 'receptive', contextAxes: ['counterpartSex'] },
+  ], [{ leftRoleId: 'watch', rightRoleId: 'be-watched' }]);
+}
+
+function power(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  return practice(seed, categoryId, [
+    { id: 'lead', label: 'Lead / control', perspective: 'active' },
+    { id: 'follow', label: 'Follow / receive', perspective: 'receptive' },
+  ], [{ leftRoleId: 'lead', rightRoleId: 'follow' }]);
+}
+
+function group(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  return practice(seed, categoryId, [
+    { id: 'center', label: 'Be the center', perspective: 'receptive' },
+    { id: 'participate', label: 'Participate around the center', perspective: 'active' },
+  ], [{ leftRoleId: 'center', rightRoleId: 'participate' }]);
+}
+
+function focus(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  return practice(seed, categoryId, [
+    { id: 'interest', label: 'Interested / attracted', perspective: 'neutral', contextAxes: ['counterpartSex'] },
+  ], [{ leftRoleId: 'interest', rightRoleId: 'interest' }]);
+}
+
+function toy(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  const sites = seed.targetSites ?? ([] as readonly TargetSite[]);
+  return practice(seed, categoryId, [
+    {
+      id: 'use-on-self', label: 'Use it on myself', perspective: 'neutral',
+      contextAxes: ['targetSite'], contextValues: { targetSite: sites }, targetOwner: 'self',
+    },
+    {
+      id: 'use-on-partner', label: 'Use it on my partner', perspective: 'active',
+      contextAxes: ['counterpartSex', 'targetSite'], contextValues: { targetSite: sites }, targetOwner: 'partner',
+    },
+    {
+      id: 'partner-uses-on-me', label: 'Have my partner use it on me', perspective: 'receptive',
+      contextAxes: ['counterpartSex', 'targetSite'], contextValues: { targetSite: sites }, targetOwner: 'self',
+    },
+  ], [
+    { leftRoleId: 'use-on-self', rightRoleId: 'use-on-self' },
+    { leftRoleId: 'use-on-partner', rightRoleId: 'partner-uses-on-me' },
+  ]);
+}
+
+function practice(
+  seed: CataloguePracticeSeed,
+  categoryId: string,
+  roles: readonly PracticeRole[],
+  compatibleRolePairs: Practice['compatibleRolePairs'],
+): Practice {
+  return { id: seed.id, categoryId, label: seed.en, roles, compatibleRolePairs };
+}
