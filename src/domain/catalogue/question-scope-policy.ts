@@ -8,25 +8,29 @@ export abstract class QuestionScopePolicy {
 
 /**
  * Expands the context axes declared by a role into canonical answer scopes.
- * New axes can be added here without changing questionnaire components or answer identity.
+ * The policy owns the cartesian product so questionnaire components stay axis-agnostic.
  */
 export class DeclaredQuestionScopePolicy extends QuestionScopePolicy {
   override getScopes(role: PracticeRole): readonly AnswerScope[] {
     const axes = role.contextAxes ?? [];
-    if (axes.length === 0) {
-      return [{}];
-    }
+    if (axes.length === 0) return [{}];
 
     return axes.reduce<readonly AnswerScope[]>(
-      (scopes, axis) => scopes.flatMap((scope) => this.expandAxis(scope, axis)),
+      (scopes, axis) => scopes.flatMap((scope) => this.expandAxis(role, scope, axis)),
       [{}],
     );
   }
 
-  private expandAxis(scope: AnswerScope, axis: RoleContextAxis): readonly AnswerScope[] {
+  private expandAxis(
+    role: PracticeRole,
+    scope: AnswerScope,
+    axis: RoleContextAxis,
+  ): readonly AnswerScope[] {
     switch (axis) {
       case 'counterpartSex':
         return SEX_VALUES.map((counterpartSex) => ({ ...scope, counterpartSex }));
+      case 'targetSite':
+        return (role.contextValues?.targetSite ?? []).map((targetSite) => ({ ...scope, targetSite }));
     }
   }
 }
