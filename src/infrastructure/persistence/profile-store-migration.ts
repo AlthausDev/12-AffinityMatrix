@@ -2,7 +2,9 @@ const PROFILE_SCHEMA_VERSION_V2 = 2 as const;
 const PROFILE_SCHEMA_VERSION_V3 = 3 as const;
 const PROFILE_SCHEMA_VERSION_V4 = 4 as const;
 const PROFILE_SCHEMA_VERSION_V5 = 5 as const;
+const PROFILE_SCHEMA_VERSION_V6 = 6 as const;
 const CATALOGUE_VERSION_V1 = 1 as const;
+const CATALOGUE_VERSION_V3 = 3 as const;
 
 export abstract class ProfileStoreMigration {
   constructor(
@@ -134,6 +136,32 @@ export class ProfilesV4ToV5Migration extends ProfileStoreMigration {
   }
 }
 
+/**
+ * V6 introduces Catalogue V3 and generalized answer scopes such as targetSite. During the private
+ * development phase, V5 answers are test data only. Clearing them avoids inventing mappings from
+ * the old coarse catalogue into the new taxonomy while preserving profiles and metadata.
+ */
+export class ProfilesV5ToV6Migration extends ProfileStoreMigration {
+  constructor() { super(5, 6); }
+
+  override migrate(value: unknown): unknown {
+    if (!this.isRecord(value) || !Array.isArray(value['profiles'])) return value;
+    return {
+      version: this.toVersion,
+      profiles: value['profiles'].map((profile) =>
+        this.isRecord(profile)
+          ? {
+              ...profile,
+              schemaVersion: PROFILE_SCHEMA_VERSION_V6,
+              catalogueVersion: CATALOGUE_VERSION_V3,
+              answers: {},
+            }
+          : profile,
+      ),
+    };
+  }
+}
+
 export class ProfileStoreMigrator {
   constructor(
     private readonly migrations: readonly ProfileStoreMigration[] = [
@@ -141,6 +169,7 @@ export class ProfileStoreMigrator {
       new ProfilesV2ToV3Migration(),
       new ProfilesV3ToV4Migration(),
       new ProfilesV4ToV5Migration(),
+      new ProfilesV5ToV6Migration(),
     ],
   ) {}
 

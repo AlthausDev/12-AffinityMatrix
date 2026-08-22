@@ -10,11 +10,11 @@ describe('profile domain', () => {
       metadata: { alias: 'Example' },
     });
 
-    expect(profile.schemaVersion).toBe(5);
+    expect(profile.schemaVersion).toBe(6);
     expect(profile.schemaVersion).toBe(PROFILE_SCHEMA_VERSION);
     expect(profile.revision).toBe(INITIAL_PROFILE_REVISION);
     expect(profile.catalogueVersion).toBe(CURRENT_CATALOGUE_VERSION);
-    expect(profile.catalogueVersion).toBe(2);
+    expect(profile.catalogueVersion).toBe(3);
     expect(profile.metadata.alias).toBe('Example');
     expect(profile.settings.filterQuestionnaireByMetadata).toBe(true);
     expect(profile.answers).toEqual({});
@@ -24,14 +24,18 @@ describe('profile domain', () => {
     expect(createAnswerKey('cunnilingus', 'give')).toBe('cunnilingus::give');
     expect(createAnswerKey('bondage', 'receive', { counterpartSex: 'female' }))
       .toBe('bondage::receive::counterpart-sex=female');
+    expect(createAnswerKey('dildo', 'use-on-self', { targetSite: 'anal' }))
+      .toBe('dildo::use-on-self::target-site=anal');
+    expect(createAnswerKey('dildo', 'use-on-partner', { counterpartSex: 'female', targetSite: 'vaginal' }))
+      .toBe('dildo::use-on-partner::counterpart-sex=female::target-site=vaginal');
   });
 
   it('takes ownership of nested answer scope and detail objects on creation', () => {
-    const scope = { counterpartSex: 'female' as const };
-    const key = createAnswerKey('bondage', 'receive', scope);
+    const scope = { counterpartSex: 'female' as const, targetSite: 'anal' as const };
+    const key = createAnswerKey('dildo', 'partner-uses-on-me', scope);
     const answer = {
-      practiceId: 'bondage',
-      roleId: 'receive',
+      practiceId: 'dildo',
+      roleId: 'partner-uses-on-me',
       scope,
       preference: 'depends' as const,
       details: { dependsOn: 'Trusted context' },

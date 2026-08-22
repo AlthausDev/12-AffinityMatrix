@@ -30,6 +30,7 @@ describe('UiPreferencesService', () => {
     expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toEqual({
       confirmQuestionnaireExit: false,
       fontScale: 'normal',
+      hiddenCategoriesByProfile: {},
     });
   });
 
@@ -45,13 +46,37 @@ describe('UiPreferencesService', () => {
     expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toEqual({
       confirmQuestionnaireExit: true,
       fontScale: 'large',
+      hiddenCategoriesByProfile: {},
     });
   });
 
-  it('restores a stored font scale when the application initializes', () => {
+  it('keeps hidden categories local and isolated by profile', () => {
+    const service = TestBed.inject(UiPreferencesService);
+
+    service.setCategoryHidden('profile-a', 'edge', true);
+    service.setCategoryHidden('profile-a', 'fluids', true);
+    service.setCategoryHidden('profile-b', 'roleplay', true);
+
+    expect(service.hiddenCategoryIds('profile-a')).toEqual(['edge', 'fluids']);
+    expect(service.hiddenCategoryIds('profile-b')).toEqual(['roleplay']);
+    expect(service.isCategoryHidden('profile-a', 'roleplay')).toBe(false);
+
+    service.setCategoryHidden('profile-a', 'edge', false);
+    expect(service.hiddenCategoryIds('profile-a')).toEqual(['fluids']);
+
+    service.showAllCategories('profile-a');
+    expect(service.hiddenCategoryIds('profile-a')).toEqual([]);
+    expect(service.hiddenCategoryIds('profile-b')).toEqual(['roleplay']);
+  });
+
+  it('restores a stored font scale and sanitized hidden categories when the application initializes', () => {
     localStorage.setItem(UI_PREFERENCES_STORAGE_KEY, JSON.stringify({
       confirmQuestionnaireExit: true,
       fontScale: 'extra-large',
+      hiddenCategoriesByProfile: {
+        'profile-a': ['edge', 'edge', '', 4, 'fluids'],
+        'profile-b': 'not-an-array',
+      },
     }));
 
     const service = TestBed.inject(UiPreferencesService);
@@ -59,12 +84,15 @@ describe('UiPreferencesService', () => {
 
     expect(service.fontScale()).toBe('extra-large');
     expect(document.documentElement.dataset['fontScale']).toBe('extra-large');
+    expect(service.hiddenCategoryIds('profile-a')).toEqual(['edge', 'fluids']);
+    expect(service.hiddenCategoryIds('profile-b')).toEqual([]);
   });
 
   it('ignores malformed or unsupported stored preference shapes', () => {
     localStorage.setItem(UI_PREFERENCES_STORAGE_KEY, JSON.stringify({
       confirmQuestionnaireExit: 'no',
       fontScale: 'huge',
+      hiddenCategoriesByProfile: null,
     }));
 
     const service = TestBed.inject(UiPreferencesService);

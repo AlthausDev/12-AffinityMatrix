@@ -1,4 +1,4 @@
-import { AnswerScope } from '../profile/profile-answer';
+import { AnswerScope, TargetSite } from '../profile/profile-answer';
 import { Practice, PracticeRole } from './practice';
 import { ProfileMetadata, Sex } from '../profile/profile-metadata';
 import { ProfileSettings } from '../profile/profile-settings';
@@ -12,19 +12,9 @@ export interface ProfileQuestionContext {
 
 export function getRelevantPartnerSexes(metadata: ProfileMetadata): readonly Sex[] | undefined {
   const { sex, orientation } = metadata;
-
-  if (!sex || !orientation) {
-    return undefined;
-  }
-
-  if (orientation === 'bisexual') {
-    return ALL_SEXES;
-  }
-
-  if (orientation === 'homosexual') {
-    return [sex];
-  }
-
+  if (!sex || !orientation) return undefined;
+  if (orientation === 'bisexual') return ALL_SEXES;
+  if (orientation === 'homosexual') return [sex];
   return [sex === 'male' ? 'female' : 'male'];
 }
 
@@ -50,34 +40,47 @@ export class MetadataQuestionVisibilityPolicy extends QuestionVisibilityPolicy {
     context: ProfileQuestionContext,
     scope?: AnswerScope,
   ): boolean {
-    if (!context.settings.filterQuestionnaireByMetadata) {
-      return true;
-    }
+    if (!context.settings.filterQuestionnaireByMetadata) return true;
 
     const applicability = role.applicability;
     if (
       context.metadata.sex &&
       applicability?.selfSex &&
       !applicability.selfSex.includes(context.metadata.sex)
-    ) {
-      return false;
-    }
+    ) return false;
 
     const counterpartSex = scope?.counterpartSex;
     if (counterpartSex) {
-      if (applicability?.partnerSex && !applicability.partnerSex.includes(counterpartSex)) {
-        return false;
-      }
-
+      if (applicability?.partnerSex && !applicability.partnerSex.includes(counterpartSex)) return false;
       const relevantPartnerSexes = getRelevantPartnerSexes(context.metadata);
-      return relevantPartnerSexes ? relevantPartnerSexes.includes(counterpartSex) : true;
+      if (relevantPartnerSexes && !relevantPartnerSexes.includes(counterpartSex)) return false;
+    } else {
+      const relevantPartnerSexes = getRelevantPartnerSexes(context.metadata);
+      if (relevantPartnerSexes && applicability?.partnerSex) {
+        if (!applicability.partnerSex.some((sex) => relevantPartnerSexes.includes(sex))) return false;
+      }
     }
 
-    const relevantPartnerSexes = getRelevantPartnerSexes(context.metadata);
-    if (relevantPartnerSexes && applicability?.partnerSex) {
-      return applicability.partnerSex.some((sex) => relevantPartnerSexes.includes(sex));
-    }
+    return this.isTargetSiteVisible(role, context.metadata, scope);
+  }
 
+  private isTargetSiteVisible(
+    role: PracticeRole,
+    metadata: ProfileMetadata,
+    scope?: AnswerScope,
+  ): boolean {
+    const targetSite = scope?.targetSite;
+    if (!targetSite || !role.targetOwner) return true;
+
+    const targetSex = role.targetOwner === 'self' ? metadata.sex : scope?.counterpartSex;
+    if (!targetSex) return true;
+
+    return this.targetSiteSupportsSex(targetSite, targetSex);
+  }
+
+  private targetSiteSupportsSex(targetSite: TargetSite, sex: Sex): boolean {
+    if (targetSite === 'vaginal') return sex === 'female';
+    if (targetSite === 'penis') return sex === 'male';
     return true;
   }
 }

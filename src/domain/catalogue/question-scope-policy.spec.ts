@@ -18,4 +18,24 @@ describe('DeclaredQuestionScopePolicy', () => {
       { counterpartSex: 'female' },
     ]);
   });
+
+  it('expands declared axes as a deterministic cartesian product', () => {
+    const role: PracticeRole = {
+      id: 'use-on-partner',
+      label: 'Use on partner',
+      perspective: 'active',
+      contextAxes: ['counterpartSex', 'targetSite'],
+      contextValues: { targetSite: ['mouth', 'vaginal', 'anal'] },
+      targetOwner: 'partner',
+    };
+
+    expect(policy.getScopes(role)).toEqual([
+      { counterpartSex: 'male', targetSite: 'mouth' },
+      { counterpartSex: 'male', targetSite: 'vaginal' },
+      { counterpartSex: 'male', targetSite: 'anal' },
+      { counterpartSex: 'female', targetSite: 'mouth' },
+      { counterpartSex: 'female', targetSite: 'vaginal' },
+      { counterpartSex: 'female', targetSite: 'anal' },
+    ]);
+  });
 });

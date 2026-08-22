@@ -56,11 +56,43 @@ describe('profile filtering', () => {
     expect(policy.isRoleVisible(role, bisexualWoman, { counterpartSex: 'female' })).toBe(true);
   });
 
-  it('keeps all roles and counterpart variants visible when filtering is disabled', () => {
-    const role: PracticeRole = {
-      id: 'receive', label: 'Receive', perspective: 'receptive', applicability: { selfSex: ['female'] },
-      contextAxes: ['counterpartSex'],
+  it('applies target-site anatomy to the role target rather than always to the profile owner', () => {
+    const selfRole: PracticeRole = {
+      id: 'use-on-self',
+      label: 'Use on self',
+      perspective: 'neutral',
+      contextAxes: ['targetSite'],
+      contextValues: { targetSite: ['vaginal', 'penis', 'anal'] },
+      targetOwner: 'self',
     };
-    expect(policy.isRoleVisible(role, context({ sex: 'male' }, false), { counterpartSex: 'female' })).toBe(true);
+    const partnerRole: PracticeRole = {
+      id: 'use-on-partner',
+      label: 'Use on partner',
+      perspective: 'active',
+      contextAxes: ['counterpartSex', 'targetSite'],
+      contextValues: { targetSite: ['vaginal', 'penis', 'anal'] },
+      targetOwner: 'partner',
+    };
+
+    expect(policy.isRoleVisible(selfRole, context({ sex: 'female' }), { targetSite: 'vaginal' })).toBe(true);
+    expect(policy.isRoleVisible(selfRole, context({ sex: 'female' }), { targetSite: 'penis' })).toBe(false);
+    expect(policy.isRoleVisible(selfRole, context({ sex: 'male' }), { targetSite: 'vaginal' })).toBe(false);
+    expect(policy.isRoleVisible(selfRole, context({ sex: 'male' }), { targetSite: 'penis' })).toBe(true);
+
+    const bisexualWoman = context({ sex: 'female', orientation: 'bisexual' });
+    expect(policy.isRoleVisible(partnerRole, bisexualWoman, { counterpartSex: 'male', targetSite: 'vaginal' })).toBe(false);
+    expect(policy.isRoleVisible(partnerRole, bisexualWoman, { counterpartSex: 'male', targetSite: 'penis' })).toBe(true);
+    expect(policy.isRoleVisible(partnerRole, bisexualWoman, { counterpartSex: 'female', targetSite: 'vaginal' })).toBe(true);
+    expect(policy.isRoleVisible(partnerRole, bisexualWoman, { counterpartSex: 'female', targetSite: 'penis' })).toBe(false);
+    expect(policy.isRoleVisible(partnerRole, bisexualWoman, { counterpartSex: 'male', targetSite: 'anal' })).toBe(true);
+  });
+
+  it('keeps all roles, counterpart variants, and anatomy variants visible when filtering is disabled', () => {
+    const role: PracticeRole = {
+      id: 'use-on-self', label: 'Use on self', perspective: 'neutral',
+      applicability: { selfSex: ['female'] }, contextAxes: ['targetSite'],
+      contextValues: { targetSite: ['vaginal'] }, targetOwner: 'self',
+    };
+    expect(policy.isRoleVisible(role, context({ sex: 'male' }, false), { targetSite: 'vaginal' })).toBe(true);
   });
 });

@@ -32,6 +32,37 @@ const snapshot: CatalogueSnapshot = {
   },
 };
 
+const toySnapshot: CatalogueSnapshot = {
+  version: 3,
+  catalogue: {
+    categories: [{ id: 'toys', label: 'Toys', order: 0 }],
+    practices: [{
+      id: 'dildo',
+      categoryId: 'toys',
+      label: 'Dildo',
+      roles: [
+        {
+          id: 'use-on-partner',
+          label: 'Use on partner',
+          perspective: 'active',
+          contextAxes: ['counterpartSex', 'targetSite'],
+          contextValues: { targetSite: ['mouth', 'vaginal', 'anal'] },
+          targetOwner: 'partner',
+        },
+        {
+          id: 'partner-uses-on-me',
+          label: 'Partner uses on me',
+          perspective: 'receptive',
+          contextAxes: ['counterpartSex', 'targetSite'],
+          contextValues: { targetSite: ['mouth', 'vaginal', 'anal'] },
+          targetOwner: 'self',
+        },
+      ],
+      compatibleRolePairs: [{ leftRoleId: 'use-on-partner', rightRoleId: 'partner-uses-on-me' }],
+    }],
+  },
+};
+
 const comparator = new ProfileComparator();
 
 function profile(id: string, sex?: 'male' | 'female'): Profile {
@@ -85,6 +116,30 @@ describe('ProfileComparator', () => {
 
     expect(result.interactions).toHaveLength(1);
     expect(result.interactions[0]?.left.answer.preference).toBe('like');
+    expect(result.boundaryCount).toBe(0);
+  });
+
+  it('matches toy roles only when counterpart and target site describe the same interaction', () => {
+    let woman = profile('woman', 'female');
+    woman = answer(woman, 'dildo', 'partner-uses-on-me', 'favorite', {
+      counterpartSex: 'male',
+      targetSite: 'vaginal',
+    });
+    woman = answer(woman, 'dildo', 'partner-uses-on-me', 'boundary', {
+      counterpartSex: 'male',
+      targetSite: 'anal',
+    });
+    const man = answer(profile('man', 'male'), 'dildo', 'use-on-partner', 'like', {
+      counterpartSex: 'female',
+      targetSite: 'vaginal',
+    });
+
+    const result = comparator.compare(toySnapshot, woman, man);
+
+    expect(result.interactions).toHaveLength(1);
+    expect(result.interactions[0]?.left.answer.scope?.targetSite).toBe('vaginal');
+    expect(result.interactions[0]?.right.answer.scope?.targetSite).toBe('vaginal');
+    expect(result.interactions[0]?.compatibility.classification).toBe('strong-match');
     expect(result.boundaryCount).toBe(0);
   });
 
