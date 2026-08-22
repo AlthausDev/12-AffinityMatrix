@@ -3,6 +3,7 @@ import { catalogueSnapshotValidator } from '../../domain/catalogue/catalogue-sna
 import { CATALOGUE_VERSION_V3, CURRENT_CATALOGUE_VERSION } from '../../domain/catalogue/catalogue-version';
 import { createProfile } from '../../domain/profile/profile';
 import { CURRENT_CATALOGUE_SNAPSHOT } from './catalogue-v3';
+import { CATALOGUE_V3_CONTENT } from './v3/content';
 
 const questionnaire = new QuestionnaireService();
 
@@ -22,6 +23,24 @@ describe('catalogue v3 snapshot', () => {
     for (const category of categories) {
       const categoryPracticeCount = practices.filter((practice) => practice.categoryId === category.id).length;
       expect(categoryPracticeCount, `${category.id} should remain meaningfully populated`).toBeGreaterThanOrEqual(10);
+    }
+  });
+
+  it('keeps the modular seed bilingual and in one-to-one correspondence with the domain snapshot', () => {
+    const seedPractices = CATALOGUE_V3_CONTENT.flatMap((category) => category.practices);
+
+    expect(CATALOGUE_V3_CONTENT).toHaveLength(17);
+    expect(seedPractices).toHaveLength(CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.length);
+
+    for (const category of CATALOGUE_V3_CONTENT) {
+      expect(category.en.trim().length).toBeGreaterThan(0);
+      expect(category.es.trim().length).toBeGreaterThan(0);
+      expect(category.descriptionEn.trim().length).toBeGreaterThan(0);
+      expect(category.descriptionEs.trim().length).toBeGreaterThan(0);
+      for (const practice of category.practices) {
+        expect(practice.en.trim().length, `${practice.id} missing English label`).toBeGreaterThan(0);
+        expect(practice.es.trim().length, `${practice.id} missing Spanish label`).toBeGreaterThan(0);
+      }
     }
   });
 
