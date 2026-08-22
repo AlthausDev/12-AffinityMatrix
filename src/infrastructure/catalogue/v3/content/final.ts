@@ -5,6 +5,7 @@ import {
 import { applyFinalCategoryCopy } from './category-copy-overrides';
 import { polishCatalogue } from './content-polish';
 import { materializeContextualDescriptions } from './contextual-description';
+import { applyFinalApplicabilityReview, FINAL_APPLICABILITY_RETIRED_PRACTICE_IDS } from './final-applicability-review';
 import { applyFinalClarityReview, FINAL_CLARITY_RETIRED_PRACTICE_IDS } from './final-clarity-review';
 import { applyFinalContentReview } from './final-content-review';
 import { applyFinalLastMileReview, FINAL_LAST_MILE_RETIRED_PRACTICE_IDS } from './final-last-mile-review';
@@ -22,6 +23,7 @@ export const RETIRED_V3_PRACTICE_IDS = new Set<string>([
   ...FINAL_CLARITY_RETIRED_PRACTICE_IDS,
   ...FINAL_LAST_MILE_RETIRED_PRACTICE_IDS,
   ...FINAL_RELEASE_RETIRED_PRACTICE_IDS,
+  ...FINAL_APPLICABILITY_RETIRED_PRACTICE_IDS,
 ]);
 
 /** Final Catalogue V3 projection after semantic curation, role refinement and content polish. */
@@ -45,6 +47,7 @@ const CLARIFIED_CONTENT = applyFinalClarityReview(REVIEWED_CONTENT);
 const LAST_MILE_CONTENT = applyFinalLastMileReview(CLARIFIED_CONTENT);
 const RELEASE_TAXONOMY_CONTENT = applyFinalReleaseTaxonomy(LAST_MILE_CONTENT);
 const RELEASE_COPY_CONTENT = applyFinalReleaseCopy(RELEASE_TAXONOMY_CONTENT);
-const GROUPED_CONTENT = groupFinalCataloguePractices(RELEASE_COPY_CONTENT);
+const APPLICABILITY_REVIEWED_CONTENT = applyFinalApplicabilityReview(RELEASE_COPY_CONTENT);
+const GROUPED_CONTENT = groupFinalCataloguePractices(APPLICABILITY_REVIEWED_CONTENT);
 
 export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyFinalCategoryCopy(GROUPED_CONTENT);
