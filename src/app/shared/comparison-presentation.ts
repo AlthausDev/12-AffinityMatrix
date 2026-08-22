@@ -1,37 +1,38 @@
 import { ComparisonClassification, RoleRelation } from '../../domain/comparison/comparison';
 import { PREFERENCE_VALUES, Preference } from '../../domain/profile/preference';
+import { TranslationKey } from '../i18n/es.translations';
 
 export interface PreferencePresentation {
-  readonly label: string;
+  readonly labelKey: TranslationKey;
   readonly symbol: string;
 }
 
-/** Shared questionnaire/comparison presentation for preference states. */
+/** Shared questionnaire/comparison presentation metadata for preference states. */
 export const PREFERENCE_PRESENTATION: Readonly<Record<Preference, PreferencePresentation>> = {
-  favorite: { label: 'Favorite', symbol: '★' },
-  like: { label: 'Like', symbol: '●' },
-  depends: { label: 'Depends', symbol: '?' },
-  curious: { label: 'Curious', symbol: '◇' },
-  neutral: { label: 'Neutral', symbol: '—' },
-  'not-interested': { label: 'Not interested', symbol: '×' },
-  boundary: { label: 'Boundary', symbol: '!' },
+  favorite: { labelKey: 'preference.favorite', symbol: '★' },
+  like: { labelKey: 'preference.like', symbol: '●' },
+  depends: { labelKey: 'preference.depends', symbol: '?' },
+  curious: { labelKey: 'preference.curious', symbol: '◇' },
+  neutral: { labelKey: 'preference.neutral', symbol: '—' },
+  'not-interested': { labelKey: 'preference.notInterested', symbol: '×' },
+  boundary: { labelKey: 'preference.boundary', symbol: '!' },
 };
 
-export const PREFERENCE_LABELS = Object.fromEntries(
-  PREFERENCE_VALUES.map((preference) => [preference, PREFERENCE_PRESENTATION[preference].label]),
-) as Readonly<Record<Preference, string>>;
+export const PREFERENCE_LABEL_KEYS = Object.fromEntries(
+  PREFERENCE_VALUES.map((preference) => [preference, PREFERENCE_PRESENTATION[preference].labelKey]),
+) as Readonly<Record<Preference, TranslationKey>>;
 
-export const COMPARISON_CLASSIFICATION_LABELS: Readonly<Record<ComparisonClassification, string>> = {
-  'strong-match': 'Strong match',
-  explorable: 'Worth exploring',
-  conditioned: 'Depends / discuss',
-  'intensity-mismatch': 'Different intensity',
-  neutral: 'Neutral',
-  'not-shared': 'Not shared',
-  boundary: 'Boundary',
+export const COMPARISON_CLASSIFICATION_LABEL_KEYS: Readonly<Record<ComparisonClassification, TranslationKey>> = {
+  'strong-match': 'comparison.classification.strongMatch',
+  explorable: 'comparison.classification.explorable',
+  conditioned: 'comparison.classification.conditioned',
+  'intensity-mismatch': 'comparison.classification.intensityMismatch',
+  neutral: 'comparison.classification.neutral',
+  'not-shared': 'comparison.classification.notShared',
+  boundary: 'comparison.classification.boundary',
 };
 
-export const ROLE_RELATION_LABELS: Readonly<Record<RoleRelation, string>> = {
-  mutual: 'Mutual role',
-  complementary: 'Complementary roles',
+export const ROLE_RELATION_LABEL_KEYS: Readonly<Record<RoleRelation, TranslationKey>> = {
+  mutual: 'comparison.roleRelation.mutual',
+  complementary: 'comparison.roleRelation.complementary',
 };
