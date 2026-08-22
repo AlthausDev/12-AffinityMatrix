@@ -139,9 +139,9 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
       justify-content: center;
       gap: 0.28rem;
       padding: 0.35rem;
-      border: 1px solid color-mix(in srgb, var(--preference-accent) 45%, var(--border-subtle));
+      border: 1px solid var(--border-subtle);
       border-radius: 0.45rem;
-      background: color-mix(in srgb, var(--preference-accent) 7%, var(--surface-elevated));
+      background: color-mix(in srgb, var(--surface-elevated) 88%, transparent);
       color: var(--text-primary);
       cursor: pointer;
       font-size: 0.7rem;
@@ -155,20 +155,22 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     .preference-option[data-tone='negative'] { --preference-accent: var(--preference-negative); }
     .preference-option[data-tone='boundary'] { --preference-accent: var(--preference-boundary); }
     .preference-option span { display: inline; }
-    .preference-option span:first-child { color: var(--preference-accent); font-size: 0.95rem; font-weight: 800; }
+    .preference-option span:first-child { color: var(--text-secondary); font-size: 0.95rem; font-weight: 800; transition: color 140ms ease; }
     .preference-option:hover {
       border-color: var(--preference-accent);
-      background: color-mix(in srgb, var(--preference-accent) 13%, var(--surface-elevated));
-      box-shadow: 0 0 0.85rem color-mix(in srgb, var(--preference-accent) 28%, transparent);
+      background: color-mix(in srgb, var(--preference-accent) 9%, var(--surface-elevated));
+      box-shadow: 0 0 0.9rem color-mix(in srgb, var(--preference-accent) 24%, transparent);
       transform: translateY(-1px);
     }
+    .preference-option:hover span:first-child { color: var(--preference-accent); }
     .preference-option.selected {
       border-color: var(--preference-accent);
-      background: color-mix(in srgb, var(--preference-accent) 18%, var(--surface-elevated));
+      background: color-mix(in srgb, var(--preference-accent) 15%, var(--surface-elevated));
       box-shadow:
-        inset 0 0 0 1px color-mix(in srgb, var(--preference-accent) 72%, white),
-        0 0 1rem color-mix(in srgb, var(--preference-accent) 32%, transparent);
+        inset 0 0 0 1px color-mix(in srgb, var(--preference-accent) 68%, white),
+        0 0 1rem color-mix(in srgb, var(--preference-accent) 30%, transparent);
     }
+    .preference-option.selected span:first-child { color: var(--preference-accent); }
     .answer-details { grid-area: details; margin-top: 0.2rem; }
     .answer-details summary { color: var(--text-secondary); cursor: pointer; font-size: 0.82rem; }
     .detail-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; margin-top: 0.75rem; }
