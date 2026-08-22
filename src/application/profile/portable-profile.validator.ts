@@ -2,8 +2,8 @@ import { isCatalogueVersion } from '../../domain/catalogue/catalogue-version';
 import { ProfileDataValidator } from '../../domain/profile/profile-data.validator';
 import { ValidationIssue } from '../../domain/shared/validator';
 import {
-  PORTABLE_PROFILE_V5_FORMAT_VERSION,
-  PORTABLE_PROFILE_V5_PROFILE_SCHEMA_VERSION,
+  PORTABLE_PROFILE_V6_FORMAT_VERSION,
+  PORTABLE_PROFILE_V6_PROFILE_SCHEMA_VERSION,
   PortableProfile,
 } from './portable-profile';
 
@@ -26,11 +26,11 @@ export class PortableProfileValidator extends ProfileDataValidator<PortableProfi
       ...this.validateProfileData(value),
     ];
 
-    if (value['formatVersion'] !== PORTABLE_PROFILE_V5_FORMAT_VERSION) {
+    if (value['formatVersion'] !== PORTABLE_PROFILE_V6_FORMAT_VERSION) {
       issues.push({ path: 'formatVersion', message: 'Portable profile format version is unsupported.' });
     }
 
-    if (value['profileSchemaVersion'] !== PORTABLE_PROFILE_V5_PROFILE_SCHEMA_VERSION) {
+    if (value['profileSchemaVersion'] !== PORTABLE_PROFILE_V6_PROFILE_SCHEMA_VERSION) {
       issues.push({ path: 'profileSchemaVersion', message: 'Profile schema version is unsupported.' });
     }
 
