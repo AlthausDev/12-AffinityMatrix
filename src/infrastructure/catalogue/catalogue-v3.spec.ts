@@ -3,7 +3,7 @@ import { catalogueSnapshotValidator } from '../../domain/catalogue/catalogue-sna
 import { CATALOGUE_VERSION_V3, CURRENT_CATALOGUE_VERSION } from '../../domain/catalogue/catalogue-version';
 import { createProfile } from '../../domain/profile/profile';
 import { CURRENT_CATALOGUE_SNAPSHOT } from './catalogue-v3';
-import { CATALOGUE_V3_CONTENT, RETIRED_V3_PRACTICE_IDS } from './v3/content/curated';
+import { CATALOGUE_V3_CONTENT, RETIRED_V3_PRACTICE_IDS } from './v3/content/final';
 import { describeCataloguePractice } from './v3/content/practice-description';
 
 const questionnaire = new QuestionnaireService();
@@ -127,7 +127,8 @@ describe('catalogue v3 snapshot', () => {
     expect(categoryOf('glory-hole')).toBe('places-settings');
     expect(categoryOf('voyeurism')).toBe('exhibitionism');
     expect(categoryOf('creampie-vaginal')).toBe('fluids');
-    expect(categoryOf('pet-play')).toBe('power');
+    expect(categoryOf('pet-play')).toBe('roleplay');
+    expect(categoryOf('brat-dynamic')).toBe('power');
   });
 
   it('uses directed roles for affection that can meaningfully be given or received', () => {
