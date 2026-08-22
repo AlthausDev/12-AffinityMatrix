@@ -1,4 +1,4 @@
-import { Practice, PracticeRole } from '../../../domain/catalogue/practice';
+import { Practice, PracticeRole, RoleApplicability } from '../../../domain/catalogue/practice';
 import { TargetSite } from '../../../domain/profile/profile-answer';
 import { Sex } from '../../../domain/profile/profile-metadata';
 import { describeCataloguePractice } from './content/practice-description';
@@ -29,14 +29,16 @@ function mutual(seed: CataloguePracticeSeed, categoryId: string): Practice {
 
 function directed(seed: CataloguePracticeSeed, categoryId: string): Practice {
   const axes = seed.counterpartScoped ? (['counterpartSex'] as const) : undefined;
+  const giveApplicability = roleApplicability(seed.actorSex, seed.anatomySex);
+  const receiveApplicability = roleApplicability(seed.anatomySex, seed.actorSex);
   const give: PracticeRole = {
     id: 'give', label: 'Give / do', perspective: 'active',
-    ...(seed.anatomySex ? { applicability: { partnerSex: [seed.anatomySex] as readonly Sex[] } } : {}),
+    ...(giveApplicability ? { applicability: giveApplicability } : {}),
     ...(axes ? { contextAxes: axes } : {}),
   };
   const receive: PracticeRole = {
     id: 'receive', label: 'Receive', perspective: 'receptive',
-    ...(seed.anatomySex ? { applicability: { selfSex: [seed.anatomySex] as readonly Sex[] } } : {}),
+    ...(receiveApplicability ? { applicability: receiveApplicability } : {}),
     ...(axes ? { contextAxes: axes } : {}),
   };
   return practice(seed, categoryId, [give, receive], [{ leftRoleId: 'give', rightRoleId: 'receive' }]);
@@ -122,6 +124,14 @@ function toy(seed: CataloguePracticeSeed, categoryId: string): Practice {
     { leftRoleId: 'use-on-self', rightRoleId: 'use-on-self' },
     { leftRoleId: 'use-on-partner', rightRoleId: 'partner-uses-on-me' },
   ]);
+}
+
+function roleApplicability(selfSex?: Sex, partnerSex?: Sex): RoleApplicability | undefined {
+  if (!selfSex && !partnerSex) return undefined;
+  return {
+    ...(selfSex ? { selfSex: [selfSex] as readonly Sex[] } : {}),
+    ...(partnerSex ? { partnerSex: [partnerSex] as readonly Sex[] } : {}),
+  };
 }
 
 function practice(
