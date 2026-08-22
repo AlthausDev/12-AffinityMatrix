@@ -113,7 +113,10 @@ export class CatalogueTextService {
   }
 
   roleLabel(practiceId: string, role: PracticeRole): string {
-    if (V3_PRACTICES.has(practiceId)) {
+    const seed = V3_PRACTICES.get(practiceId);
+    if (seed) {
+      const pairedRole = seed.pairedRoles?.find((candidate) => candidate.id === role.id);
+      if (pairedRole) return this.translations.locale() === 'es' ? pairedRole.es : pairedRole.en;
       return V3_ROLE_LABELS[this.translations.locale()][role.id] ?? role.label;
     }
     return this.translate(roleLabelKey(practiceId, role.id), role.label);
