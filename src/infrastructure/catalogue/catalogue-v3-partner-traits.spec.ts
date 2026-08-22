@@ -18,6 +18,9 @@ describe('Catalogue V3 partner physical traits', () => {
       'breast-size-small',
       'breast-size-average',
       'breast-size-large',
+      'buttocks-size-small',
+      'buttocks-size-average',
+      'buttocks-size-large',
       'hair-length-short',
       'hair-length-medium',
       'hair-length-long',
@@ -33,6 +36,7 @@ describe('Catalogue V3 partner physical traits', () => {
 
     expect(seed('penis-size-small')?.descriptionEs).toContain('preferencia subjetiva');
     expect(seed('breast-size-large')?.descriptionEn).toContain('subjective preference');
+    expect(seed('buttocks-size-small')?.descriptionEs).toContain('preferencia subjetiva');
     expect(seed('hair-length-long')?.descriptionEs).toContain('no fija una longitud exacta');
     expect(seed('stature-tall')?.descriptionEn).toContain('without setting a fixed height cutoff');
   });
@@ -40,17 +44,20 @@ describe('Catalogue V3 partner physical traits', () => {
   it('applies sex-specific anatomy only where the physical trait requires it', () => {
     expect(seed('penis-size-large')?.anatomySex).toBe('male');
     expect(seed('breast-size-large')?.anatomySex).toBe('female');
+    expect(seed('buttocks-size-large')?.anatomySex).toBeUndefined();
     expect(seed('hair-length-long')?.anatomySex).toBeUndefined();
     expect(seed('stature-tall')?.anatomySex).toBeUndefined();
 
     const penisRole = practice('penis-size-large')?.roles[0];
     const breastRole = practice('breast-size-large')?.roles[0];
+    const buttocksRole = practice('buttocks-size-large')?.roles[0];
     const hairRole = practice('hair-length-long')?.roles[0];
 
     expect(penisRole?.id).toBe('interest');
     expect(penisRole?.contextAxes).toEqual(['counterpartSex']);
     expect(penisRole?.applicability?.partnerSex).toEqual(['male']);
     expect(breastRole?.applicability?.partnerSex).toEqual(['female']);
+    expect(buttocksRole?.applicability).toBeUndefined();
     expect(hairRole?.applicability).toBeUndefined();
   });
 });
