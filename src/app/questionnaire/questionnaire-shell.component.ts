@@ -14,6 +14,7 @@ import { CatalogueStore } from '../core/catalogue.store';
 import { ProfileStore } from '../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../core/questionnaire-service.token';
 import { TranslationService } from '../i18n/translation.service';
+import { findRouteParam } from '../shared/route-param';
 
 @Component({
   selector: 'app-questionnaire-shell',
@@ -131,7 +132,7 @@ export class QuestionnaireShellComponent {
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly profileId = this.route.parent?.snapshot.paramMap.get('id') ?? '';
+  private readonly profileId = findRouteParam(this.route, 'id') ?? '';
 
   readonly finishDialogOpen = signal(false);
   readonly profile = computed(() => this.profileStore.findById(this.profileId));
