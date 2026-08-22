@@ -26,7 +26,7 @@ const BODY_FOCUS_FINAL_ORDER = [
   'facial-hair',
   'ears',
   'neck',
-  'chest',
+  'chest-general',
   'breast-size-small',
   'breast-size-average',
   'breast-size-large',
