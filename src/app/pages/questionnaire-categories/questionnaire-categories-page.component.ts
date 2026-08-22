@@ -5,22 +5,27 @@ import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
 import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
+import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { findRouteParam } from '../../shared/route-param';
 
 @Component({
   selector: 'app-questionnaire-categories-page',
-  imports: [RouterLink],
+  imports: [RouterLink, CompletionProgressComponent],
   template: `
     <main class="questionnaire-modal-page">
       @if (profile()) {
         @if (snapshot(); as currentSnapshot) {
-          <header class="page-header dashboard-header">
+          <header class="page-header categories-header">
             <div>
               <p class="eyebrow">{{ i18n.t('questionnaire.eyebrow', { version: currentSnapshot.version }) }}</p>
               <h1>{{ i18n.t('questionnaire.categories.title') }}</h1>
               <p class="muted lead">{{ i18n.t('questionnaire.categories.description') }}</p>
             </div>
-            <p class="profile-count">{{ i18n.t('questionnaire.progress', { answered: totalAnswered(), total: totalQuestions() }) }}</p>
+            <div class="overall-progress">
+              <strong>{{ totalCompletionPercentage() }}%</strong>
+              <span class="muted">{{ i18n.t('questionnaire.progress', { answered: totalAnswered(), total: totalQuestions() }) }}</span>
+              <app-completion-progress [value]="totalCompletionPercentage()" />
+            </div>
           </header>
 
           @if (profileStore.error()) { <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p> }
@@ -60,7 +65,7 @@ import { findRouteParam } from '../../shared/route-param';
                   <strong>{{ summary.completionPercentage }}%</strong>
                 </div>
                 @if (summary.category.description) { <p class="muted">{{ catalogueText.categoryDescription(summary.category) }}</p> }
-                <div class="progress-track" aria-hidden="true"><span [style.width.%]="summary.completionPercentage"></span></div>
+                <app-completion-progress [value]="summary.completionPercentage" />
                 @if (summary.filtered > 0 && !includeFiltered()) { <small class="muted">{{ filteredCountLabel(summary.filtered) }}</small> }
               </a>
             }
@@ -76,6 +81,10 @@ import { findRouteParam } from '../../shared/route-param';
     </main>
   `,
   styles: `
+    .categories-header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(12rem, 17rem); gap: 2rem; align-items: end; }
+    .overall-progress { display: grid; gap: 0.45rem; text-align: right; }
+    .overall-progress strong { font-size: 1.65rem; }
+    .overall-progress span { font-size: 0.82rem; }
     .questionnaire-filter-toggle { margin-bottom: 1.5rem; }
     .category-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
     .category-card {
@@ -85,16 +94,24 @@ import { findRouteParam } from '../../shared/route-param';
       border: 1px solid transparent;
       border-radius: 10px;
       background:
-        linear-gradient(var(--surface-panel), var(--surface-panel)) padding-box,
+        linear-gradient(color-mix(in srgb, var(--surface-panel) 92%, transparent), color-mix(in srgb, var(--surface-panel) 92%, transparent)) padding-box,
         var(--window-border-gradient-soft) border-box;
       text-decoration: none;
+      backdrop-filter: blur(10px);
+      transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
     }
-    .category-card:hover { background: linear-gradient(var(--surface-elevated), var(--surface-elevated)) padding-box, var(--window-border-gradient) border-box; }
+    .category-card:hover {
+      background: linear-gradient(var(--surface-elevated), var(--surface-elevated)) padding-box, var(--window-border-gradient) border-box;
+      box-shadow: 0 0.8rem 2rem rgba(5, 10, 28, 0.2);
+      transform: translateY(-1px);
+    }
     .category-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
     .category-card-heading h2, .category-card p, .category-card small { margin: 0; }
-    .progress-track { height: 0.35rem; overflow: hidden; border-radius: 999px; background: var(--surface-elevated); }
-    .progress-track span { display: block; height: 100%; background: var(--text-primary); }
-    @media (max-width: 720px) { .category-list { grid-template-columns: 1fr; } }
+    @media (max-width: 720px) {
+      .categories-header { grid-template-columns: 1fr; }
+      .overall-progress { text-align: left; }
+      .category-list { grid-template-columns: 1fr; }
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -116,6 +133,10 @@ export class QuestionnaireCategoriesPageComponent {
   });
   readonly totalAnswered = computed(() => this.summaries().reduce((sum, item) => sum + item.answered, 0));
   readonly totalQuestions = computed(() => this.summaries().reduce((sum, item) => sum + item.total, 0));
+  readonly totalCompletionPercentage = computed(() => {
+    const total = this.totalQuestions();
+    return total === 0 ? 0 : Math.round((this.totalAnswered() / total) * 100);
+  });
   readonly totalFiltered = computed(() => {
     const profile = this.profile(); const snapshot = this.snapshot();
     return profile && snapshot ? this.questionnaireService.getCategorySummaries(snapshot, profile, false).reduce((sum, item) => sum + item.filtered, 0) : 0;
