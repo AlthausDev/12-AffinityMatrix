@@ -21,10 +21,16 @@ export interface CataloguePracticeSeed {
   readonly kind: CataloguePracticeKind;
   readonly counterpartScoped?: boolean;
   /**
-   * Sex of the person whose anatomy makes the practice meaningful. Builders map this to the
-   * correct participant: the receiver for directed practices, the subject for focus/state items.
+   * Sex of the person whose body is acted on or whose anatomy is the subject of the preference.
+   * Builders map this to the receiver/target for directed practices and to the subject for
+   * focus/state/toy items.
    */
   readonly anatomySex?: 'male' | 'female';
+  /**
+   * Sex required of the person performing a directed practice. This is intentionally separate
+   * from anatomySex: e.g. ejaculation has a male actor while the receiving body may be either sex.
+   */
+  readonly actorSex?: 'male' | 'female';
   readonly targetSites?: readonly TargetSite[];
 }
 
