@@ -88,11 +88,53 @@ const ROLEPLAY_WITH_TABOO = insertAfter(base('roleplay'), 'roleplay-general', [
   'adult-taboo-fantasy',
   'surreal-fantasy-roleplay',
 ]);
-const ROLEPLAY_FINAL_ORDER = insertAfter(
+const ROLEPLAY_BEFORE_RELEASE = insertAfter(
   ROLEPLAY_WITH_TABOO,
   'teacher-student-adult-roleplay',
   ['caregiver-little-adult-roleplay'],
 );
+const ROLEPLAY_WITHOUT_RELEASE_MOVES = without(ROLEPLAY_BEFORE_RELEASE, [
+  'adult-taboo-fantasy',
+  'surreal-fantasy-roleplay',
+  'caregiver-little-adult-roleplay',
+  'consensual-non-consent-roleplay',
+  'sleep-roleplay',
+  'monster-roleplay',
+  'pet-play',
+]);
+const ROLEPLAY_FINAL_ORDER = insertAfter(
+  ROLEPLAY_WITHOUT_RELEASE_MOVES,
+  'vampire-roleplay',
+  ['pet-play-soft', 'pet-play-intense'],
+);
+
+const TABOO_FINAL_ORDER = [
+  'adult-taboo-fantasy',
+  'cheating-fantasy',
+  'adult-ageplay-roleplay',
+  'caregiver-little-adult-roleplay',
+  'family-role-taboo-fantasy',
+  'religious-taboo-fantasy',
+  'extremist-war-symbolism-fantasy',
+  'consensual-non-consent-roleplay',
+  'free-use-unaware-roleplay',
+  'sleep-roleplay',
+  'public-use-fantasy',
+  'death-corpse-roleplay',
+] as const;
+
+const SURREALISM_FINAL_ORDER = [
+  'surreal-fantasy-roleplay',
+  'futanari-fantasy',
+  'transformation-fantasy',
+  'size-change-fantasy',
+  'extra-anatomy-fantasy',
+  'tentacle-fantasy',
+  'furry-anthro-fantasy',
+  'monster-roleplay',
+  'alien-fantasy',
+  'vore-fantasy',
+] as const;
 
 const EXHIBITIONISM_FINAL_ORDER = insertAfter(
   without(base('exhibitionism'), ['curtains-open-private']),
@@ -112,6 +154,8 @@ export const FINAL_CATALOGUE_PRACTICE_GROUP_ORDER: Readonly<Record<string, reado
   roleplay: ROLEPLAY_FINAL_ORDER,
   exhibitionism: EXHIBITIONISM_FINAL_ORDER,
   restraint: RESTRAINT_FINAL_ORDER,
+  'taboo-fantasies': TABOO_FINAL_ORDER,
+  surrealism: SURREALISM_FINAL_ORDER,
 };
 
 export function groupFinalCataloguePractices(
