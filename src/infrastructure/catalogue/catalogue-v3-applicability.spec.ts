@@ -87,8 +87,8 @@ describe('Catalogue V3 final applicability', () => {
 
     expect(roleIds('toys', 'strap-on', lesbian)).toEqual(['use-on-partner', 'partner-uses-on-me']);
     expect(roleIds('toys', 'strapless-strap-on', lesbian)).toEqual(['use-on-partner', 'partner-uses-on-me']);
-    expect(roleIds('toys', 'strap-on', heterosexualMan)).toEqual(['partner-uses-on-me']);
-    expect(roleIds('toys', 'strapless-strap-on', heterosexualMan)).toEqual(['partner-uses-on-me']);
+    expect(practiceIds('toys', heterosexualMan)).not.toContain('strap-on');
+    expect(practiceIds('toys', heterosexualMan)).not.toContain('strapless-strap-on');
     expect(practiceIds('toys', gayMan)).not.toContain('strap-on');
     expect(practiceIds('toys', gayMan)).not.toContain('strapless-strap-on');
   });
