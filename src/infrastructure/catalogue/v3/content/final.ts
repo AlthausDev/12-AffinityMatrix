@@ -9,6 +9,7 @@ import { applyFinalClarityReview, FINAL_CLARITY_RETIRED_PRACTICE_IDS } from './f
 import { applyFinalContentReview } from './final-content-review';
 import { applyFinalLastMileReview, FINAL_LAST_MILE_RETIRED_PRACTICE_IDS } from './final-last-mile-review';
 import { groupFinalCataloguePractices } from './final-practice-order';
+import { applyFinalReleaseCopy } from './final-release-copy';
 import { applyFinalReleaseTaxonomy, FINAL_RELEASE_RETIRED_PRACTICE_IDS } from './final-release-taxonomy';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
@@ -43,6 +44,7 @@ const REVIEWED_CONTENT = applyFinalContentReview(ACTIVE_CONTENT);
 const CLARIFIED_CONTENT = applyFinalClarityReview(REVIEWED_CONTENT);
 const LAST_MILE_CONTENT = applyFinalLastMileReview(CLARIFIED_CONTENT);
 const RELEASE_TAXONOMY_CONTENT = applyFinalReleaseTaxonomy(LAST_MILE_CONTENT);
-const GROUPED_CONTENT = groupFinalCataloguePractices(RELEASE_TAXONOMY_CONTENT);
+const RELEASE_COPY_CONTENT = applyFinalReleaseCopy(RELEASE_TAXONOMY_CONTENT);
+const GROUPED_CONTENT = groupFinalCataloguePractices(RELEASE_COPY_CONTENT);
 
 export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyFinalCategoryCopy(GROUPED_CONTENT);
