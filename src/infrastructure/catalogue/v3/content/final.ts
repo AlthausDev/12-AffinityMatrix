@@ -5,6 +5,7 @@ import {
 import { polishCatalogue } from './content-polish';
 import { materializeContextualDescriptions } from './contextual-description';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
+import { applyRoleWordingOverrides } from './role-wording-overrides';
 import { CatalogueCategorySeed } from './types';
 
 export { RETIRED_V3_PRACTICE_IDS };
@@ -18,6 +19,7 @@ const SEMANTIC_CONTENT: readonly CatalogueCategorySeed[] = CURATED_CONTENT.map((
   })),
 }));
 
-const DESCRIBED_CONTENT = materializeContextualDescriptions(SEMANTIC_CONTENT);
+const ROLE_POLISHED_CONTENT = applyRoleWordingOverrides(SEMANTIC_CONTENT);
+const DESCRIBED_CONTENT = materializeContextualDescriptions(ROLE_POLISHED_CONTENT);
 
 export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = polishCatalogue(DESCRIBED_CONTENT);
