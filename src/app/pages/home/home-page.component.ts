@@ -56,7 +56,7 @@ import { APP_VERSION } from '../../shared/app-version';
                   [attr.aria-label]="i18n.t('profileDeletion.homeAria', { alias: profile.metadata.alias || i18n.t('common.untitledProfile') })"
                   (click)="requestDeletion(profile)"
                 >
-                  ×
+                  {{ i18n.t('profileDeletion.homeAction') }}
                 </button>
               </div>
             }
@@ -94,13 +94,15 @@ import { APP_VERSION } from '../../shared/app-version';
     .profile-arrow { flex: 0 0 auto; }
     .profile-delete-button {
       align-self: stretch;
-      width: 3.35rem;
-      flex: 0 0 3.35rem;
+      flex: 0 0 auto;
+      min-width: 4.8rem;
+      padding: 0.5rem 0.9rem;
       border: 0;
       border-left: 1px solid var(--border-subtle);
       background: transparent;
       color: var(--text-secondary);
-      font-size: 1.45rem;
+      font-size: 0.78rem;
+      font-weight: 700;
       cursor: pointer;
       transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
     }
@@ -111,7 +113,7 @@ import { APP_VERSION } from '../../shared/app-version';
     }
     @media (max-width: 520px) {
       .profile-row-main { padding-inline: 1rem; }
-      .profile-delete-button { width: 3rem; flex-basis: 3rem; }
+      .profile-delete-button { min-width: 4.35rem; padding-inline: 0.65rem; }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
