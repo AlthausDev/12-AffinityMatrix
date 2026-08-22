@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProfileStore } from '../../core/profile.store';
 import { PROFILE_CODE_CODEC } from '../../core/profile-codec.token';
-import { TranslationKey } from '../../i18n/es.translations';
 import { TranslationService } from '../../i18n/translation.service';
+import { TranslationKey } from '../../i18n/ui/es-ui.translations';
 
 @Component({
   selector: 'app-profile-export-page',
