@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
 import { ProfileStore } from '../../core/profile.store';
 import { TranslationService } from '../../i18n/translation.service';
 
 @Component({
   selector: 'app-profile-dashboard-page',
-  imports: [RouterLink],
+  imports: [RouterLink, RouterOutlet],
   template: `
     <main class="page">
       <a class="back-link" routerLink="/">{{ i18n.t('dashboard.backProfiles') }}</a>
@@ -78,6 +78,8 @@ import { TranslationService } from '../../i18n/translation.service';
         </section>
       }
     </main>
+
+    <router-outlet />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

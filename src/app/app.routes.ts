@@ -22,28 +22,9 @@ export const routes: Routes = [
     title: 'Import profile',
   },
   {
-    path: 'profiles/:id',
-    component: ProfileDashboardPageComponent,
-    title: 'Profile',
-  },
-  {
     path: 'profiles/:id/edit',
     component: ProfileEditorPageComponent,
     title: 'Edit profile',
-  },
-  {
-    path: 'profiles/:id/questionnaire',
-    loadComponent: () =>
-      import('./pages/questionnaire-categories/questionnaire-categories-page.component')
-        .then((module) => module.QuestionnaireCategoriesPageComponent),
-    title: 'Questionnaire categories',
-  },
-  {
-    path: 'profiles/:id/questionnaire/:category',
-    loadComponent: () =>
-      import('./pages/questionnaire-category/questionnaire-category-page.component')
-        .then((module) => module.QuestionnaireCategoryPageComponent),
-    title: 'Questionnaire',
   },
   {
     path: 'profiles/:id/compare',
@@ -56,6 +37,35 @@ export const routes: Routes = [
     path: 'profiles/:id/export',
     component: ProfileExportPageComponent,
     title: 'Export profile',
+  },
+  {
+    path: 'profiles/:id',
+    component: ProfileDashboardPageComponent,
+    title: 'Profile',
+    children: [
+      {
+        path: 'questionnaire',
+        loadComponent: () =>
+          import('./questionnaire/questionnaire-shell.component')
+            .then((module) => module.QuestionnaireShellComponent),
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./pages/questionnaire-categories/questionnaire-categories-page.component')
+                .then((module) => module.QuestionnaireCategoriesPageComponent),
+            title: 'Questionnaire categories',
+          },
+          {
+            path: ':category',
+            loadComponent: () =>
+              import('./pages/questionnaire-category/questionnaire-category-page.component')
+                .then((module) => module.QuestionnaireCategoryPageComponent),
+            title: 'Questionnaire',
+          },
+        ],
+      },
+    ],
   },
   {
     path: '**',

@@ -1,20 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CatalogueStore } from '../../core/catalogue.store';
 import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
 import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
+import { findRouteParam } from '../../shared/route-param';
 
 @Component({
   selector: 'app-questionnaire-categories-page',
   imports: [RouterLink],
   template: `
-    <main class="page">
-      @if (profile(); as currentProfile) {
-        <a class="back-link" [routerLink]="['/profiles', currentProfile.id]">{{ i18n.t('questionnaire.backProfile') }}</a>
-
+    <main class="questionnaire-modal-page">
+      @if (profile()) {
         @if (snapshot(); as currentSnapshot) {
           <header class="page-header dashboard-header">
             <div>
@@ -49,7 +47,11 @@ import { TranslationService } from '../../i18n/translation.service';
 
           <section class="category-list" [attr.aria-label]="i18n.t('questionnaire.categoriesAria')">
             @for (summary of summaries(); track summary.category.id) {
-              <a class="category-card" [routerLink]="['/profiles', currentProfile.id, 'questionnaire', summary.category.id]" [queryParams]="includeFiltered() ? { filtered: '1' } : null">
+              <a
+                class="category-card"
+                [routerLink]="['/profiles', profileId, 'questionnaire', summary.category.id]"
+                [queryParams]="includeFiltered() ? { filtered: '1' } : null"
+              >
                 <div class="category-card-heading">
                   <div>
                     <p class="eyebrow">{{ i18n.t('questionnaire.categoryProgress', { answered: summary.answered, total: summary.total }) }}</p>
@@ -69,7 +71,6 @@ import { TranslationService } from '../../i18n/translation.service';
           <section class="panel"><h1>{{ i18n.t('common.questionnaire.unavailable.title') }}</h1><p class="muted">{{ i18n.t('common.questionnaire.unavailable.description') }}</p></section>
         }
       } @else {
-        <a class="back-link" routerLink="/">{{ i18n.t('dashboard.backProfiles') }}</a>
         <section class="panel"><h1>{{ i18n.t('common.profileNotFound.title') }}</h1><p class="muted">{{ i18n.t('common.profileNotFound.description') }}</p></section>
       }
     </main>
@@ -77,8 +78,18 @@ import { TranslationService } from '../../i18n/translation.service';
   styles: `
     .questionnaire-filter-toggle { margin-bottom: 1.5rem; }
     .category-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-    .category-card { display: grid; gap: 0.9rem; padding: 1.35rem; border: 1px solid var(--border-subtle); border-radius: 0.75rem; background: var(--surface-panel); text-decoration: none; }
-    .category-card:hover { border-color: var(--border-strong); }
+    .category-card {
+      display: grid;
+      gap: 0.9rem;
+      padding: 1.35rem;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background:
+        linear-gradient(var(--surface-panel), var(--surface-panel)) padding-box,
+        var(--window-border-gradient-soft) border-box;
+      text-decoration: none;
+    }
+    .category-card:hover { background: linear-gradient(var(--surface-elevated), var(--surface-elevated)) padding-box, var(--window-border-gradient) border-box; }
     .category-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
     .category-card-heading h2, .category-card p, .category-card small { margin: 0; }
     .progress-track { height: 0.35rem; overflow: hidden; border-radius: 999px; background: var(--surface-elevated); }
@@ -94,11 +105,10 @@ export class QuestionnaireCategoriesPageComponent {
   readonly catalogueText = inject(CatalogueTextService);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
   private readonly route = inject(ActivatedRoute);
-  private readonly params = toSignal(this.route.paramMap, { initialValue: this.route.snapshot.paramMap });
 
+  readonly profileId = findRouteParam(this.route, 'id') ?? '';
   readonly includeFiltered = signal(this.route.snapshot.queryParamMap.get('filtered') === '1');
-  readonly profileId = computed(() => this.params().get('id') ?? '');
-  readonly profile = computed(() => this.profileStore.findById(this.profileId()));
+  readonly profile = computed(() => this.profileStore.findById(this.profileId));
   readonly snapshot = computed(() => this.catalogueStore.snapshot());
   readonly summaries = computed(() => {
     const profile = this.profile(); const snapshot = this.snapshot();
