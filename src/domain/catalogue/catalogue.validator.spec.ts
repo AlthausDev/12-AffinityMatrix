@@ -39,6 +39,44 @@ describe('PracticeValidator', () => {
     expect(validator.validate(practice)).toEqual([]);
   });
 
+  it('accepts profile exclusions with optional target-site scoping', () => {
+    const practice: Practice = {
+      ...validPractice(),
+      roles: [
+        {
+          ...validPractice().roles[0],
+          applicability: {
+            selfProfileExclusions: [
+              { sex: 'male', orientation: 'heterosexual', targetSites: ['mouth', 'anal'] },
+            ],
+          },
+        },
+        validPractice().roles[1],
+      ],
+    };
+    expect(validator.validate(practice)).toEqual([]);
+  });
+
+  it('rejects unsupported values in profile exclusions', () => {
+    const candidate = {
+      ...validPractice(),
+      roles: [
+        {
+          ...validPractice().roles[0],
+          applicability: {
+            selfProfileExclusions: [
+              { sex: 'male', orientation: 'unsupported', targetSites: ['unsupported'] },
+            ],
+          },
+        },
+        validPractice().roles[1],
+      ],
+    };
+    const issues = validator.validate(candidate);
+    expect(issues.some((issue) => issue.path.endsWith('orientation'))).toBe(true);
+    expect(issues.some((issue) => issue.path.endsWith('targetSites'))).toBe(true);
+  });
+
   it('rejects unsupported sex values in extended applicability', () => {
     const candidate = {
       ...validPractice(),
