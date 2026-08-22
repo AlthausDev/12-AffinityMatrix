@@ -5,6 +5,7 @@ import { Sex, SexualOrientation } from '../../../domain/profile/profile-metadata
 import { ProfileStore } from '../../core/profile.store';
 import { PROFILE_CODE_CODEC } from '../../core/profile-codec.token';
 import { TranslationService } from '../../i18n/translation.service';
+import { TranslationKey } from '../../i18n/ui/es-ui.translations';
 
 @Component({
   selector: 'app-profile-import-page',
@@ -22,7 +23,7 @@ import { TranslationService } from '../../i18n/translation.service';
           <span>{{ i18n.t('import.codeLabel') }}</span>
           <textarea class="code-box" [placeholder]="i18n.t('import.codePlaceholder')" [value]="code()" (input)="updateCode($event)"></textarea>
         </label>
-        @if (codeError()) { <p class="alert" role="alert">{{ codeError() }}</p> }
+        @if (codeError(); as errorKey) { <p class="alert" role="alert">{{ i18n.t(errorKey) }}</p> }
         <div class="form-actions"><button class="button" type="button" [disabled]="!code().trim()" (click)="inspectCode()">{{ i18n.t('import.inspect') }}</button></div>
       </section>
 
@@ -61,21 +62,21 @@ export class ProfileImportPageComponent {
 
   readonly code = signal('');
   readonly preview = signal<PortableProfile | null>(null);
-  readonly codeError = signal('');
+  readonly codeError = signal<TranslationKey | null>(null);
 
   updateCode(event: Event): void {
     this.code.set((event.target as HTMLTextAreaElement).value);
     this.preview.set(null);
-    this.codeError.set('');
+    this.codeError.set(null);
   }
 
   inspectCode(): void {
     try {
       this.preview.set(this.codec.decode(this.code()));
-      this.codeError.set('');
+      this.codeError.set(null);
     } catch {
       this.preview.set(null);
-      this.codeError.set(this.i18n.t('import.error.read'));
+      this.codeError.set('import.error.read');
     }
   }
 
@@ -87,7 +88,7 @@ export class ProfileImportPageComponent {
       await this.router.navigate(['/profiles', saved.id]);
       return;
     }
-    this.codeError.set(this.i18n.t('import.error.save'));
+    this.codeError.set('import.error.save');
   }
 
   answerSummary(portable: PortableProfile): string {
