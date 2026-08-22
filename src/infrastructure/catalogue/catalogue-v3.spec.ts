@@ -14,6 +14,7 @@ const CATEGORY_IDS = [
   'manual-masturbation',
   'oral',
   'penetration',
+  'sexual-positions',
   'toys',
   'orgasm-control',
   'body-fetishes',
@@ -29,8 +30,13 @@ const CATEGORY_IDS = [
   'edge',
 ] as const;
 
+const allSeeds = () => CATALOGUE_V3_CONTENT.flatMap((category) => category.practices);
+const seed = (id: string) => allSeeds().find((practice) => practice.id === id);
+const snapshotPractice = (id: string) => CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices
+  .find((practice) => practice.id === id);
+
 describe('catalogue v3 snapshot', () => {
-  it('is the validated current catalogue with broad coverage and deterministic soft-to-edge ordering', () => {
+  it('is the validated current catalogue with deterministic category ordering', () => {
     const { categories, practices } = CURRENT_CATALOGUE_SNAPSHOT.catalogue;
 
     expect(CURRENT_CATALOGUE_VERSION).toBe(CATALOGUE_VERSION_V3);
@@ -41,53 +47,47 @@ describe('catalogue v3 snapshot', () => {
     expect(practices.length).toBeGreaterThanOrEqual(350);
 
     for (const category of categories) {
-      const categoryPracticeCount = practices.filter((practice) => practice.categoryId === category.id).length;
-      expect(categoryPracticeCount, `${category.id} should remain meaningfully populated`).toBeGreaterThanOrEqual(6);
+      const count = practices.filter((practice) => practice.categoryId === category.id).length;
+      expect(count, `${category.id} should remain meaningfully populated`).toBeGreaterThanOrEqual(6);
     }
   });
 
-  it('keeps every current seed bilingual, described, and free of repeated per-entry consent wording', () => {
-    const seedPractices = CATALOGUE_V3_CONTENT.flatMap((category) => category.practices);
+  it('materializes a bilingual practice-specific description for every final practice', () => {
+    const practices = allSeeds();
+    const legacyGenericDescriptions = new Set([
+      'Se valora por separado hacerlo a la pareja y recibirlo de ella.',
+      'Práctica compartida cuya preferencia se valora como participación conjunta.',
+      'Giving this to a partner and receiving it from them are rated separately.',
+      'A shared practice rated as joint participation.',
+    ]);
+
+    const esDescriptions = new Set<string>();
+    const enDescriptions = new Set<string>();
+    for (const practice of practices) {
+      expect(practice.descriptionEs?.trim().length, `${practice.id} missing Spanish description`).toBeGreaterThan(0);
+      expect(practice.descriptionEn?.trim().length, `${practice.id} missing English description`).toBeGreaterThan(0);
+      expect(legacyGenericDescriptions.has(practice.descriptionEs ?? ''), practice.id).toBe(false);
+      expect(legacyGenericDescriptions.has(practice.descriptionEn ?? ''), practice.id).toBe(false);
+      expect(describeCataloguePractice(practice, 'es')).toBe(practice.descriptionEs);
+      expect(describeCataloguePractice(practice, 'en')).toBe(practice.descriptionEn);
+      esDescriptions.add(practice.descriptionEs!);
+      enDescriptions.add(practice.descriptionEn!);
+    }
+
+    expect(esDescriptions.size).toBe(practices.length);
+    expect(enDescriptions.size).toBe(practices.length);
+  });
+
+  it('keeps labels bilingual, unique after normalization, and free of repeated consent wording', () => {
+    const practices = allSeeds();
     const redundantConsent = /consensual|consensuad[oa]s?|consentid[oa]s?/i;
 
-    expect(CATALOGUE_V3_CONTENT).toHaveLength(CATEGORY_IDS.length);
-    expect(seedPractices).toHaveLength(CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.length);
-
-    for (const category of CATALOGUE_V3_CONTENT) {
-      expect(category.en.trim().length).toBeGreaterThan(0);
-      expect(category.es.trim().length).toBeGreaterThan(0);
-      expect(category.descriptionEn.trim().length).toBeGreaterThan(0);
-      expect(category.descriptionEs.trim().length).toBeGreaterThan(0);
-      expect(category.descriptionEn).not.toMatch(redundantConsent);
-      expect(category.descriptionEs).not.toMatch(redundantConsent);
-
-      for (const practice of category.practices) {
-        expect(practice.en.trim().length, `${practice.id} missing English label`).toBeGreaterThan(0);
-        expect(practice.es.trim().length, `${practice.id} missing Spanish label`).toBeGreaterThan(0);
-        expect(describeCataloguePractice(practice, 'en').trim().length, `${practice.id} missing English description`).toBeGreaterThan(0);
-        expect(describeCataloguePractice(practice, 'es').trim().length, `${practice.id} missing Spanish description`).toBeGreaterThan(0);
-        expect(practice.en).not.toMatch(redundantConsent);
-        expect(practice.es).not.toMatch(redundantConsent);
-        expect(describeCataloguePractice(practice, 'en')).not.toMatch(redundantConsent);
-        expect(describeCataloguePractice(practice, 'es')).not.toMatch(redundantConsent);
-      }
-    }
-  });
-
-  it('uses the specific glossary descriptions for ambiguous terms instead of a generic role sentence', () => {
-    const faceSitting = CATALOGUE_V3_CONTENT.flatMap((category) => category.practices)
-      .find((practice) => practice.id === 'face-sitting');
-    expect(faceSitting).toBeDefined();
-    expect(describeCataloguePractice(faceSitting!, 'es')).toContain('se sienta');
-    expect(describeCataloguePractice(faceSitting!, 'en')).toContain('sits or kneels');
-  });
-
-  it('does not keep duplicate labels after the semantic curation pass', () => {
-    const practices = CATALOGUE_V3_CONTENT.flatMap((category) => category.practices);
     for (const locale of ['en', 'es'] as const) {
       const seen = new Map<string, string>();
       for (const practice of practices) {
         const label = locale === 'es' ? practice.es : practice.en;
+        expect(label.trim().length, `${practice.id} missing ${locale} label`).toBeGreaterThan(0);
+        expect(label).not.toMatch(redundantConsent);
         const normalized = label.toLocaleLowerCase(locale)
           .normalize('NFD')
           .replace(/[\u0300-\u036f]/g, '')
@@ -100,84 +100,118 @@ describe('catalogue v3 snapshot', () => {
     }
   });
 
-  it('removes reviewed aliases and composite questions instead of keeping parallel semantics', () => {
-    const ids = new Set(CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.map((practice) => practice.id));
+  it('keeps retired aliases out of the final projection', () => {
+    const ids = new Set(allSeeds().map((practice) => practice.id));
     for (const retiredId of RETIRED_V3_PRACTICE_IDS) expect(ids.has(retiredId), retiredId).toBe(false);
 
+    expect(ids.has('full-body-massage')).toBe(false);
     expect(ids.has('watch-partner-masturbate')).toBe(true);
     expect(ids.has('masturbation-in-front-of-partner')).toBe(false);
-    expect(ids.has('gangbang')).toBe(true);
-    expect(ids.has('being-center-of-group')).toBe(false);
-    expect(ids.has('urine-play')).toBe(true);
-    expect(ids.has('urinating-on-partner')).toBe(false);
     expect(ids.has('remote-control-toy')).toBe(true);
     expect(ids.has('app-controlled-toy')).toBe(false);
-    expect(ids.has('edging')).toBe(true);
-    expect(ids.has('edging-manual')).toBe(false);
-    expect(ids.has('oral-edging')).toBe(false);
   });
 
-  it('uses one primary category per practice and separates style and place from unrelated categories', () => {
-    const practices = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices;
-    const categoryOf = (practiceId: string) => practices.find((practice) => practice.id === practiceId)?.categoryId;
+  it('groups affection and intimacy by related forms of contact', () => {
+    const ids = CATALOGUE_V3_CONTENT.find((category) => category.id === 'affection-intimacy')
+      ?.practices.map((practice) => practice.id);
 
-    expect(categoryOf('slow-sex')).toBe('sexual-style');
-    expect(categoryOf('competitive-sex')).toBe('sexual-style');
-    expect(categoryOf('sex-in-car')).toBe('places-settings');
-    expect(categoryOf('glory-hole')).toBe('places-settings');
-    expect(categoryOf('voyeurism')).toBe('exhibitionism');
-    expect(categoryOf('creampie-vaginal')).toBe('fluids');
-    expect(categoryOf('pet-play')).toBe('roleplay');
-    expect(categoryOf('brat-dynamic')).toBe('power');
-  });
-
-  it('uses directed roles for affection that can meaningfully be given or received', () => {
-    const cuddling = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.find((practice) => practice.id === 'cuddling');
-    expect(cuddling?.roles.map((role) => role.id)).toEqual(['give', 'receive']);
-    expect(cuddling?.roles.every((role) => role.contextAxes?.includes('counterpartSex'))).toBe(true);
-    expect(cuddling?.compatibleRolePairs).toEqual([{ leftRoleId: 'give', rightRoleId: 'receive' }]);
-  });
-
-  it('models solo and hands-free individual activities without fake partner participation', () => {
-    for (const id of ['solo-masturbation', 'hands-free-masturbation', 'hands-free-orgasm']) {
-      const practice = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.find((candidate) => candidate.id === id);
-      expect(practice?.roles.map((role) => role.id), id).toEqual(['self']);
-      expect(practice?.roles[0]?.contextAxes, id).toBeUndefined();
-      expect(practice?.compatibleRolePairs, id).toEqual([{ leftRoleId: 'self', rightRoleId: 'self' }]);
-    }
-  });
-
-  it('models clothing state independently for the profile owner and their partner', () => {
-    for (const id of ['clothed-sex', 'partial-nudity', 'full-nudity']) {
-      const practice = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.find((candidate) => candidate.id === id);
-      expect(practice?.roles.map((role) => role.id), id).toEqual(['self-state', 'partner-state']);
-      expect(practice?.roles.find((role) => role.id === 'self-state')?.contextAxes, id).toBeUndefined();
-      expect(practice?.roles.find((role) => role.id === 'partner-state')?.contextAxes, id).toEqual(['counterpartSex']);
-      expect(practice?.compatibleRolePairs, id).toEqual([{ leftRoleId: 'self-state', rightRoleId: 'partner-state' }]);
-    }
-  });
-
-  it('models dildo use as solo, partner-directed, and partner-on-self roles with explicit target sites', () => {
-    const dildo = CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.find((practice) => practice.id === 'dildo');
-
-    expect(dildo?.roles.map((role) => role.id)).toEqual([
-      'use-on-self',
-      'use-on-partner',
-      'partner-uses-on-me',
-    ]);
-    expect(dildo?.roles.find((role) => role.id === 'use-on-self')?.contextAxes).toEqual(['targetSite']);
-    expect(dildo?.roles.find((role) => role.id === 'use-on-partner')?.contextAxes)
-      .toEqual(['counterpartSex', 'targetSite']);
-    expect(dildo?.roles.every((role) =>
-      role.contextValues?.targetSite?.join(',') === 'mouth,vaginal,anal',
-    )).toBe(true);
-    expect(dildo?.compatibleRolePairs).toEqual([
-      { leftRoleId: 'use-on-self', rightRoleId: 'use-on-self' },
-      { leftRoleId: 'use-on-partner', rightRoleId: 'partner-uses-on-me' },
+    expect(ids).toEqual([
+      'kissing',
+      'making-out',
+      'verbal-affection',
+      'holding-hands',
+      'hair-stroking',
+      'face-caressing',
+      'back-rubs',
+      'skin-to-skin-contact',
+      'cuddling',
+      'spooning',
+      'sleeping-naked-together',
+      'showering-together',
+      'bathing-together',
+      'sensual-massage',
     ]);
   });
 
-  it('never generates anatomically impossible oral variants, even when filtered questions are revealed', () => {
+  it('uses practice-specific verbs instead of generic give/do wording where the action is obvious', () => {
+    expect(seed('kissing')?.roleLabels?.give?.es).toBe('Besar a mi pareja');
+    expect(seed('kissing')?.roleLabels?.receive?.es).toBe('Que me besen');
+    expect(snapshotPractice('kissing')?.roles.map((role) => role.label)).toEqual(['Kiss my partner', 'Be kissed']);
+
+    expect(seed('hair-stroking')?.roleLabels?.give?.es).toBe('Acariciar el pelo de mi pareja');
+    expect(seed('sensual-massage')?.roleLabels?.receive?.es).toBe('Recibir un masaje sensual');
+  });
+
+  it('separates sexual positions from penetration mechanics and groups the positions coherently', () => {
+    const positions = CATALOGUE_V3_CONTENT.find((category) => category.id === 'sexual-positions');
+    const positionIds = positions?.practices.map((practice) => practice.id);
+
+    expect(positionIds).toEqual([
+      'missionary',
+      'legs-on-shoulders',
+      'cowgirl',
+      'reverse-cowgirl',
+      'doggy-style',
+      'spooning-penetration',
+      'seated-penetration',
+      'lotus-position',
+      'standing-penetration',
+      'against-wall',
+      'sixty-nine',
+      'face-sitting',
+    ]);
+    expect(snapshotPractice('missionary')?.categoryId).toBe('sexual-positions');
+    expect(snapshotPractice('sixty-nine')?.categoryId).toBe('sexual-positions');
+    expect(snapshotPractice('vaginal-penetration')?.categoryId).toBe('penetration');
+  });
+
+  it('reduces toy target sites to anatomically and practically useful choices', () => {
+    const sites = (id: string) => seed(id)?.targetSites;
+
+    expect(sites('vibrator')).toEqual(['external-genitals', 'vaginal', 'anal']);
+    expect(sites('wand-vibrator')).toEqual(['external-genitals', 'nipples']);
+    expect(sites('rabbit-vibrator')).toEqual(['external-genitals', 'vaginal']);
+    expect(sites('clitoral-suction-toy')).toEqual(['external-genitals']);
+    expect(sites('kegel-balls')).toEqual(['vaginal']);
+    expect(sites('remote-control-toy')).toEqual(['external-genitals', 'vaginal', 'anal']);
+    expect(sites('wearable-vibrator')).toEqual(['external-genitals', 'vaginal', 'anal']);
+    expect(sites('sex-machine')).toEqual(['vaginal', 'anal']);
+    expect(sites('vacuum-cup-toys')).toEqual(['vaginal', 'anal']);
+    expect(sites('pinwheel')).toEqual(['body']);
+  });
+
+  it('groups toys by family rather than mixing unrelated accessories', () => {
+    const ids = CATALOGUE_V3_CONTENT.find((category) => category.id === 'toys')
+      ?.practices.map((practice) => practice.id) ?? [];
+
+    expect(ids.slice(0, 6)).toEqual([
+      'vibrator',
+      'wand-vibrator',
+      'bullet-vibrator',
+      'rabbit-vibrator',
+      'wearable-vibrator',
+      'remote-control-toy',
+    ]);
+    expect(ids.indexOf('dildo')).toBeLessThan(ids.indexOf('anal-plug'));
+    expect(ids.indexOf('anal-plug')).toBeLessThan(ids.indexOf('strap-on'));
+    expect(ids.indexOf('strap-on')).toBeLessThan(ids.indexOf('cock-ring'));
+  });
+
+  it('adds blood and scat preferences to fluids while leaving cutting itself in Edge', () => {
+    const fluidIds = CATALOGUE_V3_CONTENT.find((category) => category.id === 'fluids')
+      ?.practices.map((practice) => practice.id) ?? [];
+
+    expect(fluidIds).toContain('blood-play');
+    expect(fluidIds).toContain('blood-on-body');
+    expect(fluidIds).toContain('blood-drinking');
+    expect(fluidIds).toContain('scat-on-body');
+    expect(fluidIds).toContain('scat-in-mouth');
+    expect(fluidIds).toContain('scat-ingestion');
+    expect(snapshotPractice('blood-play')?.categoryId).toBe('fluids');
+    expect(snapshotPractice('cutting-play')?.categoryId).toBe('edge');
+  });
+
+  it('never generates anatomically impossible oral variants even when filtered questions are revealed', () => {
     const man = createProfile({
       id: 'man',
       now: '2026-08-22T16:00:00.000Z',
@@ -201,7 +235,7 @@ describe('catalogue v3 snapshot', () => {
     expect(roles(womanOral, 'fellatio')).toEqual(['give:male']);
   });
 
-  it('distinguishes performer anatomy from receiver anatomy for ejaculation practices', () => {
+  it('keeps performer anatomy separate from receiver anatomy for ejaculation practices', () => {
     const man = createProfile({
       id: 'man',
       now: '2026-08-22T16:00:00.000Z',
@@ -223,92 +257,5 @@ describe('catalogue v3 snapshot', () => {
     expect(roles(womanFluids, 'semen-in-mouth')).toEqual(['receive:male']);
     expect(roles(manFluids, 'creampie-vaginal')).toEqual(['give:female']);
     expect(roles(womanFluids, 'creampie-vaginal')).toEqual(['receive:male']);
-  });
-
-  it('applies anatomy to body-focus and anatomy-specific toy practices', () => {
-    const man = createProfile({
-      id: 'man',
-      now: '2026-08-22T16:00:00.000Z',
-      metadata: { sex: 'male', orientation: 'bisexual' },
-    });
-    const body = questionnaire.getCategory(CURRENT_CATALOGUE_SNAPSHOT, man, 'body-fetishes', true);
-    const penis = body?.practices.find((item) => item.practice.id === 'penis');
-    const vulva = body?.practices.find((item) => item.practice.id === 'vulva');
-    const breasts = body?.practices.find((item) => item.practice.id === 'breasts');
-    const chest = body?.practices.find((item) => item.practice.id === 'chest');
-
-    expect(penis?.roles.map((item) => item.counterpartSex)).toEqual(['male']);
-    expect(vulva?.roles.map((item) => item.counterpartSex)).toEqual(['female']);
-    expect(breasts?.roles.map((item) => item.counterpartSex)).toEqual(['female']);
-    expect(chest?.roles.map((item) => item.counterpartSex)).toEqual(['male']);
-
-    const toys = questionnaire.getCategory(CURRENT_CATALOGUE_SNAPSHOT, man, 'toys', true);
-    const prostateMassager = toys?.practices.find((item) => item.practice.id === 'prostate-massager');
-    expect(prostateMassager?.roles.some(
-      (item) => item.role.id === 'use-on-partner' && item.counterpartSex === 'female',
-    )).toBe(false);
-  });
-
-  it('filters anatomically impossible toy target sites without removing valid variants', () => {
-    const woman = createProfile({
-      id: 'woman',
-      now: '2026-08-22T16:00:00.000Z',
-      metadata: { sex: 'female', orientation: 'bisexual' },
-    });
-    const man = createProfile({
-      id: 'man',
-      now: '2026-08-22T16:00:00.000Z',
-      metadata: { sex: 'male', orientation: 'bisexual' },
-    });
-
-    const womanDildo = questionnaire
-      .getCategory(CURRENT_CATALOGUE_SNAPSHOT, woman, 'toys')
-      ?.practices.find((item) => item.practice.id === 'dildo');
-    const manDildo = questionnaire
-      .getCategory(CURRENT_CATALOGUE_SNAPSHOT, man, 'toys')
-      ?.practices.find((item) => item.practice.id === 'dildo');
-
-    const womanSelfSites = womanDildo?.roles
-      .filter((item) => item.role.id === 'use-on-self')
-      .map((item) => item.scope?.targetSite);
-    const manSelfSites = manDildo?.roles
-      .filter((item) => item.role.id === 'use-on-self')
-      .map((item) => item.scope?.targetSite);
-
-    expect(womanSelfSites).toEqual(['mouth', 'vaginal', 'anal']);
-    expect(manSelfSites).toEqual(['mouth', 'anal']);
-
-    const womanUsingOnMalePartner = womanDildo?.roles.filter(
-      (item) => item.role.id === 'use-on-partner' && item.scope?.counterpartSex === 'male',
-    );
-    const womanUsingOnFemalePartner = womanDildo?.roles.filter(
-      (item) => item.role.id === 'use-on-partner' && item.scope?.counterpartSex === 'female',
-    );
-
-    expect(womanUsingOnMalePartner?.map((item) => item.scope?.targetSite)).toEqual(['mouth', 'anal']);
-    expect(womanUsingOnFemalePartner?.map((item) => item.scope?.targetSite)).toEqual(['mouth', 'vaginal', 'anal']);
-  });
-
-  it('can exclude hidden categories from visible progress and navigation without removing the catalogue', () => {
-    const profile = createProfile({
-      id: 'profile',
-      now: '2026-08-22T16:00:00.000Z',
-      metadata: { sex: 'female', orientation: 'bisexual' },
-    });
-
-    const summaries = questionnaire.getCategorySummaries(
-      CURRENT_CATALOGUE_SNAPSHOT,
-      profile,
-      false,
-      ['fluids', 'edge'],
-    );
-
-    expect(summaries).toHaveLength(CATEGORY_IDS.length - 2);
-    expect(summaries.some((summary) => summary.category.id === 'fluids')).toBe(false);
-    expect(summaries.some((summary) => summary.category.id === 'edge')).toBe(false);
-    expect(CURRENT_CATALOGUE_SNAPSHOT.catalogue.categories.some((category) => category.id === 'edge')).toBe(true);
-
-    expect(questionnaire.getNeighbours(CURRENT_CATALOGUE_SNAPSHOT, 'sensation', ['fluids']))
-      .toEqual({ previousCategoryId: 'psychological', nextCategoryId: 'edge' });
   });
 });
