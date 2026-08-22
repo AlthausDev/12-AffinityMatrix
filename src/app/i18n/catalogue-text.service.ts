@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Practice, PracticeCategory, PracticeRole } from '../../domain/catalogue/practice';
 import { CATALOGUE_V3_CONTENT } from '../../infrastructure/catalogue/v3/content';
+import { describeCataloguePractice } from '../../infrastructure/catalogue/v3/content/practice-description';
 import { CataloguePracticeSeed } from '../../infrastructure/catalogue/v3/content/types';
 import { EN_CATALOGUE_TRANSLATIONS } from './catalogue/en-catalogue.translations';
 import {
@@ -23,8 +24,11 @@ const V3_PRACTICES = new Map<string, CataloguePracticeSeed>(
 const V3_ROLE_LABELS: Readonly<Record<Locale, Readonly<Record<string, string>>>> = {
   es: {
     participate: 'Participar',
-    give: 'Hacérselo a mi pareja',
-    receive: 'Que mi pareja me lo haga',
+    give: 'Dar / hacer',
+    receive: 'Recibir',
+    self: 'Hacerlo / vivirlo yo',
+    'self-state': 'En mí / yo',
+    'partner-state': 'En mi pareja',
     wear: 'Llevarlo yo',
     'partner-wears': 'Que lo lleve mi pareja',
     watch: 'Mirar',
@@ -39,8 +43,11 @@ const V3_ROLE_LABELS: Readonly<Record<Locale, Readonly<Record<string, string>>>>
   },
   en: {
     participate: 'Participate',
-    give: 'Do it to my partner',
-    receive: 'Have my partner do it to me',
+    give: 'Give / do',
+    receive: 'Receive',
+    self: 'Do / experience it myself',
+    'self-state': 'For me / myself',
+    'partner-state': 'For my partner',
     wear: 'Wear it myself',
     'partner-wears': 'Have my partner wear it',
     watch: 'Watch',
@@ -98,6 +105,8 @@ export class CatalogueTextService {
   }
 
   practiceDescription(practice: Practice): string {
+    const seed = V3_PRACTICES.get(practice.id);
+    if (seed) return describeCataloguePractice(seed, this.translations.locale());
     return practice.description
       ? this.translate(practiceDescriptionKey(practice.id), practice.description)
       : '';
