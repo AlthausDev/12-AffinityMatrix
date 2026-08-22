@@ -9,31 +9,32 @@ import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { QuestionnaireCategoryNavigationComponent } from '../../questionnaire/questionnaire-category-navigation.component';
 import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-role.component';
+import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { findRouteParam } from '../../shared/route-param';
 
 @Component({
   selector: 'app-questionnaire-category-page',
-  imports: [RouterLink, QuestionnaireCategoryNavigationComponent, QuestionnaireRoleComponent],
+  imports: [
+    RouterLink,
+    QuestionnaireCategoryNavigationComponent,
+    QuestionnaireRoleComponent,
+    CompletionProgressComponent,
+  ],
   template: `
     <main class="questionnaire-modal-page questionnaire-page">
       @if (profile()) {
         @if (category(); as currentCategory) {
-          <div class="top-navigation">
-            <app-questionnaire-category-navigation
-              [profileId]="profileId"
-              [previousCategoryId]="neighbours().previousCategoryId"
-              [nextCategoryId]="neighbours().nextCategoryId"
-              [includeFiltered]="includeFiltered()"
-            />
-          </div>
-
-          <header class="page-header dashboard-header">
+          <header class="page-header category-header">
             <div>
               <p class="eyebrow">{{ i18n.t('questionnaire.category.eyebrow', { answered: currentCategory.answered, total: currentCategory.total }) }}</p>
               <h1>{{ catalogueText.categoryLabel(currentCategory.category) }}</h1>
               <p class="muted lead">{{ catalogueText.categoryDescription(currentCategory.category) }}</p>
             </div>
-            <p class="profile-count">{{ currentCategory.completionPercentage }}%</p>
+            <div class="category-progress-summary">
+              <strong>{{ currentCategory.completionPercentage }}%</strong>
+              <span class="muted">{{ currentCategory.answered }} / {{ currentCategory.total }}</span>
+              <app-completion-progress [value]="currentCategory.completionPercentage" />
+            </div>
           </header>
 
           @if (profileStore.error()) { <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p> }
@@ -93,15 +94,22 @@ import { findRouteParam } from '../../shared/route-param';
   `,
   styles: `
     .questionnaire-page { max-width: 72rem; }
-    .top-navigation { margin-bottom: 1.75rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); }
-    .bottom-navigation { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); }
+    .category-header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(10rem, 14rem); gap: 2rem; align-items: end; }
+    .category-progress-summary { display: grid; gap: 0.42rem; text-align: right; }
+    .category-progress-summary strong { font-size: 1.55rem; }
+    .category-progress-summary span { font-size: 0.8rem; }
     .questionnaire-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
     .compact-toggle { min-width: min(100%, 24rem); padding: 0.75rem; }
     .save-state { margin: 0; font-size: 0.85rem; }
     .question-list { display: grid; gap: 1rem; }
     .question-card-header { margin-bottom: 0.65rem; }
     .question-card-header p { margin-bottom: 0; }
-    @media (max-width: 720px) { .questionnaire-toolbar { align-items: stretch; flex-direction: column; } }
+    .bottom-navigation { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); }
+    @media (max-width: 720px) {
+      .category-header { grid-template-columns: 1fr; align-items: stretch; }
+      .category-progress-summary { text-align: left; }
+      .questionnaire-toolbar { align-items: stretch; flex-direction: column; }
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
