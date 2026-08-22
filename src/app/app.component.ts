@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { UiPreferencesService } from './core/ui-preferences.service';
 import { LanguageSwitcherComponent } from './i18n/language-switcher.component';
 
 @Component({
@@ -11,4 +12,10 @@ import { LanguageSwitcherComponent } from './i18n/language-switcher.component';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {}
+export class AppComponent {
+  private readonly uiPreferences = inject(UiPreferencesService);
+
+  constructor() {
+    this.uiPreferences.initialize();
+  }
+}
