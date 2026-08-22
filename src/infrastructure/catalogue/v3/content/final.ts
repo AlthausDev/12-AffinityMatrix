@@ -7,6 +7,7 @@ import { polishCatalogue } from './content-polish';
 import { materializeContextualDescriptions } from './contextual-description';
 import { applyFinalClarityReview, FINAL_CLARITY_RETIRED_PRACTICE_IDS } from './final-clarity-review';
 import { applyFinalContentReview } from './final-content-review';
+import { applyFinalLastMileReview, FINAL_LAST_MILE_RETIRED_PRACTICE_IDS } from './final-last-mile-review';
 import { groupFinalCataloguePractices } from './final-practice-order';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
@@ -17,6 +18,7 @@ export const RETIRED_V3_PRACTICE_IDS = new Set<string>([
   ...CURATED_RETIRED_V3_PRACTICE_IDS,
   ...FINAL_CONTENT_RETIRED_PRACTICE_IDS,
   ...FINAL_CLARITY_RETIRED_PRACTICE_IDS,
+  ...FINAL_LAST_MILE_RETIRED_PRACTICE_IDS,
 ]);
 
 /** Final Catalogue V3 projection after semantic curation, role refinement and content polish. */
@@ -37,6 +39,7 @@ const ACTIVE_CONTENT = POLISHED_CONTENT.map((category) => ({
 }));
 const REVIEWED_CONTENT = applyFinalContentReview(ACTIVE_CONTENT);
 const CLARIFIED_CONTENT = applyFinalClarityReview(REVIEWED_CONTENT);
-const GROUPED_CONTENT = groupFinalCataloguePractices(CLARIFIED_CONTENT);
+const LAST_MILE_CONTENT = applyFinalLastMileReview(CLARIFIED_CONTENT);
+const GROUPED_CONTENT = groupFinalCataloguePractices(LAST_MILE_CONTENT);
 
 export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyFinalCategoryCopy(GROUPED_CONTENT);
