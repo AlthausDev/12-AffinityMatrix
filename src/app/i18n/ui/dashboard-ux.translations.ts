@@ -31,6 +31,7 @@ export const ES_DASHBOARD_UX_TRANSLATIONS = {
   'profileDeletion.confirm': 'Borrar definitivamente',
   'profileDeletion.deleting': 'Borrando…',
   'profileDeletion.failed': 'No se ha podido borrar el perfil. Inténtalo de nuevo.',
+  'profileDeletion.homeAction': 'Borrar',
   'profileDeletion.homeAria': 'Borrar {alias}',
 } as const;
 
@@ -69,5 +70,6 @@ export const EN_DASHBOARD_UX_TRANSLATIONS: Readonly<Record<DashboardUxTranslatio
   'profileDeletion.confirm': 'Delete permanently',
   'profileDeletion.deleting': 'Deleting…',
   'profileDeletion.failed': 'The profile could not be deleted. Please try again.',
+  'profileDeletion.homeAction': 'Delete',
   'profileDeletion.homeAria': 'Delete {alias}',
 };
