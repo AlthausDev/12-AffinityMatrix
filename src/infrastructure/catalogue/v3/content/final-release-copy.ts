@@ -4,8 +4,8 @@ const RELEASE_COPY_OVERRIDES: Readonly<Record<string, Partial<CataloguePracticeS
   'adult-taboo-fantasy': {
     en: 'Taboo fantasy (general)',
     es: 'Fantasía tabú (general)',
-    descriptionEn: 'General attraction to adult fictional scenarios whose appeal comes from feeling forbidden, improper or socially transgressive. Use the more specific entries in this category when the exact taboo matters.',
-    descriptionEs: 'Atracción general por escenarios ficticios entre adultos cuyo atractivo procede de sentirse prohibidos, impropios o socialmente transgresores. Si importa el tabú concreto, conviene valorar también las entradas específicas de esta categoría.',
+    descriptionEn: 'General attraction to fictional scenarios whose appeal comes from feeling forbidden, improper or socially transgressive, with all real participants being adults. Use the more specific entries in this category when the exact taboo matters.',
+    descriptionEs: 'Atracción general por escenarios ficticios cuyo atractivo procede de sentirse prohibidos, impropios o socialmente transgresores, siendo adultas todas las personas reales participantes. Si importa el tabú concreto, conviene valorar también las entradas específicas de esta categoría.',
   },
   'caregiver-little-adult-roleplay': {
     descriptionEn: 'An adult-only Caregiver/Little dynamic where one adult takes a caring, guiding or authority-flavoured Daddy/Mommy/Caregiver role and the other takes a Little role. “Little” always means a role portrayed by an adult. It can involve comfort, rules, praise or dependency themes, but it does not require pretending to be a different age; explicit age portrayal is rated separately under Ageplay.',
@@ -26,8 +26,8 @@ const RELEASE_COPY_OVERRIDES: Readonly<Record<string, Partial<CataloguePracticeS
   'surreal-fantasy-roleplay': {
     en: 'Surreal / impossible fantasy (general)',
     es: 'Fantasía surrealista / imposible (general)',
-    descriptionEn: 'General attraction to sexual fantasy that deliberately breaks real-world biology or physics. Use the specific entries below when tentacles, transformation, altered anatomy, unusual scale or a particular fictional creature is what matters.',
-    descriptionEs: 'Atracción general por fantasías sexuales que rompen deliberadamente la biología o la física del mundo real. Conviene usar las entradas específicas cuando lo importante sean tentáculos, transformación, anatomía alterada, cambios de escala o una criatura ficticia concreta.',
+    descriptionEn: 'General attraction to sexual fantasy that deliberately breaks real-world biology or physics, including impossible anatomy and other unreal elements. Use the specific entries below when tentacles, transformation, altered anatomy, unusual scale or a particular fictional creature is what matters.',
+    descriptionEs: 'Atracción general por fantasías sexuales que rompen deliberadamente la biología o la física del mundo real, incluidas anatomías imposibles y otros elementos irreales. Conviene usar las entradas específicas cuando lo importante sean tentáculos, transformación, anatomía alterada, cambios de escala o una criatura ficticia concreta.',
   },
   'monster-roleplay': {
     en: 'Monster / fictional creature fantasy',
