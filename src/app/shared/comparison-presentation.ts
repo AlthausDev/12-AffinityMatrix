@@ -1,6 +1,6 @@
 import { ComparisonClassification, RoleRelation } from '../../domain/comparison/comparison';
 import { PREFERENCE_VALUES, Preference } from '../../domain/profile/preference';
-import { TranslationKey } from '../i18n/es.translations';
+import { TranslationKey } from '../i18n/ui/es-ui.translations';
 
 export interface PreferencePresentation {
   readonly labelKey: TranslationKey;
