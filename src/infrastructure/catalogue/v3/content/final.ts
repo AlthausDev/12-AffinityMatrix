@@ -5,9 +5,10 @@ import {
 import { applyFinalCategoryCopy } from './category-copy-overrides';
 import { polishCatalogue } from './content-polish';
 import { materializeContextualDescriptions } from './contextual-description';
+import { applyFinalContentReview } from './final-content-review';
+import { groupFinalCataloguePractices } from './final-practice-order';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
-import { groupCataloguePractices } from './practice-group-order';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
 import { CatalogueCategorySeed } from './types';
 
@@ -32,6 +33,7 @@ const ACTIVE_CONTENT = POLISHED_CONTENT.map((category) => ({
   ...category,
   practices: category.practices.filter((practice) => !FINAL_CONTENT_RETIRED_PRACTICE_IDS.has(practice.id)),
 }));
-const GROUPED_CONTENT = groupCataloguePractices(ACTIVE_CONTENT);
+const REVIEWED_CONTENT = applyFinalContentReview(ACTIVE_CONTENT);
+const GROUPED_CONTENT = groupFinalCataloguePractices(REVIEWED_CONTENT);
 
 export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyFinalCategoryCopy(GROUPED_CONTENT);
