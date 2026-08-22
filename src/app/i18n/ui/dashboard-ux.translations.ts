@@ -20,6 +20,18 @@ export const ES_DASHBOARD_UX_TRANSLATIONS = {
   'settings.questionnaireExit.title': 'Confirmar al salir del cuestionario',
   'settings.questionnaireExit.description': 'Muestra un aviso con las preguntas pendientes antes de volver al perfil.',
   'settings.localOnly': 'Estos ajustes se guardan únicamente en este navegador.',
+  'settings.danger.eyebrow': 'Gestión del perfil',
+  'settings.danger.title': 'Borrar perfil',
+  'settings.danger.description': 'Elimina este perfil y todas sus respuestas guardadas de este navegador.',
+  'settings.danger.action': 'Borrar este perfil',
+
+  'profileDeletion.title': 'Borrar perfil',
+  'profileDeletion.description': 'Vas a borrar «{alias}» de este navegador.',
+  'profileDeletion.warning': 'Esta acción no se puede deshacer. Si no tienes una copia exportada, sus respuestas se perderán.',
+  'profileDeletion.confirm': 'Borrar definitivamente',
+  'profileDeletion.deleting': 'Borrando…',
+  'profileDeletion.failed': 'No se ha podido borrar el perfil. Inténtalo de nuevo.',
+  'profileDeletion.homeAria': 'Borrar {alias}',
 } as const;
 
 export type DashboardUxTranslationKey = keyof typeof ES_DASHBOARD_UX_TRANSLATIONS;
@@ -46,4 +58,16 @@ export const EN_DASHBOARD_UX_TRANSLATIONS: Readonly<Record<DashboardUxTranslatio
   'settings.questionnaireExit.title': 'Confirm before leaving the questionnaire',
   'settings.questionnaireExit.description': 'Show a summary of unanswered questions before returning to the profile.',
   'settings.localOnly': 'These settings are stored only in this browser.',
+  'settings.danger.eyebrow': 'Profile management',
+  'settings.danger.title': 'Delete profile',
+  'settings.danger.description': 'Delete this profile and all its saved answers from this browser.',
+  'settings.danger.action': 'Delete this profile',
+
+  'profileDeletion.title': 'Delete profile',
+  'profileDeletion.description': 'You are about to delete “{alias}” from this browser.',
+  'profileDeletion.warning': 'This action cannot be undone. If you do not have an exported copy, its answers will be lost.',
+  'profileDeletion.confirm': 'Delete permanently',
+  'profileDeletion.deleting': 'Deleting…',
+  'profileDeletion.failed': 'The profile could not be deleted. Please try again.',
+  'profileDeletion.homeAria': 'Delete {alias}',
 };
