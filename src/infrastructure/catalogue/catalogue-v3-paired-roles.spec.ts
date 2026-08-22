@@ -25,7 +25,8 @@ describe('Catalogue V3 semantic paired roles', () => {
   it('distinguishes asymmetric roleplay roles instead of reducing them to participation', () => {
     expect(practice('boss-employee-roleplay')?.roles.map((role) => role.id)).toEqual(['boss', 'employee']);
     expect(practice('captor-captive-roleplay')?.roles.map((role) => role.id)).toEqual(['captor', 'captive']);
-    expect(practice('pet-play')?.roles.map((role) => role.id)).toEqual(['handler', 'pet']);
+    expect(practice('pet-play-soft')?.roles.map((role) => role.id)).toEqual(['handler', 'pet']);
+    expect(practice('pet-play-intense')?.roles.map((role) => role.id)).toEqual(['handler', 'pet']);
     expect(practice('sleep-roleplay')?.roles.map((role) => role.id)).toEqual(['awake-role', 'sleeping-role']);
     expect(practice('consensual-non-consent-roleplay')?.roles.map((role) => role.id)).toEqual([
       'initiator',
