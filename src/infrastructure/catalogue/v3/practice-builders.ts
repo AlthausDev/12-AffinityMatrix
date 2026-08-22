@@ -13,6 +13,7 @@ export function buildPractice(seed: CataloguePracticeSeed, categoryId: string): 
     case 'wear': return wear(seed, categoryId);
     case 'watch': return watch(seed, categoryId);
     case 'power': return power(seed, categoryId);
+    case 'paired': return paired(seed, categoryId);
     case 'group': return group(seed, categoryId);
     case 'focus': return focus(seed, categoryId);
     case 'toy': return toy(seed, categoryId);
@@ -84,6 +85,26 @@ function power(seed: CataloguePracticeSeed, categoryId: string): Practice {
     { id: 'lead', label: 'Lead / control', perspective: 'active' },
     { id: 'follow', label: 'Follow / receive', perspective: 'receptive' },
   ], [{ leftRoleId: 'lead', rightRoleId: 'follow' }]);
+}
+
+function paired(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  const roles = seed.pairedRoles;
+  if (!roles) throw new Error(`Paired practice ${seed.id} requires pairedRoles`);
+  const axes = seed.counterpartScoped ? (['counterpartSex'] as const) : undefined;
+  const [left, right] = roles;
+  const leftRole: PracticeRole = {
+    id: left.id,
+    label: left.en,
+    perspective: left.perspective,
+    ...(axes ? { contextAxes: axes } : {}),
+  };
+  const rightRole: PracticeRole = {
+    id: right.id,
+    label: right.en,
+    perspective: right.perspective,
+    ...(axes ? { contextAxes: axes } : {}),
+  };
+  return practice(seed, categoryId, [leftRole, rightRole], [{ leftRoleId: left.id, rightRoleId: right.id }]);
 }
 
 function group(seed: CataloguePracticeSeed, categoryId: string): Practice {
