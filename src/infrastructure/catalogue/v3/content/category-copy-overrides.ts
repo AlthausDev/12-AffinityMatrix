@@ -13,6 +13,12 @@ const CATEGORY_COPY: Readonly<Record<string, Partial<CatalogueCategorySeed>>> = 
     descriptionEn: 'Sex toys and sexual equipment, grouped by family and limited to body sites that are meaningful for each item.',
     descriptionEs: 'Juguetes y equipamiento sexual, agrupados por familia y limitados a las zonas corporales que tienen sentido para cada elemento.',
   },
+  'body-fetishes': {
+    en: 'Body, physical traits & fetishes',
+    es: 'Cuerpo, rasgos físicos y fetiches',
+    descriptionEn: 'Preferences about a partner’s body parts, proportions, build, hair, scent and other physical traits.',
+    descriptionEs: 'Preferencias sobre partes del cuerpo, proporciones, complexión, pelo, olor y otros rasgos físicos de la pareja.',
+  },
   fluids: {
     descriptionEn: 'Saliva, semen, urine, blood, feces, sweat, food, oils and other substances used as part of sexual play.',
     descriptionEs: 'Saliva, semen, orina, sangre, heces, sudor, comida, aceites y otras sustancias utilizadas como parte del juego sexual.',
