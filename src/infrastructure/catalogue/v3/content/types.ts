@@ -21,6 +21,31 @@ export interface CataloguePairedRoleSeed {
   readonly perspective: RolePerspective;
 }
 
+export interface CatalogueRoleLabelSeed {
+  readonly en: string;
+  readonly es: string;
+}
+
+export interface CatalogueRoleLabelsSeed extends Readonly<Record<string, CatalogueRoleLabelSeed | undefined>> {
+  readonly participate?: CatalogueRoleLabelSeed;
+  readonly give?: CatalogueRoleLabelSeed;
+  readonly receive?: CatalogueRoleLabelSeed;
+  readonly self?: CatalogueRoleLabelSeed;
+  readonly 'self-state'?: CatalogueRoleLabelSeed;
+  readonly 'partner-state'?: CatalogueRoleLabelSeed;
+  readonly wear?: CatalogueRoleLabelSeed;
+  readonly 'partner-wears'?: CatalogueRoleLabelSeed;
+  readonly watch?: CatalogueRoleLabelSeed;
+  readonly 'be-watched'?: CatalogueRoleLabelSeed;
+  readonly lead?: CatalogueRoleLabelSeed;
+  readonly follow?: CatalogueRoleLabelSeed;
+  readonly center?: CatalogueRoleLabelSeed;
+  readonly interest?: CatalogueRoleLabelSeed;
+  readonly 'use-on-self'?: CatalogueRoleLabelSeed;
+  readonly 'use-on-partner'?: CatalogueRoleLabelSeed;
+  readonly 'partner-uses-on-me'?: CatalogueRoleLabelSeed;
+}
+
 export interface CataloguePracticeSeed {
   readonly id: string;
   readonly en: string;
@@ -31,6 +56,8 @@ export interface CataloguePracticeSeed {
   readonly counterpartScoped?: boolean;
   /** Two complementary semantic roles used by `paired` practices. */
   readonly pairedRoles?: readonly [CataloguePairedRoleSeed, CataloguePairedRoleSeed];
+  /** Optional human wording for builder-generated roles, keyed by the stable role id. */
+  readonly roleLabels?: CatalogueRoleLabelsSeed;
   /**
    * Sex of the person whose body is acted on or whose anatomy is the subject of the preference.
    * Builders map this to the receiver/target for directed practices and to the subject for

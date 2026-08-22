@@ -115,9 +115,12 @@ export class CatalogueTextService {
   roleLabel(practiceId: string, role: PracticeRole): string {
     const seed = V3_PRACTICES.get(practiceId);
     if (seed) {
+      const locale = this.translations.locale();
+      const explicitRole = seed.roleLabels?.[role.id];
+      if (explicitRole) return locale === 'es' ? explicitRole.es : explicitRole.en;
       const pairedRole = seed.pairedRoles?.find((candidate) => candidate.id === role.id);
-      if (pairedRole) return this.translations.locale() === 'es' ? pairedRole.es : pairedRole.en;
-      return V3_ROLE_LABELS[this.translations.locale()][role.id] ?? role.label;
+      if (pairedRole) return locale === 'es' ? pairedRole.es : pairedRole.en;
+      return V3_ROLE_LABELS[locale][role.id] ?? role.label;
     }
     return this.translate(roleLabelKey(practiceId, role.id), role.label);
   }
