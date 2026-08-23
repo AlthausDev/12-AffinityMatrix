@@ -32,6 +32,7 @@ describe('UiPreferencesService', () => {
       fontScale: 'normal',
       hiddenCategoriesByProfile: {},
       profileOrder: [],
+      profileSortMode: 'manual',
     });
   });
 
@@ -49,6 +50,7 @@ describe('UiPreferencesService', () => {
       fontScale: 'large',
       hiddenCategoriesByProfile: {},
       profileOrder: [],
+      profileSortMode: 'manual',
     });
   });
 
@@ -71,6 +73,19 @@ describe('UiPreferencesService', () => {
     expect(service.hiddenCategoryIds('profile-b')).toEqual(['roleplay']);
   });
 
+  it('cleans profile-scoped UI preferences when a profile is deleted', () => {
+    const service = TestBed.inject(UiPreferencesService);
+    service.setProfileOrder(['profile-a', 'profile-b']);
+    service.setCategoryHidden('profile-a', 'edge', true);
+    service.setCategoryHidden('profile-b', 'roleplay', true);
+
+    service.removeProfile('profile-a');
+
+    expect(service.profileOrder()).toEqual(['profile-b']);
+    expect(service.hiddenCategoryIds('profile-a')).toEqual([]);
+    expect(service.hiddenCategoryIds('profile-b')).toEqual(['roleplay']);
+  });
+
   it('persists a sanitized local profile order', () => {
     const service = TestBed.inject(UiPreferencesService);
 
@@ -82,6 +97,21 @@ describe('UiPreferencesService', () => {
       fontScale: 'normal',
       hiddenCategoriesByProfile: {},
       profileOrder: ['profile-b', 'profile-a'],
+      profileSortMode: 'manual',
+    });
+  });
+
+  it('persists the selected profile sort mode without changing the manual order', () => {
+    const service = TestBed.inject(UiPreferencesService);
+    service.setProfileOrder(['profile-b', 'profile-a']);
+
+    service.setProfileSortMode('completion');
+
+    expect(service.profileSortMode()).toBe('completion');
+    expect(service.profileOrder()).toEqual(['profile-b', 'profile-a']);
+    expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({
+      profileOrder: ['profile-b', 'profile-a'],
+      profileSortMode: 'completion',
     });
   });
 
@@ -94,6 +124,7 @@ describe('UiPreferencesService', () => {
         'profile-b': 'not-an-array',
       },
       profileOrder: ['profile-c', 'profile-a', 'profile-c', 7, ''],
+      profileSortMode: 'alias',
     }));
 
     const service = TestBed.inject(UiPreferencesService);
@@ -104,6 +135,7 @@ describe('UiPreferencesService', () => {
     expect(service.hiddenCategoryIds('profile-a')).toEqual(['edge', 'fluids']);
     expect(service.hiddenCategoryIds('profile-b')).toEqual([]);
     expect(service.profileOrder()).toEqual(['profile-c', 'profile-a']);
+    expect(service.profileSortMode()).toBe('alias');
   });
 
   it('ignores malformed or unsupported stored preference shapes', () => {
@@ -112,6 +144,7 @@ describe('UiPreferencesService', () => {
       fontScale: 'huge',
       hiddenCategoriesByProfile: null,
       profileOrder: 'not-an-array',
+      profileSortMode: 'random',
     }));
 
     const service = TestBed.inject(UiPreferencesService);

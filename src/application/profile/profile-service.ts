@@ -1,6 +1,7 @@
 import { CatalogueVersion } from '../../domain/catalogue/catalogue-version';
 import {
   AnswerScope,
+  cloneAnswers,
   clonePracticeAnswer,
   createAnswerKey,
   PracticeAnswer,
@@ -35,6 +36,20 @@ export class ProfileService {
     const profile = this.factory.create(metadata, settings, this.clock.now());
     await this.repository.save(profile);
     return profile;
+  }
+
+  async duplicate(id: ProfileId, metadata?: ProfileMetadata): Promise<Profile | undefined> {
+    const current = await this.repository.findById(id);
+    if (!current) return undefined;
+
+    const duplicate = this.factory.create(metadata ?? current.metadata, current.settings, this.clock.now());
+    const restoredCopy: Profile = {
+      ...duplicate,
+      catalogueVersion: current.catalogueVersion,
+      answers: cloneAnswers(current.answers),
+    };
+    await this.repository.save(restoredCopy);
+    return restoredCopy;
   }
 
   async importPortable(portable: PortableProfile): Promise<Profile> {

@@ -39,6 +39,10 @@ export class ProfileStore {
     return this.enqueueProfileMutation(() => this.service.create(metadata, settings));
   }
 
+  duplicate(id: ProfileId, metadata?: ProfileMetadata): Promise<Profile | undefined> {
+    return this.enqueueProfileMutation(() => this.service.duplicate(id, metadata));
+  }
+
   importPortable(portable: PortableProfile): Promise<Profile | undefined> {
     return this.enqueueProfileMutation(() => this.service.importPortable(portable));
   }

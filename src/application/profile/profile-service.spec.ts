@@ -60,6 +60,33 @@ describe('ProfileService', () => {
     expect(await repository.findAll()).toHaveLength(1);
   });
 
+  it('duplicates a profile with a fresh identity while preserving settings, answers and catalogue semantics', async () => {
+    const profile = await service.create(
+      { alias: 'Original', sex: 'female', orientation: 'bisexual' },
+      { filterQuestionnaireByMetadata: false },
+    );
+    await service.upsertAnswer(profile.id, {
+      practiceId: 'bondage', roleId: 'receive', preference: 'favorite',
+      details: { desiredFrequency: 'regularly' },
+    }, 3);
+
+    clock.set('2026-08-17T14:00:00.000Z');
+    const duplicate = await service.duplicate(profile.id, {
+      ...profile.metadata,
+      alias: 'Original (copy)',
+    });
+
+    expect(duplicate?.id).toBe('profile-2');
+    expect(duplicate?.revision).toBe(1);
+    expect(duplicate?.metadata.alias).toBe('Original (copy)');
+    expect(duplicate?.settings.filterQuestionnaireByMetadata).toBe(false);
+    expect(duplicate?.catalogueVersion).toBe(3);
+    expect(duplicate?.answers['bondage::receive']?.preference).toBe('favorite');
+    expect(duplicate?.answers['bondage::receive']).not.toBe((await repository.findById(profile.id))?.answers['bondage::receive']);
+    expect(duplicate?.createdAt).toBe('2026-08-17T14:00:00.000Z');
+    expect(duplicate?.updatedAt).toBe('2026-08-17T14:00:00.000Z');
+  });
+
   it('updates metadata and settings atomically while incrementing the revision', async () => {
     const profile = await service.create({ alias: 'Original' });
     clock.set('2026-08-17T13:00:00.000Z');
