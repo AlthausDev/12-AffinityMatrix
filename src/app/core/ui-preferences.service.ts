@@ -6,11 +6,15 @@ export const UI_PREFERENCES_STORAGE_KEY = 'preference-profile.ui-preferences.v1'
 export const FONT_SCALE_VALUES = ['normal', 'large', 'extra-large'] as const;
 export type FontScale = (typeof FONT_SCALE_VALUES)[number];
 
+export const PROFILE_SORT_MODES = ['manual', 'recent', 'completion', 'alias'] as const;
+export type ProfileSortMode = (typeof PROFILE_SORT_MODES)[number];
+
 export interface UiPreferences {
   readonly confirmQuestionnaireExit: boolean;
   readonly fontScale: FontScale;
   readonly hiddenCategoriesByProfile: Readonly<Record<string, readonly string[]>>;
   readonly profileOrder: readonly string[];
+  readonly profileSortMode: ProfileSortMode;
 }
 
 export const DEFAULT_UI_PREFERENCES: UiPreferences = {
@@ -18,6 +22,7 @@ export const DEFAULT_UI_PREFERENCES: UiPreferences = {
   fontScale: 'normal',
   hiddenCategoriesByProfile: {},
   profileOrder: [],
+  profileSortMode: 'manual',
 };
 
 @Injectable({ providedIn: 'root' })
@@ -47,6 +52,10 @@ export class UiPreferencesService {
     return this.state().profileOrder;
   }
 
+  profileSortMode(): ProfileSortMode {
+    return this.state().profileSortMode;
+  }
+
   isCategoryHidden(profileId: string, categoryId: string): boolean {
     return this.hiddenCategoryIds(profileId).includes(categoryId);
   }
@@ -63,6 +72,10 @@ export class UiPreferencesService {
   setProfileOrder(profileIds: readonly string[]): void {
     const profileOrder = [...new Set(profileIds.filter((profileId) => profileId.length > 0))];
     this.update({ profileOrder });
+  }
+
+  setProfileSortMode(value: ProfileSortMode): void {
+    this.update({ profileSortMode: value });
   }
 
   setCategoryHidden(profileId: string, categoryId: string, hidden: boolean): void {
@@ -108,6 +121,9 @@ export class UiPreferencesService {
           : DEFAULT_UI_PREFERENCES.fontScale,
         hiddenCategoriesByProfile: this.readHiddenCategories(parsed['hiddenCategoriesByProfile']),
         profileOrder: this.readProfileOrder(parsed['profileOrder']),
+        profileSortMode: this.isProfileSortMode(parsed['profileSortMode'])
+          ? parsed['profileSortMode']
+          : DEFAULT_UI_PREFERENCES.profileSortMode,
       };
     } catch {
       return DEFAULT_UI_PREFERENCES;
@@ -148,6 +164,10 @@ export class UiPreferencesService {
 
   private isFontScale(value: unknown): value is FontScale {
     return typeof value === 'string' && FONT_SCALE_VALUES.includes(value as FontScale);
+  }
+
+  private isProfileSortMode(value: unknown): value is ProfileSortMode {
+    return typeof value === 'string' && PROFILE_SORT_MODES.includes(value as ProfileSortMode);
   }
 
   private isRecord(value: unknown): value is Record<string, unknown> {
