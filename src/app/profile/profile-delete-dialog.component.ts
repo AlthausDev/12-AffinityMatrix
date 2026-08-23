@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
 import { ProfileStore } from '../core/profile.store';
+import { UiPreferencesService } from '../core/ui-preferences.service';
 import { TranslationService } from '../i18n/translation.service';
 
 @Component({
@@ -82,6 +83,7 @@ export class ProfileDeleteDialogComponent {
 
   readonly i18n = inject(TranslationService);
   private readonly profileStore = inject(ProfileStore);
+  private readonly preferences = inject(UiPreferencesService);
 
   readonly deleting = signal(false);
   readonly failed = signal(false);
@@ -100,10 +102,12 @@ export class ProfileDeleteDialogComponent {
 
     this.failed.set(false);
     this.deleting.set(true);
-    const deleted = await this.profileStore.delete(this.profileId());
+    const profileId = this.profileId();
+    const deleted = await this.profileStore.delete(profileId);
     this.deleting.set(false);
 
     if (deleted) {
+      this.preferences.removeProfile(profileId);
       this.deleted.emit();
       return;
     }
