@@ -1,16 +1,17 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { PRODUCT_MONOGRAM } from './product-brand';
 
 /**
  * Stable presentation slot for the product mark.
  *
- * The temporary AM monogram deliberately lives behind this component so a future
+ * The temporary DesireSync monogram deliberately lives behind this component so a future
  * image/SVG logo can replace it without changing page layout or brand spacing.
  */
 @Component({
   selector: 'app-brand-mark',
   template: `
     <span class="brand-mark" aria-hidden="true">
-      <span class="brand-monogram">AM</span>
+      <span class="brand-monogram">{{ monogram }}</span>
     </span>
   `,
   styles: `
@@ -68,4 +69,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BrandMarkComponent {}
+export class BrandMarkComponent {
+  readonly monogram = PRODUCT_MONOGRAM;
+}
