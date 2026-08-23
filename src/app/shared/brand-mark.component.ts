@@ -18,10 +18,10 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
       >
       <img
         class="brand-wordmark"
-        src="/branding/desiresync-logo.avif"
+        src="/branding/desiresync-logo.png"
         alt=""
-        width="360"
-        height="221"
+        width="480"
+        height="294"
       >
     </span>
   `,
