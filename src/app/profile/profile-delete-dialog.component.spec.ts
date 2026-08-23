@@ -25,6 +25,32 @@ describe('ProfileDeleteDialogComponent', () => {
     expect(buttons[1]?.classList.contains('secondary')).toBe(true);
   });
 
+  it('defaults keyboard safety to cancel, announces the warning and closes with Escape', async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProfileDeleteDialogComponent],
+      providers: [
+        { provide: ProfileStore, useValue: { delete: vi.fn() } },
+        { provide: UiPreferencesService, useValue: { removeProfile: vi.fn() } },
+      ],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(ProfileDeleteDialogComponent);
+    fixture.componentRef.setInput('profileId', 'profile-1');
+    let cancelled = false;
+    fixture.componentInstance.cancelled.subscribe(() => { cancelled = true; });
+    fixture.detectChanges();
+
+    const cancel = fixture.nativeElement.querySelector('.button.secondary') as HTMLButtonElement;
+    const dialog = fixture.nativeElement.querySelector('[role="dialog"]') as HTMLElement;
+    const backdrop = fixture.nativeElement.querySelector('.delete-backdrop') as HTMLElement;
+
+    expect(cancel.hasAttribute('autofocus')).toBe(true);
+    expect(dialog.getAttribute('aria-describedby')).toContain('profile-delete-warning');
+
+    backdrop.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(cancelled).toBe(true);
+  });
+
   it('deletes the selected profile, cleans local UI state and emits deleted after confirmation', async () => {
     const deleteProfile = vi.fn().mockResolvedValue(true);
     const removeProfile = vi.fn();

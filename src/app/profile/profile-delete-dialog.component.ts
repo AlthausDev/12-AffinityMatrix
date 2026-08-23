@@ -6,20 +6,20 @@ import { TranslationService } from '../i18n/translation.service';
 @Component({
   selector: 'app-profile-delete-dialog',
   template: `
-    <div class="delete-backdrop">
+    <div class="delete-backdrop" (keydown.escape)="cancel()">
       <section
         class="delete-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-delete-title"
-        aria-describedby="profile-delete-description"
+        aria-describedby="profile-delete-description profile-delete-warning"
       >
         <p class="eyebrow">{{ i18n.t('settings.danger.eyebrow') }}</p>
         <h2 id="profile-delete-title">{{ i18n.t('profileDeletion.title') }}</h2>
         <p id="profile-delete-description" class="muted">
           {{ i18n.t('profileDeletion.description', { alias: displayAlias() }) }}
         </p>
-        <p class="delete-warning">{{ i18n.t('profileDeletion.warning') }}</p>
+        <p id="profile-delete-warning" class="delete-warning">{{ i18n.t('profileDeletion.warning') }}</p>
 
         @if (failed()) {
           <p class="alert delete-error" role="alert">{{ i18n.t('profileDeletion.failed') }}</p>
@@ -29,7 +29,7 @@ import { TranslationService } from '../i18n/translation.service';
           <button class="button danger" type="button" [disabled]="deleting()" (click)="confirmDeletion()">
             {{ i18n.t(deleting() ? 'profileDeletion.deleting' : 'profileDeletion.confirm') }}
           </button>
-          <button class="button secondary" type="button" [disabled]="deleting()" (click)="cancel()">
+          <button class="button secondary" type="button" autofocus [disabled]="deleting()" (click)="cancel()">
             {{ i18n.t('common.cancel') }}
           </button>
         </div>
