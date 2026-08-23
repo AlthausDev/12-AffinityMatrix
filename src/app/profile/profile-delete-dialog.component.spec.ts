@@ -4,6 +4,23 @@ import { ProfileStore } from '../core/profile.store';
 import { ProfileDeleteDialogComponent } from './profile-delete-dialog.component';
 
 describe('ProfileDeleteDialogComponent', () => {
+  it('places the destructive action first and keeps both actions equal-width', async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProfileDeleteDialogComponent],
+      providers: [{ provide: ProfileStore, useValue: { delete: vi.fn() } }],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(ProfileDeleteDialogComponent);
+    fixture.componentRef.setInput('profileId', 'profile-1');
+    fixture.detectChanges();
+
+    const actions = fixture.nativeElement.querySelector('.delete-actions') as HTMLElement;
+    const buttons = actions.querySelectorAll('button');
+
+    expect(buttons[0]?.classList.contains('danger')).toBe(true);
+    expect(buttons[1]?.classList.contains('secondary')).toBe(true);
+  });
+
   it('deletes the selected profile and emits deleted after confirmation', async () => {
     const deleteProfile = vi.fn().mockResolvedValue(true);
 
@@ -20,8 +37,8 @@ describe('ProfileDeleteDialogComponent', () => {
     fixture.componentInstance.deleted.subscribe(() => { emitted = true; });
     fixture.detectChanges();
 
-    const buttons = fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
-    buttons[1]?.click();
+    const confirm = fixture.nativeElement.querySelector('.button.danger') as HTMLButtonElement;
+    confirm.click();
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -42,8 +59,8 @@ describe('ProfileDeleteDialogComponent', () => {
     fixture.componentRef.setInput('profileId', 'profile-1');
     fixture.detectChanges();
 
-    const buttons = fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
-    buttons[1]?.click();
+    const confirm = fixture.nativeElement.querySelector('.button.danger') as HTMLButtonElement;
+    confirm.click();
     await fixture.whenStable();
     fixture.detectChanges();
 
