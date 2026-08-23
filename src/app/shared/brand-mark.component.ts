@@ -1,14 +1,14 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-/**
- * Stable presentation slot for DesireSync branding.
- *
- * The hub hero uses the complete wordmark while compact contexts use the icon-only mark.
- */
+/** Stable presentation slot for DesireSync branding. */
 @Component({
   selector: 'app-brand-mark',
   template: `
-    <span class="brand-mark" aria-hidden="true">
+    <span
+      class="brand-mark"
+      [class.brand-mark-hero]="variant === 'hero'"
+      aria-hidden="true"
+    >
       <img
         class="brand-icon"
         src="/branding/desiresync-icon.avif"
@@ -30,7 +30,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     .brand-mark {
       position: relative;
       display: grid;
-      width: clamp(4.6rem, 8vw, 5.8rem);
+      width: var(--brand-mark-size, clamp(4.6rem, 8vw, 5.8rem));
       aspect-ratio: 1;
       place-items: center;
       overflow: hidden;
@@ -56,12 +56,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     }
     .brand-wordmark { display: none; }
 
-    :host-context(.profile-hub .hub-hero) {
-      display: block;
+    .brand-mark-hero {
       width: min(82vw, 25rem);
-    }
-    :host-context(.profile-hub .hub-hero) .brand-mark {
-      width: 100%;
       aspect-ratio: auto;
       overflow: visible;
       border: 0;
@@ -70,8 +66,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       box-shadow: none;
       backdrop-filter: none;
     }
-    :host-context(.profile-hub .hub-hero) .brand-icon { display: none; }
-    :host-context(.profile-hub .hub-hero) .brand-wordmark {
+    .brand-mark-hero .brand-icon { display: none; }
+    .brand-mark-hero .brand-wordmark {
       display: block;
       width: 100%;
       height: auto;
@@ -83,4 +79,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BrandMarkComponent {}
+export class BrandMarkComponent {
+  @Input() variant: 'compact' | 'hero' = 'compact';
+}
