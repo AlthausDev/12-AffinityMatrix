@@ -31,11 +31,11 @@ interface ProfileCardView {
             style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;"
           >{{ productName }}</h1>
           <img
-            src="/branding/desiresync-logo.avif"
+            src="/branding/desiresync-logo.png"
             alt=""
             aria-hidden="true"
-            width="480"
-            height="294"
+            width="320"
+            height="196"
             style="display:block;width:min(82vw,30rem);height:auto;object-fit:contain;position:relative;z-index:10;visibility:visible;opacity:1;"
           >
           <div class="brand-copy">
