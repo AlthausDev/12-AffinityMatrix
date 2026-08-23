@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { HomePageComponent } from './pages/home/home-page.component';
 import { ProfileEditorPageComponent } from './pages/profile-editor/profile-editor-page.component';
 import { ProfileExportPageComponent } from './pages/profile-export/profile-export-page.component';
 import { ProfileImportPageComponent } from './pages/profile-import/profile-import-page.component';
@@ -7,7 +6,9 @@ import { ProfileImportPageComponent } from './pages/profile-import/profile-impor
 export const routes: Routes = [
   {
     path: '',
-    component: HomePageComponent,
+    loadComponent: () =>
+      import('./pages/home/home-page.component')
+        .then((module) => module.HomePageComponent),
     title: 'Affinity Matrix',
   },
   {
