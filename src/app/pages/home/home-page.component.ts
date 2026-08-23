@@ -28,20 +28,16 @@ interface ProfileCardView {
       <header class="hub-hero">
         <div class="brand-cluster">
           <h1
-            [attr.aria-label]="productName"
-            style="display:flex !important; min-height:9rem; align-items:center; justify-content:center; flex-direction:column; gap:.35rem; margin:0 0 .55rem; visibility:visible !important; opacity:1 !important;"
+            style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;"
+          >{{ productName }}</h1>
+          <img
+            src="/branding/desiresync-logo.avif"
+            alt=""
+            aria-hidden="true"
+            width="480"
+            height="294"
+            style="display:block;width:min(82vw,30rem);height:auto;object-fit:contain;position:relative;z-index:10;visibility:visible;opacity:1;"
           >
-            <img
-              src="/branding/desiresync-favicon.png"
-              alt=""
-              width="112"
-              height="112"
-              style="display:block !important; width:7rem; height:7rem; object-fit:contain; visibility:visible !important; opacity:1 !important;"
-            >
-            <span style="display:flex !important; align-items:baseline; justify-content:center; visibility:visible !important; opacity:1 !important; font-size:clamp(2.65rem,7vw,4.2rem); font-weight:850; letter-spacing:-.065em; line-height:.95;">
-              <span style="color:#53d6ff !important;">Desire</span><span style="color:#ef62c8 !important;">Sync</span>
-            </span>
-          </h1>
           <div class="brand-copy">
             <p class="lead">{{ i18n.t('homeHub.tagline') }}</p>
             <span class="version-pill">v{{ appVersion }}</span>
