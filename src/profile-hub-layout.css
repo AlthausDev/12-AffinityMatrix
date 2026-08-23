@@ -218,3 +218,15 @@
     text-align: left;
   }
 }
+
+@media (max-width: 620px) {
+  .profile-hub .profile-toolbar-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profile-hub .hub-action-button {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+}
