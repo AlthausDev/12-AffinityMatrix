@@ -34,9 +34,9 @@ interface ProfileCardView {
             src="/branding/desiresync-logo.png"
             alt=""
             aria-hidden="true"
-            width="320"
-            height="196"
-            style="display:block;width:min(82vw,30rem);height:auto;object-fit:contain;position:relative;z-index:10;visibility:visible;opacity:1;"
+            width="800"
+            height="485"
+            style="display:block;width:min(86vw,34rem);height:auto;object-fit:contain;position:relative;z-index:10;visibility:visible;opacity:1;"
           >
           <div class="brand-copy">
             <p class="lead">{{ i18n.t('homeHub.tagline') }}</p>
