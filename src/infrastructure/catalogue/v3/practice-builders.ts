@@ -23,6 +23,7 @@ export function buildPractice(seed: CataloguePracticeSeed, categoryId: string): 
     case 'group': return group(seed, categoryId);
     case 'focus': return focus(seed, categoryId);
     case 'toy': return toy(seed, categoryId);
+    case 'dual-use-toy': return dualUseToy(seed, categoryId);
   }
 }
 
@@ -241,6 +242,30 @@ function toy(seed: CataloguePracticeSeed, categoryId: string): Practice {
   ];
 
   return practice(seed, categoryId, roles, compatibleRolePairs);
+}
+
+function dualUseToy(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  const sharedApplicability = mergeRoleApplicability(seed, 'use-together');
+  const selfApplicability = mergeRoleApplicability(seed, 'use-on-self');
+  const roles: PracticeRole[] = [
+    {
+      id: 'use-together',
+      label: roleLabel(seed, 'use-together', 'Use it together with my partner'),
+      perspective: 'neutral',
+      contextAxes: ['counterpartSex'],
+      ...(sharedApplicability ? { applicability: sharedApplicability } : {}),
+    },
+    {
+      id: 'use-on-self',
+      label: roleLabel(seed, 'use-on-self', 'Use both ends on myself'),
+      perspective: 'neutral',
+      ...(selfApplicability ? { applicability: selfApplicability } : {}),
+    },
+  ];
+  return practice(seed, categoryId, roles, [
+    { leftRoleId: 'use-together', rightRoleId: 'use-together' },
+    { leftRoleId: 'use-on-self', rightRoleId: 'use-on-self' },
+  ]);
 }
 
 function roleLabel(seed: CataloguePracticeSeed, roleId: string, fallback: string): string {
