@@ -261,7 +261,7 @@
 @media (max-width: 620px) {
   .profile-entry-page {
     width: min(100% - 1.2rem, 50rem);
-    padding-top: 3.2rem;
+    padding-top: 5.2rem;
   }
   .profile-entry-page .profile-entry-header h1 { font-size: clamp(1.9rem, 10vw, 2.5rem); }
   .profile-entry-page .profile-entry-panel { padding: 1rem; border-radius: 0.82rem; }
