@@ -25,9 +25,6 @@ type ProfileDropPosition = 'before' | 'after';
 interface ProfilePointerDragState {
   readonly profileId: string;
   readonly pointerId: number;
-  readonly startX: number;
-  readonly startY: number;
-  active: boolean;
   targetProfileId: string | null;
   dropPosition: ProfileDropPosition | null;
 }
@@ -61,7 +58,11 @@ interface ProfilePointerDragState {
         <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p>
       }
 
-      <section class="profiles-section" aria-labelledby="local-profiles-title">
+      <section
+        class="profiles-section"
+        [class.profile-reorder-mode]="reorderMode()"
+        aria-labelledby="local-profiles-title"
+      >
         <div class="profiles-toolbar">
           <div class="profiles-heading">
             <div>
@@ -69,6 +70,17 @@ interface ProfilePointerDragState {
               <div class="profiles-title-row">
                 <h2 id="local-profiles-title">{{ i18n.t('homeHub.profiles.title') }}</h2>
                 <span class="profile-count-pill">{{ profileCards().length }}</span>
+                @if (profileCards().length > 1) {
+                  <button
+                    class="profile-order-button"
+                    type="button"
+                    [attr.aria-pressed]="reorderMode()"
+                    (click)="toggleReorderMode()"
+                  >
+                    <span aria-hidden="true">{{ reorderMode() ? '✓' : '↕' }}</span>
+                    {{ i18n.t(reorderMode() ? 'homeHub.profiles.orderDone' : 'homeHub.profiles.order') }}
+                  </button>
+                }
               </div>
             </div>
           </div>
@@ -84,6 +96,10 @@ interface ProfilePointerDragState {
             </a>
           </nav>
         </div>
+
+        @if (reorderMode() && profileCards().length > 1) {
+          <p class="profile-reorder-hint" role="status">{{ i18n.t('homeHub.profiles.orderHint') }}</p>
+        }
 
         @if (profileCards().length === 0) {
           <div class="empty-hub-state">
@@ -108,13 +124,16 @@ interface ProfilePointerDragState {
                 (pointerup)="endProfileDrag($event)"
                 (pointercancel)="cancelProfileDrag()"
                 (lostpointercapture)="cancelProfileDrag()"
-                (click)="suppressProfileClickAfterDrag($event)"
+                (contextmenu)="suppressProfileContextMenu($event)"
               >
                 <a
                   class="profile-card-main"
-                  [routerLink]="['/profiles', card.profile.id]"
+                  [routerLink]="reorderMode() ? null : ['/profiles', card.profile.id]"
+                  [attr.aria-disabled]="reorderMode() ? 'true' : null"
+                  [attr.tabindex]="reorderMode() ? 0 : null"
+                  [attr.aria-keyshortcuts]="reorderMode() ? 'Alt+ArrowUp Alt+ArrowDown' : null"
                   draggable="false"
-                  aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
+                  (click)="suppressProfileNavigationInReorderMode($event)"
                   (dragstart)="$event.preventDefault()"
                   (keydown)="reorderFromKeyboard($event, card.profile.id)"
                 >
@@ -143,23 +162,25 @@ interface ProfilePointerDragState {
                   <span class="profile-card-arrow" aria-hidden="true">→</span>
                 </a>
 
-                <div class="profile-card-actions">
-                  <button
-                    class="profile-menu-button"
-                    type="button"
-                    [attr.aria-label]="i18n.t('homeHub.profile.menu', { alias: card.profile.metadata.alias || i18n.t('common.untitledProfile') })"
-                    [attr.aria-expanded]="activeMenuProfileId() === card.profile.id"
-                    (click)="toggleProfileMenu(card.profile.id)"
-                  >⋯</button>
+                @if (!reorderMode()) {
+                  <div class="profile-card-actions">
+                    <button
+                      class="profile-menu-button"
+                      type="button"
+                      [attr.aria-label]="i18n.t('homeHub.profile.menu', { alias: card.profile.metadata.alias || i18n.t('common.untitledProfile') })"
+                      [attr.aria-expanded]="activeMenuProfileId() === card.profile.id"
+                      (click)="toggleProfileMenu(card.profile.id)"
+                    >⋯</button>
 
-                  @if (activeMenuProfileId() === card.profile.id) {
-                    <div class="profile-menu">
-                      <button class="profile-delete-action" type="button" (click)="requestDeletion(card.profile)">
-                        {{ i18n.t('profileDeletion.homeAction') }}
-                      </button>
-                    </div>
-                  }
-                </div>
+                    @if (activeMenuProfileId() === card.profile.id) {
+                      <div class="profile-menu">
+                        <button class="profile-delete-action" type="button" (click)="requestDeletion(card.profile)">
+                          {{ i18n.t('profileDeletion.homeAction') }}
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
               </article>
             }
           </div>
@@ -203,12 +224,11 @@ export class HomePageComponent {
   readonly currentYear = new Date().getFullYear();
   readonly pendingDeletion = signal<Profile | null>(null);
   readonly activeMenuProfileId = signal<string | null>(null);
+  readonly reorderMode = signal(false);
   readonly draggedProfileId = signal<string | null>(null);
   readonly dragTargetProfileId = signal<string | null>(null);
   readonly dragDropPosition = signal<ProfileDropPosition | null>(null);
   private profilePointerDrag: ProfilePointerDragState | null = null;
-  private suppressProfileClickUntil = 0;
-  private readonly profileDragThreshold = 7;
 
   readonly profileCards = computed<readonly ProfileCardView[]>(() => {
     const snapshot = this.catalogueStore.snapshot();
@@ -272,45 +292,41 @@ export class HomePageComponent {
     this.pendingDeletion.set(profile);
   }
 
+  toggleReorderMode(): void {
+    this.cancelProfileDrag();
+    this.activeMenuProfileId.set(null);
+    this.reorderMode.update((current) => !current);
+  }
+
   startProfileDrag(event: PointerEvent, profileId: string): void {
+    if (!this.reorderMode()) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
 
-    const target = event.target instanceof Element ? event.target : null;
-    if (target?.closest('.profile-card-actions')) return;
-
-    this.suppressProfileClickUntil = 0;
+    event.preventDefault();
+    this.activeMenuProfileId.set(null);
     this.profilePointerDrag = {
       profileId,
       pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      active: false,
       targetProfileId: null,
       dropPosition: null,
     };
+    this.draggedProfileId.set(profileId);
+
+    const card = event.currentTarget as HTMLElement | null;
+    if (card && !card.hasPointerCapture(event.pointerId)) {
+      try {
+        card.setPointerCapture(event.pointerId);
+      } catch {
+        // Drag can continue while the pointer remains over the card if capture is unavailable.
+      }
+    }
   }
 
   moveProfileDrag(event: PointerEvent): void {
+    if (!this.reorderMode()) return;
+
     const drag = this.profilePointerDrag;
     if (!drag || drag.pointerId !== event.pointerId) return;
-
-    if (!drag.active) {
-      const distance = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY);
-      if (distance < this.profileDragThreshold) return;
-
-      const card = event.currentTarget as HTMLElement | null;
-      if (card && !card.hasPointerCapture(event.pointerId)) {
-        try {
-          card.setPointerCapture(event.pointerId);
-        } catch {
-          // Drag can continue while the pointer remains over the card even if capture is unavailable.
-        }
-      }
-
-      drag.active = true;
-      this.activeMenuProfileId.set(null);
-      this.draggedProfileId.set(drag.profileId);
-    }
 
     event.preventDefault();
     const target = this.document
@@ -334,15 +350,11 @@ export class HomePageComponent {
     const drag = this.profilePointerDrag;
     if (!drag || drag.pointerId !== event.pointerId) return;
 
-    const shouldDrop = drag.active && drag.targetProfileId !== null && drag.dropPosition !== null;
+    const shouldDrop = drag.targetProfileId !== null && drag.dropPosition !== null;
     const targetProfileId = drag.targetProfileId;
     const dropPosition = drag.dropPosition;
 
-    if (drag.active) {
-      event.preventDefault();
-      this.suppressProfileClickUntil = Date.now() + 300;
-    }
-
+    event.preventDefault();
     this.resetProfileDrag();
 
     if (shouldDrop && targetProfileId && dropPosition) {
@@ -354,16 +366,22 @@ export class HomePageComponent {
     this.resetProfileDrag();
   }
 
-  suppressProfileClickAfterDrag(event: MouseEvent): void {
-    if (Date.now() > this.suppressProfileClickUntil) return;
+  suppressProfileContextMenu(event: MouseEvent): void {
+    if (!this.reorderMode()) return;
 
-    this.suppressProfileClickUntil = 0;
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  suppressProfileNavigationInReorderMode(event: MouseEvent): void {
+    if (!this.reorderMode()) return;
+
     event.preventDefault();
     event.stopPropagation();
   }
 
   reorderFromKeyboard(event: KeyboardEvent, profileId: string): void {
-    if (!event.altKey) return;
+    if (!this.reorderMode() || !event.altKey) return;
 
     const backwards = event.key === 'ArrowUp';
     const forwards = event.key === 'ArrowDown';
