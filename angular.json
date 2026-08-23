@@ -23,8 +23,7 @@
             ],
             "styles": [
               "src/styles.css",
-              "src/profile-hub.css",
-              "src/profile-hub-glass-performance.css"
+              "src/profile-hub.css"
             ]
           },
           "configurations": {
