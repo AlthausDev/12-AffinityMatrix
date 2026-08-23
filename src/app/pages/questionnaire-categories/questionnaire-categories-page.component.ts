@@ -121,7 +121,7 @@ import { findRouteParam } from '../../shared/route-param';
     .category-main-link { display: grid; gap: 0.7rem; padding: 1.1rem 1.2rem 2.9rem; text-decoration: none; }
     .category-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
     .category-card-heading h2, .category-card p, .category-card small { margin: 0; }
-    .category-card-description { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; font-size: 0.86rem; line-height: 1.4; }
+    .category-card-description { font-size: 0.86rem; line-height: 1.4; }
     .category-visibility-action { position: absolute; right: 1.1rem; bottom: 0.9rem; padding: 0.3rem 0.5rem; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.75rem; text-decoration: underline; }
     .category-visibility-action:hover, .text-action:hover { color: var(--text-primary); }
     .hidden-categories { margin-top: 1.5rem; }
