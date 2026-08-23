@@ -12,6 +12,7 @@ import { ProfileDeleteDialogComponent } from '../../profile/profile-delete-dialo
 import { APP_VERSION } from '../../shared/app-version';
 import { BrandMarkComponent } from '../../shared/brand-mark.component';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
+import { PointerGlowDirective } from '../../shared/pointer-glow.directive';
 
 interface ProfileCardView {
   readonly profile: Profile;
@@ -19,11 +20,9 @@ interface ProfileCardView {
   readonly completionPercentage?: number;
 }
 
-type Rgb = readonly [number, number, number];
-
 @Component({
   selector: 'app-home-page',
-  imports: [RouterLink, ProfileDeleteDialogComponent, BrandMarkComponent, CompletionProgressComponent],
+  imports: [RouterLink, ProfileDeleteDialogComponent, BrandMarkComponent, CompletionProgressComponent, PointerGlowDirective],
   template: `
     <main class="page profile-hub">
       <header class="hub-hero">
@@ -78,10 +77,9 @@ type Rgb = readonly [number, number, number];
             @for (card of profileCards(); track card.profile.id) {
               <article
                 class="profile-card"
+                appPointerGlow
                 [class.profile-card-dragging]="draggedProfileId() === card.profile.id"
                 [attr.data-profile-id]="card.profile.id"
-                (pointermove)="updateCardLighting($event)"
-                (pointerleave)="resetCardLighting($event)"
               >
                 <button
                   class="profile-drag-handle"
@@ -174,10 +172,6 @@ type Rgb = readonly [number, number, number];
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomePageComponent {
-  private static readonly NEON_CYAN: Rgb = [54, 186, 255];
-  private static readonly NEON_VIOLET: Rgb = [140, 92, 255];
-  private static readonly NEON_MAGENTA: Rgb = [230, 80, 197];
-
   readonly profileStore = inject(ProfileStore);
   readonly catalogueStore = inject(CatalogueStore);
   readonly i18n = inject(TranslationService);
@@ -243,34 +237,6 @@ export class HomePageComponent {
     }).format(new Date(value));
   }
 
-  updateCardLighting(event: PointerEvent): void {
-    const card = event.currentTarget;
-    if (!(card instanceof HTMLElement)) return;
-
-    const rect = card.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) return;
-
-    const x = Math.min(rect.width, Math.max(0, event.clientX - rect.left));
-    const y = Math.min(rect.height, Math.max(0, event.clientY - rect.top));
-    const color = this.neonColorAt(x / rect.width);
-
-    card.style.setProperty('--pointer-x', `${x}px`);
-    card.style.setProperty('--pointer-y', `${y}px`);
-    card.style.setProperty('--pointer-r', `${color[0]}`);
-    card.style.setProperty('--pointer-g', `${color[1]}`);
-    card.style.setProperty('--pointer-b', `${color[2]}`);
-  }
-
-  resetCardLighting(event: PointerEvent): void {
-    const card = event.currentTarget;
-    if (!(card instanceof HTMLElement)) return;
-    card.style.removeProperty('--pointer-x');
-    card.style.removeProperty('--pointer-y');
-    card.style.removeProperty('--pointer-r');
-    card.style.removeProperty('--pointer-g');
-    card.style.removeProperty('--pointer-b');
-  }
-
   toggleProfileMenu(profileId: string): void {
     this.activeMenuProfileId.update((current) => current === profileId ? null : profileId);
   }
@@ -333,22 +299,6 @@ export class HomePageComponent {
     orderedIds.splice(sourceIndex, 1);
     orderedIds.splice(targetIndex, 0, profileId);
     this.preferences.setProfileOrder(orderedIds);
-  }
-
-  private neonColorAt(position: number): Rgb {
-    const normalized = Math.min(1, Math.max(0, position));
-    if (normalized <= 0.5) {
-      return this.mixColor(HomePageComponent.NEON_CYAN, HomePageComponent.NEON_VIOLET, normalized * 2);
-    }
-    return this.mixColor(HomePageComponent.NEON_VIOLET, HomePageComponent.NEON_MAGENTA, (normalized - 0.5) * 2);
-  }
-
-  private mixColor(from: Rgb, to: Rgb, amount: number): Rgb {
-    return [
-      Math.round(from[0] + (to[0] - from[0]) * amount),
-      Math.round(from[1] + (to[1] - from[1]) * amount),
-      Math.round(from[2] + (to[2] - from[2]) * amount),
-    ];
   }
 
   private sexLabel(sex: Sex | undefined): string | undefined {
