@@ -2,11 +2,12 @@ import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Profile } from '../../../domain/profile/profile';
-import { Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
+import { PROFILE_ALIAS_MAX_LENGTH, Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
 import { CatalogueStore } from '../../core/catalogue.store';
+import { PROFILE_STORAGE_CONTEXT } from '../../core/profile-repository.token';
 import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
-import { UiPreferencesService } from '../../core/ui-preferences.service';
+import { ProfileSortMode, UiPreferencesService } from '../../core/ui-preferences.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { ProfileDeleteDialogComponent } from '../../profile/profile-delete-dialog.component';
 import { APP_VERSION } from '../../shared/app-version';
@@ -55,12 +56,18 @@ interface ProfilePointerDragState {
       </header>
 
       @if (profileStore.error()) {
-        <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p>
+        <p class="alert profile-storage-alert" role="alert">{{ i18n.t('homeHub.storage.error') }}</p>
+      } @else if (storageContext.mode !== 'persistent') {
+        <p class="profile-storage-notice" role="status">
+          <span aria-hidden="true">◇</span>
+          {{ i18n.t(storageContext.mode === 'session' ? 'homeHub.storage.session' : 'homeHub.storage.memory') }}
+        </p>
       }
 
       <section
         class="profiles-section"
         [class.profile-reorder-mode]="reorderMode()"
+        [class.profile-manual-reorder-mode]="manualReorderEnabled()"
         aria-labelledby="local-profiles-title"
       >
         <div class="profiles-toolbar">
@@ -98,7 +105,21 @@ interface ProfilePointerDragState {
         </div>
 
         @if (reorderMode() && profileCards().length > 1) {
-          <p class="profile-reorder-hint" role="status">{{ i18n.t('homeHub.profiles.orderHint') }}</p>
+          <div class="profile-order-tools">
+            <div class="profile-sort-options" role="group" [attr.aria-label]="i18n.t('homeHub.profiles.sortOptionsLabel')">
+              @for (mode of profileSortModes; track mode) {
+                <button
+                  class="profile-sort-option"
+                  type="button"
+                  [attr.aria-pressed]="profileSortMode() === mode"
+                  (click)="setProfileSortMode(mode)"
+                >{{ sortModeLabel(mode) }}</button>
+              }
+            </div>
+            <p class="profile-reorder-hint" role="status">
+              {{ i18n.t(profileSortMode() === 'manual' ? 'homeHub.profiles.orderHint.manual' : 'homeHub.profiles.orderHint.sorted') }}
+            </p>
+          </div>
         }
 
         @if (profileCards().length === 0) {
@@ -131,7 +152,8 @@ interface ProfilePointerDragState {
                   [routerLink]="reorderMode() ? null : ['/profiles', card.profile.id]"
                   [attr.aria-disabled]="reorderMode() ? 'true' : null"
                   [attr.tabindex]="reorderMode() ? 0 : null"
-                  [attr.aria-keyshortcuts]="reorderMode() ? 'Alt+ArrowUp Alt+ArrowDown' : null"
+                  [attr.aria-keyshortcuts]="manualReorderEnabled() ? 'Alt+ArrowUp Alt+ArrowDown' : null"
+                  [attr.title]="profileDisplayName(card.profile)"
                   draggable="false"
                   (click)="suppressProfileNavigationInReorderMode($event)"
                   (dragstart)="$event.preventDefault()"
@@ -139,7 +161,7 @@ interface ProfilePointerDragState {
                 >
                   <header class="profile-card-header">
                     <div class="profile-title-copy">
-                      <h3>{{ card.profile.metadata.alias || i18n.t('common.untitledProfile') }}</h3>
+                      <h3>{{ profileDisplayName(card.profile) }}</h3>
                       <p>{{ metadataLabel(card.profile) }}</p>
                     </div>
                   </header>
@@ -167,16 +189,27 @@ interface ProfilePointerDragState {
                     <button
                       class="profile-menu-button"
                       type="button"
-                      [attr.aria-label]="i18n.t('homeHub.profile.menu', { alias: card.profile.metadata.alias || i18n.t('common.untitledProfile') })"
+                      aria-haspopup="menu"
+                      [attr.aria-label]="i18n.t('homeHub.profile.menu', { alias: profileDisplayName(card.profile) })"
                       [attr.aria-expanded]="activeMenuProfileId() === card.profile.id"
                       (click)="toggleProfileMenu(card.profile.id)"
                     >⋯</button>
 
                     @if (activeMenuProfileId() === card.profile.id) {
-                      <div class="profile-menu">
-                        <button class="profile-delete-action" type="button" (click)="requestDeletion(card.profile)">
-                          {{ i18n.t('profileDeletion.homeAction') }}
-                        </button>
+                      <div class="profile-menu" role="menu">
+                        <button
+                          class="profile-menu-action"
+                          type="button"
+                          role="menuitem"
+                          [disabled]="profileStore.saving()"
+                          (click)="duplicateProfile(card.profile)"
+                        >{{ i18n.t('homeHub.profile.duplicate') }}</button>
+                        <button
+                          class="profile-menu-action profile-menu-action-danger"
+                          type="button"
+                          role="menuitem"
+                          (click)="requestDeletion(card.profile)"
+                        >{{ i18n.t('profileDeletion.homeAction') }}</button>
                       </div>
                     }
                   </div>
@@ -197,6 +230,8 @@ interface ProfilePointerDragState {
         </div>
         <p class="footer-meta">{{ currentYear }} · v{{ appVersion }}</p>
       </footer>
+
+      <p class="profile-live-region" aria-live="polite" aria-atomic="true">{{ liveAnnouncement() }}</p>
     </main>
 
     @if (pendingDeletion(); as profile) {
@@ -214,6 +249,7 @@ export class HomePageComponent {
   readonly profileStore = inject(ProfileStore);
   readonly catalogueStore = inject(CatalogueStore);
   readonly i18n = inject(TranslationService);
+  readonly storageContext = inject(PROFILE_STORAGE_CONTEXT);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
   private readonly preferences = inject(UiPreferencesService);
   private readonly document = inject(DOCUMENT);
@@ -222,28 +258,21 @@ export class HomePageComponent {
   readonly productName = PRODUCT_NAME;
   readonly productMonogram = PRODUCT_MONOGRAM;
   readonly currentYear = new Date().getFullYear();
+  readonly profileSortModes: readonly ProfileSortMode[] = ['manual', 'recent', 'completion', 'alias'];
   readonly pendingDeletion = signal<Profile | null>(null);
   readonly activeMenuProfileId = signal<string | null>(null);
   readonly reorderMode = signal(false);
   readonly draggedProfileId = signal<string | null>(null);
   readonly dragTargetProfileId = signal<string | null>(null);
   readonly dragDropPosition = signal<ProfileDropPosition | null>(null);
+  readonly liveAnnouncement = signal('');
+  readonly profileSortMode = computed(() => this.preferences.profileSortMode());
+  readonly manualReorderEnabled = computed(() => this.reorderMode() && this.profileSortMode() === 'manual');
   private profilePointerDrag: ProfilePointerDragState | null = null;
 
   readonly profileCards = computed<readonly ProfileCardView[]>(() => {
     const snapshot = this.catalogueStore.snapshot();
-    const manualOrder = this.preferences.profileOrder();
-    const orderIndex = new Map(manualOrder.map((profileId, index) => [profileId, index]));
-    const profiles = [...this.profileStore.profiles()].sort((left, right) => {
-      const leftIndex = orderIndex.get(left.id);
-      const rightIndex = orderIndex.get(right.id);
-      if (leftIndex !== undefined && rightIndex !== undefined) return leftIndex - rightIndex;
-      if (leftIndex !== undefined) return -1;
-      if (rightIndex !== undefined) return 1;
-      return Date.parse(right.updatedAt) - Date.parse(left.updatedAt);
-    });
-
-    return profiles.map((profile) => {
+    const cards = this.profileStore.profiles().map((profile): ProfileCardView => {
       const answerCount = Object.keys(profile.answers).length;
       if (!snapshot) return { profile, answerCount };
 
@@ -258,6 +287,35 @@ export class HomePageComponent {
       const completionPercentage = questions === 0 ? 0 : Math.round((answered / questions) * 100);
       return { profile, answerCount, completionPercentage };
     });
+
+    const updatedDescending = (left: ProfileCardView, right: ProfileCardView) =>
+      Date.parse(right.profile.updatedAt) - Date.parse(left.profile.updatedAt);
+    const mode = this.profileSortMode();
+
+    if (mode === 'recent') return [...cards].sort(updatedDescending);
+    if (mode === 'completion') {
+      return [...cards].sort((left, right) =>
+        ((right.completionPercentage ?? -1) - (left.completionPercentage ?? -1)) || updatedDescending(left, right),
+      );
+    }
+    if (mode === 'alias') {
+      const collator = new Intl.Collator(this.i18n.locale(), { sensitivity: 'base', numeric: true });
+      return [...cards].sort((left, right) =>
+        collator.compare(this.profileDisplayName(left.profile), this.profileDisplayName(right.profile)) ||
+        updatedDescending(left, right),
+      );
+    }
+
+    const manualOrder = this.preferences.profileOrder();
+    const orderIndex = new Map(manualOrder.map((profileId, index) => [profileId, index]));
+    return [...cards].sort((left, right) => {
+      const leftIndex = orderIndex.get(left.profile.id);
+      const rightIndex = orderIndex.get(right.profile.id);
+      if (leftIndex !== undefined && rightIndex !== undefined) return leftIndex - rightIndex;
+      if (leftIndex !== undefined) return -1;
+      if (rightIndex !== undefined) return 1;
+      return updatedDescending(left, right);
+    });
   });
 
   constructor() {
@@ -266,6 +324,10 @@ export class HomePageComponent {
 
   answersLabel(count: number): string {
     return this.i18n.plural(count, 'homeHub.profile.answers.one', 'homeHub.profile.answers.other');
+  }
+
+  profileDisplayName(profile: Profile): string {
+    return profile.metadata.alias?.trim() || this.i18n.t('common.untitledProfile');
   }
 
   metadataLabel(profile: Profile): string {
@@ -283,8 +345,38 @@ export class HomePageComponent {
     }).format(new Date(value));
   }
 
+  sortModeLabel(mode: ProfileSortMode): string {
+    if (mode === 'recent') return this.i18n.t('homeHub.profiles.sort.recent');
+    if (mode === 'completion') return this.i18n.t('homeHub.profiles.sort.completion');
+    if (mode === 'alias') return this.i18n.t('homeHub.profiles.sort.alias');
+    return this.i18n.t('homeHub.profiles.sort.manual');
+  }
+
+  setProfileSortMode(mode: ProfileSortMode): void {
+    if (mode === this.profileSortMode()) return;
+    this.cancelProfileDrag();
+    this.preferences.setProfileSortMode(mode);
+    this.liveAnnouncement.set(this.i18n.t('homeHub.profiles.sortApplied', { sort: this.sortModeLabel(mode) }));
+  }
+
   toggleProfileMenu(profileId: string): void {
     this.activeMenuProfileId.update((current) => current === profileId ? null : profileId);
+  }
+
+  async duplicateProfile(profile: Profile): Promise<void> {
+    this.activeMenuProfileId.set(null);
+    const previousOrder = this.profileCards().map((card) => card.profile.id);
+    const copyAlias = this.copyAliasFor(profile);
+    const duplicate = await this.profileStore.duplicate(profile.id, { ...profile.metadata, alias: copyAlias });
+    if (!duplicate) return;
+
+    if (this.profileSortMode() === 'manual') {
+      const sourceIndex = previousOrder.indexOf(profile.id);
+      const nextOrder = [...previousOrder];
+      nextOrder.splice(sourceIndex >= 0 ? sourceIndex + 1 : nextOrder.length, 0, duplicate.id);
+      this.preferences.setProfileOrder(nextOrder);
+    }
+    this.liveAnnouncement.set(this.i18n.t('homeHub.profile.duplicated'));
   }
 
   requestDeletion(profile: Profile): void {
@@ -299,7 +391,7 @@ export class HomePageComponent {
   }
 
   startProfileDrag(event: PointerEvent, profileId: string): void {
-    if (!this.reorderMode()) return;
+    if (!this.manualReorderEnabled()) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
 
     event.preventDefault();
@@ -323,7 +415,7 @@ export class HomePageComponent {
   }
 
   moveProfileDrag(event: PointerEvent): void {
-    if (!this.reorderMode()) return;
+    if (!this.manualReorderEnabled()) return;
 
     const drag = this.profilePointerDrag;
     if (!drag || drag.pointerId !== event.pointerId) return;
@@ -367,7 +459,7 @@ export class HomePageComponent {
   }
 
   suppressProfileContextMenu(event: MouseEvent): void {
-    if (!this.reorderMode()) return;
+    if (!this.manualReorderEnabled()) return;
 
     event.preventDefault();
     event.stopPropagation();
@@ -381,7 +473,7 @@ export class HomePageComponent {
   }
 
   reorderFromKeyboard(event: KeyboardEvent, profileId: string): void {
-    if (!this.reorderMode() || !event.altKey) return;
+    if (!this.manualReorderEnabled() || !event.altKey) return;
 
     const backwards = event.key === 'ArrowUp';
     const forwards = event.key === 'ArrowDown';
@@ -396,6 +488,13 @@ export class HomePageComponent {
     event.stopPropagation();
     const targetProfileId = orderedIds[targetIndex];
     if (targetProfileId) this.moveProfile(profileId, targetProfileId);
+  }
+
+  private copyAliasFor(profile: Profile): string {
+    const desired = this.i18n.t('homeHub.profile.copyName', { alias: this.profileDisplayName(profile) });
+    return desired.length <= PROFILE_ALIAS_MAX_LENGTH
+      ? desired
+      : desired.slice(0, PROFILE_ALIAS_MAX_LENGTH).trimEnd();
   }
 
   private setDragTarget(
@@ -431,6 +530,7 @@ export class HomePageComponent {
     if (orderedIds.every((id, index) => id === originalOrder[index])) return;
 
     this.preferences.setProfileOrder(orderedIds);
+    this.announceProfilePosition(profileId, orderedIds);
   }
 
   private moveProfile(profileId: string, targetProfileId: string): void {
@@ -442,6 +542,18 @@ export class HomePageComponent {
     orderedIds.splice(sourceIndex, 1);
     orderedIds.splice(targetIndex, 0, profileId);
     this.preferences.setProfileOrder(orderedIds);
+    this.announceProfilePosition(profileId, orderedIds);
+  }
+
+  private announceProfilePosition(profileId: string, orderedIds: readonly string[]): void {
+    const profile = this.profileStore.findById(profileId);
+    const position = orderedIds.indexOf(profileId) + 1;
+    if (!profile || position <= 0) return;
+    this.liveAnnouncement.set(this.i18n.t('homeHub.profiles.moved', {
+      alias: this.profileDisplayName(profile),
+      position,
+      total: orderedIds.length,
+    }));
   }
 
   private sexLabel(sex: Sex | undefined): string | undefined {
