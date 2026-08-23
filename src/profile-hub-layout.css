@@ -9,6 +9,14 @@
   gap: 0.7rem;
 }
 
+.profile-hub .profile-card {
+  background:
+    linear-gradient(145deg, rgba(58, 64, 79, 0.58), rgba(29, 33, 49, 0.64)) padding-box,
+    var(--window-border-gradient-soft) border-box;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
 .profile-hub .profile-card-main {
   min-height: 8rem;
   grid-template-columns: minmax(0, 1fr) minmax(13rem, 0.72fr);
@@ -19,12 +27,22 @@
   column-gap: 1.6rem;
   row-gap: 0.72rem;
   padding: 0.9rem 1rem 0.85rem;
+  cursor: grab;
+}
+
+.profile-hub .profile-card-dragging,
+.profile-hub .profile-card-dragging .profile-card-main {
+  cursor: grabbing;
 }
 
 .profile-hub .profile-card-header {
   grid-area: header;
   align-self: end;
   padding: 0 1rem 0 1.35rem;
+}
+
+.profile-hub .profile-title-copy h3 {
+  font-size: 1.16rem;
 }
 
 .profile-hub .profile-facts {
