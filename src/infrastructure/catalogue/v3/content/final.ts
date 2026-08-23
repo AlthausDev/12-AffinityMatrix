@@ -13,6 +13,7 @@ import { groupFinalCataloguePractices } from './final-practice-order';
 import { applyFinalReleaseCopy } from './final-release-copy';
 import { applyFinalReleaseTaxonomy, FINAL_RELEASE_RETIRED_PRACTICE_IDS } from './final-release-taxonomy';
 import { applyConciseCategoryCopy, applyFinalRolePolish, FINAL_ROLE_POLISH_RETIRED_PRACTICE_IDS } from './final-role-polish';
+import { sanitizeFinalCatalogueSeeds } from './final-seed-sanitization';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
@@ -51,7 +52,8 @@ const RELEASE_TAXONOMY_CONTENT = applyFinalReleaseTaxonomy(LAST_MILE_CONTENT);
 const RELEASE_COPY_CONTENT = applyFinalReleaseCopy(RELEASE_TAXONOMY_CONTENT);
 const APPLICABILITY_REVIEWED_CONTENT = applyFinalApplicabilityReview(RELEASE_COPY_CONTENT);
 const FINAL_ROLE_CONTENT = applyFinalRolePolish(APPLICABILITY_REVIEWED_CONTENT);
-const GROUPED_CONTENT = groupFinalCataloguePractices(FINAL_ROLE_CONTENT);
+const SANITIZED_CONTENT = sanitizeFinalCatalogueSeeds(FINAL_ROLE_CONTENT);
+const GROUPED_CONTENT = groupFinalCataloguePractices(SANITIZED_CONTENT);
 const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(GROUPED_CONTENT);
 
 export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyConciseCategoryCopy(CATEGORY_COPY_CONTENT);
