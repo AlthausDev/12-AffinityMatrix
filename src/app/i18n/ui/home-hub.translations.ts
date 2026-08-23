@@ -1,0 +1,41 @@
+export const ES_HOME_HUB_TRANSLATIONS = {
+  'homeHub.tagline': 'Perfiles privados, locales y comparables.',
+  'homeHub.create.eyebrow': 'Nuevo perfil',
+  'homeHub.create.description': 'Empieza desde cero y configura sólo los datos que quieras usar para el filtrado.',
+  'homeHub.import.eyebrow': 'Portabilidad',
+  'homeHub.import.description': 'Trae un perfil mediante su código y revísalo antes de guardarlo en este navegador.',
+  'homeHub.profiles.eyebrow': 'Este dispositivo',
+  'homeHub.profiles.title': 'Tus perfiles',
+  'homeHub.profile.open': 'Abrir perfil',
+  'homeHub.profile.progress': '{percentage}% completado',
+  'homeHub.profile.answers.one': '{count} respuesta guardada',
+  'homeHub.profile.answers.other': '{count} respuestas guardadas',
+  'homeHub.profile.updated': 'Actualizado {date}',
+  'homeHub.profile.menu': 'Acciones para {alias}',
+  'homeHub.empty.title': 'Tu espacio está listo',
+  'homeHub.empty.description': 'Crea un perfil nuevo o importa uno existente. Todo permanecerá local en este navegador.',
+  'homeHub.privacy.title': 'Privado por defecto',
+  'homeHub.privacy.description': 'Tus perfiles permanecen en este dispositivo y no se envían a ningún servidor.',
+} as const;
+
+export type HomeHubTranslationKey = keyof typeof ES_HOME_HUB_TRANSLATIONS;
+
+export const EN_HOME_HUB_TRANSLATIONS = {
+  'homeHub.tagline': 'Private, local and comparable profiles.',
+  'homeHub.create.eyebrow': 'New profile',
+  'homeHub.create.description': 'Start from scratch and configure only the data you want to use for filtering.',
+  'homeHub.import.eyebrow': 'Portability',
+  'homeHub.import.description': 'Bring in a profile using its code and review it before saving it in this browser.',
+  'homeHub.profiles.eyebrow': 'This device',
+  'homeHub.profiles.title': 'Your profiles',
+  'homeHub.profile.open': 'Open profile',
+  'homeHub.profile.progress': '{percentage}% complete',
+  'homeHub.profile.answers.one': '{count} saved answer',
+  'homeHub.profile.answers.other': '{count} saved answers',
+  'homeHub.profile.updated': 'Updated {date}',
+  'homeHub.profile.menu': 'Actions for {alias}',
+  'homeHub.empty.title': 'Your space is ready',
+  'homeHub.empty.description': 'Create a new profile or import an existing one. Everything stays local in this browser.',
+  'homeHub.privacy.title': 'Private by default',
+  'homeHub.privacy.description': 'Your profiles stay on this device and are not sent to any server.',
+} satisfies Readonly<Record<HomeHubTranslationKey, string>>;
