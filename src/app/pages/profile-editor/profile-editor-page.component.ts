@@ -10,6 +10,7 @@ import {
 import { ProfileSettings } from '../../../domain/profile/profile-settings';
 import { ProfileStore } from '../../core/profile.store';
 import { TranslationService } from '../../i18n/translation.service';
+import { BrandMarkComponent } from '../../shared/brand-mark.component';
 
 interface ProfileFormModel {
   alias: string;
@@ -20,29 +21,32 @@ interface ProfileFormModel {
 
 @Component({
   selector: 'app-profile-editor-page',
-  imports: [FormField, RouterLink],
+  imports: [FormField, RouterLink, BrandMarkComponent],
   template: `
-    <main class="page narrow-page">
-      <a class="back-link" [routerLink]="backLink">{{ isEditing ? i18n.t('export.backProfile') : i18n.t('dashboard.backProfiles') }}</a>
+    <main class="page narrow-page profile-entry-page">
+      <a class="back-link profile-entry-back" [routerLink]="backLink">
+        {{ isEditing ? i18n.t('export.backProfile') : i18n.t('dashboard.backProfiles') }}
+      </a>
 
       @if (profileId && !existingProfile) {
-        <section class="panel">
+        <section class="panel profile-entry-panel">
           <h1>{{ i18n.t('common.profileNotFound.title') }}</h1>
           <p class="muted">{{ i18n.t('common.profileNotFound.description') }}</p>
           <a class="button" routerLink="/">{{ i18n.t('common.returnToProfiles') }}</a>
         </section>
       } @else {
-        <header class="page-header">
+        <header class="page-header profile-entry-header">
+          <div class="profile-entry-brand-slot"><app-brand-mark /></div>
           <p class="eyebrow">{{ i18n.t('profileEditor.eyebrow') }}</p>
           <h1>{{ i18n.t(isEditing ? 'profileEditor.editTitle' : 'profileEditor.createTitle') }}</h1>
           <p class="muted">{{ i18n.t('profileEditor.description') }}</p>
         </header>
 
         @if (profileStore.error()) {
-          <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p>
+          <p class="alert profile-entry-alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p>
         }
 
-        <form class="panel form-grid" (submit)="save($event)">
+        <form class="profile-entry-panel form-grid" (submit)="save($event)">
           <label class="field">
             <span>{{ i18n.t('profileEditor.alias') }}</span>
             <input type="text" autocomplete="off" [placeholder]="i18n.t('common.optional')" [formField]="profileForm.alias" />
