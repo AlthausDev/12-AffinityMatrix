@@ -288,7 +288,6 @@ export class HomePageComponent {
       targetProfileId: null,
       dropPosition: null,
     };
-    (event.currentTarget as HTMLElement | null)?.setPointerCapture(event.pointerId);
   }
 
   moveProfileDrag(event: PointerEvent): void {
@@ -298,6 +297,15 @@ export class HomePageComponent {
     if (!drag.active) {
       const distance = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY);
       if (distance < this.profileDragThreshold) return;
+
+      const card = event.currentTarget as HTMLElement | null;
+      if (card && !card.hasPointerCapture(event.pointerId)) {
+        try {
+          card.setPointerCapture(event.pointerId);
+        } catch {
+          // Drag can continue while the pointer remains over the card even if capture is unavailable.
+        }
+      }
 
       drag.active = true;
       this.activeMenuProfileId.set(null);
