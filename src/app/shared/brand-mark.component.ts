@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { PRODUCT_NAME } from './product-brand';
 
 /** Stable presentation slot for DesireSync branding. */
 @Component({
@@ -17,7 +16,9 @@ import { PRODUCT_NAME } from './product-brand';
         width="128"
         height="128"
       >
-      <span class="brand-wordmark">{{ productName }}</span>
+      <span class="brand-wordmark">
+        <span class="brand-wordmark-desire">Desire</span><span class="brand-wordmark-sync">Sync</span>
+      </span>
     </span>
   `,
   styles: `
@@ -54,51 +55,46 @@ import { PRODUCT_NAME } from './product-brand';
     .brand-mark-hero {
       display: flex;
       width: min(82vw, 27rem);
-      aspect-ratio: auto;
+      min-height: 10rem;
       align-items: center;
+      justify-content: center;
       flex-direction: column;
-      gap: 0.2rem;
+      gap: 0.35rem;
       overflow: visible;
       border: 0;
       border-radius: 0;
       background: transparent;
       box-shadow: none;
       backdrop-filter: none;
+      opacity: 1;
+      visibility: visible;
     }
     .brand-mark-hero .brand-icon {
       display: block;
-      width: clamp(7rem, 18vw, 10.5rem);
+      width: clamp(6.5rem, 16vw, 9rem);
       height: auto;
-      filter:
-        drop-shadow(0 0 0.65rem color-mix(in srgb, var(--neon-cyan) 24%, transparent))
-        drop-shadow(0 0 0.9rem color-mix(in srgb, var(--neon-magenta) 20%, transparent));
+      opacity: 1;
+      visibility: visible;
+      filter: none;
     }
     .brand-mark-hero .brand-wordmark {
-      display: block;
-      padding: 0.05em 0.08em 0.12em;
-      background: linear-gradient(
-        90deg,
-        #53d6ff 0%,
-        #6fa8ff 27%,
-        #a56cff 56%,
-        #ef62c8 82%,
-        #ff7eaa 100%
-      );
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
+      display: inline-flex;
+      align-items: baseline;
+      padding: 0.04em 0.08em 0.12em;
+      color: #f4f7ff;
       font-size: clamp(2.65rem, 7vw, 4.2rem);
       font-weight: 850;
       letter-spacing: -0.065em;
       line-height: 0.95;
-      filter:
-        drop-shadow(0 0 0.42rem rgba(54, 186, 255, 0.2))
-        drop-shadow(0 0 0.65rem rgba(230, 80, 197, 0.15));
+      opacity: 1;
+      visibility: visible;
+      text-shadow: 0 0 0.7rem rgba(105, 153, 255, 0.2);
     }
+    .brand-wordmark-desire { color: #66d7ff; }
+    .brand-wordmark-sync { color: #f06bc9; }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BrandMarkComponent {
   @Input() variant: 'compact' | 'hero' = 'compact';
-  readonly productName = PRODUCT_NAME;
 }
