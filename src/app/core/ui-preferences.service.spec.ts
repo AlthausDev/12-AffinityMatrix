@@ -73,6 +73,19 @@ describe('UiPreferencesService', () => {
     expect(service.hiddenCategoryIds('profile-b')).toEqual(['roleplay']);
   });
 
+  it('cleans profile-scoped UI preferences when a profile is deleted', () => {
+    const service = TestBed.inject(UiPreferencesService);
+    service.setProfileOrder(['profile-a', 'profile-b']);
+    service.setCategoryHidden('profile-a', 'edge', true);
+    service.setCategoryHidden('profile-b', 'roleplay', true);
+
+    service.removeProfile('profile-a');
+
+    expect(service.profileOrder()).toEqual(['profile-b']);
+    expect(service.hiddenCategoryIds('profile-a')).toEqual([]);
+    expect(service.hiddenCategoryIds('profile-b')).toEqual(['roleplay']);
+  });
+
   it('persists a sanitized local profile order', () => {
     const service = TestBed.inject(UiPreferencesService);
 
