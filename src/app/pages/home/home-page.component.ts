@@ -104,20 +104,14 @@ interface ProfilePointerDragState {
                 (lostpointercapture)="cancelProfileDrag()"
                 (click)="suppressProfileClickAfterDrag($event)"
               >
-                <button
-                  class="profile-drag-handle"
-                  type="button"
-                  [attr.aria-label]="i18n.t('homeHub.profile.reorder', { alias: card.profile.metadata.alias || i18n.t('common.untitledProfile') })"
+                <a
+                  class="profile-card-main"
+                  [routerLink]="['/profiles', card.profile.id]"
+                  draggable="false"
+                  aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
+                  (dragstart)="$event.preventDefault()"
                   (keydown)="reorderFromKeyboard($event, card.profile.id)"
                 >
-                  <span class="profile-drag-grip" aria-hidden="true">
-                    <span></span><span></span>
-                    <span></span><span></span>
-                    <span></span><span></span>
-                  </span>
-                </button>
-
-                <a class="profile-card-main" [routerLink]="['/profiles', card.profile.id]">
                   <header class="profile-card-header">
                     <div class="profile-title-copy">
                       <h3>{{ card.profile.metadata.alias || i18n.t('common.untitledProfile') }}</h3>
@@ -344,8 +338,10 @@ export class HomePageComponent {
   }
 
   reorderFromKeyboard(event: KeyboardEvent, profileId: string): void {
-    const backwards = event.key === 'ArrowLeft' || event.key === 'ArrowUp';
-    const forwards = event.key === 'ArrowRight' || event.key === 'ArrowDown';
+    if (!event.altKey) return;
+
+    const backwards = event.key === 'ArrowUp';
+    const forwards = event.key === 'ArrowDown';
     if (!backwards && !forwards) return;
 
     const orderedIds = this.profileCards().map((card) => card.profile.id);
@@ -354,6 +350,7 @@ export class HomePageComponent {
     if (currentIndex < 0 || targetIndex < 0 || targetIndex >= orderedIds.length) return;
 
     event.preventDefault();
+    event.stopPropagation();
     const targetProfileId = orderedIds[targetIndex];
     if (targetProfileId) this.moveProfile(profileId, targetProfileId);
   }
