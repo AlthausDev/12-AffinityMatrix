@@ -28,9 +28,10 @@ interface ProfileCardView {
     <main class="page profile-hub">
       <header class="hub-hero">
         <div class="brand-cluster">
-          <app-brand-mark />
+          <h1 [attr.aria-label]="productName">
+            <app-brand-mark variant="hero" />
+          </h1>
           <div class="brand-copy">
-            <h1>{{ productName }}</h1>
             <p class="lead">{{ i18n.t('homeHub.tagline') }}</p>
             <span class="version-pill">v{{ appVersion }}</span>
           </div>
