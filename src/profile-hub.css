@@ -126,7 +126,7 @@
 
 .profile-hub .profile-card-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.8rem;
 }
 .profile-hub .profile-card {
@@ -192,15 +192,6 @@
     0 0.9rem 1.9rem rgba(2, 5, 20, 0.24);
 }
 .profile-hub .profile-card:hover::before { opacity: 1; }
-.profile-hub .profile-card-dragging {
-  z-index: 8;
-  opacity: 0.76;
-  transform: scale(0.985);
-  box-shadow:
-    0 0 0.18rem color-mix(in srgb, var(--neon-cyan) 70%, transparent),
-    0 0 1.5rem color-mix(in srgb, var(--neon-violet) 28%, transparent),
-    0 1rem 2.2rem rgba(2, 5, 20, 0.32);
-}
 .profile-hub .profile-card-main {
   position: relative;
   z-index: 2;
@@ -269,62 +260,33 @@
   text-shadow: 0 0 0.8rem rgb(var(--pointer-r) var(--pointer-g) var(--pointer-b) / 0.55);
 }
 
-.profile-hub .profile-drag-handle,
 .profile-hub .profile-menu-button {
   position: absolute;
   z-index: 5;
   top: 0.72rem;
+  right: 0.72rem;
   display: grid;
+  width: 1.95rem;
   height: 1.95rem;
   place-items: center;
   border: 1px solid transparent;
   border-radius: 0.52rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
-}
-.profile-hub .profile-drag-handle {
-  left: 0.62rem;
-  width: 1.45rem;
-  padding: 0;
-  background: transparent;
-  touch-action: none;
-  cursor: grab;
-}
-.profile-hub .profile-drag-handle:active { cursor: grabbing; }
-.profile-hub .profile-drag-grip {
-  display: grid;
-  grid-template-columns: repeat(2, 0.18rem);
-  grid-template-rows: repeat(3, 0.18rem);
-  gap: 0.18rem;
-}
-.profile-hub .profile-drag-grip > span {
-  width: 0.18rem;
-  height: 0.18rem;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 0.35rem color-mix(in srgb, currentColor 28%, transparent);
-}
-.profile-hub .profile-menu-button {
-  right: 0.72rem;
-  width: 1.95rem;
   background: rgba(14, 26, 53, 0.5);
+  color: var(--text-secondary);
   font-size: 1.1rem;
   line-height: 1;
+  cursor: pointer;
   backdrop-filter: blur(9px);
-}
-.profile-hub .profile-drag-handle:hover,
-.profile-hub .profile-drag-handle:focus-visible {
-  color: var(--neon-cyan);
-  background: rgba(31, 89, 142, 0.12);
-  box-shadow: 0 0 0.8rem rgba(54, 186, 255, 0.13);
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
 }
 .profile-hub .profile-menu-button:hover,
+.profile-hub .profile-menu-button:focus-visible,
 .profile-hub .profile-menu-button[aria-expanded='true'] {
   border-color: color-mix(in srgb, var(--neon-violet) 40%, var(--border-subtle));
   background: rgba(39, 42, 85, 0.82);
   color: var(--text-primary);
   box-shadow: 0 0 0.8rem rgba(140, 92, 255, 0.12);
+  outline: none;
 }
 .profile-hub .profile-card-actions {
   position: absolute;
@@ -336,7 +298,7 @@
   position: absolute;
   top: 3rem;
   right: 0.72rem;
-  min-width: 9.5rem;
+  min-width: 10.5rem;
   padding: 0.3rem;
   border: 1px solid color-mix(in srgb, var(--neon-violet) 34%, var(--border-subtle));
   border-radius: 0.58rem;
@@ -344,19 +306,6 @@
   box-shadow: 0 0.75rem 1.8rem rgba(1, 4, 16, 0.42), 0 0 1rem rgba(140, 92, 255, 0.08);
   backdrop-filter: blur(16px);
 }
-.profile-hub .profile-delete-action {
-  width: 100%;
-  padding: 0.56rem 0.66rem;
-  border: 0;
-  border-radius: 0.4rem;
-  background: transparent;
-  color: #ffdce9;
-  text-align: left;
-  font-size: 0.76rem;
-  font-weight: 750;
-  cursor: pointer;
-}
-.profile-hub .profile-delete-action:hover { background: color-mix(in srgb, var(--preference-boundary) 15%, transparent); }
 
 .profile-hub .empty-hub-state {
   display: flex;
@@ -425,17 +374,12 @@
   letter-spacing: 0.025em;
 }
 
-@media (max-width: 900px) {
-  .profile-hub .profile-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
 @media (max-width: 620px) {
   .profile-hub { width: min(100% - 1.25rem, 76rem); padding-top: 1.35rem; }
   .profile-hub .hub-hero { margin-bottom: 2.2rem; }
   .profile-hub .hub-hero h1 { font-size: clamp(2.05rem, 11vw, 3rem); }
   .profile-hub .profiles-toolbar { align-items: stretch; flex-direction: column; }
   .profile-hub .profile-toolbar-actions { justify-content: flex-start; }
-  .profile-hub .profile-card-grid { grid-template-columns: 1fr; }
   .profile-hub .profile-card-main { min-height: 9.8rem; }
   .profile-hub .privacy-capsule { width: 100%; border-radius: 0.78rem; }
 }
