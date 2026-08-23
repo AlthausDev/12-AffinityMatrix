@@ -13,6 +13,7 @@ import { APP_VERSION } from '../../shared/app-version';
 import { BrandMarkComponent } from '../../shared/brand-mark.component';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { PointerGlowDirective } from '../../shared/pointer-glow.directive';
+import { PRODUCT_MONOGRAM, PRODUCT_NAME } from '../../shared/product-brand';
 
 interface ProfileCardView {
   readonly profile: Profile;
@@ -29,7 +30,7 @@ interface ProfileCardView {
         <div class="brand-cluster">
           <app-brand-mark />
           <div class="brand-copy">
-            <h1>Affinity Matrix</h1>
+            <h1>{{ productName }}</h1>
             <p class="lead">{{ i18n.t('homeHub.tagline') }}</p>
             <span class="version-pill">v{{ appVersion }}</span>
           </div>
@@ -66,7 +67,7 @@ interface ProfileCardView {
 
         @if (profileCards().length === 0) {
           <div class="empty-hub-state">
-            <div class="empty-orb" aria-hidden="true">AM</div>
+            <div class="empty-orb" aria-hidden="true">{{ productMonogram }}</div>
             <div>
               <h3>{{ i18n.t('homeHub.empty.title') }}</h3>
               <p>{{ i18n.t('homeHub.empty.description') }}</p>
@@ -180,6 +181,8 @@ export class HomePageComponent {
   private readonly document = inject(DOCUMENT);
 
   readonly appVersion = APP_VERSION;
+  readonly productName = PRODUCT_NAME;
+  readonly productMonogram = PRODUCT_MONOGRAM;
   readonly currentYear = new Date().getFullYear();
   readonly pendingDeletion = signal<Profile | null>(null);
   readonly activeMenuProfileId = signal<string | null>(null);
