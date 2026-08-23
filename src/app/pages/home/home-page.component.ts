@@ -20,6 +20,14 @@ interface ProfileCardView {
   readonly completionPercentage?: number;
 }
 
+interface ProfilePointerDragState {
+  readonly profileId: string;
+  readonly pointerId: number;
+  readonly startX: number;
+  readonly startY: number;
+  active: boolean;
+}
+
 @Component({
   selector: 'app-home-page',
   imports: [RouterLink, ProfileDeleteDialogComponent, CompletionProgressComponent, PointerGlowDirective],
@@ -89,16 +97,17 @@ interface ProfileCardView {
                 appPointerGlow
                 [class.profile-card-dragging]="draggedProfileId() === card.profile.id"
                 [attr.data-profile-id]="card.profile.id"
+                (pointerdown)="startProfileDrag($event, card.profile.id)"
+                (pointermove)="moveProfileDrag($event)"
+                (pointerup)="endProfileDrag($event)"
+                (pointercancel)="cancelProfileDrag($event)"
+                (lostpointercapture)="cancelProfileDrag()"
+                (click)="suppressProfileClickAfterDrag($event)"
               >
                 <button
                   class="profile-drag-handle"
                   type="button"
                   [attr.aria-label]="i18n.t('homeHub.profile.reorder', { alias: card.profile.metadata.alias || i18n.t('common.untitledProfile') })"
-                  (pointerdown)="startProfileDrag($event, card.profile.id)"
-                  (pointermove)="moveProfileDrag($event)"
-                  (pointerup)="endProfileDrag($event)"
-                  (pointercancel)="endProfileDrag($event)"
-                  (lostpointercapture)="endProfileDrag()"
                   (keydown)="reorderFromKeyboard($event, card.profile.id)"
                 >
                   <span class="profile-drag-grip" aria-hidden="true">
@@ -195,6 +204,10 @@ export class HomePageComponent {
   readonly pendingDeletion = signal<Profile | null>(null);
   readonly activeMenuProfileId = signal<string | null>(null);
   readonly draggedProfileId = signal<string | null>(null);
+  private profilePointerDrag: ProfilePointerDragState | null = null;
+  private suppressProfileClickUntil = 0;
+  private readonly profileDragThreshold = 7;
+
   readonly profileCards = computed<readonly ProfileCardView[]>(() => {
     const snapshot = this.catalogueStore.snapshot();
     const manualOrder = this.preferences.profileOrder();
@@ -259,31 +272,75 @@ export class HomePageComponent {
 
   startProfileDrag(event: PointerEvent, profileId: string): void {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
-    event.preventDefault();
-    this.activeMenuProfileId.set(null);
-    this.draggedProfileId.set(profileId);
+
+    const target = event.target instanceof Element ? event.target : null;
+    if (target?.closest('.profile-card-actions')) return;
+
+    this.suppressProfileClickUntil = 0;
+    this.profilePointerDrag = {
+      profileId,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      active: false,
+    };
     (event.currentTarget as HTMLElement | null)?.setPointerCapture(event.pointerId);
   }
 
   moveProfileDrag(event: PointerEvent): void {
-    const draggedProfileId = this.draggedProfileId();
-    if (!draggedProfileId) return;
-    event.preventDefault();
+    const drag = this.profilePointerDrag;
+    if (!drag || drag.pointerId !== event.pointerId) return;
 
+    if (!drag.active) {
+      const distance = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY);
+      if (distance < this.profileDragThreshold) return;
+
+      drag.active = true;
+      this.activeMenuProfileId.set(null);
+      this.draggedProfileId.set(drag.profileId);
+    }
+
+    event.preventDefault();
     const target = this.document
       .elementFromPoint(event.clientX, event.clientY)
       ?.closest<HTMLElement>('[data-profile-id]');
     const targetProfileId = target?.dataset['profileId'];
-    if (!targetProfileId || targetProfileId === draggedProfileId) return;
+    if (!targetProfileId || targetProfileId === drag.profileId) return;
 
-    this.moveProfile(draggedProfileId, targetProfileId);
+    this.moveProfile(drag.profileId, targetProfileId);
   }
 
-  endProfileDrag(event?: PointerEvent): void {
+  endProfileDrag(event: PointerEvent): void {
+    const drag = this.profilePointerDrag;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+
+    if (event.currentTarget instanceof HTMLElement && event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    if (drag.active) {
+      event.preventDefault();
+      this.suppressProfileClickUntil = Date.now() + 300;
+    }
+
+    this.profilePointerDrag = null;
+    this.draggedProfileId.set(null);
+  }
+
+  cancelProfileDrag(event?: PointerEvent): void {
     if (event?.currentTarget instanceof HTMLElement && event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+    this.profilePointerDrag = null;
     this.draggedProfileId.set(null);
+  }
+
+  suppressProfileClickAfterDrag(event: MouseEvent): void {
+    if (Date.now() > this.suppressProfileClickUntil) return;
+
+    this.suppressProfileClickUntil = 0;
+    event.preventDefault();
+    event.stopPropagation();
   }
 
   reorderFromKeyboard(event: KeyboardEvent, profileId: string): void {
