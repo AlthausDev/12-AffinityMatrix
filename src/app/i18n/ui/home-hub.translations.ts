@@ -16,7 +16,7 @@ export const ES_HOME_HUB_TRANSLATIONS = {
   'homeHub.empty.title': 'Tu espacio está listo',
   'homeHub.empty.description': 'Crea un perfil nuevo o importa uno existente. Todo permanecerá local en este navegador.',
   'homeHub.privacy.title': 'Privado por defecto',
-  'homeHub.privacy.description': 'Tus perfiles permanecen en este dispositivo y no se envían a ningún servidor.',
+  'homeHub.privacy.description': 'Tus perfiles permanecen en este dispositivo y no se envían a ningún servidor. El almacenamiento del navegador no está cifrado.',
 } as const;
 
 export type HomeHubTranslationKey = keyof typeof ES_HOME_HUB_TRANSLATIONS;
@@ -39,5 +39,5 @@ export const EN_HOME_HUB_TRANSLATIONS = {
   'homeHub.empty.title': 'Your space is ready',
   'homeHub.empty.description': 'Create a new profile or import an existing one. Everything stays local in this browser.',
   'homeHub.privacy.title': 'Private by default',
-  'homeHub.privacy.description': 'Your profiles stay on this device and are not sent to any server.',
+  'homeHub.privacy.description': 'Your profiles stay on this device and are not sent to any server. Browser storage is not encrypted.',
 } satisfies Readonly<Record<HomeHubTranslationKey, string>>;
