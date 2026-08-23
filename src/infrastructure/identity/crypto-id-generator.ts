@@ -3,33 +3,33 @@ import { IdGenerator } from '../../application/shared/id-generator';
 type RandomUuid = () => string;
 type FillRandomBytes = (array: Uint8Array<ArrayBuffer>) => void;
 
-function browserRandomUuid(): RandomUuid | undefined {
-  const api = globalThis.crypto;
-  return typeof api?.randomUUID === 'function' ? () => api.randomUUID() : undefined;
+interface UuidSources {
+  readonly randomUuid?: RandomUuid;
+  readonly fillRandomBytes?: FillRandomBytes;
 }
 
-function browserFillRandomBytes(): FillRandomBytes | undefined {
+function browserUuidSources(): UuidSources {
   const api = globalThis.crypto;
-  return typeof api?.getRandomValues === 'function'
-    ? (array) => { api.getRandomValues(array); }
-    : undefined;
+  return {
+    ...(typeof api?.randomUUID === 'function' ? { randomUuid: () => api.randomUUID() } : {}),
+    ...(typeof api?.getRandomValues === 'function'
+      ? { fillRandomBytes: (array: Uint8Array<ArrayBuffer>) => { api.getRandomValues(array); } }
+      : {}),
+  };
 }
 
-export function generateCompatibleUuid(
-  randomUuid: RandomUuid | undefined = browserRandomUuid(),
-  fillRandomBytes: FillRandomBytes | undefined = browserFillRandomBytes(),
-): string {
-  if (randomUuid) {
+export function generateCompatibleUuid(sources: UuidSources = browserUuidSources()): string {
+  if (sources.randomUuid) {
     try {
-      return randomUuid();
+      return sources.randomUuid();
     } catch {
       // Some browsers expose randomUUID but reject it outside a secure context.
     }
   }
 
   const bytes = new Uint8Array(new ArrayBuffer(16));
-  if (fillRandomBytes) {
-    fillRandomBytes(bytes);
+  if (sources.fillRandomBytes) {
+    sources.fillRandomBytes(bytes);
   } else {
     // Profile ids are local identifiers rather than secrets. This final compatibility
     // fallback keeps creation working in very restricted/legacy browser contexts.
