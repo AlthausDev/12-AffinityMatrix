@@ -10,12 +10,14 @@ export interface UiPreferences {
   readonly confirmQuestionnaireExit: boolean;
   readonly fontScale: FontScale;
   readonly hiddenCategoriesByProfile: Readonly<Record<string, readonly string[]>>;
+  readonly profileOrder: readonly string[];
 }
 
 export const DEFAULT_UI_PREFERENCES: UiPreferences = {
   confirmQuestionnaireExit: true,
   fontScale: 'normal',
   hiddenCategoriesByProfile: {},
+  profileOrder: [],
 };
 
 @Injectable({ providedIn: 'root' })
@@ -41,6 +43,10 @@ export class UiPreferencesService {
     return this.state().hiddenCategoriesByProfile[profileId] ?? [];
   }
 
+  profileOrder(): readonly string[] {
+    return this.state().profileOrder;
+  }
+
   isCategoryHidden(profileId: string, categoryId: string): boolean {
     return this.hiddenCategoryIds(profileId).includes(categoryId);
   }
@@ -52,6 +58,11 @@ export class UiPreferencesService {
   setFontScale(value: FontScale): void {
     this.update({ fontScale: value });
     this.applyFontScale(value);
+  }
+
+  setProfileOrder(profileIds: readonly string[]): void {
+    const profileOrder = [...new Set(profileIds.filter((profileId) => profileId.length > 0))];
+    this.update({ profileOrder });
   }
 
   setCategoryHidden(profileId: string, categoryId: string, hidden: boolean): void {
@@ -96,6 +107,7 @@ export class UiPreferencesService {
           ? parsed['fontScale']
           : DEFAULT_UI_PREFERENCES.fontScale,
         hiddenCategoriesByProfile: this.readHiddenCategories(parsed['hiddenCategoriesByProfile']),
+        profileOrder: this.readProfileOrder(parsed['profileOrder']),
       };
     } catch {
       return DEFAULT_UI_PREFERENCES;
@@ -113,6 +125,13 @@ export class UiPreferencesService {
       if (clean.length > 0) result[profileId] = clean;
     }
     return result;
+  }
+
+  private readProfileOrder(value: unknown): readonly string[] {
+    if (!Array.isArray(value)) return [];
+    return [...new Set(value.filter(
+      (profileId): profileId is string => typeof profileId === 'string' && profileId.length > 0,
+    ))];
   }
 
   private persist(value: UiPreferences): void {

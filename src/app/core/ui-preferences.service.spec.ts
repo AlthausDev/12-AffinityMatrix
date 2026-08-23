@@ -31,6 +31,7 @@ describe('UiPreferencesService', () => {
       confirmQuestionnaireExit: false,
       fontScale: 'normal',
       hiddenCategoriesByProfile: {},
+      profileOrder: [],
     });
   });
 
@@ -47,6 +48,7 @@ describe('UiPreferencesService', () => {
       confirmQuestionnaireExit: true,
       fontScale: 'large',
       hiddenCategoriesByProfile: {},
+      profileOrder: [],
     });
   });
 
@@ -69,7 +71,21 @@ describe('UiPreferencesService', () => {
     expect(service.hiddenCategoryIds('profile-b')).toEqual(['roleplay']);
   });
 
-  it('restores a stored font scale and sanitized hidden categories when the application initializes', () => {
+  it('persists a sanitized local profile order', () => {
+    const service = TestBed.inject(UiPreferencesService);
+
+    service.setProfileOrder(['profile-b', 'profile-a', 'profile-b', '']);
+
+    expect(service.profileOrder()).toEqual(['profile-b', 'profile-a']);
+    expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toEqual({
+      confirmQuestionnaireExit: true,
+      fontScale: 'normal',
+      hiddenCategoriesByProfile: {},
+      profileOrder: ['profile-b', 'profile-a'],
+    });
+  });
+
+  it('restores stored preferences and sanitizes local collections when the application initializes', () => {
     localStorage.setItem(UI_PREFERENCES_STORAGE_KEY, JSON.stringify({
       confirmQuestionnaireExit: true,
       fontScale: 'extra-large',
@@ -77,6 +93,7 @@ describe('UiPreferencesService', () => {
         'profile-a': ['edge', 'edge', '', 4, 'fluids'],
         'profile-b': 'not-an-array',
       },
+      profileOrder: ['profile-c', 'profile-a', 'profile-c', 7, ''],
     }));
 
     const service = TestBed.inject(UiPreferencesService);
@@ -86,6 +103,7 @@ describe('UiPreferencesService', () => {
     expect(document.documentElement.dataset['fontScale']).toBe('extra-large');
     expect(service.hiddenCategoryIds('profile-a')).toEqual(['edge', 'fluids']);
     expect(service.hiddenCategoryIds('profile-b')).toEqual([]);
+    expect(service.profileOrder()).toEqual(['profile-c', 'profile-a']);
   });
 
   it('ignores malformed or unsupported stored preference shapes', () => {
@@ -93,6 +111,7 @@ describe('UiPreferencesService', () => {
       confirmQuestionnaireExit: 'no',
       fontScale: 'huge',
       hiddenCategoriesByProfile: null,
+      profileOrder: 'not-an-array',
     }));
 
     const service = TestBed.inject(UiPreferencesService);

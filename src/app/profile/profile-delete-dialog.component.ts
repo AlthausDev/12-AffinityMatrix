@@ -24,12 +24,12 @@ import { TranslationService } from '../i18n/translation.service';
           <p class="alert delete-error" role="alert">{{ i18n.t('profileDeletion.failed') }}</p>
         }
 
-        <div class="form-actions">
-          <button class="button secondary" type="button" [disabled]="deleting()" (click)="cancel()">
-            {{ i18n.t('common.cancel') }}
-          </button>
+        <div class="delete-actions">
           <button class="button danger" type="button" [disabled]="deleting()" (click)="confirmDeletion()">
             {{ i18n.t(deleting() ? 'profileDeletion.deleting' : 'profileDeletion.confirm') }}
+          </button>
+          <button class="button secondary" type="button" [disabled]="deleting()" (click)="cancel()">
+            {{ i18n.t('common.cancel') }}
           </button>
         </div>
       </section>
@@ -65,6 +65,12 @@ import { TranslationService } from '../i18n/translation.service';
       color: #ffe6e9;
     }
     .delete-error { margin-bottom: 1rem; }
+    .delete-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+    .delete-actions .button { width: 100%; }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

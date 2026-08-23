@@ -67,12 +67,14 @@ describe('TranslationService', () => {
   it('provides the profile hub resources in both locales', () => {
     const service = TestBed.inject(TranslationService);
 
-    expect(service.t('homeHub.tagline')).toBe('Perfiles privados, locales y comparables.');
+    expect(service.t('homeHub.tagline')).toBe(
+      'Explora tus preferencias y descubre, en privado, dónde encajan con las de otra persona.',
+    );
     expect(service.plural(2, 'homeHub.profile.answers.one', 'homeHub.profile.answers.other')).toBe(
       '2 respuestas guardadas',
     );
 
     service.setLocale('en');
-    expect(service.t('homeHub.profile.open')).toBe('Open profile');
+    expect(service.t('homeHub.profile.reorder', { alias: 'Example' })).toBe('Reorder Example');
   });
 });
