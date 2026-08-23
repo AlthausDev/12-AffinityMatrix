@@ -13,14 +13,14 @@ function sampleProfile() {
     settings: { filterQuestionnaireByMetadata: false },
   });
 
-  const scope = { counterpartSex: 'male' as const };
-  const key = createAnswerKey('example-practice', 'receive', scope);
+  const scope = { counterpartSex: 'male' as const, targetSite: 'anal' as const };
+  const key = createAnswerKey('dildo', 'partner-uses-on-me', scope);
   return {
     ...profile,
     answers: {
       [key]: {
-        practiceId: 'example-practice',
-        roleId: 'receive',
+        practiceId: 'dildo',
+        roleId: 'partner-uses-on-me',
         scope,
         preference: 'depends' as const,
         details: {
@@ -35,15 +35,15 @@ function sampleProfile() {
 }
 
 describe('VersionedProfileCodeCodec', () => {
-  it('round-trips scoped portable profile data including unicode and optional details', () => {
+  it('round-trips P6 scoped portable profile data including target site, unicode, and optional details', () => {
     const decoded = codec.decode(codec.encode(sampleProfile()));
     const answer = Object.values(decoded.answers)[0];
 
-    expect(decoded.formatVersion).toBe(5);
-    expect(decoded.profileSchemaVersion).toBe(5);
+    expect(decoded.formatVersion).toBe(6);
+    expect(decoded.profileSchemaVersion).toBe(6);
     expect(decoded.metadata.alias).toBe('Ána ✓');
-    expect(decoded.catalogueVersion).toBe(2);
-    expect(answer?.scope?.counterpartSex).toBe('male');
+    expect(decoded.catalogueVersion).toBe(3);
+    expect(answer?.scope).toEqual({ counterpartSex: 'male', targetSite: 'anal' });
     expect(answer?.preference).toBe('depends');
     expect(answer?.details?.desiredFrequency).toBe('occasionally');
   });
@@ -77,7 +77,27 @@ describe('VersionedProfileCodeCodec', () => {
     expect(() => tinyCodec.encode(sampleProfile())).toThrow(ProfileCodeError);
   });
 
-  it('migrates P4 Neutral answers to unanswered while preserving explicit choices', () => {
+  it('migrates P5 metadata into P6 and intentionally discards development-catalogue answers', () => {
+    const v5 = {
+      formatVersion: 5,
+      profileSchemaVersion: 5,
+      catalogueVersion: 2,
+      metadata: { alias: 'Legacy V5', sex: 'female', orientation: 'bisexual' },
+      answers: {
+        'kissing::give': { practiceId: 'kissing', roleId: 'give', preference: 'like' },
+      },
+    };
+
+    const decoded = codec.decode(legacyCode('P5', v5));
+
+    expect(decoded.formatVersion).toBe(6);
+    expect(decoded.profileSchemaVersion).toBe(6);
+    expect(decoded.catalogueVersion).toBe(3);
+    expect(decoded.metadata).toEqual({ alias: 'Legacy V5', sex: 'female', orientation: 'bisexual' });
+    expect(decoded.answers).toEqual({});
+  });
+
+  it('migrates P4 and P3 metadata without guessing answer mappings', () => {
     const v4 = {
       formatVersion: 4,
       profileSchemaVersion: 4,
@@ -88,32 +108,27 @@ describe('VersionedProfileCodeCodec', () => {
         'kissing::give': { practiceId: 'kissing', roleId: 'give', preference: 'like' },
       },
     };
-
-    const decoded = codec.decode(legacyCode('P4', v4));
-
-    expect(decoded.formatVersion).toBe(5);
-    expect(decoded.profileSchemaVersion).toBe(5);
-    expect(decoded.answers['cuddling::mutual']).toBeUndefined();
-    expect(decoded.answers['kissing::give']?.preference).toBe('like');
-  });
-
-  it('migrates P3 without inventing relational scope and keeps its catalogue version', () => {
     const v3 = {
       formatVersion: 3,
       profileSchemaVersion: 3,
       catalogueVersion: 1,
       metadata: { alias: 'Legacy V3' },
       answers: {
-        'kissing::mutual': {
-          practiceId: 'kissing', roleId: 'mutual', preference: 'like',
-        },
+        'kissing::mutual': { practiceId: 'kissing', roleId: 'mutual', preference: 'like' },
       },
     };
-    const decoded = codec.decode(legacyCode('P3', v3));
-    expect(decoded.formatVersion).toBe(5);
-    expect(decoded.profileSchemaVersion).toBe(5);
-    expect(decoded.catalogueVersion).toBe(1);
-    expect(decoded.answers['kissing::mutual']?.scope).toBeUndefined();
+
+    const decodedV4 = codec.decode(legacyCode('P4', v4));
+    const decodedV3 = codec.decode(legacyCode('P3', v3));
+
+    expect(decodedV4.formatVersion).toBe(6);
+    expect(decodedV4.catalogueVersion).toBe(3);
+    expect(decodedV4.metadata.alias).toBe('Legacy V4');
+    expect(decodedV4.answers).toEqual({});
+    expect(decodedV3.formatVersion).toBe(6);
+    expect(decodedV3.catalogueVersion).toBe(3);
+    expect(decodedV3.metadata.alias).toBe('Legacy V3');
+    expect(decodedV3.answers).toEqual({});
   });
 
   it('migrates valid P2 and P1 codes to the current portable model', () => {
@@ -135,16 +150,18 @@ describe('VersionedProfileCodeCodec', () => {
     const decodedV2 = codec.decode(legacyCode('P2', v2));
     const decodedV1 = codec.decode(legacyCode('P1', v1));
 
-    expect(decodedV2.formatVersion).toBe(5);
-    expect(decodedV2.profileSchemaVersion).toBe(5);
-    expect(decodedV2.catalogueVersion).toBe(1);
+    expect(decodedV2.formatVersion).toBe(6);
+    expect(decodedV2.profileSchemaVersion).toBe(6);
+    expect(decodedV2.catalogueVersion).toBe(3);
     expect(decodedV2.metadata.alias).toBe('Legacy V2');
+    expect(decodedV1.formatVersion).toBe(6);
+    expect(decodedV1.catalogueVersion).toBe(3);
     expect(decodedV1.metadata.alias).toBe('Legacy V1');
     expect('filterByProfileMetadata' in decodedV1.metadata).toBe(false);
   });
 });
 
-function legacyCode(prefix: 'P1' | 'P2' | 'P3' | 'P4', value: unknown): string {
+function legacyCode(prefix: 'P1' | 'P2' | 'P3' | 'P4' | 'P5', value: unknown): string {
   const json = JSON.stringify(value);
   const bytes = new TextEncoder().encode(json);
   const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');

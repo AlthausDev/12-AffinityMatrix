@@ -5,7 +5,7 @@ import {
 import { Profile, ProfileId } from '../../domain/profile/profile';
 import { DomainValidationError } from '../../domain/shared/validator';
 import { ProfileStoreMigrator } from './profile-store-migration';
-import { PROFILE_STORE_VERSION, StoredProfilesV5 } from './profile-store';
+import { PROFILE_STORE_VERSION, StoredProfilesV6 } from './profile-store';
 import { StoredProfilesValidator, storedProfilesValidator } from './stored-profiles.validator';
 
 export const DEFAULT_PROFILE_STORAGE_KEY = 'preference-profile-store';
@@ -75,7 +75,7 @@ export class LocalStorageProfileRepository implements ProfileRepository {
     });
   }
 
-  private readStore(): StoredProfilesV5 {
+  private readStore(): StoredProfilesV6 {
     let source: { readonly key: string; readonly raw: string } | undefined;
     try {
       source = this.findStoredValue();
@@ -123,7 +123,7 @@ export class LocalStorageProfileRepository implements ProfileRepository {
     return undefined;
   }
 
-  private assertValidStore(value: unknown): StoredProfilesV5 {
+  private assertValidStore(value: unknown): StoredProfilesV6 {
     try {
       return this.validator.assert(value, 'Stored profile data failed validation.');
     } catch (error: unknown) {
@@ -140,7 +140,7 @@ export class LocalStorageProfileRepository implements ProfileRepository {
     }
   }
 
-  private writeStore(store: StoredProfilesV5): void {
+  private writeStore(store: StoredProfilesV6): void {
     this.assertValidStore(store);
     try {
       this.storage.setItem(this.storageKey, JSON.stringify(store));

@@ -30,7 +30,9 @@
 }
 
 * { box-sizing: border-box; }
-html { min-height: 100%; background: #121827; }
+html { min-height: 100%; background: #121827; font-size: 100%; }
+html[data-font-scale='large'] { font-size: 112.5%; }
+html[data-font-scale='extra-large'] { font-size: 125%; }
 body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--surface-page-gradient); color: var(--text-primary); }
 button, input, select, textarea { font: inherit; }
 a { color: inherit; }

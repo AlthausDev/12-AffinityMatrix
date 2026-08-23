@@ -56,7 +56,7 @@ describe('ProfileService', () => {
       { filterQuestionnaireByMetadata: true },
     );
     expect(profile.id).toBe('profile-1');
-    expect(profile.catalogueVersion).toBe(2);
+    expect(profile.catalogueVersion).toBe(3);
     expect(await repository.findAll()).toHaveLength(1);
   });
 
@@ -79,24 +79,37 @@ describe('ProfileService', () => {
     const profile = await service.create({ alias: 'Example' });
     await service.upsertAnswer(profile.id, {
       practiceId: 'bondage', roleId: 'receive', scope: { counterpartSex: 'female' }, preference: 'favorite',
-    }, 2);
+    }, 3);
     const updated = await service.upsertAnswer(profile.id, {
       practiceId: 'bondage', roleId: 'receive', scope: { counterpartSex: 'male' }, preference: 'curious',
-    }, 2);
+    }, 3);
 
     expect(updated?.answers[createAnswerKey('bondage', 'receive', { counterpartSex: 'female' })]?.preference).toBe('favorite');
     expect(updated?.answers[createAnswerKey('bondage', 'receive', { counterpartSex: 'male' })]?.preference).toBe('curious');
     expect(updated?.revision).toBe(3);
   });
 
+  it('stores target-site variants independently for the same toy role', async () => {
+    const profile = await service.create({ alias: 'Example' });
+    await service.upsertAnswer(profile.id, {
+      practiceId: 'dildo', roleId: 'use-on-self', scope: { targetSite: 'vaginal' }, preference: 'favorite',
+    }, 3);
+    const updated = await service.upsertAnswer(profile.id, {
+      practiceId: 'dildo', roleId: 'use-on-self', scope: { targetSite: 'anal' }, preference: 'curious',
+    }, 3);
+
+    expect(updated?.answers[createAnswerKey('dildo', 'use-on-self', { targetSite: 'vaginal' })]?.preference).toBe('favorite');
+    expect(updated?.answers[createAnswerKey('dildo', 'use-on-self', { targetSite: 'anal' })]?.preference).toBe('curious');
+  });
+
   it('removes only the selected scoped answer', async () => {
     const profile = await service.create({ alias: 'Example' });
     await service.upsertAnswer(profile.id, {
       practiceId: 'bondage', roleId: 'receive', scope: { counterpartSex: 'female' }, preference: 'like',
-    }, 2);
+    }, 3);
     await service.upsertAnswer(profile.id, {
       practiceId: 'bondage', roleId: 'receive', scope: { counterpartSex: 'male' }, preference: 'like',
-    }, 2);
+    }, 3);
 
     const updated = await service.removeAnswer(profile.id, 'bondage', 'receive', { counterpartSex: 'female' });
     expect(updated?.answers[createAnswerKey('bondage', 'receive', { counterpartSex: 'female' })]).toBeUndefined();
@@ -108,10 +121,10 @@ describe('ProfileService', () => {
     const updated = await service.upsertAnswer(profile.id, {
       practiceId: 'bondage', roleId: 'receive', preference: 'like',
       details: { desiredFrequency: 'regularly', initiative: 'prefer-partner' },
-    }, 2);
+    }, 3);
     expect(updated?.answers['bondage::receive']?.details?.desiredFrequency).toBe('regularly');
     expect(updated?.revision).toBe(2);
-    expect(updated?.catalogueVersion).toBe(2);
+    expect(updated?.catalogueVersion).toBe(3);
   });
 
   it('never downgrades a profile catalogue version when editing through an older catalogue', async () => {

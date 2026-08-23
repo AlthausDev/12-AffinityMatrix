@@ -1,13 +1,32 @@
-import { Sex } from '../profile/profile-metadata';
+import { TargetSite } from '../profile/profile-answer';
+import { Sex, SexualOrientation } from '../profile/profile-metadata';
 
 export type PracticeId = string;
 export type RoleId = string;
 export type RolePerspective = 'active' | 'receptive' | 'neutral';
-export type RoleContextAxis = 'counterpartSex';
+export type RoleContextAxis = 'counterpartSex' | 'targetSite';
+export type TargetOwner = 'self' | 'partner';
+
+export interface SelfProfileApplicabilityExclusion {
+  readonly sex?: Sex;
+  readonly orientation?: SexualOrientation;
+  /** When present, the exclusion only applies to these scoped target sites. */
+  readonly targetSites?: readonly TargetSite[];
+}
 
 export interface RoleApplicability {
   readonly selfSex?: readonly Sex[];
   readonly partnerSex?: readonly Sex[];
+  /** Exact participant composition for fixed-composition group practices. */
+  readonly groupComposition?: readonly Sex[];
+  /** At least one participant in the relevant encounter must have one of these sexes. */
+  readonly requiresAnyParticipantSex?: readonly Sex[];
+  /** Soft metadata exclusions used to suppress irrelevant role/scope variants in the normal questionnaire. */
+  readonly selfProfileExclusions?: readonly SelfProfileApplicabilityExclusion[];
+}
+
+export interface RoleContextValues {
+  readonly targetSite?: readonly TargetSite[];
 }
 
 export interface PracticeRole {
@@ -16,6 +35,8 @@ export interface PracticeRole {
   readonly perspective: RolePerspective;
   readonly applicability?: RoleApplicability;
   readonly contextAxes?: readonly RoleContextAxis[];
+  readonly contextValues?: RoleContextValues;
+  readonly targetOwner?: TargetOwner;
 }
 
 export interface RoleCompatibilityPair {

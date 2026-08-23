@@ -61,10 +61,12 @@ export class QuestionnaireService {
     snapshot: CatalogueSnapshot,
     profile: Profile,
     includeFiltered = false,
+    excludedCategoryIds: readonly string[] = [],
   ): readonly QuestionnaireCategorySummary[] {
-    return this.sortedCategories(snapshot).map((category) =>
-      this.summarizeCategory(snapshot, profile, category, includeFiltered),
-    );
+    const excluded = new Set(excludedCategoryIds);
+    return this.sortedCategories(snapshot)
+      .filter((category) => !excluded.has(category.id))
+      .map((category) => this.summarizeCategory(snapshot, profile, category, includeFiltered));
   }
 
   getCategory(
@@ -88,8 +90,13 @@ export class QuestionnaireService {
     };
   }
 
-  getNeighbours(snapshot: CatalogueSnapshot, categoryId: string): QuestionnaireNeighbours {
-    const categories = this.sortedCategories(snapshot);
+  getNeighbours(
+    snapshot: CatalogueSnapshot,
+    categoryId: string,
+    excludedCategoryIds: readonly string[] = [],
+  ): QuestionnaireNeighbours {
+    const excluded = new Set(excludedCategoryIds);
+    const categories = this.sortedCategories(snapshot).filter((category) => !excluded.has(category.id));
     const index = categories.findIndex((category) => category.id === categoryId);
     if (index < 0) return {};
     return {
@@ -134,6 +141,8 @@ export class QuestionnaireService {
       for (const role of practice.roles) {
         for (const candidateScope of this.scopePolicy.getScopes(role)) {
           const scope = this.nonEmptyScope(candidateScope);
+          if (!this.visibilityPolicy.isRoleApplicable(role, context, scope)) continue;
+
           const visible = this.visibilityPolicy.isRoleVisible(role, context, scope);
           if (!visible) filtered += 1;
           if (!visible && !includeFiltered) continue;
@@ -161,6 +170,8 @@ export class QuestionnaireService {
     const roles = practice.roles.flatMap((role): QuestionnaireRoleView[] =>
       this.scopePolicy.getScopes(role).flatMap((candidateScope): QuestionnaireRoleView[] => {
         const scope = this.nonEmptyScope(candidateScope);
+        if (!this.visibilityPolicy.isRoleApplicable(role, context, scope)) return [];
+
         const visible = this.visibilityPolicy.isRoleVisible(role, context, scope);
         if (!visible && !includeFiltered) return [];
         const answerKey = createAnswerKey(practice.id, role.id, scope);
@@ -187,6 +198,6 @@ export class QuestionnaireService {
   }
 
   private nonEmptyScope(scope: AnswerScope): AnswerScope | undefined {
-    return scope.counterpartSex ? scope : undefined;
+    return scope.counterpartSex || scope.targetSite ? scope : undefined;
   }
 }

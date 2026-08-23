@@ -1,6 +1,6 @@
 import { CatalogueSnapshot } from '../catalogue/catalogue-snapshot';
 import { Practice, PracticeRole } from '../catalogue/practice';
-import { createAnswerKey, PracticeAnswer } from '../profile/profile-answer';
+import { AnswerKey, PracticeAnswer } from '../profile/profile-answer';
 import { Sex } from '../profile/profile-metadata';
 import {
   CategoryComparison,
@@ -65,8 +65,8 @@ export class ProfileComparator {
       boundaryCount: classifications.boundary,
       classifications,
       contextIssues: {
-        leftSexMissing: !left.metadata.sex && this.hasScopedAnswers(right),
-        rightSexMissing: !right.metadata.sex && this.hasScopedAnswers(left),
+        leftSexMissing: !left.metadata.sex && this.hasCounterpartScopedAnswers(right),
+        rightSexMissing: !right.metadata.sex && this.hasCounterpartScopedAnswers(left),
       },
     };
   }
@@ -83,12 +83,10 @@ export class ProfileComparator {
       const rightRole = practice.roles.find((role) => role.id === pair.rightRoleId);
       if (!leftRole || !rightRole) continue;
 
-      const first = this.compareOrientation(practice, leftRole, rightRole, left, right);
-      if (first) interactions.push(first);
+      interactions.push(...this.compareOrientation(practice, leftRole, rightRole, left, right));
 
       if (leftRole.id !== rightRole.id) {
-        const reverse = this.compareOrientation(practice, rightRole, leftRole, left, right);
-        if (reverse) interactions.push(reverse);
+        interactions.push(...this.compareOrientation(practice, rightRole, leftRole, left, right));
       }
     }
 
@@ -101,56 +99,86 @@ export class ProfileComparator {
     rightRole: PracticeRole,
     left: ComparisonSubject,
     right: ComparisonSubject,
-  ): ComparisonInteraction | undefined {
-    const leftAnswer = this.findAnswer(left, practice.id, leftRole, right.metadata.sex);
-    const rightAnswer = this.findAnswer(right, practice.id, rightRole, left.metadata.sex);
-    if (!leftAnswer || !rightAnswer) return undefined;
-
+  ): readonly ComparisonInteraction[] {
+    const leftAnswers = this.findAnswers(left, practice.id, leftRole, right.metadata.sex);
+    const rightAnswers = this.findAnswers(right, practice.id, rightRole, left.metadata.sex);
     const roleRelation: RoleRelation = leftRole.id === rightRole.id ? 'mutual' : 'complementary';
-    const compatibility = this.preferencePolicy.compare(
-      leftAnswer.answer.preference,
-      rightAnswer.answer.preference,
-    );
+    const interactions: ComparisonInteraction[] = [];
 
-    return {
-      id: `${practice.id}::${leftAnswer.answerKey}=>${rightAnswer.answerKey}`,
-      categoryId: practice.categoryId,
-      practiceId: practice.id,
-      roleRelation,
-      left: leftAnswer,
-      right: rightAnswer,
-      compatibility,
-    };
+    for (const leftAnswer of leftAnswers) {
+      for (const rightAnswer of rightAnswers) {
+        if (!this.scopesCanInteract(leftRole, rightRole, leftAnswer.answer, rightAnswer.answer)) continue;
+
+        const compatibility = this.preferencePolicy.compare(
+          leftAnswer.answer.preference,
+          rightAnswer.answer.preference,
+        );
+        interactions.push({
+          id: `${practice.id}::${leftAnswer.answerKey}=>${rightAnswer.answerKey}`,
+          categoryId: practice.categoryId,
+          practiceId: practice.id,
+          roleRelation,
+          left: leftAnswer,
+          right: rightAnswer,
+          compatibility,
+        });
+      }
+    }
+
+    return interactions;
   }
 
-  private findAnswer(
+  private findAnswers(
     subject: ComparisonSubject,
     practiceId: string,
     role: PracticeRole,
     counterpartSex: Sex | undefined,
-  ): ComparedAnswer | undefined {
+  ): readonly ComparedAnswer[] {
     const requiresCounterpartSex = role.contextAxes?.includes('counterpartSex') ?? false;
-    if (requiresCounterpartSex && !counterpartSex) return undefined;
+    const requiresTargetSite = role.contextAxes?.includes('targetSite') ?? false;
+    if (requiresCounterpartSex && !counterpartSex) return [];
 
-    const scope = requiresCounterpartSex && counterpartSex ? { counterpartSex } : undefined;
-    const answerKey = createAnswerKey(practiceId, role.id, scope);
-    const answer = subject.answers[answerKey];
-    if (!answer) return undefined;
+    const allowedTargetSites = role.contextValues?.targetSite;
+    return Object.entries(subject.answers)
+      .filter((entry): entry is [AnswerKey, PracticeAnswer] => {
+        const [, answer] = entry;
+        if (answer.practiceId !== practiceId || answer.roleId !== role.id) return false;
 
-    return {
-      answerKey,
-      roleId: role.id,
-      answer,
-    };
+        if (requiresCounterpartSex) {
+          if (answer.scope?.counterpartSex !== counterpartSex) return false;
+        } else if (answer.scope?.counterpartSex !== undefined) {
+          return false;
+        }
+
+        if (requiresTargetSite) {
+          const site = answer.scope?.targetSite;
+          if (!site || (allowedTargetSites && !allowedTargetSites.includes(site))) return false;
+        } else if (answer.scope?.targetSite !== undefined) {
+          return false;
+        }
+
+        return true;
+      })
+      .map(([answerKey, answer]) => ({ answerKey, roleId: role.id, answer }));
+  }
+
+  private scopesCanInteract(
+    leftRole: PracticeRole,
+    rightRole: PracticeRole,
+    leftAnswer: PracticeAnswer,
+    rightAnswer: PracticeAnswer,
+  ): boolean {
+    const leftUsesTargetSite = leftRole.contextAxes?.includes('targetSite') ?? false;
+    const rightUsesTargetSite = rightRole.contextAxes?.includes('targetSite') ?? false;
+    if (!leftUsesTargetSite && !rightUsesTargetSite) return true;
+    return leftAnswer.scope?.targetSite === rightAnswer.scope?.targetSite;
   }
 
   private countClassifications(
     interactions: readonly ComparisonInteraction[],
   ): ComparisonClassificationCounts {
     const counts = emptyClassificationCounts();
-    for (const interaction of interactions) {
-      counts[interaction.compatibility.classification] += 1;
-    }
+    for (const interaction of interactions) counts[interaction.compatibility.classification] += 1;
     return counts;
   }
 
@@ -160,8 +188,10 @@ export class ProfileComparator {
     return Math.round(total / interactions.length);
   }
 
-  private hasScopedAnswers(subject: ComparisonSubject): boolean {
-    return Object.values(subject.answers).some((answer: PracticeAnswer) => answer.scope?.counterpartSex !== undefined);
+  private hasCounterpartScopedAnswers(subject: ComparisonSubject): boolean {
+    return Object.values(subject.answers).some(
+      (answer: PracticeAnswer) => answer.scope?.counterpartSex !== undefined,
+    );
   }
 }
 

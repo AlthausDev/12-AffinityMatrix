@@ -1,4 +1,4 @@
-import { CURRENT_CATALOGUE_SNAPSHOT } from '../../infrastructure/catalogue/catalogue-v2';
+import { CURRENT_CATALOGUE_SNAPSHOT as CATALOGUE_V2_SNAPSHOT } from '../../infrastructure/catalogue/catalogue-v2';
 import {
   categoryDescriptionKey,
   categoryLabelKey,
@@ -14,17 +14,17 @@ const resources: Readonly<Record<string, Readonly<Record<string, string>>>> = {
   en: EN_CATALOGUE_TRANSLATIONS,
 };
 
-describe('current catalogue translations', () => {
+describe('legacy v2 catalogue translation tables', () => {
   for (const [locale, translations] of Object.entries(resources)) {
-    it(`covers every current catalogue label and description in ${locale}`, () => {
+    it(`covers every v2 catalogue label and description in ${locale}`, () => {
       const missing: string[] = [];
 
-      for (const category of CURRENT_CATALOGUE_SNAPSHOT.catalogue.categories) {
+      for (const category of CATALOGUE_V2_SNAPSHOT.catalogue.categories) {
         requireKey(translations, categoryLabelKey(category.id), missing);
         if (category.description) requireKey(translations, categoryDescriptionKey(category.id), missing);
       }
 
-      for (const practice of CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices) {
+      for (const practice of CATALOGUE_V2_SNAPSHOT.catalogue.practices) {
         requireKey(translations, practiceLabelKey(practice.id), missing);
         if (practice.description) requireKey(translations, practiceDescriptionKey(practice.id), missing);
         for (const role of practice.roles) {

@@ -4,12 +4,13 @@ import { createAnswerKey } from '../../domain/profile/profile-answer';
 import { QuestionnaireService } from './questionnaire-service';
 
 const snapshot: CatalogueSnapshot = {
-  version: 2,
+  version: 3,
   catalogue: {
     categories: [
       { id: 'general', label: 'General', order: 0 },
       { id: 'oral', label: 'Oral', order: 1 },
       { id: 'restraint', label: 'Restraint', order: 2 },
+      { id: 'toys', label: 'Toys', order: 3 },
     ],
     practices: [
       {
@@ -24,8 +25,14 @@ const snapshot: CatalogueSnapshot = {
         categoryId: 'oral',
         label: 'Cunnilingus',
         roles: [
-          { id: 'give', label: 'Give', perspective: 'active', applicability: { partnerSex: ['female'] } },
-          { id: 'receive', label: 'Receive', perspective: 'receptive', applicability: { selfSex: ['female'] }, contextAxes: ['counterpartSex'] },
+          {
+            id: 'give', label: 'Give', perspective: 'active',
+            applicability: { partnerSex: ['female'] }, contextAxes: ['counterpartSex'],
+          },
+          {
+            id: 'receive', label: 'Receive', perspective: 'receptive',
+            applicability: { selfSex: ['female'] }, contextAxes: ['counterpartSex'],
+          },
         ],
         compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
       },
@@ -38,6 +45,35 @@ const snapshot: CatalogueSnapshot = {
           { id: 'be-restrained', label: 'Be restrained', perspective: 'receptive', contextAxes: ['counterpartSex'] },
         ],
         compatibleRolePairs: [{ leftRoleId: 'restrain', rightRoleId: 'be-restrained' }],
+      },
+      {
+        id: 'dildo',
+        categoryId: 'toys',
+        label: 'Dildo',
+        roles: [
+          {
+            id: 'use-on-self', label: 'Use on myself', perspective: 'neutral',
+            contextAxes: ['targetSite'],
+            contextValues: { targetSite: ['mouth', 'vaginal', 'anal'] },
+            targetOwner: 'self',
+          },
+          {
+            id: 'use-on-partner', label: 'Use on partner', perspective: 'active',
+            contextAxes: ['counterpartSex', 'targetSite'],
+            contextValues: { targetSite: ['mouth', 'vaginal', 'anal'] },
+            targetOwner: 'partner',
+          },
+          {
+            id: 'partner-uses-on-me', label: 'Partner uses on me', perspective: 'receptive',
+            contextAxes: ['counterpartSex', 'targetSite'],
+            contextValues: { targetSite: ['mouth', 'vaginal', 'anal'] },
+            targetOwner: 'self',
+          },
+        ],
+        compatibleRolePairs: [
+          { leftRoleId: 'use-on-self', rightRoleId: 'use-on-self' },
+          { leftRoleId: 'use-on-partner', rightRoleId: 'partner-uses-on-me' },
+        ],
       },
     ],
   },
@@ -115,10 +151,44 @@ describe('QuestionnaireService', () => {
     expect(general?.practices[0]?.roles.find((item) => item.counterpartSex === 'female')?.answer).toBeUndefined();
   });
 
-  it('still applies anatomy-related role applicability before counterpart context', () => {
-    const oral = service.getCategory(snapshot, profile('male', 'heterosexual'), 'oral');
-    expect(oral?.practices[0]?.roles.map((item) => item.role.id)).toEqual(['give']);
-    expect(oral?.filtered).toBe(2);
+  it('expands target-site scopes and excludes impossible anatomy variants', () => {
+    const woman = profile('female', 'bisexual');
+    const toys = service.getCategory(snapshot, woman, 'toys');
+    const dildo = toys?.practices.find((item) => item.practice.id === 'dildo');
+
+    expect(dildo?.roles
+      .filter((item) => item.role.id === 'use-on-self')
+      .map((item) => item.scope?.targetSite))
+      .toEqual(['mouth', 'vaginal', 'anal']);
+
+    expect(dildo?.roles
+      .filter((item) => item.role.id === 'use-on-partner' && item.scope?.counterpartSex === 'male')
+      .map((item) => item.scope?.targetSite))
+      .toEqual(['mouth', 'anal']);
+
+    expect(dildo?.roles
+      .filter((item) => item.role.id === 'use-on-partner' && item.scope?.counterpartSex === 'female')
+      .map((item) => item.scope?.targetSite))
+      .toEqual(['mouth', 'vaginal', 'anal']);
+  });
+
+  it('never reveals anatomically impossible variants through includeFiltered', () => {
+    const oral = service.getCategory(snapshot, profile('male', 'heterosexual'), 'oral', true);
+    const cunnilingus = oral?.practices.find((item) => item.practice.id === 'cunnilingus');
+
+    expect(cunnilingus?.roles.map((item) => `${item.role.id}:${item.counterpartSex ?? 'none'}`))
+      .toEqual(['give:female']);
+    expect(oral?.filtered).toBe(0);
+    expect(oral?.total).toBe(1);
+  });
+
+  it('excludes hidden categories only from summaries and neighbours, not direct category lookup', () => {
+    const current = profile('female', 'bisexual');
+    const summaries = service.getCategorySummaries(snapshot, current, false, ['oral', 'restraint']);
+
+    expect(summaries.map((item) => item.category.id)).toEqual(['general', 'toys']);
+    expect(service.getNeighbours(snapshot, 'general', ['oral', 'restraint'])).toEqual({ nextCategoryId: 'toys' });
+    expect(service.getCategory(snapshot, current, 'oral')).toBeDefined();
   });
 
   it('treats a legacy unscoped answer to a newly scoped role as preserved unknown data', () => {

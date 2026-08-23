@@ -5,6 +5,7 @@ import { AnswerScope, PracticeAnswer } from '../../../domain/profile/profile-ans
 import { CatalogueStore } from '../../core/catalogue.store';
 import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
+import { UiPreferencesService } from '../../core/ui-preferences.service';
 import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { QuestionnaireCategoryNavigationComponent } from '../../questionnaire/questionnaire-category-navigation.component';
@@ -14,12 +15,7 @@ import { findRouteParam } from '../../shared/route-param';
 
 @Component({
   selector: 'app-questionnaire-category-page',
-  imports: [
-    RouterLink,
-    QuestionnaireCategoryNavigationComponent,
-    QuestionnaireRoleComponent,
-    CompletionProgressComponent,
-  ],
+  imports: [RouterLink, QuestionnaireCategoryNavigationComponent, QuestionnaireRoleComponent, CompletionProgressComponent],
   template: `
     <main class="questionnaire-modal-page questionnaire-page">
       @if (profile()) {
@@ -55,7 +51,7 @@ import { findRouteParam } from '../../shared/route-param';
             <section class="question-list">
               @for (item of currentCategory.practices; track item.practice.id) {
                 <article class="panel question-card">
-                  <header class="question-card-header"><h2>{{ catalogueText.practiceLabel(item.practice) }}</h2><p class="muted">{{ catalogueText.practiceDescription(item.practice) }}</p></header>
+                  <header class="question-card-header"><h2>{{ catalogueText.practiceLabel(item.practice) }}</h2>@if (catalogueText.practiceDescription(item.practice)) { <p class="muted">{{ catalogueText.practiceDescription(item.practice) }}</p> }</header>
                   @for (roleView of item.roles; track roleView.answerKey) {
                     <app-questionnaire-role
                       [practiceId]="item.practice.id"
@@ -119,6 +115,7 @@ export class QuestionnaireCategoryPageComponent {
   readonly i18n = inject(TranslationService);
   readonly catalogueText = inject(CatalogueTextService);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
+  private readonly preferences = inject(UiPreferencesService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly params = toSignal(this.route.paramMap, { initialValue: this.route.snapshot.paramMap });
@@ -128,6 +125,7 @@ export class QuestionnaireCategoryPageComponent {
   readonly categoryId = computed(() => this.params().get('category') ?? '');
   readonly profile = computed(() => this.profileStore.findById(this.profileId));
   readonly snapshot = computed(() => this.catalogueStore.snapshot());
+  readonly hiddenCategoryIds = computed(() => this.preferences.hiddenCategoryIds(this.profileId));
   readonly category = computed(() => {
     const profile = this.profile(); const snapshot = this.snapshot();
     return profile && snapshot ? this.questionnaireService.getCategory(snapshot, profile, this.categoryId(), this.includeFiltered()) : undefined;
@@ -138,7 +136,7 @@ export class QuestionnaireCategoryPageComponent {
   });
   readonly neighbours = computed(() => {
     const snapshot = this.snapshot();
-    return snapshot ? this.questionnaireService.getNeighbours(snapshot, this.categoryId()) : {};
+    return snapshot ? this.questionnaireService.getNeighbours(snapshot, this.categoryId(), this.hiddenCategoryIds()) : {};
   });
 
   constructor() { void this.catalogueStore.initialize(); }
@@ -146,17 +144,10 @@ export class QuestionnaireCategoryPageComponent {
   toggleFiltered(event: Event): void {
     const include = (event.target as HTMLInputElement).checked;
     this.includeFiltered.set(include);
-    void this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { filtered: include ? '1' : null },
-      queryParamsHandling: 'merge',
-      replaceUrl: true,
-    });
+    void this.router.navigate([], { relativeTo: this.route, queryParams: { filtered: include ? '1' : null }, queryParamsHandling: 'merge', replaceUrl: true });
   }
 
-  filteredInCategoryLabel(count: number): string {
-    return this.i18n.plural(count, 'questionnaire.category.filtered.one', 'questionnaire.category.filtered.other');
-  }
+  filteredInCategoryLabel(count: number): string { return this.i18n.plural(count, 'questionnaire.category.filtered.one', 'questionnaire.category.filtered.other'); }
 
   saveAnswer(answer: PracticeAnswer): void {
     const snapshot = this.snapshot();
