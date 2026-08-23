@@ -27,26 +27,28 @@ import { TranslationService } from './translation.service';
         <span class="language-chevron" aria-hidden="true">⌄</span>
       </button>
 
-      <div
-        class="language-menu"
-        role="listbox"
-        [attr.aria-label]="i18n.t('language.selectorLabel')"
-      >
-        @for (locale of i18n.supportedLocales; track locale.id) {
-          <button
-            class="language-option"
-            type="button"
-            role="option"
-            [attr.aria-selected]="i18n.locale() === locale.id"
-            [class.is-selected]="i18n.locale() === locale.id"
-            (click)="selectLanguage(locale.id)"
-          >
-            <span>{{ locale.nativeLabel }}</span>
-            @if (i18n.locale() === locale.id) {
-              <span class="language-check" aria-hidden="true">✓</span>
-            }
-          </button>
-        }
+      <div class="language-menu">
+        <div
+          class="language-menu-surface"
+          role="listbox"
+          [attr.aria-label]="i18n.t('language.selectorLabel')"
+        >
+          @for (locale of i18n.supportedLocales; track locale.id) {
+            <button
+              class="language-option"
+              type="button"
+              role="option"
+              [attr.aria-selected]="i18n.locale() === locale.id"
+              [class.is-selected]="i18n.locale() === locale.id"
+              (click)="selectLanguage(locale.id)"
+            >
+              <span>{{ locale.nativeLabel }}</span>
+              @if (i18n.locale() === locale.id) {
+                <span class="language-check" aria-hidden="true">✓</span>
+              }
+            </button>
+          }
+        </div>
       </div>
     </div>
   `,
@@ -113,10 +115,20 @@ import { TranslationService } from './translation.service';
     }
     .language-menu {
       position: absolute;
-      top: calc(100% + 0.42rem);
+      top: 100%;
       right: 0;
-      display: grid;
       width: max-content;
+      min-width: 100%;
+      padding-top: 0.42rem;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(-0.3rem) scale(0.98);
+      transform-origin: top right;
+      transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+    }
+    .language-menu-surface {
+      display: grid;
       min-width: 100%;
       gap: 0.18rem;
       padding: 0.3rem;
@@ -124,13 +136,7 @@ import { TranslationService } from './translation.service';
       border-radius: 0.62rem;
       background: rgba(7, 15, 37, 0.94);
       box-shadow: 0 0.8rem 2rem rgba(1, 4, 16, 0.42), 0 0 1rem rgba(140, 92, 255, 0.12);
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transform: translateY(-0.3rem) scale(0.98);
-      transform-origin: top right;
       backdrop-filter: blur(16px) saturate(132%);
-      transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
     }
     .language-switcher.is-open .language-menu {
       opacity: 1;
