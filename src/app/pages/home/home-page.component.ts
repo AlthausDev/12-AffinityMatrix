@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Profile } from '../../../domain/profile/profile';
@@ -30,11 +31,9 @@ interface ProfileCardView {
         <div class="brand-cluster">
           <app-brand-mark />
           <div class="brand-copy">
-            <div class="brand-meta">
-              <span class="version-pill">v{{ appVersion }}</span>
-            </div>
             <h1>Affinity Matrix</h1>
             <p class="lead">{{ i18n.t('homeHub.tagline') }}</p>
+            <span class="version-pill">v{{ appVersion }}</span>
           </div>
         </div>
       </header>
@@ -43,35 +42,28 @@ interface ProfileCardView {
         <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p>
       }
 
-      <section class="entry-actions" [attr.aria-label]="i18n.t('homeHub.actionsLabel')">
-        <a class="entry-card entry-card-primary" routerLink="/profiles/new">
-          <span class="entry-icon" aria-hidden="true">+</span>
-          <span class="entry-content">
-            <span class="eyebrow">{{ i18n.t('homeHub.create.eyebrow') }}</span>
-            <strong>{{ i18n.t('common.createProfile') }}</strong>
-            <span class="entry-description">{{ i18n.t('homeHub.create.description') }}</span>
-          </span>
-          <span class="entry-arrow" aria-hidden="true">→</span>
-        </a>
-
-        <a class="entry-card" routerLink="/profiles/import">
-          <span class="entry-icon import-icon" aria-hidden="true">↓</span>
-          <span class="entry-content">
-            <span class="eyebrow">{{ i18n.t('homeHub.import.eyebrow') }}</span>
-            <strong>{{ i18n.t('common.importProfile') }}</strong>
-            <span class="entry-description">{{ i18n.t('homeHub.import.description') }}</span>
-          </span>
-          <span class="entry-arrow" aria-hidden="true">→</span>
-        </a>
-      </section>
-
       <section class="profiles-section" aria-labelledby="local-profiles-title">
-        <div class="profiles-heading">
-          <div>
-            <p class="eyebrow">{{ i18n.t('homeHub.profiles.eyebrow') }}</p>
-            <h2 id="local-profiles-title">{{ i18n.t('homeHub.profiles.title') }}</h2>
+        <div class="profiles-toolbar">
+          <div class="profiles-heading">
+            <div>
+              <p class="eyebrow">{{ i18n.t('homeHub.profiles.eyebrow') }}</p>
+              <div class="profiles-title-row">
+                <h2 id="local-profiles-title">{{ i18n.t('homeHub.profiles.title') }}</h2>
+                <span class="profile-count-pill">{{ profileCards().length }}</span>
+              </div>
+            </div>
           </div>
-          <span class="profile-count-pill">{{ profileCards().length }}</span>
+
+          <nav class="profile-toolbar-actions" [attr.aria-label]="i18n.t('homeHub.actionsLabel')">
+            <a class="hub-action-button hub-action-primary" routerLink="/profiles/new">
+              <span aria-hidden="true">+</span>
+              {{ i18n.t('common.createProfile') }}
+            </a>
+            <a class="hub-action-button" routerLink="/profiles/import">
+              <span aria-hidden="true">↓</span>
+              {{ i18n.t('common.importProfile') }}
+            </a>
+          </nav>
         </div>
 
         @if (profileCards().length === 0) {
@@ -85,7 +77,25 @@ interface ProfileCardView {
         } @else {
           <div class="profile-card-grid">
             @for (card of profileCards(); track card.profile.id) {
-              <article class="profile-card">
+              <article
+                class="profile-card"
+                [class.profile-card-dragging]="draggedProfileId() === card.profile.id"
+                [attr.data-profile-id]="card.profile.id"
+              >
+                <button
+                  class="profile-drag-handle"
+                  type="button"
+                  [attr.aria-label]="i18n.t('homeHub.profile.reorder', { alias: card.profile.metadata.alias || i18n.t('common.untitledProfile') })"
+                  (pointerdown)="startProfileDrag($event, card.profile.id)"
+                  (pointermove)="moveProfileDrag($event)"
+                  (pointerup)="endProfileDrag($event)"
+                  (pointercancel)="endProfileDrag($event)"
+                  (lostpointercapture)="endProfileDrag()"
+                  (keydown)="reorderFromKeyboard($event, card.profile.id)"
+                >
+                  <span aria-hidden="true">⠿</span>
+                </button>
+
                 <a class="profile-card-main" [routerLink]="['/profiles', card.profile.id]">
                   <header class="profile-card-header">
                     <div class="profile-title-copy">
@@ -109,10 +119,7 @@ interface ProfileCardView {
                     <span>{{ i18n.t('homeHub.profile.updated', { date: updatedAtLabel(card.profile.updatedAt) }) }}</span>
                   </div>
 
-                  <div class="profile-open">
-                    <span>{{ i18n.t('homeHub.profile.open') }}</span>
-                    <span aria-hidden="true">→</span>
-                  </div>
+                  <span class="profile-card-arrow" aria-hidden="true">→</span>
                 </a>
 
                 <div class="profile-card-actions">
@@ -138,12 +145,15 @@ interface ProfileCardView {
         }
       </section>
 
-      <footer class="privacy-capsule">
-        <span class="privacy-lock" aria-hidden="true">◇</span>
-        <span>
-          <strong>{{ i18n.t('homeHub.privacy.title') }}</strong>
-          <small>{{ i18n.t('homeHub.privacy.description') }}</small>
-        </span>
+      <footer class="hub-footer">
+        <div class="privacy-capsule">
+          <span class="privacy-lock" aria-hidden="true">◇</span>
+          <span>
+            <strong>{{ i18n.t('homeHub.privacy.title') }}</strong>
+            <small>{{ i18n.t('homeHub.privacy.description') }}</small>
+          </span>
+        </div>
+        <p class="footer-meta">{{ currentYear }} · v{{ appVersion }}</p>
       </footer>
     </main>
 
@@ -164,30 +174,41 @@ export class HomePageComponent {
   readonly i18n = inject(TranslationService);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
   private readonly preferences = inject(UiPreferencesService);
+  private readonly document = inject(DOCUMENT);
 
   readonly appVersion = APP_VERSION;
+  readonly currentYear = new Date().getFullYear();
   readonly pendingDeletion = signal<Profile | null>(null);
   readonly activeMenuProfileId = signal<string | null>(null);
+  readonly draggedProfileId = signal<string | null>(null);
   readonly profileCards = computed<readonly ProfileCardView[]>(() => {
     const snapshot = this.catalogueStore.snapshot();
+    const manualOrder = this.preferences.profileOrder();
+    const orderIndex = new Map(manualOrder.map((profileId, index) => [profileId, index]));
+    const profiles = [...this.profileStore.profiles()].sort((left, right) => {
+      const leftIndex = orderIndex.get(left.id);
+      const rightIndex = orderIndex.get(right.id);
+      if (leftIndex !== undefined && rightIndex !== undefined) return leftIndex - rightIndex;
+      if (leftIndex !== undefined) return -1;
+      if (rightIndex !== undefined) return 1;
+      return Date.parse(right.updatedAt) - Date.parse(left.updatedAt);
+    });
 
-    return [...this.profileStore.profiles()]
-      .sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt))
-      .map((profile) => {
-        const answerCount = Object.keys(profile.answers).length;
-        if (!snapshot) return { profile, answerCount };
+    return profiles.map((profile) => {
+      const answerCount = Object.keys(profile.answers).length;
+      if (!snapshot) return { profile, answerCount };
 
-        const summaries = this.questionnaireService.getCategorySummaries(
-          snapshot,
-          profile,
-          false,
-          this.preferences.hiddenCategoryIds(profile.id),
-        );
-        const answered = summaries.reduce((total, item) => total + item.answered, 0);
-        const questions = summaries.reduce((total, item) => total + item.total, 0);
-        const completionPercentage = questions === 0 ? 0 : Math.round((answered / questions) * 100);
-        return { profile, answerCount, completionPercentage };
-      });
+      const summaries = this.questionnaireService.getCategorySummaries(
+        snapshot,
+        profile,
+        false,
+        this.preferences.hiddenCategoryIds(profile.id),
+      );
+      const answered = summaries.reduce((total, item) => total + item.answered, 0);
+      const questions = summaries.reduce((total, item) => total + item.total, 0);
+      const completionPercentage = questions === 0 ? 0 : Math.round((answered / questions) * 100);
+      return { profile, answerCount, completionPercentage };
+    });
   });
 
   constructor() {
@@ -220,6 +241,61 @@ export class HomePageComponent {
   requestDeletion(profile: Profile): void {
     this.activeMenuProfileId.set(null);
     this.pendingDeletion.set(profile);
+  }
+
+  startProfileDrag(event: PointerEvent, profileId: string): void {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    event.preventDefault();
+    this.activeMenuProfileId.set(null);
+    this.draggedProfileId.set(profileId);
+    (event.currentTarget as HTMLElement | null)?.setPointerCapture(event.pointerId);
+  }
+
+  moveProfileDrag(event: PointerEvent): void {
+    const draggedProfileId = this.draggedProfileId();
+    if (!draggedProfileId) return;
+    event.preventDefault();
+
+    const target = this.document
+      .elementFromPoint(event.clientX, event.clientY)
+      ?.closest<HTMLElement>('[data-profile-id]');
+    const targetProfileId = target?.dataset['profileId'];
+    if (!targetProfileId || targetProfileId === draggedProfileId) return;
+
+    this.moveProfile(draggedProfileId, targetProfileId);
+  }
+
+  endProfileDrag(event?: PointerEvent): void {
+    if (event?.currentTarget instanceof HTMLElement && event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    this.draggedProfileId.set(null);
+  }
+
+  reorderFromKeyboard(event: KeyboardEvent, profileId: string): void {
+    const backwards = event.key === 'ArrowLeft' || event.key === 'ArrowUp';
+    const forwards = event.key === 'ArrowRight' || event.key === 'ArrowDown';
+    if (!backwards && !forwards) return;
+
+    const orderedIds = this.profileCards().map((card) => card.profile.id);
+    const currentIndex = orderedIds.indexOf(profileId);
+    const targetIndex = currentIndex + (backwards ? -1 : 1);
+    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= orderedIds.length) return;
+
+    event.preventDefault();
+    const targetProfileId = orderedIds[targetIndex];
+    if (targetProfileId) this.moveProfile(profileId, targetProfileId);
+  }
+
+  private moveProfile(profileId: string, targetProfileId: string): void {
+    const orderedIds = this.profileCards().map((card) => card.profile.id);
+    const sourceIndex = orderedIds.indexOf(profileId);
+    const targetIndex = orderedIds.indexOf(targetProfileId);
+    if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) return;
+
+    orderedIds.splice(sourceIndex, 1);
+    orderedIds.splice(targetIndex, 0, profileId);
+    this.preferences.setProfileOrder(orderedIds);
   }
 
   private sexLabel(sex: Sex | undefined): string | undefined {
