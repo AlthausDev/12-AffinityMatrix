@@ -15,6 +15,11 @@ import {
 import { EN_UI_TRANSLATIONS } from './ui/en-ui.translations';
 import { ES_UI_TRANSLATIONS, TranslationKey as BaseTranslationKey } from './ui/es-ui.translations';
 import {
+  EN_HOME_HUB_TRANSLATIONS,
+  ES_HOME_HUB_TRANSLATIONS,
+  HomeHubTranslationKey,
+} from './ui/home-hub.translations';
+import {
   EN_PREFERENCE_SCALE_TRANSLATIONS,
   ES_PREFERENCE_SCALE_TRANSLATIONS,
   PreferenceScaleTranslationKey,
@@ -30,7 +35,8 @@ export type TranslationKey =
   | BaseTranslationKey
   | QuestionnaireUxTranslationKey
   | PreferenceScaleTranslationKey
-  | DashboardUxTranslationKey;
+  | DashboardUxTranslationKey
+  | HomeHubTranslationKey;
 
 const TRANSLATIONS: Readonly<Record<Locale, Readonly<Record<TranslationKey, string>>>> = {
   es: {
@@ -38,12 +44,14 @@ const TRANSLATIONS: Readonly<Record<Locale, Readonly<Record<TranslationKey, stri
     ...ES_QUESTIONNAIRE_UX_TRANSLATIONS,
     ...ES_PREFERENCE_SCALE_TRANSLATIONS,
     ...ES_DASHBOARD_UX_TRANSLATIONS,
+    ...ES_HOME_HUB_TRANSLATIONS,
   },
   en: {
     ...EN_UI_TRANSLATIONS,
     ...EN_QUESTIONNAIRE_UX_TRANSLATIONS,
     ...EN_PREFERENCE_SCALE_TRANSLATIONS,
     ...EN_DASHBOARD_UX_TRANSLATIONS,
+    ...EN_HOME_HUB_TRANSLATIONS,
   },
 };
 
