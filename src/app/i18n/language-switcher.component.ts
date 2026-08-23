@@ -1,56 +1,216 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { isLocale } from './locale';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { isLocale, Locale } from './locale';
 import { TranslationService } from './translation.service';
 
 @Component({
   selector: 'app-language-switcher',
   template: `
-    <label class="language-switcher">
-      <span>{{ i18n.t('language.selectorLabel') }}</span>
-      <select
-        [value]="i18n.locale()"
+    <div
+      class="language-switcher"
+      [class.is-open]="menuOpen()"
+      (mouseenter)="openMenu()"
+      (mouseleave)="closeMenu()"
+      (focusin)="openMenu()"
+      (focusout)="handleFocusOut($event)"
+    >
+      <button
+        class="language-trigger"
+        type="button"
+        aria-haspopup="listbox"
+        [attr.aria-expanded]="menuOpen()"
         [attr.aria-label]="i18n.t('language.selectorLabel')"
-        (change)="changeLanguage($event)"
+        (click)="toggleMenu()"
+        (keydown.escape)="closeMenu()"
+      >
+        <span class="language-mark" aria-hidden="true">Aa</span>
+        <span>{{ currentLocaleLabel() }}</span>
+        <span class="language-chevron" aria-hidden="true">⌄</span>
+      </button>
+
+      <div
+        class="language-menu"
+        role="listbox"
+        [attr.aria-label]="i18n.t('language.selectorLabel')"
       >
         @for (locale of i18n.supportedLocales; track locale.id) {
-          <option [value]="locale.id">{{ locale.nativeLabel }}</option>
+          <button
+            class="language-option"
+            type="button"
+            role="option"
+            [attr.aria-selected]="i18n.locale() === locale.id"
+            [class.is-selected]="i18n.locale() === locale.id"
+            (click)="selectLanguage(locale.id)"
+          >
+            <span>{{ locale.nativeLabel }}</span>
+            @if (i18n.locale() === locale.id) {
+              <span class="language-check" aria-hidden="true">✓</span>
+            }
+          </button>
         }
-      </select>
-    </label>
+      </div>
+    </div>
   `,
   styles: `
     :host {
       position: fixed;
       top: 0.75rem;
       right: 0.75rem;
-      z-index: 20;
+      z-index: 30;
     }
     .language-switcher {
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      padding: 0.4rem 0.5rem;
-      border: 1px solid var(--border-subtle);
-      border-radius: 0.5rem;
-      background: var(--surface-panel);
-      color: var(--text-secondary);
-      font-size: 0.75rem;
+      position: relative;
+      min-width: 7.8rem;
     }
-    .language-switcher select {
-      padding: 0.25rem 0.35rem;
-      border: 1px solid var(--border-strong);
-      border-radius: 0.35rem;
-      background: var(--surface-elevated);
+    .language-trigger {
+      display: flex;
+      width: 100%;
+      min-height: 2.35rem;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.4rem 0.58rem;
+      border: 1px solid color-mix(in srgb, var(--neon-cyan) 24%, var(--border-subtle));
+      border-radius: 0.65rem;
+      background: linear-gradient(145deg, rgba(12, 28, 59, 0.78), rgba(31, 20, 62, 0.78));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0.55rem 1.35rem rgba(2, 6, 22, 0.16);
       color: var(--text-primary);
+      font-size: 0.75rem;
+      font-weight: 760;
+      cursor: pointer;
+      backdrop-filter: blur(12px) saturate(128%);
+      transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+    }
+    .language-switcher.is-open .language-trigger,
+    .language-trigger:hover {
+      border-color: color-mix(in srgb, var(--neon-violet) 46%, var(--neon-cyan));
+      background: linear-gradient(145deg, rgba(18, 45, 85, 0.84), rgba(47, 25, 82, 0.84));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.11),
+        0 0 0.7rem rgba(54, 186, 255, 0.12),
+        0 0 1.1rem rgba(140, 92, 255, 0.09);
+    }
+    .language-mark {
+      display: grid;
+      width: 1.45rem;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid rgba(54, 186, 255, 0.3);
+      border-radius: 50%;
+      background: rgba(54, 186, 255, 0.09);
+      color: #d9ecff;
+      font-size: 0.55rem;
+      letter-spacing: -0.05em;
+    }
+    .language-chevron {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      transform: translateY(-0.08rem);
+      transition: transform 140ms ease, color 140ms ease;
+    }
+    .language-switcher.is-open .language-chevron {
+      transform: translateY(0.08rem) rotate(180deg);
+      color: var(--neon-cyan);
+    }
+    .language-menu {
+      position: absolute;
+      top: calc(100% + 0.42rem);
+      right: 0;
+      display: grid;
+      width: max-content;
+      min-width: 100%;
+      gap: 0.18rem;
+      padding: 0.3rem;
+      border: 1px solid color-mix(in srgb, var(--neon-violet) 38%, var(--border-subtle));
+      border-radius: 0.62rem;
+      background: rgba(7, 15, 37, 0.94);
+      box-shadow: 0 0.8rem 2rem rgba(1, 4, 16, 0.42), 0 0 1rem rgba(140, 92, 255, 0.12);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(-0.3rem) scale(0.98);
+      transform-origin: top right;
+      backdrop-filter: blur(16px) saturate(132%);
+      transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+    }
+    .language-switcher.is-open .language-menu {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+    .language-option {
+      display: flex;
+      min-width: 8.5rem;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.5rem 0.58rem;
+      border: 1px solid transparent;
+      border-radius: 0.42rem;
+      background: transparent;
+      color: var(--text-secondary);
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+    }
+    .language-option:hover,
+    .language-option:focus-visible {
+      border-color: rgba(54, 186, 255, 0.18);
+      background: linear-gradient(90deg, rgba(54, 186, 255, 0.12), rgba(140, 92, 255, 0.1));
+      color: var(--text-primary);
+    }
+    .language-option.is-selected {
+      color: #e6f2ff;
+    }
+    .language-check {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 0.6rem rgba(54, 186, 255, 0.55);
+    }
+    @media (max-width: 520px) {
+      :host { top: 0.5rem; right: 0.5rem; }
+      .language-trigger { min-height: 2.15rem; padding: 0.32rem 0.48rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .language-trigger,
+      .language-chevron,
+      .language-menu,
+      .language-option { transition: none; }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LanguageSwitcherComponent {
   readonly i18n = inject(TranslationService);
+  readonly menuOpen = signal(false);
 
-  changeLanguage(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value;
-    if (isLocale(value)) this.i18n.setLocale(value);
+  currentLocaleLabel(): string {
+    return this.i18n.supportedLocales.find((locale) => locale.id === this.i18n.locale())?.nativeLabel
+      ?? this.i18n.locale();
+  }
+
+  openMenu(): void {
+    this.menuOpen.set(true);
+  }
+
+  closeMenu(): void {
+    this.menuOpen.set(false);
+  }
+
+  toggleMenu(): void {
+    this.menuOpen.update((open) => !open);
+  }
+
+  handleFocusOut(event: FocusEvent): void {
+    const next = event.relatedTarget;
+    const current = event.currentTarget;
+    if (current instanceof HTMLElement && next instanceof Node && current.contains(next)) return;
+    this.closeMenu();
+  }
+
+  selectLanguage(locale: Locale): void {
+    if (isLocale(locale)) this.i18n.setLocale(locale);
+    this.closeMenu();
   }
 }
