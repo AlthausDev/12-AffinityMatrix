@@ -6,51 +6,76 @@ import { ProfileStore } from '../../core/profile.store';
 import { PROFILE_CODE_CODEC } from '../../core/profile-codec.token';
 import { TranslationService } from '../../i18n/translation.service';
 import { TranslationKey } from '../../i18n/ui/es-ui.translations';
+import { BrandMarkComponent } from '../../shared/brand-mark.component';
 
 @Component({
   selector: 'app-profile-import-page',
-  imports: [RouterLink],
+  imports: [RouterLink, BrandMarkComponent],
   template: `
-    <main class="page narrow-page">
-      <a class="back-link" routerLink="/">{{ i18n.t('import.backProfiles') }}</a>
-      <header class="page-header">
+    <main class="page narrow-page profile-entry-page">
+      <a class="back-link profile-entry-back" routerLink="/">{{ i18n.t('import.backProfiles') }}</a>
+
+      <header class="page-header profile-entry-header">
+        <div class="profile-entry-brand-slot"><app-brand-mark /></div>
         <p class="eyebrow">{{ i18n.t('import.eyebrow') }}</p>
         <h1>{{ i18n.t('import.title') }}</h1>
         <p class="muted">{{ i18n.t('import.description') }}</p>
       </header>
-      <section class="panel form-grid">
+
+      <section class="profile-entry-panel form-grid">
         <label class="field">
           <span>{{ i18n.t('import.codeLabel') }}</span>
-          <textarea class="code-box" [placeholder]="i18n.t('import.codePlaceholder')" [value]="code()" (input)="updateCode($event)"></textarea>
+          <textarea
+            class="profile-entry-code-box"
+            [placeholder]="i18n.t('import.codePlaceholder')"
+            [value]="code()"
+            (input)="updateCode($event)"
+          ></textarea>
         </label>
-        @if (codeError(); as errorKey) { <p class="alert" role="alert">{{ i18n.t(errorKey) }}</p> }
-        <div class="form-actions"><button class="button" type="button" [disabled]="!code().trim()" (click)="inspectCode()">{{ i18n.t('import.inspect') }}</button></div>
+
+        @if (codeError(); as errorKey) {
+          <p class="alert profile-entry-alert" role="alert">{{ i18n.t(errorKey) }}</p>
+        }
+
+        <div class="form-actions">
+          <button class="button" type="button" [disabled]="!code().trim()" (click)="inspectCode()">
+            {{ i18n.t('import.inspect') }}
+          </button>
+        </div>
       </section>
 
       @if (preview(); as portable) {
-        <section class="panel import-preview" aria-labelledby="import-preview-title">
+        <section class="profile-entry-panel profile-entry-preview" aria-labelledby="import-preview-title">
           <div>
             <p class="eyebrow">{{ i18n.t('import.validProfile') }}</p>
             <h2 id="import-preview-title">{{ portable.metadata.alias || i18n.t('common.untitledProfile') }}</h2>
             <p class="muted">{{ answerSummary(portable) }}</p>
           </div>
+
           <dl class="status-list">
-            <div><dt>{{ i18n.t('import.sex') }}</dt><dd>{{ sexLabel(portable.metadata.sex) }}</dd></div>
-            <div><dt>{{ i18n.t('import.orientation') }}</dt><dd>{{ orientationLabel(portable.metadata.orientation) }}</dd></div>
-            <div><dt>{{ i18n.t('import.localSettings') }}</dt><dd>{{ i18n.t('import.localSettingsReset') }}</dd></div>
+            <div>
+              <dt>{{ i18n.t('import.sex') }}</dt>
+              <dd>{{ sexLabel(portable.metadata.sex) }}</dd>
+            </div>
+            <div>
+              <dt>{{ i18n.t('import.orientation') }}</dt>
+              <dd>{{ orientationLabel(portable.metadata.orientation) }}</dd>
+            </div>
+            <div>
+              <dt>{{ i18n.t('import.localSettings') }}</dt>
+              <dd>{{ i18n.t('import.localSettingsReset') }}</dd>
+            </div>
           </dl>
+
           <div class="form-actions import-actions">
             <button class="button secondary" type="button" disabled>{{ i18n.t('import.compareWithoutSaving') }}</button>
-            <button class="button" type="button" [disabled]="profileStore.saving()" (click)="saveProfile()">{{ profileStore.saving() ? i18n.t('common.saving') : i18n.t('import.saveBrowser') }}</button>
+            <button class="button" type="button" [disabled]="profileStore.saving()" (click)="saveProfile()">
+              {{ profileStore.saving() ? i18n.t('common.saving') : i18n.t('import.saveBrowser') }}
+            </button>
           </div>
         </section>
       }
     </main>
-  `,
-  styles: `
-    .code-box { min-height: 12rem; resize: vertical; padding: 0.75rem; border: 1px solid var(--border-strong); border-radius: 0.5rem; background: var(--surface-elevated); color: var(--text-primary); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.8rem; line-height: 1.45; }
-    .import-preview { margin-top: 1.5rem; }
-    .import-actions { margin-top: 1.5rem; }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
