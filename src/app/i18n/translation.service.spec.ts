@@ -63,4 +63,16 @@ describe('TranslationService', () => {
     expect(service.t('questionnaireRole.counterpart', { sex: 'Woman' })).toBe('Partner: Woman');
     expect(service.t('questionnaire.finish.action')).toBe('Finish');
   });
+
+  it('provides the profile hub resources in both locales', () => {
+    const service = TestBed.inject(TranslationService);
+
+    expect(service.t('homeHub.tagline')).toBe('Perfiles privados, locales y comparables.');
+    expect(service.plural(2, 'homeHub.profile.answers.one', 'homeHub.profile.answers.other')).toBe(
+      '2 respuestas guardadas',
+    );
+
+    service.setLocale('en');
+    expect(service.t('homeHub.profile.open')).toBe('Open profile');
+  });
 });
