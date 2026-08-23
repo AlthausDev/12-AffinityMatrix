@@ -1,15 +1,27 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-/** Stable presentation slot for the compact DesireSync product mark. */
+/**
+ * Stable presentation slot for DesireSync branding.
+ *
+ * The hub hero uses the complete wordmark while compact contexts use the icon-only mark.
+ */
 @Component({
   selector: 'app-brand-mark',
   template: `
     <span class="brand-mark" aria-hidden="true">
       <img
+        class="brand-icon"
         src="/branding/desiresync-icon.avif"
         alt=""
         width="128"
         height="128"
+      >
+      <img
+        class="brand-wordmark"
+        src="/branding/desiresync-logo.avif"
+        alt=""
+        width="360"
+        height="221"
       >
     </span>
   `,
@@ -33,7 +45,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
         0 0 2rem color-mix(in srgb, var(--neon-violet) 18%, transparent);
       backdrop-filter: blur(16px) saturate(128%);
     }
-    .brand-mark img {
+    .brand-icon {
       display: block;
       width: 92%;
       height: 92%;
@@ -41,6 +53,32 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       filter:
         drop-shadow(0 0 0.32rem color-mix(in srgb, var(--neon-cyan) 28%, transparent))
         drop-shadow(0 0 0.5rem color-mix(in srgb, var(--neon-magenta) 20%, transparent));
+    }
+    .brand-wordmark { display: none; }
+
+    :host-context(.profile-hub .hub-hero) {
+      display: block;
+      width: min(82vw, 25rem);
+    }
+    :host-context(.profile-hub .hub-hero) .brand-mark {
+      width: 100%;
+      aspect-ratio: auto;
+      overflow: visible;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+    :host-context(.profile-hub .hub-hero) .brand-icon { display: none; }
+    :host-context(.profile-hub .hub-hero) .brand-wordmark {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      filter:
+        drop-shadow(0 0 0.65rem color-mix(in srgb, var(--neon-cyan) 18%, transparent))
+        drop-shadow(0 0 1rem color-mix(in srgb, var(--neon-magenta) 14%, transparent));
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
