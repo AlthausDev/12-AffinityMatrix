@@ -13,7 +13,8 @@ export type CataloguePracticeKind =
   | 'paired'
   | 'group'
   | 'focus'
-  | 'toy';
+  | 'toy'
+  | 'dual-use-toy';
 
 export type CatalogueToyRoleId = 'use-on-self' | 'use-on-partner' | 'partner-uses-on-me';
 
@@ -47,6 +48,7 @@ export interface CatalogueRoleLabelsSeed extends Readonly<Record<string, Catalog
   readonly 'use-on-self'?: CatalogueRoleLabelSeed;
   readonly 'use-on-partner'?: CatalogueRoleLabelSeed;
   readonly 'partner-uses-on-me'?: CatalogueRoleLabelSeed;
+  readonly 'use-together'?: CatalogueRoleLabelSeed;
 }
 
 export interface CataloguePracticeSeed {

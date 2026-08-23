@@ -39,6 +39,8 @@ function describeObviousPracticeEs(seed: CataloguePracticeSeed): string {
       return `Atracción o interés erótico por «${label}» como rasgo, parte corporal o elemento de la pareja.`;
     case 'toy':
       return `Interés por usar «${label}», diferenciando uso propio, uso con la pareja y las zonas compatibles cuando corresponde.`;
+    case 'dual-use-toy':
+      return `Interés por usar «${label}», distinguiendo el uso compartido con la pareja del uso doble sobre uno mismo.`;
   }
 }
 
@@ -67,6 +69,8 @@ function describeObviousPracticeEn(seed: CataloguePracticeSeed): string {
       return `Erotic attraction or interest in “${label}” as a feature, body part or element of a partner.`;
     case 'toy':
       return `Interest in using “${label}”, distinguishing self-use, partnered use and compatible body sites where relevant.`;
+    case 'dual-use-toy':
+      return `Interest in using “${label}”, distinguishing shared use with a partner from double self-use.`;
   }
 }
 

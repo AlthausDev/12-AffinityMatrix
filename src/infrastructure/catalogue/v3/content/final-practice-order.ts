@@ -148,6 +148,12 @@ const EXHIBITIONISM_FINAL_ORDER = insertAfter(
 );
 
 const RESTRAINT_FINAL_ORDER = insertBefore(base('restraint'), 'gag', ['hand-over-mouth']);
+const FLUIDS_FINAL_ORDER = insertAfter(base('fluids'), 'female-ejaculation', ['squirting-on-partner']);
+const EDGE_FINAL_ORDER = insertBefore(
+  without(base('edge'), ['genital-torture']),
+  'cock-and-ball-torture',
+  ['pussy-torture'],
+);
 
 /** Final deliberate order, extending the base grouping only where final review changes content. */
 export const FINAL_CATALOGUE_PRACTICE_GROUP_ORDER: Readonly<Record<string, readonly string[]>> = {
@@ -159,8 +165,10 @@ export const FINAL_CATALOGUE_PRACTICE_GROUP_ORDER: Readonly<Record<string, reado
   roleplay: ROLEPLAY_FINAL_ORDER,
   exhibitionism: EXHIBITIONISM_FINAL_ORDER,
   restraint: RESTRAINT_FINAL_ORDER,
+  fluids: FLUIDS_FINAL_ORDER,
   'taboo-fantasies': TABOO_FINAL_ORDER,
   surrealism: SURREALISM_FINAL_ORDER,
+  edge: EDGE_FINAL_ORDER,
 };
 
 export function groupFinalCataloguePractices(

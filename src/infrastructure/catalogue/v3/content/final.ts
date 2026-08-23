@@ -12,19 +12,27 @@ import { applyFinalLastMileReview, FINAL_LAST_MILE_RETIRED_PRACTICE_IDS } from '
 import { groupFinalCataloguePractices } from './final-practice-order';
 import { applyFinalReleaseCopy } from './final-release-copy';
 import { applyFinalReleaseTaxonomy, FINAL_RELEASE_RETIRED_PRACTICE_IDS } from './final-release-taxonomy';
+import { addFinalRolePractices, REACTIVATED_V3_PRACTICE_IDS } from './final-role-additions';
+import { applyConciseCategoryCopy, applyFinalRolePolish, FINAL_ROLE_POLISH_RETIRED_PRACTICE_IDS } from './final-role-polish';
+import { sanitizeFinalCatalogueSeeds } from './final-seed-sanitization';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
 import { CatalogueCategorySeed } from './types';
 
-export const RETIRED_V3_PRACTICE_IDS = new Set<string>([
+const ALL_RETIRED_V3_PRACTICE_IDS = [
   ...CURATED_RETIRED_V3_PRACTICE_IDS,
   ...FINAL_CONTENT_RETIRED_PRACTICE_IDS,
   ...FINAL_CLARITY_RETIRED_PRACTICE_IDS,
   ...FINAL_LAST_MILE_RETIRED_PRACTICE_IDS,
   ...FINAL_RELEASE_RETIRED_PRACTICE_IDS,
   ...FINAL_APPLICABILITY_RETIRED_PRACTICE_IDS,
-]);
+  ...FINAL_ROLE_POLISH_RETIRED_PRACTICE_IDS,
+];
+
+export const RETIRED_V3_PRACTICE_IDS = new Set<string>(
+  ALL_RETIRED_V3_PRACTICE_IDS.filter((id) => !REACTIVATED_V3_PRACTICE_IDS.has(id)),
+);
 
 /** Final Catalogue V3 projection after semantic curation, role refinement and content polish. */
 const SEMANTIC_CONTENT: readonly CatalogueCategorySeed[] = CURATED_CONTENT.map((category) => ({
@@ -48,6 +56,10 @@ const LAST_MILE_CONTENT = applyFinalLastMileReview(CLARIFIED_CONTENT);
 const RELEASE_TAXONOMY_CONTENT = applyFinalReleaseTaxonomy(LAST_MILE_CONTENT);
 const RELEASE_COPY_CONTENT = applyFinalReleaseCopy(RELEASE_TAXONOMY_CONTENT);
 const APPLICABILITY_REVIEWED_CONTENT = applyFinalApplicabilityReview(RELEASE_COPY_CONTENT);
-const GROUPED_CONTENT = groupFinalCataloguePractices(APPLICABILITY_REVIEWED_CONTENT);
+const FINAL_ROLE_CONTENT = applyFinalRolePolish(APPLICABILITY_REVIEWED_CONTENT);
+const ROLE_ADDED_CONTENT = addFinalRolePractices(FINAL_ROLE_CONTENT);
+const SANITIZED_CONTENT = sanitizeFinalCatalogueSeeds(ROLE_ADDED_CONTENT);
+const GROUPED_CONTENT = groupFinalCataloguePractices(SANITIZED_CONTENT);
+const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(GROUPED_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyFinalCategoryCopy(GROUPED_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyConciseCategoryCopy(CATEGORY_COPY_CONTENT);
