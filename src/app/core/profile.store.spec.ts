@@ -54,6 +54,23 @@ describe('ProfileStore', () => {
     expect(store.saving()).toBe(false);
   });
 
+  it('duplicates a profile and publishes the copy as a new local profile', async () => {
+    const created = await store.create({ alias: 'Original' });
+    await store.upsertAnswer(
+      created!.id,
+      { practiceId: 'kissing', roleId: 'mutual', preference: 'favorite' },
+      3,
+    );
+
+    const duplicate = await store.duplicate(created!.id, { alias: 'Original (copy)' });
+
+    expect(duplicate?.id).not.toBe(created!.id);
+    expect(duplicate?.metadata.alias).toBe('Original (copy)');
+    expect(duplicate?.answers['kissing::mutual']?.preference).toBe('favorite');
+    expect(store.profiles()).toHaveLength(2);
+    expect(store.error()).toBeNull();
+  });
+
   it('updates profile metadata and local settings together', async () => {
     const created = await store.create({ alias: 'Original' });
     const updated = await store.updateProfile(
