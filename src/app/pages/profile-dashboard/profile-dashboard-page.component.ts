@@ -92,11 +92,11 @@ import { CompletionProgressComponent } from '../../shared/completion-progress.co
     .storage-status { grid-column: span 2; }
     .category-progress-section { margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); }
     .category-progress-section h3 { margin-bottom: 1rem; }
-    .category-progress-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem 1rem; }
-    .category-progress-row { display: grid; gap: 0.48rem; padding: 0.8rem; border: 1px solid color-mix(in srgb, var(--border-subtle) 72%, transparent); border-radius: 0.6rem; background: color-mix(in srgb, var(--surface-elevated) 42%, transparent); }
+    .category-progress-list { column-count: 2; column-gap: 1rem; }
+    .category-progress-row { display: grid; break-inside: avoid; gap: 0.48rem; margin-bottom: 0.8rem; padding: 0.8rem; border: 1px solid color-mix(in srgb, var(--border-subtle) 72%, transparent); border-radius: 0.6rem; background: color-mix(in srgb, var(--surface-elevated) 42%, transparent); }
     .category-progress-copy { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8rem; }
     .category-progress-copy span { font-size: 0.75rem; white-space: nowrap; }
-    @media (max-width: 720px) { .dashboard-header-actions, .status-heading, .progress-copy, .category-progress-copy { align-items: flex-start; flex-direction: column; } .dashboard-header-actions { width: 100%; } .settings-button { width: 100%; } .overall-percentage { text-align: left; } .category-progress-list { grid-template-columns: 1fr; } .storage-status { grid-column: auto; } }
+    @media (max-width: 720px) { .dashboard-header-actions, .status-heading, .progress-copy, .category-progress-copy { align-items: flex-start; flex-direction: column; } .dashboard-header-actions { width: 100%; } .settings-button { width: 100%; } .overall-percentage { text-align: left; } .category-progress-list { column-count: 1; } .storage-status { grid-column: auto; } }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

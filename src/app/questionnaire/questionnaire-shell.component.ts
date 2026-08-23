@@ -126,6 +126,7 @@ export class QuestionnaireShellComponent {
   }
 
   requestFinish(): void { if (!this.preferences.confirmQuestionnaireExit()) { this.navigateToProfile(); return; } this.dontAskAgain.set(false); this.finishDialogOpen.set(true); }
+  requestCompletion(): void { if (this.pendingCount() === 0) { this.navigateToProfile(); return; } this.requestFinish(); }
   continueQuestionnaire(): void { this.finishDialogOpen.set(false); this.dontAskAgain.set(false); }
   confirmFinish(): void { if (this.dontAskAgain()) this.preferences.setConfirmQuestionnaireExit(false); this.finishDialogOpen.set(false); this.navigateToProfile(); }
   toggleDontAskAgain(event: Event): void { this.dontAskAgain.set((event.target as HTMLInputElement).checked); }
