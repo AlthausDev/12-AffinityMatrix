@@ -32,7 +32,7 @@ import { QuestionnaireShellComponent } from './questionnaire-shell.component';
             [queryParams]="includeFiltered() ? { filtered: '1' } : null"
           >{{ i18n.t('questionnaire.next') }}</a>
         } @else {
-          <button class="button" type="button" (click)="finish()">{{ i18n.t('questionnaire.finish.action') }}</button>
+          <button class="button final-finish-button" type="button" (click)="finish()">{{ i18n.t('questionnaire.finish.action') }}</button>
         }
       </div>
     </nav>
@@ -45,6 +45,20 @@ import { QuestionnaireShellComponent } from './questionnaire-shell.component';
       gap: 0.75rem;
     }
     .next-slot { text-align: right; }
+    .final-finish-button {
+      border-color: color-mix(in srgb, var(--completion-complete) 72%, var(--border-strong));
+      background: color-mix(in srgb, var(--completion-complete) 18%, #eef7f1);
+      color: #102218;
+      box-shadow: 0 0.35rem 0.9rem color-mix(in srgb, var(--completion-complete) 12%, transparent);
+    }
+    .final-finish-button:hover {
+      border-color: var(--completion-complete);
+      box-shadow: 0 0.55rem 1.2rem color-mix(in srgb, var(--completion-complete) 22%, transparent);
+    }
+    .final-finish-button:active {
+      transform: translateY(0);
+      box-shadow: 0 0.2rem 0.55rem color-mix(in srgb, var(--completion-complete) 18%, transparent);
+    }
     @media (max-width: 720px) {
       .questionnaire-nav { grid-template-columns: 1fr; }
       .questionnaire-nav .button { width: 100%; }
@@ -64,7 +78,7 @@ export class QuestionnaireCategoryNavigationComponent {
 
   finish(): void {
     if (this.shell) {
-      this.shell.requestFinish();
+      this.shell.requestCompletion();
       return;
     }
     void this.router.navigate(['/profiles', this.profileId()]);
