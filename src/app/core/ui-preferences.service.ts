@@ -78,6 +78,21 @@ export class UiPreferencesService {
     this.update({ profileSortMode: value });
   }
 
+  removeProfile(profileId: string): void {
+    if (!profileId) return;
+    const current = this.state();
+    const profileOrder = current.profileOrder.filter((id) => id !== profileId);
+    const hiddenCategoriesByProfile = { ...current.hiddenCategoriesByProfile };
+    delete hiddenCategoriesByProfile[profileId];
+
+    if (
+      profileOrder.length === current.profileOrder.length &&
+      !(profileId in current.hiddenCategoriesByProfile)
+    ) return;
+
+    this.update({ profileOrder, hiddenCategoriesByProfile });
+  }
+
   setCategoryHidden(profileId: string, categoryId: string, hidden: boolean): void {
     if (!profileId || !categoryId) return;
     const current = new Set(this.hiddenCategoryIds(profileId));
