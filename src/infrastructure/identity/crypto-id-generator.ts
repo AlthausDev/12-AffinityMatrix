@@ -1,22 +1,35 @@
 import { IdGenerator } from '../../application/shared/id-generator';
 
-interface CryptoLike {
-  readonly randomUUID?: () => string;
-  readonly getRandomValues?: (array: Uint8Array) => Uint8Array;
+type RandomUuid = () => string;
+type FillRandomBytes = (array: Uint8Array) => void;
+
+function browserRandomUuid(): RandomUuid | undefined {
+  const api = globalThis.crypto;
+  return typeof api?.randomUUID === 'function' ? () => api.randomUUID() : undefined;
 }
 
-export function generateCompatibleUuid(cryptoApi: CryptoLike | undefined = globalThis.crypto): string {
-  if (typeof cryptoApi?.randomUUID === 'function') {
+function browserFillRandomBytes(): FillRandomBytes | undefined {
+  const api = globalThis.crypto;
+  return typeof api?.getRandomValues === 'function'
+    ? (array) => { api.getRandomValues(array); }
+    : undefined;
+}
+
+export function generateCompatibleUuid(
+  randomUuid: RandomUuid | undefined = browserRandomUuid(),
+  fillRandomBytes: FillRandomBytes | undefined = browserFillRandomBytes(),
+): string {
+  if (randomUuid) {
     try {
-      return cryptoApi.randomUUID();
+      return randomUuid();
     } catch {
       // Some browsers expose randomUUID but reject it outside a secure context.
     }
   }
 
   const bytes = new Uint8Array(16);
-  if (typeof cryptoApi?.getRandomValues === 'function') {
-    cryptoApi.getRandomValues(bytes);
+  if (fillRandomBytes) {
+    fillRandomBytes(bytes);
   } else {
     // Profile ids are local identifiers rather than secrets. This final compatibility
     // fallback keeps creation working in very restricted/legacy browser contexts.
