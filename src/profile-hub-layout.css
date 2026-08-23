@@ -10,14 +10,14 @@
 }
 
 .profile-hub .profile-card-main {
-  min-height: 8.35rem;
-  grid-template-columns: minmax(13rem, 0.9fr) minmax(0, 1.4fr);
+  min-height: 8rem;
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 0.72fr);
   grid-template-areas:
-    "header progress"
-    "facts progress";
-  align-items: center;
+    "header facts"
+    "progress progress";
+  align-items: end;
   column-gap: 1.6rem;
-  row-gap: 0.45rem;
+  row-gap: 0.72rem;
   padding: 0.9rem 1rem 0.85rem;
 }
 
@@ -27,16 +27,19 @@
   padding: 0 1rem 0 1.35rem;
 }
 
-.profile-hub .profile-progress-block {
-  grid-area: progress;
-  margin-top: 0;
-  padding-right: 2.6rem;
-}
-
 .profile-hub .profile-facts {
   grid-area: facts;
-  align-self: start;
-  padding: 0 1rem 0 1.35rem;
+  align-self: end;
+  justify-self: end;
+  padding: 0 2.7rem 0 1rem;
+  text-align: right;
+}
+
+.profile-hub .profile-progress-block {
+  grid-area: progress;
+  width: 100%;
+  margin-top: 0;
+  padding: 0 2.6rem 0 1.35rem;
 }
 
 .profile-hub .hub-footer {
@@ -62,11 +65,13 @@
 
   .profile-hub .profile-progress-block {
     margin-top: auto;
-    padding-right: 0;
+    padding: 0;
   }
 
   .profile-hub .profile-facts {
     align-self: auto;
+    justify-self: stretch;
     padding: 0 1.6rem 0 0;
+    text-align: left;
   }
 }
