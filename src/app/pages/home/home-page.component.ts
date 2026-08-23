@@ -151,7 +151,7 @@ interface ProfilePointerDragState {
                   class="profile-card-main"
                   [routerLink]="reorderMode() ? null : ['/profiles', card.profile.id]"
                   [attr.aria-disabled]="reorderMode() ? 'true' : null"
-                  [attr.tabindex]="reorderMode() ? 0 : null"
+                  [attr.tabindex]="manualReorderEnabled() ? 0 : reorderMode() ? -1 : null"
                   [attr.aria-keyshortcuts]="manualReorderEnabled() ? 'Alt+ArrowUp Alt+ArrowDown' : null"
                   [attr.title]="profileDisplayName(card.profile)"
                   draggable="false"
@@ -189,25 +189,27 @@ interface ProfilePointerDragState {
                     <button
                       class="profile-menu-button"
                       type="button"
-                      aria-haspopup="menu"
                       [attr.aria-label]="i18n.t('homeHub.profile.menu', { alias: profileDisplayName(card.profile) })"
                       [attr.aria-expanded]="activeMenuProfileId() === card.profile.id"
+                      [attr.aria-controls]="'profile-actions-' + card.profile.id"
                       (click)="toggleProfileMenu(card.profile.id)"
                     >⋯</button>
 
                     @if (activeMenuProfileId() === card.profile.id) {
-                      <div class="profile-menu" role="menu">
+                      <div
+                        class="profile-menu"
+                        [id]="'profile-actions-' + card.profile.id"
+                        (keydown.escape)="closeProfileMenu($event)"
+                      >
                         <button
                           class="profile-menu-action"
                           type="button"
-                          role="menuitem"
                           [disabled]="profileStore.saving()"
                           (click)="duplicateProfile(card.profile)"
                         >{{ i18n.t('homeHub.profile.duplicate') }}</button>
                         <button
                           class="profile-menu-action profile-menu-action-danger"
                           type="button"
-                          role="menuitem"
                           (click)="requestDeletion(card.profile)"
                         >{{ i18n.t('profileDeletion.homeAction') }}</button>
                       </div>
@@ -306,16 +308,12 @@ export class HomePageComponent {
       );
     }
 
-    const manualOrder = this.preferences.profileOrder();
+    const manualOrder = this.manualProfileIds();
     const orderIndex = new Map(manualOrder.map((profileId, index) => [profileId, index]));
-    return [...cards].sort((left, right) => {
-      const leftIndex = orderIndex.get(left.profile.id);
-      const rightIndex = orderIndex.get(right.profile.id);
-      if (leftIndex !== undefined && rightIndex !== undefined) return leftIndex - rightIndex;
-      if (leftIndex !== undefined) return -1;
-      if (rightIndex !== undefined) return 1;
-      return updatedDescending(left, right);
-    });
+    return [...cards].sort((left, right) =>
+      (orderIndex.get(left.profile.id) ?? Number.MAX_SAFE_INTEGER) -
+      (orderIndex.get(right.profile.id) ?? Number.MAX_SAFE_INTEGER),
+    );
   });
 
   constructor() {
@@ -363,19 +361,23 @@ export class HomePageComponent {
     this.activeMenuProfileId.update((current) => current === profileId ? null : profileId);
   }
 
+  closeProfileMenu(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.activeMenuProfileId.set(null);
+  }
+
   async duplicateProfile(profile: Profile): Promise<void> {
     this.activeMenuProfileId.set(null);
-    const previousOrder = this.profileCards().map((card) => card.profile.id);
+    const previousManualOrder = this.manualProfileIds();
     const copyAlias = this.copyAliasFor(profile);
     const duplicate = await this.profileStore.duplicate(profile.id, { ...profile.metadata, alias: copyAlias });
     if (!duplicate) return;
 
-    if (this.profileSortMode() === 'manual') {
-      const sourceIndex = previousOrder.indexOf(profile.id);
-      const nextOrder = [...previousOrder];
-      nextOrder.splice(sourceIndex >= 0 ? sourceIndex + 1 : nextOrder.length, 0, duplicate.id);
-      this.preferences.setProfileOrder(nextOrder);
-    }
+    const sourceIndex = previousManualOrder.indexOf(profile.id);
+    const nextOrder = [...previousManualOrder];
+    nextOrder.splice(sourceIndex >= 0 ? sourceIndex + 1 : nextOrder.length, 0, duplicate.id);
+    this.preferences.setProfileOrder(nextOrder);
     this.liveAnnouncement.set(this.i18n.t('homeHub.profile.duplicated'));
   }
 
@@ -488,6 +490,21 @@ export class HomePageComponent {
     event.stopPropagation();
     const targetProfileId = orderedIds[targetIndex];
     if (targetProfileId) this.moveProfile(profileId, targetProfileId);
+  }
+
+  private manualProfileIds(): string[] {
+    const manualOrder = this.preferences.profileOrder();
+    const orderIndex = new Map(manualOrder.map((profileId, index) => [profileId, index]));
+    return [...this.profileStore.profiles()]
+      .sort((left, right) => {
+        const leftIndex = orderIndex.get(left.id);
+        const rightIndex = orderIndex.get(right.id);
+        if (leftIndex !== undefined && rightIndex !== undefined) return leftIndex - rightIndex;
+        if (leftIndex !== undefined) return -1;
+        if (rightIndex !== undefined) return 1;
+        return Date.parse(right.updatedAt) - Date.parse(left.updatedAt);
+      })
+      .map((profile) => profile.id);
   }
 
   private copyAliasFor(profile: Profile): string {
