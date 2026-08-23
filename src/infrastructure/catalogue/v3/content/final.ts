@@ -12,6 +12,7 @@ import { applyFinalLastMileReview, FINAL_LAST_MILE_RETIRED_PRACTICE_IDS } from '
 import { groupFinalCataloguePractices } from './final-practice-order';
 import { applyFinalReleaseCopy } from './final-release-copy';
 import { applyFinalReleaseTaxonomy, FINAL_RELEASE_RETIRED_PRACTICE_IDS } from './final-release-taxonomy';
+import { applyConciseCategoryCopy, applyFinalRolePolish, FINAL_ROLE_POLISH_RETIRED_PRACTICE_IDS } from './final-role-polish';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
@@ -24,6 +25,7 @@ export const RETIRED_V3_PRACTICE_IDS = new Set<string>([
   ...FINAL_LAST_MILE_RETIRED_PRACTICE_IDS,
   ...FINAL_RELEASE_RETIRED_PRACTICE_IDS,
   ...FINAL_APPLICABILITY_RETIRED_PRACTICE_IDS,
+  ...FINAL_ROLE_POLISH_RETIRED_PRACTICE_IDS,
 ]);
 
 /** Final Catalogue V3 projection after semantic curation, role refinement and content polish. */
@@ -48,6 +50,8 @@ const LAST_MILE_CONTENT = applyFinalLastMileReview(CLARIFIED_CONTENT);
 const RELEASE_TAXONOMY_CONTENT = applyFinalReleaseTaxonomy(LAST_MILE_CONTENT);
 const RELEASE_COPY_CONTENT = applyFinalReleaseCopy(RELEASE_TAXONOMY_CONTENT);
 const APPLICABILITY_REVIEWED_CONTENT = applyFinalApplicabilityReview(RELEASE_COPY_CONTENT);
-const GROUPED_CONTENT = groupFinalCataloguePractices(APPLICABILITY_REVIEWED_CONTENT);
+const FINAL_ROLE_CONTENT = applyFinalRolePolish(APPLICABILITY_REVIEWED_CONTENT);
+const GROUPED_CONTENT = groupFinalCataloguePractices(FINAL_ROLE_CONTENT);
+const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(GROUPED_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyFinalCategoryCopy(GROUPED_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyConciseCategoryCopy(CATEGORY_COPY_CONTENT);
