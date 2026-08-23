@@ -1,7 +1,7 @@
 # DesireSync brand assets
 
-- `desiresync-icon.avif`: compact synchronized-wave mark used in square brand slots and as the visual basis of the hub hero.
+- `desiresync-icon.avif`: compact synchronized-wave mark used in square brand slots.
 - `desiresync-favicon.png`: reduced icon for browser tabs.
-- `desiresync-logo.avif`: retained source raster for the selected full logo concept; the hub wordmark is rendered live for reliable display and responsive sharpness.
+- `desiresync-logo.png`: full DesireSync logo used by the Profile Hub hero.
 
-The main hub combines the compact mark with semantic DesireSync text, keeping the brand crisp at any scale without depending on a full raster wordmark at runtime.
+The full logo is kept as PNG because the previous AVIF conversion produced a fully transparent image in-browser. The compact icon remains separate for small square placements where the full wordmark would not be legible.
