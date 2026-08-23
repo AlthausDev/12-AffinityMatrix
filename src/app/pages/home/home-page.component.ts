@@ -10,7 +10,6 @@ import { UiPreferencesService } from '../../core/ui-preferences.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { ProfileDeleteDialogComponent } from '../../profile/profile-delete-dialog.component';
 import { APP_VERSION } from '../../shared/app-version';
-import { BrandMarkComponent } from '../../shared/brand-mark.component';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { PointerGlowDirective } from '../../shared/pointer-glow.directive';
 import { PRODUCT_MONOGRAM, PRODUCT_NAME } from '../../shared/product-brand';
@@ -23,13 +22,25 @@ interface ProfileCardView {
 
 @Component({
   selector: 'app-home-page',
-  imports: [RouterLink, ProfileDeleteDialogComponent, BrandMarkComponent, CompletionProgressComponent, PointerGlowDirective],
+  imports: [RouterLink, ProfileDeleteDialogComponent, CompletionProgressComponent, PointerGlowDirective],
   template: `
     <main class="page profile-hub">
       <header class="hub-hero">
         <div class="brand-cluster">
-          <h1 [attr.aria-label]="productName">
-            <app-brand-mark variant="hero" />
+          <h1
+            [attr.aria-label]="productName"
+            style="display:flex !important; min-height:9rem; align-items:center; justify-content:center; flex-direction:column; gap:.35rem; margin:0 0 .55rem; visibility:visible !important; opacity:1 !important;"
+          >
+            <img
+              src="/branding/desiresync-favicon.png"
+              alt=""
+              width="112"
+              height="112"
+              style="display:block !important; width:7rem; height:7rem; object-fit:contain; visibility:visible !important; opacity:1 !important;"
+            >
+            <span style="display:flex !important; align-items:baseline; justify-content:center; visibility:visible !important; opacity:1 !important; font-size:clamp(2.65rem,7vw,4.2rem); font-weight:850; letter-spacing:-.065em; line-height:.95;">
+              <span style="color:#53d6ff !important;">Desire</span><span style="color:#ef62c8 !important;">Sync</span>
+            </span>
           </h1>
           <div class="brand-copy">
             <p class="lead">{{ i18n.t('homeHub.tagline') }}</p>
