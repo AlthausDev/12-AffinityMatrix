@@ -1,7 +1,7 @@
 import { IdGenerator } from '../../application/shared/id-generator';
 
 type RandomUuid = () => string;
-type FillRandomBytes = (array: Uint8Array) => void;
+type FillRandomBytes = (array: Uint8Array<ArrayBuffer>) => void;
 
 function browserRandomUuid(): RandomUuid | undefined {
   const api = globalThis.crypto;
@@ -27,7 +27,7 @@ export function generateCompatibleUuid(
     }
   }
 
-  const bytes = new Uint8Array(16);
+  const bytes = new Uint8Array(new ArrayBuffer(16));
   if (fillRandomBytes) {
     fillRandomBytes(bytes);
   } else {
