@@ -296,18 +296,23 @@
 }
 
 @media (max-width: 620px) {
+  .profile-hub .profiles-heading {
+    width: 100%;
+  }
+
   .profile-hub .profiles-title-row {
     display: grid;
-    grid-template-columns: auto auto;
-    justify-content: start;
+    width: 100%;
+    grid-template-columns: auto auto 1fr;
+    justify-content: stretch;
     align-items: center;
   }
 
   .profile-hub .profile-order-button {
     position: static;
-    grid-column: 1 / -1;
-    justify-self: start;
-    margin-top: 0.5rem;
+    grid-column: 3;
+    justify-self: end;
+    margin-top: 0;
   }
 
   .profile-hub .profile-toolbar-actions {
