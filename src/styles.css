@@ -1,20 +1,27 @@
 :root {
   color-scheme: dark;
-  --surface-page: #151a2a;
+  --surface-page: #070b1c;
   --surface-page-gradient:
-    radial-gradient(circle at 18% 18%, rgba(59, 95, 170, 0.24) 0%, transparent 34%),
-    radial-gradient(circle at 82% 78%, rgba(119, 55, 164, 0.22) 0%, transparent 38%),
-    linear-gradient(145deg, #121827 0%, #1a2d49 52%, #2a1938 100%);
-  --surface-panel: rgba(27, 34, 54, 0.9);
-  --surface-elevated: rgba(39, 49, 74, 0.94);
-  --text-primary: #f4f5fb;
-  --text-secondary: #c0c8d7;
-  --border-subtle: rgba(101, 116, 148, 0.38);
-  --border-strong: rgba(142, 157, 190, 0.62);
-  --focus-ring: #b5c5ff;
-  --error-text: #ffb8b8;
-  --window-border-gradient: linear-gradient(135deg, #6572ff 0%, #9a4de2 52%, #6b3de8 100%);
-  --window-border-gradient-soft: linear-gradient(135deg, rgba(101, 114, 255, 0.5) 0%, rgba(154, 77, 226, 0.44) 52%, rgba(107, 61, 232, 0.5) 100%);
+    radial-gradient(ellipse at 14% 12%, rgba(34, 111, 220, 0.28) 0%, rgba(15, 57, 126, 0.12) 30%, transparent 52%),
+    radial-gradient(ellipse at 84% 18%, rgba(90, 62, 214, 0.19) 0%, transparent 43%),
+    radial-gradient(ellipse at 72% 82%, rgba(202, 52, 166, 0.16) 0%, rgba(101, 34, 128, 0.08) 34%, transparent 58%),
+    radial-gradient(ellipse at 20% 92%, rgba(33, 154, 224, 0.12) 0%, transparent 42%),
+    linear-gradient(145deg, #050919 0%, #091229 38%, #101537 62%, #1b0d30 82%, #240b2d 100%);
+  --surface-panel: rgba(18, 29, 59, 0.9);
+  --surface-elevated: rgba(31, 45, 82, 0.94);
+  --text-primary: #f4f7ff;
+  --text-secondary: #c4cce0;
+  --border-subtle: rgba(91, 121, 174, 0.38);
+  --border-strong: rgba(136, 168, 222, 0.62);
+  --focus-ring: #b8d9ff;
+  --error-text: #ffb8c8;
+  --neon-cyan: #36baff;
+  --neon-blue: #416cff;
+  --neon-violet: #8c5cff;
+  --neon-magenta: #e650c5;
+  --neon-rose: #f56aa7;
+  --window-border-gradient: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 32%, var(--neon-violet) 64%, var(--neon-magenta) 100%);
+  --window-border-gradient-soft: linear-gradient(135deg, rgba(54, 186, 255, 0.5) 0%, rgba(65, 108, 255, 0.48) 32%, rgba(140, 92, 255, 0.46) 64%, rgba(230, 80, 197, 0.42) 100%);
   --completion-danger: #ff4058;
   --completion-low: #ff7a32;
   --completion-mid: #f0c43c;
@@ -30,10 +37,22 @@
 }
 
 * { box-sizing: border-box; }
-html { min-height: 100%; background: #121827; font-size: 100%; }
+html { min-height: 100%; background: #050919; font-size: 100%; }
 html[data-font-scale='large'] { font-size: 112.5%; }
 html[data-font-scale='extra-large'] { font-size: 125%; }
-body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--surface-page-gradient); color: var(--text-primary); }
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #050919;
+  background-image: var(--surface-page-gradient);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  color: var(--text-primary);
+}
 button, input, select, textarea { font: inherit; }
 a { color: inherit; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
