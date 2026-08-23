@@ -1,5 +1,6 @@
 export const ES_HOME_HUB_TRANSLATIONS = {
   'homeHub.tagline': 'Perfiles privados, locales y comparables.',
+  'homeHub.actionsLabel': 'Crear o importar perfiles',
   'homeHub.create.eyebrow': 'Nuevo perfil',
   'homeHub.create.description': 'Empieza desde cero y configura sólo los datos que quieras usar para el filtrado.',
   'homeHub.import.eyebrow': 'Portabilidad',
@@ -22,6 +23,7 @@ export type HomeHubTranslationKey = keyof typeof ES_HOME_HUB_TRANSLATIONS;
 
 export const EN_HOME_HUB_TRANSLATIONS = {
   'homeHub.tagline': 'Private, local and comparable profiles.',
+  'homeHub.actionsLabel': 'Create or import profiles',
   'homeHub.create.eyebrow': 'New profile',
   'homeHub.create.description': 'Start from scratch and configure only the data you want to use for filtering.',
   'homeHub.import.eyebrow': 'Portability',
