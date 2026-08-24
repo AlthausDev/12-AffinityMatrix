@@ -1,0 +1,41 @@
+.profile-dashboard .dashboard-preference-layout {
+  grid-template-columns: minmax(7.6rem, 8.8rem) minmax(0, 1fr);
+  gap: clamp(0.8rem, 2vw, 1.2rem);
+}
+
+.profile-dashboard .preference-donut {
+  width: clamp(7.6rem, 11vw, 8.8rem);
+}
+
+.profile-dashboard .preference-legend {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.28rem 0.9rem;
+  align-content: center;
+}
+
+.profile-dashboard .preference-legend-row {
+  gap: 0.38rem;
+  padding: 0.18rem 0;
+}
+
+.profile-dashboard .preference-legend-value {
+  min-width: 4.5rem;
+  text-align: right;
+}
+
+@media (max-width: 700px) {
+  .profile-dashboard .preference-legend {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-dashboard .dashboard-preference-layout {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .profile-dashboard .preference-donut {
+    width: 8rem;
+  }
+}
