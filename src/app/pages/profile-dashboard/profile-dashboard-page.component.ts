@@ -69,9 +69,7 @@ import { buildPreferenceDistribution } from './profile-dashboard-insights';
               <div class="completion-ring completion-ring-muted" aria-hidden="true">
                 <div class="completion-ring-core"><strong>—</strong><span>{{ i18n.t('dashboard.header.progress') }}</span></div>
               </div>
-              <p class="dashboard-progress-message">
-                {{ i18n.t(catalogueStore.loading() ? 'dashboard.status.catalogueLoading' : 'dashboard.status.catalogueUnavailable') }}
-              </p>
+              <p class="dashboard-progress-message">{{ visibleProgressStatus() }}</p>
             }
           </div>
         </header>
@@ -183,7 +181,7 @@ import { buildPreferenceDistribution } from './profile-dashboard-insights';
                   <div class="preference-donut" [style.background]="preferenceChartGradient()" aria-hidden="true">
                     <div class="preference-donut-core">
                       <strong>{{ savedAnswerCount() }}</strong>
-                      <span>{{ i18n.t('dashboard.preference.total', { count: savedAnswerCount() }) }}</span>
+                      <span>{{ preferenceTotalLabel(savedAnswerCount()) }}</span>
                     </div>
                   </div>
 
@@ -209,7 +207,7 @@ import { buildPreferenceDistribution } from './profile-dashboard-insights';
               <header class="dashboard-chart-heading">
                 <div>
                   <h3>{{ i18n.t('dashboard.header.progress') }}</h3>
-                  <p>{{ i18n.t('dashboard.status.visibleAnswered', { answered: totalAnswered(), total: totalQuestions() }) }}</p>
+                  <p>{{ progressSummaryLabel() }}</p>
                 </div>
                 @if (totalQuestions() > 0) {
                   <strong class="dashboard-summary-percentage">{{ completionPercentage() }}%</strong>
@@ -251,21 +249,17 @@ import { buildPreferenceDistribution } from './profile-dashboard-insights';
             @if (categorySummaries().length > 0) {
               <div class="dashboard-category-bars">
                 @for (summary of categorySummaries(); track summary.category.id) {
-                  @if (summary.total > 0) {
-                    <div class="dashboard-category-row">
-                      <div class="dashboard-category-copy">
-                        <strong [title]="catalogueText.categoryLabel(summary.category)">{{ catalogueText.categoryLabel(summary.category) }}</strong>
-                        <span>{{ i18n.t('dashboard.status.categoryValue', { answered: summary.answered, total: summary.total, percentage: summary.completionPercentage }) }}</span>
-                      </div>
-                      <app-completion-progress [value]="summary.completionPercentage" />
+                  <div class="dashboard-category-row">
+                    <div class="dashboard-category-copy">
+                      <strong [title]="catalogueText.categoryLabel(summary.category)">{{ catalogueText.categoryLabel(summary.category) }}</strong>
+                      <span>{{ i18n.t('dashboard.status.categoryValue', { answered: summary.answered, total: summary.total, percentage: summary.completionPercentage }) }}</span>
                     </div>
-                  }
+                    <app-completion-progress [value]="summary.completionPercentage" />
+                  </div>
                 }
               </div>
             } @else {
-              <p class="dashboard-category-message">
-                {{ i18n.t(catalogueStore.loading() ? 'dashboard.status.catalogueLoading' : 'dashboard.status.catalogueUnavailable') }}
-              </p>
+              <p class="dashboard-category-message">{{ visibleProgressStatus() }}</p>
             }
           </article>
         </section>
@@ -307,9 +301,11 @@ export class ProfileDashboardPageComponent {
   readonly categorySummaries = computed(() => {
     const profile = this.profile();
     const snapshot = this.catalogueStore.snapshot();
-    return profile && snapshot
-      ? this.questionnaireService.getCategorySummaries(snapshot, profile, false, this.hiddenCategoryIds())
-      : [];
+    if (!profile || !snapshot) return [];
+
+    return this.questionnaireService
+      .getCategorySummaries(snapshot, profile, false, this.hiddenCategoryIds())
+      .filter((summary) => summary.total > 0);
   });
   readonly totalAnswered = computed(() => this.categorySummaries().reduce((sum, item) => sum + item.answered, 0));
   readonly totalQuestions = computed(() => this.categorySummaries().reduce((sum, item) => sum + item.total, 0));
@@ -317,9 +313,9 @@ export class ProfileDashboardPageComponent {
     const total = this.totalQuestions();
     return total === 0 ? 0 : Math.round((this.totalAnswered() / total) * 100);
   });
-  readonly totalCategories = computed(() => this.categorySummaries().filter((summary) => summary.total > 0).length);
+  readonly totalCategories = computed(() => this.categorySummaries().length);
   readonly completedCategories = computed(() =>
-    this.categorySummaries().filter((summary) => summary.total > 0 && summary.answered === summary.total).length,
+    this.categorySummaries().filter((summary) => summary.answered === summary.total).length,
   );
   readonly preferenceDistribution = computed(() => buildPreferenceDistribution(this.profile()));
   readonly preferenceChartGradient = computed(() => {
@@ -356,6 +352,24 @@ export class ProfileDashboardPageComponent {
     if (preference === 'curious') return this.i18n.t('preference.curious');
     if (preference === 'not-interested') return this.i18n.t('preference.notInterested');
     return this.i18n.t('preference.boundary');
+  }
+
+  preferenceTotalLabel(count: number): string {
+    return this.i18n.plural(count, 'dashboard.preference.total.one', 'dashboard.preference.total.other');
+  }
+
+  progressSummaryLabel(): string {
+    if (this.totalQuestions() === 0) return this.visibleProgressStatus();
+    return this.i18n.t('dashboard.status.visibleAnswered', {
+      answered: this.totalAnswered(),
+      total: this.totalQuestions(),
+    });
+  }
+
+  visibleProgressStatus(): string {
+    if (this.catalogueStore.loading()) return this.i18n.t('dashboard.status.catalogueLoading');
+    if (this.catalogueStore.error()) return this.i18n.t('dashboard.status.catalogueUnavailable');
+    return this.i18n.t('dashboard.status.noVisibleQuestions');
   }
 
   storageLabel(): string {
