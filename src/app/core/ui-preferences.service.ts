@@ -12,6 +12,7 @@ export type ProfileSortMode = (typeof PROFILE_SORT_MODES)[number];
 export interface UiPreferences {
   readonly confirmQuestionnaireExit: boolean;
   readonly fontScale: FontScale;
+  readonly reduceVisualEffects: boolean;
   readonly hiddenCategoriesByProfile: Readonly<Record<string, readonly string[]>>;
   readonly profileOrder: readonly string[];
   readonly profileSortMode: ProfileSortMode;
@@ -20,6 +21,7 @@ export interface UiPreferences {
 export const DEFAULT_UI_PREFERENCES: UiPreferences = {
   confirmQuestionnaireExit: true,
   fontScale: 'normal',
+  reduceVisualEffects: false,
   hiddenCategoriesByProfile: {},
   profileOrder: [],
   profileSortMode: 'manual',
@@ -34,6 +36,7 @@ export class UiPreferencesService {
 
   initialize(): void {
     this.applyFontScale(this.state().fontScale);
+    this.applyVisualEffects(this.state().reduceVisualEffects);
   }
 
   confirmQuestionnaireExit(): boolean {
@@ -42,6 +45,10 @@ export class UiPreferencesService {
 
   fontScale(): FontScale {
     return this.state().fontScale;
+  }
+
+  reduceVisualEffects(): boolean {
+    return this.state().reduceVisualEffects;
   }
 
   hiddenCategoryIds(profileId: string): readonly string[] {
@@ -67,6 +74,11 @@ export class UiPreferencesService {
   setFontScale(value: FontScale): void {
     this.update({ fontScale: value });
     this.applyFontScale(value);
+  }
+
+  setReduceVisualEffects(value: boolean): void {
+    this.update({ reduceVisualEffects: value });
+    this.applyVisualEffects(value);
   }
 
   setProfileOrder(profileIds: readonly string[]): void {
@@ -134,6 +146,10 @@ export class UiPreferencesService {
         fontScale: this.isFontScale(parsed['fontScale'])
           ? parsed['fontScale']
           : DEFAULT_UI_PREFERENCES.fontScale,
+        reduceVisualEffects:
+          typeof parsed['reduceVisualEffects'] === 'boolean'
+            ? parsed['reduceVisualEffects']
+            : DEFAULT_UI_PREFERENCES.reduceVisualEffects,
         hiddenCategoriesByProfile: this.readHiddenCategories(parsed['hiddenCategoriesByProfile']),
         profileOrder: this.readProfileOrder(parsed['profileOrder']),
         profileSortMode: this.isProfileSortMode(parsed['profileSortMode'])
@@ -175,6 +191,10 @@ export class UiPreferencesService {
 
   private applyFontScale(value: FontScale): void {
     this.document.documentElement.dataset['fontScale'] = value;
+  }
+
+  private applyVisualEffects(value: boolean): void {
+    this.document.documentElement.dataset['visualEffects'] = value ? 'reduced' : 'full';
   }
 
   private isFontScale(value: unknown): value is FontScale {
