@@ -1,7 +1,11 @@
 import { Practice } from '../../../domain/catalogue/practice';
 import { createProfile } from '../../../domain/profile/profile';
 import { createAnswerKey } from '../../../domain/profile/profile-answer';
-import { buildPracticeProgress, buildPreferenceDistribution } from './profile-dashboard-insights';
+import {
+  buildPracticeProgress,
+  buildPreferenceDistribution,
+  buildRoleProfile,
+} from './profile-dashboard-insights';
 
 describe('buildPreferenceDistribution', () => {
   it('summarizes saved preferences without treating unanswered questions as neutral', () => {
@@ -86,5 +90,93 @@ describe('buildPracticeProgress', () => {
 
     expect(progress).toHaveLength(1);
     expect(progress[0]?.practice.id).toBe('visible');
+  });
+});
+
+describe('buildRoleProfile', () => {
+  const practices: readonly Practice[] = [
+    {
+      id: 'paired',
+      categoryId: 'category-1',
+      label: 'Paired',
+      roles: [
+        { id: 'give', label: 'Give', perspective: 'active' },
+        { id: 'receive', label: 'Receive', perspective: 'receptive' },
+      ],
+      compatibleRolePairs: [{ leftRoleId: 'give', rightRoleId: 'receive' }],
+    },
+    {
+      id: 'shared',
+      categoryId: 'category-1',
+      label: 'Shared',
+      roles: [{ id: 'participate', label: 'Participate', perspective: 'neutral' }],
+      compatibleRolePairs: [],
+    },
+  ];
+
+  it('groups saved answers by role perspective and separates affinity from favorites', () => {
+    const profile = createProfile({
+      id: 'profile-role',
+      now: '2026-08-24T09:00:00.000Z',
+      answers: {
+        [createAnswerKey('paired', 'give')]: {
+          practiceId: 'paired', roleId: 'give', preference: 'favorite',
+        },
+        [createAnswerKey('paired', 'give', { targetSite: 'mouth' })]: {
+          practiceId: 'paired', roleId: 'give', scope: { targetSite: 'mouth' }, preference: 'like',
+        },
+        [createAnswerKey('paired', 'receive')]: {
+          practiceId: 'paired', roleId: 'receive', preference: 'curious',
+        },
+        [createAnswerKey('shared', 'participate')]: {
+          practiceId: 'shared', roleId: 'participate', preference: 'favorite',
+        },
+      },
+    });
+
+    const profileByRole = buildRoleProfile(profile, practices);
+
+    expect(profileByRole).toEqual([
+      expect.objectContaining({
+        perspective: 'active',
+        answerCount: 2,
+        affinityCount: 2,
+        favoriteCount: 1,
+        affinityPercentage: 100,
+        favoritePercentage: 50,
+      }),
+      expect.objectContaining({
+        perspective: 'receptive',
+        answerCount: 1,
+        affinityCount: 0,
+        favoriteCount: 0,
+        affinityPercentage: 0,
+        favoritePercentage: 0,
+      }),
+      expect.objectContaining({
+        perspective: 'neutral',
+        answerCount: 1,
+        affinityCount: 1,
+        favoriteCount: 1,
+        affinityPercentage: 100,
+        favoritePercentage: 100,
+      }),
+    ]);
+  });
+
+  it('ignores saved answers that can no longer be mapped to the current catalogue', () => {
+    const profile = createProfile({
+      id: 'profile-legacy',
+      now: '2026-08-24T09:00:00.000Z',
+      answers: {
+        [createAnswerKey('removed-practice', 'old-role')]: {
+          practiceId: 'removed-practice', roleId: 'old-role', preference: 'favorite',
+        },
+      },
+    });
+
+    const profileByRole = buildRoleProfile(profile, practices);
+
+    expect(profileByRole.every((entry) => entry.answerCount === 0)).toBe(true);
   });
 });
