@@ -32,6 +32,7 @@
               "src/profile-dashboard-role-profile.css",
               "src/profile-dashboard-progress-gradient.css",
               "src/profile-dashboard-insight-polish.css",
+              "src/profile-dashboard-mobile-settings.css",
               "src/ui-preferences.css",
               "src/desiresync-brand.css"
             ]
