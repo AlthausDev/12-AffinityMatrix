@@ -15,6 +15,7 @@ import { DETAIL_CAPABLE_PREFERENCES, PREFERENCE_VALUES, Preference } from '../..
 import { CatalogueTextService } from '../i18n/catalogue-text.service';
 import { TranslationService } from '../i18n/translation.service';
 import { PREFERENCE_PRESENTATION } from '../shared/comparison-presentation';
+import { QuestionnaireRolePromptService } from './questionnaire-role-prompt.service';
 
 const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
   value,
@@ -27,10 +28,7 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     <section class="role-block" [class.filtered-role]="filtered()">
       <div class="role-heading">
         <div>
-          <h3>{{ roleLabel() }}</h3>
-          @if (counterpartSex(); as sex) {
-            <p class="scope-note">{{ i18n.t('questionnaireRole.counterpart', { sex: sexLabel(sex) }) }}</p>
-          }
+          <h3>{{ questionPrompt() }}</h3>
           @if (targetSite(); as site) {
             <p class="scope-note">{{ i18n.t('questionnaireRole.targetSite', { site: targetSiteLabel(site) }) }}</p>
           }
@@ -122,14 +120,14 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
       grid-template-areas: "heading scale" "details details";
       align-items: center;
       gap: 0.55rem 1rem;
-      padding: 0.7rem 0;
-      border-top: 1px solid var(--border-subtle);
+      padding: 0.85rem 0;
+      border-top: 1px solid color-mix(in srgb, var(--border-subtle) 72%, transparent);
     }
     .role-block:first-child { border-top: 0; padding-top: 0; }
     .filtered-role { opacity: 0.82; }
     .role-heading { grid-area: heading; display: flex; align-items: flex-start; justify-content: space-between; gap: 0.6rem; }
-    .role-heading h3 { margin: 0; font-size: 0.95rem; }
-    .scope-note, .filtered-note { margin: 0.18rem 0 0; color: var(--text-secondary); font-size: 0.72rem; }
+    .role-heading h3 { margin: 0; font-size: 1rem; line-height: 1.25; letter-spacing: -0.01em; }
+    .scope-note, .filtered-note { margin: 0.2rem 0 0; color: var(--text-secondary); font-size: 0.72rem; }
     .scope-note { font-weight: 700; }
     .text-button { padding: 0; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.72rem; text-decoration: underline; }
     .preference-scale { grid-area: scale; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.35rem; }
@@ -137,7 +135,7 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
       --preference-accent: var(--border-strong);
       display: flex; min-height: 2.55rem; align-items: center; justify-content: center; gap: 0.28rem;
       padding: 0.35rem; border: 1px solid color-mix(in srgb, var(--border-strong) 74%, white);
-      border-radius: 0.45rem; background: color-mix(in srgb, var(--surface-elevated) 86%, #f3f5ff 6%);
+      border-radius: 0.52rem; background: color-mix(in srgb, var(--surface-elevated) 86%, #f3f5ff 6%);
       color: #fafbff; cursor: pointer; font-size: 0.7rem; line-height: 1.15;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
       transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease, transform 140ms ease;
@@ -172,13 +170,19 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     .detail-field select, .detail-field textarea { width: 100%; padding: 0.55rem 0.65rem; border: 1px solid var(--border-strong); border-radius: 0.45rem; background: var(--surface-elevated); color: var(--text-primary); }
     .full-width { grid-column: 1 / -1; }
     @media (max-width: 920px) {
-      .role-block { grid-template-columns: 1fr; grid-template-areas: "heading" "scale" "details"; }
+      .role-block { grid-template-columns: 1fr; grid-template-areas: "heading" "scale" "details"; gap: 0.6rem; }
     }
     @media (max-width: 760px) {
-      .preference-scale { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .preference-option { min-height: 2.85rem; }
+      .role-block { padding: 0.9rem 0; }
+      .role-heading h3 { font-size: 1.02rem; }
+      .preference-scale { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.42rem; }
+      .preference-option { min-height: 3rem; padding: 0.42rem 0.28rem; flex-direction: column; gap: 0.18rem; font-size: 0.67rem; }
+      .preference-option span:first-child { font-size: 1rem; }
       .detail-grid { grid-template-columns: 1fr; }
       .full-width { grid-column: auto; }
+    }
+    @media (max-width: 360px) {
+      .preference-option { font-size: 0.62rem; }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -186,6 +190,7 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
 export class QuestionnaireRoleComponent {
   readonly i18n = inject(TranslationService);
   private readonly catalogueText = inject(CatalogueTextService);
+  private readonly prompts = inject(QuestionnaireRolePromptService);
 
   readonly practiceId = input.required<string>();
   readonly role = input.required<PracticeRole>();
@@ -198,11 +203,10 @@ export class QuestionnaireRoleComponent {
   readonly counterpartSex = computed(() => this.scope()?.counterpartSex);
   readonly targetSite = computed(() => this.scope()?.targetSite);
   readonly roleLabel = computed(() => this.catalogueText.roleLabel(this.practiceId(), this.role()));
+  readonly questionPrompt = computed(() => this.prompts.prompt(this.role(), this.scope(), this.roleLabel()));
   readonly ariaLabel = computed(() => {
-    const parts = [this.roleLabel()];
-    const sex = this.counterpartSex();
+    const parts = [this.questionPrompt()];
     const site = this.targetSite();
-    if (sex) parts.push(this.i18n.t('questionnaireRole.counterpart', { sex: this.sexLabel(sex) }));
     if (site) parts.push(this.i18n.t('questionnaireRole.targetSite', { site: this.targetSiteLabel(site) }));
     return parts.join('. ');
   });
