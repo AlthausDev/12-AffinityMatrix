@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { isLocale, Locale } from './locale';
+import { LocaleFlagComponent } from './locale-flag.component';
 import { TranslationService } from './translation.service';
 
 @Component({
   selector: 'app-language-switcher',
+  imports: [LocaleFlagComponent],
   template: `
     <div
       class="language-switcher"
@@ -22,12 +24,7 @@ import { TranslationService } from './translation.service';
         (click)="toggleMenu()"
         (keydown.escape)="closeMenu()"
       >
-        <span
-          class="language-mark locale-flag"
-          [class.locale-flag-es]="i18n.locale() === 'es'"
-          [class.locale-flag-en]="i18n.locale() === 'en'"
-          aria-hidden="true"
-        ></span>
+        <app-locale-flag class="language-mark" [locale]="i18n.locale()" />
         <span class="language-current-label">{{ currentLocaleLabel() }}</span>
         <span class="language-chevron" aria-hidden="true">⌄</span>
       </button>
@@ -48,12 +45,7 @@ import { TranslationService } from './translation.service';
               (click)="selectLanguage(locale.id)"
             >
               <span class="language-option-copy">
-                <span
-                  class="language-option-flag locale-flag"
-                  [class.locale-flag-es]="locale.id === 'es'"
-                  [class.locale-flag-en]="locale.id === 'en'"
-                  aria-hidden="true"
-                ></span>
+                <app-locale-flag class="language-option-flag" [locale]="locale.id" />
                 <span>{{ locale.nativeLabel }}</span>
               </span>
               @if (i18n.locale() === locale.id) {
@@ -104,39 +96,7 @@ import { TranslationService } from './translation.service';
         0 0 0.7rem rgba(54, 186, 255, 0.12),
         0 0 1.1rem rgba(140, 92, 255, 0.09);
     }
-    .language-mark {
-      width: 1.45rem;
-      height: 1rem;
-      flex: 0 0 auto;
-      border: 1px solid rgba(255, 255, 255, 0.24);
-      border-radius: 0.18rem;
-      box-shadow: 0 0 0.55rem rgba(54, 186, 255, 0.08);
-    }
-    .locale-flag {
-      display: inline-block;
-      overflow: hidden;
-      background-color: #17336f;
-      background-repeat: no-repeat;
-      background-size: 100% 100%;
-      vertical-align: middle;
-    }
-    .locale-flag-es {
-      background:
-        linear-gradient(
-          to bottom,
-          #aa151b 0 25%,
-          #f1bf00 25% 75%,
-          #aa151b 75% 100%
-        );
-    }
-    .locale-flag-en {
-      background:
-        linear-gradient(33deg, transparent 43%, #fff 43% 49%, #c8102e 49% 53%, #fff 53% 59%, transparent 59%),
-        linear-gradient(-33deg, transparent 43%, #fff 43% 49%, #c8102e 49% 53%, #fff 53% 59%, transparent 59%),
-        linear-gradient(to right, transparent 39%, #fff 39% 45%, #c8102e 45% 55%, #fff 55% 61%, transparent 61%),
-        linear-gradient(to bottom, transparent 35%, #fff 35% 42%, #c8102e 42% 58%, #fff 58% 65%, transparent 65%),
-        #012169;
-    }
+    .language-mark { --locale-flag-width: 1.55rem; }
     .language-chevron {
       color: var(--text-secondary);
       font-size: 0.9rem;
@@ -200,22 +160,14 @@ import { TranslationService } from './translation.service';
       align-items: center;
       gap: 0.5rem;
     }
-    .language-option-flag {
-      width: 1.35rem;
-      height: 0.9rem;
-      flex: 0 0 auto;
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      border-radius: 0.14rem;
-    }
+    .language-option-flag { --locale-flag-width: 1.42rem; }
     .language-option:hover,
     .language-option:focus-visible {
       border-color: rgba(54, 186, 255, 0.18);
       background: linear-gradient(90deg, rgba(54, 186, 255, 0.12), rgba(140, 92, 255, 0.1));
       color: var(--text-primary);
     }
-    .language-option.is-selected {
-      color: #e6f2ff;
-    }
+    .language-option.is-selected { color: #e6f2ff; }
     .language-check {
       color: var(--neon-cyan);
       text-shadow: 0 0 0.6rem rgba(54, 186, 255, 0.55);
@@ -231,14 +183,8 @@ import { TranslationService } from './translation.service';
         border-radius: 50%;
       }
       .language-current-label,
-      .language-chevron {
-        display: none;
-      }
-      .language-mark {
-        width: 1.55rem;
-        height: 1.02rem;
-        border-radius: 0.16rem;
-      }
+      .language-chevron { display: none; }
+      .language-mark { --locale-flag-width: 1.68rem; }
       .language-menu { min-width: 8.5rem; }
     }
     @media (prefers-reduced-motion: reduce) {
