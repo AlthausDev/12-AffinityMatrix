@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
+import { RolePerspective } from '../../../domain/catalogue/practice';
 import { Preference } from '../../../domain/profile/preference';
 import { Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
 import { CatalogueStore } from '../../core/catalogue.store';
@@ -11,7 +12,11 @@ import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { PointerGlowDirective } from '../../shared/pointer-glow.directive';
-import { buildPracticeProgress, buildPreferenceDistribution } from './profile-dashboard-insights';
+import {
+  buildPracticeProgress,
+  buildPreferenceDistribution,
+  buildRoleProfile,
+} from './profile-dashboard-insights';
 
 @Component({
   selector: 'app-profile-dashboard-page',
@@ -64,6 +69,9 @@ import { buildPracticeProgress, buildPreferenceDistribution } from './profile-da
               <div class="dashboard-progress-caption">
                 <strong>{{ totalAnswered() }} / {{ totalQuestions() }}</strong>
                 <span>{{ i18n.t('dashboard.header.visibleAnswered', { answered: totalAnswered(), total: totalQuestions() }) }}</span>
+                <span class="dashboard-progress-categories">
+                  {{ i18n.t('dashboard.header.categoriesComplete', { completed: completedCategories(), total: totalCategories() }) }}
+                </span>
               </div>
             } @else {
               <div class="completion-ring completion-ring-muted" aria-hidden="true">
@@ -203,35 +211,72 @@ import { buildPracticeProgress, buildPreferenceDistribution } from './profile-da
               }
             </article>
 
-            <article class="dashboard-chart-card dashboard-summary-card">
+            <article class="dashboard-chart-card dashboard-role-card">
               <header class="dashboard-chart-heading">
                 <div>
-                  <h3>{{ i18n.t('dashboard.header.progress') }}</h3>
-                  <p>{{ progressSummaryLabel() }}</p>
+                  <h3>{{ i18n.t('dashboard.roleProfile.title') }}</h3>
+                  <p>{{ i18n.t('dashboard.roleProfile.description') }}</p>
                 </div>
-                @if (totalQuestions() > 0) {
-                  <strong class="dashboard-summary-percentage">{{ completionPercentage() }}%</strong>
-                }
               </header>
 
-              <div class="dashboard-summary-progress">
-                <app-completion-progress [value]="completionPercentage()" />
-              </div>
+              @if (roleProfileAnswerCount() > 0) {
+                <div class="dashboard-role-legend">
+                  <span>
+                    <span class="dashboard-role-legend-swatch dashboard-role-legend-swatch-affinity" aria-hidden="true"></span>
+                    {{ i18n.t('dashboard.roleProfile.affinity') }} · {{ i18n.t('dashboard.roleProfile.affinityHint') }}
+                  </span>
+                  <span>
+                    <span class="dashboard-role-legend-swatch dashboard-role-legend-swatch-favorite" aria-hidden="true"></span>
+                    {{ i18n.t('dashboard.roleProfile.favorites') }}
+                  </span>
+                </div>
 
-              <dl class="dashboard-stat-grid">
-                <div>
-                  <dt>{{ i18n.t('dashboard.insights.savedAnswers') }}</dt>
-                  <dd>{{ savedAnswerCount() }}</dd>
+                <div class="dashboard-role-profile">
+                  @for (entry of roleProfile(); track entry.perspective) {
+                    <div class="dashboard-role-row" [class.dashboard-role-row-empty]="entry.answerCount === 0">
+                      <div class="dashboard-role-row-heading">
+                        <strong>{{ rolePerspectiveLabel(entry.perspective) }}</strong>
+                        <span>{{ roleProfileAnswerLabel(entry.answerCount) }}</span>
+                      </div>
+
+                      <div class="dashboard-role-metrics">
+                        <div class="dashboard-role-metric">
+                          <div class="dashboard-role-metric-label">
+                            <span>{{ i18n.t('dashboard.roleProfile.affinity') }}</span>
+                            <strong>{{ entry.affinityPercentage }}%</strong>
+                          </div>
+                          <div
+                            class="dashboard-role-track"
+                            role="img"
+                            [attr.aria-label]="rolePerspectiveLabel(entry.perspective) + ' · ' + i18n.t('dashboard.roleProfile.affinity') + ' ' + entry.affinityPercentage + '%'"
+                          >
+                            <span class="dashboard-role-fill dashboard-role-fill-affinity" [style.width.%]="entry.affinityPercentage"></span>
+                          </div>
+                        </div>
+
+                        <div class="dashboard-role-metric">
+                          <div class="dashboard-role-metric-label">
+                            <span>{{ i18n.t('dashboard.roleProfile.favorites') }}</span>
+                            <strong>{{ entry.favoritePercentage }}%</strong>
+                          </div>
+                          <div
+                            class="dashboard-role-track"
+                            role="img"
+                            [attr.aria-label]="rolePerspectiveLabel(entry.perspective) + ' · ' + i18n.t('dashboard.roleProfile.favorites') + ' ' + entry.favoritePercentage + '%'"
+                          >
+                            <span class="dashboard-role-fill dashboard-role-fill-favorite" [style.width.%]="entry.favoritePercentage"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
                 </div>
-                <div>
-                  <dt>{{ i18n.t('dashboard.insights.categoriesComplete') }}</dt>
-                  <dd>{{ completedCategories() }} / {{ totalCategories() }}</dd>
+              } @else {
+                <div class="dashboard-chart-empty">
+                  <span aria-hidden="true">◇</span>
+                  <p>{{ i18n.t('dashboard.roleProfile.empty') }}</p>
                 </div>
-                <div>
-                  <dt>{{ i18n.t('dashboard.insights.hiddenCategories') }}</dt>
-                  <dd>{{ hiddenCategoryIds().length }}</dd>
-                </div>
-              </dl>
+              }
             </article>
           </div>
 
@@ -348,6 +393,12 @@ export class ProfileDashboardPageComponent {
     this.categorySummaries().filter((summary) => summary.answered === summary.total).length,
   );
   readonly preferenceDistribution = computed(() => buildPreferenceDistribution(this.profile()));
+  readonly roleProfile = computed(() =>
+    buildRoleProfile(this.profile(), this.catalogueStore.snapshot()?.catalogue.practices),
+  );
+  readonly roleProfileAnswerCount = computed(() =>
+    this.roleProfile().reduce((sum, entry) => sum + entry.answerCount, 0),
+  );
   readonly preferenceChartGradient = computed(() => {
     const active = this.preferenceDistribution().filter((entry) => entry.count > 0);
     if (active.length === 0) return 'conic-gradient(rgba(107, 122, 166, 0.18) 0% 100%)';
@@ -398,6 +449,20 @@ export class ProfileDashboardPageComponent {
     );
   }
 
+  rolePerspectiveLabel(perspective: RolePerspective): string {
+    if (perspective === 'active') return this.i18n.t('dashboard.roleProfile.active');
+    if (perspective === 'receptive') return this.i18n.t('dashboard.roleProfile.receptive');
+    return this.i18n.t('dashboard.roleProfile.neutral');
+  }
+
+  roleProfileAnswerLabel(count: number): string {
+    return this.i18n.plural(
+      count,
+      'dashboard.roleProfile.answers.one',
+      'dashboard.roleProfile.answers.other',
+    );
+  }
+
   preferenceLabel(preference: Preference): string {
     if (preference === 'favorite') return this.i18n.t('preference.favorite');
     if (preference === 'like') return this.i18n.t('preference.like');
@@ -409,14 +474,6 @@ export class ProfileDashboardPageComponent {
 
   preferenceTotalLabel(count: number): string {
     return this.i18n.plural(count, 'dashboard.preference.total.one', 'dashboard.preference.total.other');
-  }
-
-  progressSummaryLabel(): string {
-    if (this.totalQuestions() === 0) return this.visibleProgressStatus();
-    return this.i18n.t('dashboard.status.visibleAnswered', {
-      answered: this.totalAnswered(),
-      total: this.totalQuestions(),
-    });
   }
 
   visibleProgressStatus(): string {
