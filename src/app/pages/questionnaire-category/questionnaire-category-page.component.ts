@@ -6,6 +6,7 @@ import { CatalogueStore } from '../../core/catalogue.store';
 import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
 import { UiPreferencesService } from '../../core/ui-preferences.service';
+import { CatalogueTaxonomyService } from '../../i18n/catalogue-taxonomy.service';
 import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { QuestionnaireCategoryNavigationComponent } from '../../questionnaire/questionnaire-category-navigation.component';
@@ -47,11 +48,59 @@ import { findRouteParam } from '../../shared/route-param';
 
           @if (currentCategory.practices.length === 0) {
             <section class="panel"><h2>{{ i18n.t('questionnaire.category.empty.title') }}</h2><p class="muted">{{ i18n.t('questionnaire.category.empty.description') }}</p></section>
+          } @else if (sections().length > 0) {
+            <section class="subcategory-list" aria-label="Subcategorías">
+              @for (section of sections(); track section.id; let first = $first) {
+                <details class="subcategory-section" [open]="first">
+                  <summary class="subcategory-summary">
+                    <span class="subcategory-summary-copy">
+                      <strong>{{ section.label }}</strong>
+                      <small>{{ section.answered }} / {{ section.total }}</small>
+                    </span>
+                    <span class="subcategory-progress">
+                      <strong>{{ section.percentage }}%</strong>
+                      <app-completion-progress [value]="section.percentage" />
+                    </span>
+                  </summary>
+                  <div class="subcategory-content">
+                    <p class="subcategory-description">{{ section.description }}</p>
+                    <div class="question-list">
+                      @for (item of section.practices; track item.practice.id) {
+                        <article class="panel question-card">
+                          <header class="question-card-header">
+                            <h2>{{ catalogueText.practiceLabel(item.practice) }}</h2>
+                            @if (catalogueText.practiceDescription(item.practice)) {
+                              <p class="muted">{{ catalogueText.practiceDescription(item.practice) }}</p>
+                            }
+                          </header>
+                          @for (roleView of item.roles; track roleView.answerKey) {
+                            <app-questionnaire-role
+                              [practiceId]="item.practice.id"
+                              [role]="roleView.role"
+                              [scope]="roleView.scope"
+                              [answer]="roleView.answer"
+                              [filtered]="roleView.filtered"
+                              (answerChange)="saveAnswer($event)"
+                              (answerRemove)="removeAnswer($event)"
+                            />
+                          }
+                        </article>
+                      }
+                    </div>
+                  </div>
+                </details>
+              }
+            </section>
           } @else {
             <section class="question-list">
               @for (item of currentCategory.practices; track item.practice.id) {
                 <article class="panel question-card">
-                  <header class="question-card-header"><h2>{{ catalogueText.practiceLabel(item.practice) }}</h2>@if (catalogueText.practiceDescription(item.practice)) { <p class="muted">{{ catalogueText.practiceDescription(item.practice) }}</p> }</header>
+                  <header class="question-card-header">
+                    <h2>{{ catalogueText.practiceLabel(item.practice) }}</h2>
+                    @if (catalogueText.practiceDescription(item.practice)) {
+                      <p class="muted">{{ catalogueText.practiceDescription(item.practice) }}</p>
+                    }
+                  </header>
                   @for (roleView of item.roles; track roleView.answerKey) {
                     <app-questionnaire-role
                       [practiceId]="item.practice.id"
@@ -89,7 +138,7 @@ import { findRouteParam } from '../../shared/route-param';
     </main>
   `,
   styles: `
-    .questionnaire-page { max-width: 72rem; }
+    .questionnaire-page { max-width: 66rem; }
     .category-header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(10rem, 14rem); gap: 2rem; align-items: end; }
     .category-progress-summary { display: grid; gap: 0.42rem; text-align: right; }
     .category-progress-summary strong { font-size: 1.55rem; }
@@ -97,14 +146,61 @@ import { findRouteParam } from '../../shared/route-param';
     .questionnaire-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
     .compact-toggle { min-width: min(100%, 24rem); padding: 0.75rem; }
     .save-state { margin: 0; font-size: 0.85rem; }
-    .question-list { display: grid; gap: 1rem; }
-    .question-card-header { margin-bottom: 0.65rem; }
-    .question-card-header p { margin-bottom: 0; }
+    .subcategory-list { display: grid; gap: 0.9rem; }
+    .subcategory-section {
+      overflow: clip;
+      border: 1px solid color-mix(in srgb, var(--border-strong) 68%, var(--neon-violet));
+      border-radius: 0.9rem;
+      background: linear-gradient(145deg, color-mix(in srgb, var(--surface-panel) 94%, #17346a 6%), color-mix(in srgb, var(--surface-panel) 94%, #492561 6%));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.055);
+    }
+    .subcategory-summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(8rem, 12rem);
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.1rem;
+      cursor: pointer;
+      list-style: none;
+    }
+    .subcategory-summary::-webkit-details-marker { display: none; }
+    .subcategory-summary::after {
+      content: '⌄';
+      position: absolute;
+      right: 0.85rem;
+      color: var(--text-secondary);
+      transition: transform 140ms ease;
+    }
+    .subcategory-section[open] > .subcategory-summary::after { transform: rotate(180deg); }
+    .subcategory-summary-copy { display: grid; gap: 0.18rem; min-width: 0; }
+    .subcategory-summary-copy > strong { font-size: 1.08rem; letter-spacing: -0.015em; }
+    .subcategory-summary-copy small { color: var(--text-secondary); font-size: 0.72rem; }
+    .subcategory-progress { display: grid; gap: 0.28rem; padding-right: 1.35rem; text-align: right; }
+    .subcategory-progress > strong { font-size: 0.82rem; }
+    .subcategory-content { padding: 0 1rem 1rem; border-top: 1px solid color-mix(in srgb, var(--border-subtle) 72%, transparent); }
+    .subcategory-description { max-width: 48rem; margin: 0.85rem 0 1rem; color: var(--text-secondary); font-size: 0.82rem; line-height: 1.5; }
+    .question-list { display: grid; gap: 0.85rem; }
+    .question-card { background: color-mix(in srgb, var(--surface-panel) 94%, transparent); }
+    .question-card-header { margin-bottom: 0.7rem; }
+    .question-card-header h2 { margin-bottom: 0.35rem; font-size: 1.18rem; letter-spacing: -0.015em; }
+    .question-card-header p { max-width: 50rem; margin-bottom: 0; font-size: 0.84rem; line-height: 1.5; }
     .bottom-navigation { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); }
     @media (max-width: 720px) {
-      .category-header { grid-template-columns: 1fr; align-items: stretch; }
-      .category-progress-summary { text-align: left; }
-      .questionnaire-toolbar { align-items: stretch; flex-direction: column; }
+      .questionnaire-page { width: min(100% - 1rem, 66rem); }
+      .category-header { grid-template-columns: 1fr; gap: 0.8rem; align-items: stretch; }
+      .category-header .lead { font-size: 0.88rem; line-height: 1.5; }
+      .category-progress-summary { grid-template-columns: auto 1fr; align-items: center; gap: 0.35rem 0.7rem; text-align: left; }
+      .category-progress-summary app-completion-progress { grid-column: 1 / -1; }
+      .questionnaire-toolbar { align-items: stretch; flex-direction: column; gap: 0.55rem; }
+      .subcategory-summary { grid-template-columns: minmax(0, 1fr) 7rem; padding: 0.9rem 0.85rem; gap: 0.65rem; }
+      .subcategory-summary::after { right: 0.55rem; }
+      .subcategory-progress { padding-right: 1rem; }
+      .subcategory-content { padding: 0 0.55rem 0.65rem; }
+      .subcategory-description { margin: 0.75rem 0.35rem 0.85rem; }
+      .question-list { gap: 0.65rem; }
+      .question-card { padding: 0.9rem; border-radius: 0.72rem; }
+      .question-card-header h2 { font-size: 1.12rem; }
+      .question-card-header p { font-size: 0.8rem; line-height: 1.45; }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -114,6 +210,7 @@ export class QuestionnaireCategoryPageComponent {
   readonly catalogueStore = inject(CatalogueStore);
   readonly i18n = inject(TranslationService);
   readonly catalogueText = inject(CatalogueTextService);
+  private readonly taxonomy = inject(CatalogueTaxonomyService);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
   private readonly preferences = inject(UiPreferencesService);
   private readonly route = inject(ActivatedRoute);
@@ -129,6 +226,28 @@ export class QuestionnaireCategoryPageComponent {
   readonly category = computed(() => {
     const profile = this.profile(); const snapshot = this.snapshot();
     return profile && snapshot ? this.questionnaireService.getCategory(snapshot, profile, this.categoryId(), this.includeFiltered()) : undefined;
+  });
+  readonly sections = computed(() => {
+    const category = this.category();
+    if (!category) return [];
+    const subcategories = this.taxonomy.subcategoriesFor(category.category.id);
+    if (subcategories.length === 0) return [];
+
+    const visiblePracticeIds = new Set(category.practices.map((item) => item.practice.id));
+    return subcategories.map((subcategory) => {
+      const practiceIds = new Set(subcategory.practiceIds);
+      const practices = category.practices.filter((item) => practiceIds.has(item.practice.id));
+      const total = practices.reduce((sum, item) => sum + item.roles.length, 0);
+      const answered = practices.reduce((sum, item) => sum + item.roles.filter((role) => role.answer !== undefined).length, 0);
+      return {
+        ...subcategory,
+        practices,
+        total,
+        answered,
+        percentage: total === 0 ? 0 : Math.round((answered / total) * 100),
+        hasVisiblePractices: subcategory.practiceIds.some((id) => visiblePracticeIds.has(id)),
+      };
+    }).filter((section) => section.hasVisiblePractices);
   });
   readonly filteredCount = computed(() => {
     const profile = this.profile(); const snapshot = this.snapshot();
