@@ -5,18 +5,16 @@ import { AnswerScope, PracticeAnswer } from '../../../domain/profile/profile-ans
 import { CatalogueStore } from '../../core/catalogue.store';
 import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
-import { UiPreferencesService } from '../../core/ui-preferences.service';
 import { CatalogueTaxonomyService } from '../../i18n/catalogue-taxonomy.service';
 import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
-import { QuestionnaireCategoryNavigationComponent } from '../../questionnaire/questionnaire-category-navigation.component';
 import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-role.component';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { findRouteParam } from '../../shared/route-param';
 
 @Component({
   selector: 'app-questionnaire-category-page',
-  imports: [RouterLink, QuestionnaireCategoryNavigationComponent, QuestionnaireRoleComponent, CompletionProgressComponent],
+  imports: [RouterLink, QuestionnaireRoleComponent, CompletionProgressComponent],
   template: `
     <main class="questionnaire-modal-page questionnaire-page">
       @if (profile()) {
@@ -116,15 +114,6 @@ import { findRouteParam } from '../../shared/route-param';
               }
             </section>
           }
-
-          <div class="bottom-navigation">
-            <app-questionnaire-category-navigation
-              [profileId]="profileId"
-              [previousCategoryId]="neighbours().previousCategoryId"
-              [nextCategoryId]="neighbours().nextCategoryId"
-              [includeFiltered]="includeFiltered()"
-            />
-          </div>
         } @else if (catalogueStore.loading()) {
           <section class="panel"><h1>{{ i18n.t('common.questionnaire.loading.title') }}</h1><p class="muted">{{ i18n.t('common.questionnaire.loading.description') }}</p></section>
         } @else if (!snapshot()) {
@@ -184,7 +173,6 @@ import { findRouteParam } from '../../shared/route-param';
     .question-card-header { margin-bottom: 0.7rem; }
     .question-card-header h2 { margin-bottom: 0.35rem; font-size: 1.18rem; letter-spacing: -0.015em; }
     .question-card-header p { max-width: 50rem; margin-bottom: 0; font-size: 0.84rem; line-height: 1.5; }
-    .bottom-navigation { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); }
     @media (max-width: 720px) {
       .questionnaire-page { width: min(100% - 1rem, 66rem); }
       .category-header { grid-template-columns: 1fr; gap: 0.8rem; align-items: stretch; }
@@ -212,7 +200,6 @@ export class QuestionnaireCategoryPageComponent {
   readonly catalogueText = inject(CatalogueTextService);
   private readonly taxonomy = inject(CatalogueTaxonomyService);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
-  private readonly preferences = inject(UiPreferencesService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly params = toSignal(this.route.paramMap, { initialValue: this.route.snapshot.paramMap });
@@ -222,10 +209,12 @@ export class QuestionnaireCategoryPageComponent {
   readonly categoryId = computed(() => this.params().get('category') ?? '');
   readonly profile = computed(() => this.profileStore.findById(this.profileId));
   readonly snapshot = computed(() => this.catalogueStore.snapshot());
-  readonly hiddenCategoryIds = computed(() => this.preferences.hiddenCategoryIds(this.profileId));
   readonly category = computed(() => {
-    const profile = this.profile(); const snapshot = this.snapshot();
-    return profile && snapshot ? this.questionnaireService.getCategory(snapshot, profile, this.categoryId(), this.includeFiltered()) : undefined;
+    const profile = this.profile();
+    const snapshot = this.snapshot();
+    return profile && snapshot
+      ? this.questionnaireService.getCategory(snapshot, profile, this.categoryId(), this.includeFiltered())
+      : undefined;
   });
   readonly sections = computed(() => {
     const category = this.category();
@@ -234,39 +223,52 @@ export class QuestionnaireCategoryPageComponent {
     if (subcategories.length === 0) return [];
 
     const visiblePracticeIds = new Set(category.practices.map((item) => item.practice.id));
-    return subcategories.map((subcategory) => {
-      const practiceIds = new Set(subcategory.practiceIds);
-      const practices = category.practices.filter((item) => practiceIds.has(item.practice.id));
-      const total = practices.reduce((sum, item) => sum + item.roles.length, 0);
-      const answered = practices.reduce((sum, item) => sum + item.roles.filter((role) => role.answer !== undefined).length, 0);
-      return {
-        ...subcategory,
-        practices,
-        total,
-        answered,
-        percentage: total === 0 ? 0 : Math.round((answered / total) * 100),
-        hasVisiblePractices: subcategory.practiceIds.some((id) => visiblePracticeIds.has(id)),
-      };
-    }).filter((section) => section.hasVisiblePractices);
+    return subcategories
+      .map((subcategory) => {
+        const practiceIds = new Set(subcategory.practiceIds);
+        const practices = category.practices.filter((item) => practiceIds.has(item.practice.id));
+        const total = practices.reduce((sum, item) => sum + item.roles.length, 0);
+        const answered = practices.reduce(
+          (sum, item) => sum + item.roles.filter((role) => role.answer !== undefined).length,
+          0,
+        );
+        return {
+          ...subcategory,
+          practices,
+          total,
+          answered,
+          percentage: total === 0 ? 0 : Math.round((answered / total) * 100),
+          hasVisiblePractices: subcategory.practiceIds.some((id) => visiblePracticeIds.has(id)),
+        };
+      })
+      .filter((section) => section.hasVisiblePractices);
   });
   readonly filteredCount = computed(() => {
-    const profile = this.profile(); const snapshot = this.snapshot();
-    return profile && snapshot ? this.questionnaireService.getCategory(snapshot, profile, this.categoryId(), false)?.filtered ?? 0 : 0;
-  });
-  readonly neighbours = computed(() => {
+    const profile = this.profile();
     const snapshot = this.snapshot();
-    return snapshot ? this.questionnaireService.getNeighbours(snapshot, this.categoryId(), this.hiddenCategoryIds()) : {};
+    return profile && snapshot
+      ? this.questionnaireService.getCategory(snapshot, profile, this.categoryId(), false)?.filtered ?? 0
+      : 0;
   });
 
-  constructor() { void this.catalogueStore.initialize(); }
+  constructor() {
+    void this.catalogueStore.initialize();
+  }
 
   toggleFiltered(event: Event): void {
     const include = (event.target as HTMLInputElement).checked;
     this.includeFiltered.set(include);
-    void this.router.navigate([], { relativeTo: this.route, queryParams: { filtered: include ? '1' : null }, queryParamsHandling: 'merge', replaceUrl: true });
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { filtered: include ? '1' : null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
-  filteredInCategoryLabel(count: number): string { return this.i18n.plural(count, 'questionnaire.category.filtered.one', 'questionnaire.category.filtered.other'); }
+  filteredInCategoryLabel(count: number): string {
+    return this.i18n.plural(count, 'questionnaire.category.filtered.one', 'questionnaire.category.filtered.other');
+  }
 
   saveAnswer(answer: PracticeAnswer): void {
     const snapshot = this.snapshot();
