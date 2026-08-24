@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { Preference } from '../../../domain/profile/preference';
 import { Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
@@ -11,7 +11,7 @@ import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { PointerGlowDirective } from '../../shared/pointer-glow.directive';
-import { buildPreferenceDistribution } from './profile-dashboard-insights';
+import { buildPracticeProgress, buildPreferenceDistribution } from './profile-dashboard-insights';
 
 @Component({
   selector: 'app-profile-dashboard-page',
@@ -249,12 +249,41 @@ import { buildPreferenceDistribution } from './profile-dashboard-insights';
             @if (categorySummaries().length > 0) {
               <div class="dashboard-category-bars">
                 @for (summary of categorySummaries(); track summary.category.id) {
-                  <div class="dashboard-category-row">
-                    <div class="dashboard-category-copy">
-                      <strong [title]="catalogueText.categoryLabel(summary.category)">{{ catalogueText.categoryLabel(summary.category) }}</strong>
-                      <span>{{ i18n.t('dashboard.status.categoryValue', { answered: summary.answered, total: summary.total, percentage: summary.completionPercentage }) }}</span>
-                    </div>
-                    <app-completion-progress [value]="summary.completionPercentage" />
+                  <div
+                    class="dashboard-category-row"
+                    [class.dashboard-category-row-expanded]="isCategoryExpanded(summary.category.id)"
+                  >
+                    <button
+                      class="dashboard-category-toggle"
+                      type="button"
+                      [attr.aria-expanded]="isCategoryExpanded(summary.category.id)"
+                      [attr.aria-controls]="'dashboard-category-detail-' + summary.category.id"
+                      (click)="toggleCategory(summary.category.id)"
+                    >
+                      <div class="dashboard-category-copy">
+                        <strong [title]="catalogueText.categoryLabel(summary.category)">{{ catalogueText.categoryLabel(summary.category) }}</strong>
+                        <span class="dashboard-category-value">{{ i18n.t('dashboard.status.categoryValue', { answered: summary.answered, total: summary.total, percentage: summary.completionPercentage }) }}</span>
+                        <span class="dashboard-category-chevron" aria-hidden="true">⌄</span>
+                      </div>
+                      <app-completion-progress [value]="summary.completionPercentage" />
+                    </button>
+
+                    @if (isCategoryExpanded(summary.category.id)) {
+                      <div
+                        class="dashboard-subcategory-list"
+                        [id]="'dashboard-category-detail-' + summary.category.id"
+                      >
+                        @for (detail of categoryPracticeProgress(summary.category.id); track detail.practice.id) {
+                          <div class="dashboard-subcategory-row">
+                            <div class="dashboard-subcategory-copy">
+                              <strong [title]="catalogueText.practiceLabel(detail.practice)">{{ catalogueText.practiceLabel(detail.practice) }}</strong>
+                              <span>{{ i18n.t('dashboard.status.categoryValue', { answered: detail.answered, total: detail.total, percentage: detail.completionPercentage }) }}</span>
+                            </div>
+                            <app-completion-progress [value]="detail.completionPercentage" />
+                          </div>
+                        }
+                      </div>
+                    }
                   </div>
                 }
               </div>
@@ -298,6 +327,7 @@ export class ProfileDashboardPageComponent {
   readonly profile = computed(() => this.profileStore.findById(this.profileId));
   readonly savedAnswerCount = computed(() => Object.keys(this.profile()?.answers ?? {}).length);
   readonly hiddenCategoryIds = computed(() => this.preferences.hiddenCategoryIds(this.profileId));
+  readonly expandedCategoryIds = signal<ReadonlySet<string>>(new Set());
   readonly categorySummaries = computed(() => {
     const profile = this.profile();
     const snapshot = this.catalogueStore.snapshot();
@@ -343,6 +373,29 @@ export class ProfileDashboardPageComponent {
     if (value < 60) return 'completion-ring completion-ring-mid';
     if (value < 80) return 'completion-ring completion-ring-high';
     return 'completion-ring completion-ring-complete';
+  }
+
+  isCategoryExpanded(categoryId: string): boolean {
+    return this.expandedCategoryIds().has(categoryId);
+  }
+
+  toggleCategory(categoryId: string): void {
+    this.expandedCategoryIds.update((current) => {
+      const next = new Set(current);
+      if (next.has(categoryId)) next.delete(categoryId);
+      else next.add(categoryId);
+      return next;
+    });
+  }
+
+  categoryPracticeProgress(categoryId: string) {
+    const profile = this.profile();
+    const snapshot = this.catalogueStore.snapshot();
+    if (!profile || !snapshot) return [];
+
+    return buildPracticeProgress(
+      this.questionnaireService.getCategory(snapshot, profile, categoryId, false)?.practices,
+    );
   }
 
   preferenceLabel(preference: Preference): string {
