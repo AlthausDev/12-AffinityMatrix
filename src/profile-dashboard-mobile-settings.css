@@ -62,10 +62,10 @@
     display: grid;
     width: 100%;
     min-width: 0;
-    grid-template-columns: minmax(5.2rem, 1fr) auto minmax(5.2rem, 1fr);
+    grid-template-columns: minmax(4.8rem, 1fr) auto minmax(4.8rem, 1fr);
     grid-template-rows: auto auto;
     align-items: center;
-    column-gap: 0.5rem;
+    column-gap: 0.32rem;
     row-gap: 0;
   }
 
@@ -83,7 +83,12 @@
     grid-column: 1;
     grid-row: 1;
     align-self: end;
-    justify-self: start;
+    justify-self: end;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: right;
     white-space: nowrap;
   }
 
@@ -91,30 +96,53 @@
     grid-column: 1;
     grid-row: 2;
     align-self: start;
-    justify-self: start;
-    max-width: 6.4rem;
+    justify-self: end;
+    max-width: 5.4rem;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 400;
+    line-height: 1.35;
+    text-align: right;
   }
 
   .profile-dashboard .dashboard-progress-categories {
+    display: block;
     grid-column: 3;
     grid-row: 1 / span 2;
     align-self: center;
-    justify-self: end;
-    max-width: 6.6rem;
-    padding-left: 0.55rem;
-    border-left: 1px solid color-mix(in srgb, var(--border-subtle) 58%, transparent);
-    text-align: right;
+    justify-self: start;
+    width: 4.65rem;
+    max-width: 4.65rem;
+    padding: 0;
+    border: 0;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 400;
+    line-height: 1.35;
+    text-align: left;
+  }
+
+  .profile-dashboard .dashboard-progress-categories::first-line {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.15;
   }
 }
 
 @media (max-width: 360px) {
   .profile-dashboard .dashboard-progress-visual {
-    grid-template-columns: minmax(4.6rem, 1fr) auto minmax(4.6rem, 1fr);
-    column-gap: 0.3rem;
+    grid-template-columns: minmax(4.4rem, 1fr) auto minmax(4.4rem, 1fr);
+    column-gap: 0.2rem;
+  }
+
+  .profile-dashboard .dashboard-progress-caption > span:not(.dashboard-progress-categories) {
+    max-width: 4.8rem;
   }
 
   .profile-dashboard .dashboard-progress-categories {
-    padding-left: 0.35rem;
+    width: 4.4rem;
+    max-width: 4.4rem;
   }
 }
 
