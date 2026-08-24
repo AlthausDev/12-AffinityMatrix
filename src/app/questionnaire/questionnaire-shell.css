@@ -4,7 +4,7 @@
 }
 
 .questionnaire-overlay {
-  --questionnaire-top-space: 5.5rem;
+  --questionnaire-top-space: 5.8rem;
   --questionnaire-bottom-space: 0rem;
 
   position: fixed;
@@ -19,7 +19,7 @@
 }
 
 .questionnaire-overlay.category-navigation-active {
-  --questionnaire-bottom-space: 5.6rem;
+  --questionnaire-bottom-space: 5.2rem;
 }
 
 .questionnaire-window {
@@ -45,27 +45,27 @@
 
 .questionnaire-top-dock {
   top: 0;
-  padding: 0.72rem clamp(1rem, 4vw, 3rem) 1.85rem;
+  padding: 0 clamp(0.75rem, 3vw, 2.5rem) 2rem;
   background: linear-gradient(
     to bottom,
-    rgba(14, 28, 56, 0.995) 0%,
-    rgba(14, 28, 56, 0.96) 54%,
-    rgba(14, 28, 56, 0.68) 74%,
-    rgba(14, 28, 56, 0.28) 88%,
-    rgba(14, 28, 56, 0) 100%
+    rgba(8, 21, 47, 0.995) 0%,
+    rgba(10, 25, 53, 0.92) 38%,
+    rgba(12, 26, 54, 0.68) 61%,
+    rgba(12, 26, 54, 0.30) 80%,
+    rgba(12, 26, 54, 0) 100%
   );
 }
 
 .questionnaire-bottom-dock {
   bottom: 0;
-  padding: 1.85rem clamp(1rem, 4vw, 3rem) max(0.72rem, env(safe-area-inset-bottom));
+  padding: 2rem clamp(0.75rem, 3vw, 2.5rem) 0;
   background: linear-gradient(
     to top,
-    rgba(14, 28, 56, 0.995) 0%,
-    rgba(14, 28, 56, 0.96) 54%,
-    rgba(14, 28, 56, 0.68) 74%,
-    rgba(14, 28, 56, 0.28) 88%,
-    rgba(14, 28, 56, 0) 100%
+    rgba(8, 21, 47, 0.995) 0%,
+    rgba(10, 25, 53, 0.92) 38%,
+    rgba(12, 26, 54, 0.68) 61%,
+    rgba(12, 26, 54, 0.30) 80%,
+    rgba(12, 26, 54, 0) 100%
   );
 }
 
@@ -73,6 +73,28 @@
   width: min(100%, 76rem);
   margin: 0 auto;
   pointer-events: auto;
+  border: 1px solid color-mix(in srgb, var(--neon-cyan) 24%, var(--neon-violet));
+  background:
+    linear-gradient(135deg, rgba(19, 43, 81, 0.86), rgba(46, 28, 78, 0.84)) padding-box,
+    linear-gradient(120deg, rgba(71, 200, 255, 0.26), rgba(169, 99, 255, 0.22)) border-box;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 -1px 0 rgba(109, 188, 255, 0.03),
+    0 0.7rem 2rem rgba(2, 8, 26, 0.20);
+  backdrop-filter: blur(16px) saturate(118%);
+}
+
+.questionnaire-top-dock .questionnaire-dock-inner {
+  padding: 0.68rem 0.8rem 0.72rem;
+  border-top: 0;
+  border-radius: 0 0 1rem 1rem;
+}
+
+.questionnaire-bottom-dock .questionnaire-dock-inner {
+  width: min(calc(100% - 1rem), 34rem);
+  padding: 0.5rem;
+  border-bottom: 0;
+  border-radius: 1rem 1rem 0 0;
 }
 
 .toolbar-primary {
@@ -84,7 +106,8 @@
 
 .pending-label {
   min-width: 0;
-  color: var(--text-secondary);
+  color: color-mix(in srgb, var(--text-secondary) 92%, #d9efff);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
 }
 
 .toolbar-global-actions {
@@ -92,17 +115,25 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.45rem;
+  gap: 0.5rem;
 }
 
 .compact-button {
   min-height: 2.25rem;
-  padding: 0.45rem 0.72rem;
+  padding: 0.45rem 0.78rem;
   font-size: 0.8rem;
 }
 
 .categories-button {
   min-width: 7.3rem;
+  border-color: color-mix(in srgb, var(--neon-cyan) 26%, var(--border-strong));
+  background: linear-gradient(145deg, rgba(22, 51, 93, 0.76), rgba(42, 33, 79, 0.70));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.055);
+}
+
+.categories-button:hover {
+  border-color: color-mix(in srgb, var(--neon-cyan) 54%, var(--neon-violet));
+  background: linear-gradient(145deg, rgba(25, 61, 108, 0.82), rgba(52, 37, 92, 0.78));
 }
 
 .exit-button {
@@ -127,7 +158,7 @@
 .toolbar-sequence-actions {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0.65rem;
+  gap: 0.55rem;
 }
 
 .sequence-slot {
@@ -143,15 +174,23 @@
   display: inline-flex;
   width: 100%;
   min-width: 0;
-  min-height: 2.65rem;
+  min-height: 2.45rem;
   align-items: center;
   justify-content: center;
+  border-color: color-mix(in srgb, var(--neon-cyan) 22%, var(--border-strong));
+  background: linear-gradient(145deg, rgba(19, 46, 86, 0.78), rgba(43, 31, 77, 0.73));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.sequence-button:hover {
+  border-color: color-mix(in srgb, var(--neon-cyan) 50%, var(--neon-violet));
+  background: linear-gradient(145deg, rgba(23, 57, 102, 0.84), rgba(51, 35, 90, 0.80));
 }
 
 .sequence-placeholder {
   display: block;
   width: 100%;
-  min-height: 2.65rem;
+  min-height: 2.45rem;
 }
 
 .questionnaire-scroll-controls {
@@ -191,7 +230,7 @@
   .questionnaire-scroll-controls {
     position: fixed;
     right: clamp(1rem, 2vw, 2rem);
-    bottom: calc(var(--questionnaire-bottom-space) + 1.25rem);
+    bottom: calc(var(--questionnaire-bottom-space) + 0.85rem);
     z-index: 45;
     display: grid;
     gap: 0.5rem;
@@ -229,13 +268,13 @@
 
 @media (max-width: 720px) {
   .questionnaire-overlay {
-    --questionnaire-top-space: 8.15rem;
+    --questionnaire-top-space: 7.65rem;
     padding-right: 0;
     padding-left: 0;
   }
 
   .questionnaire-overlay.category-navigation-active {
-    --questionnaire-bottom-space: 5.7rem;
+    --questionnaire-bottom-space: 5.5rem;
   }
 
   .questionnaire-window {
@@ -244,17 +283,28 @@
   }
 
   .questionnaire-top-dock {
-    padding: 0.62rem 0.75rem 1.6rem;
+    padding: 0 0.55rem 1.55rem;
   }
 
   .questionnaire-bottom-dock {
-    padding: 1.6rem 0.75rem max(0.62rem, env(safe-area-inset-bottom));
+    padding: 1.55rem 0.55rem max(0.35rem, env(safe-area-inset-bottom));
+  }
+
+  .questionnaire-top-dock .questionnaire-dock-inner {
+    padding: 0.58rem 0.62rem 0.62rem;
+    border-radius: 0 0 0.82rem 0.82rem;
+  }
+
+  .questionnaire-bottom-dock .questionnaire-dock-inner {
+    width: 100%;
+    padding: 0.42rem;
+    border-radius: 0.82rem 0.82rem 0 0;
   }
 
   .toolbar-primary {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 0.5rem;
+    gap: 0.48rem;
   }
 
   .pending-label {
@@ -264,9 +314,10 @@
 
   .toolbar-global-actions.category-navigation-active {
     grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    display: flex;
     width: 100%;
+    align-items: center;
+    justify-content: flex-end;
     gap: 0.48rem;
   }
 
@@ -275,21 +326,22 @@
   }
 
   .categories-button {
-    width: 100%;
-    min-width: 0;
+    width: auto;
+    min-width: 7.6rem;
+    max-width: 9rem;
   }
 
   .exit-button {
-    min-width: 5.1rem;
+    min-width: 5.2rem;
   }
 
   .toolbar-sequence-actions {
-    gap: 0.5rem;
+    gap: 0.45rem;
   }
 
   .sequence-button,
   .sequence-placeholder {
-    min-height: 2.8rem;
+    min-height: 2.65rem;
   }
 
   .sequence-button {
