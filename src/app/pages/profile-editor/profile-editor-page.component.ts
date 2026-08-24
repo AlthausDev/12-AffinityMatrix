@@ -92,7 +92,7 @@ interface ProfileFormModel {
           <section class="profile-entry-panel profile-editor-section">
             <header class="profile-editor-section-heading">
               <p class="eyebrow">{{ i18n.t('dashboard.questionnaire.eyebrow') }}</p>
-              <h2>{{ i18n.t('profileEditor.filter.title') }}</h2>
+              <h2>{{ i18n.t('dashboard.questionnaire.eyebrow') }}</h2>
             </header>
 
             <label class="check-field">
@@ -103,42 +103,6 @@ interface ProfileFormModel {
               </span>
             </label>
             <p class="muted form-note">{{ i18n.t('profileEditor.filter.note') }}</p>
-
-            @if (isEditing) {
-              <div class="profile-editor-category-section">
-                <div class="profile-editor-category-heading">
-                  <div>
-                    <strong>{{ i18n.t('settings.categories.title') }}</strong>
-                    <p class="muted">{{ i18n.t('settings.categories.description') }}</p>
-                  </div>
-                  @if (hiddenCategoryIds().length > 0) {
-                    <button class="button secondary profile-editor-compact-action" type="button" (click)="showAllCategories()">
-                      {{ i18n.t('settings.categories.showAll') }}
-                    </button>
-                  }
-                </div>
-
-                @if (categories().length > 0) {
-                  <div class="profile-editor-category-list" [attr.aria-label]="i18n.t('settings.categories.aria')">
-                    @for (category of categories(); track category.id) {
-                      <label class="profile-editor-category-row">
-                        <input
-                          type="checkbox"
-                          [checked]="!preferences.isCategoryHidden(profileId!, category.id)"
-                          (change)="toggleCategory(category.id, $event)"
-                        />
-                        <span>
-                          <strong>{{ catalogueText.categoryLabel(category) }}</strong>
-                          <small>{{ catalogueText.categoryDescription(category) }}</small>
-                        </span>
-                      </label>
-                    }
-                  </div>
-                }
-
-                <p class="muted profile-editor-local-note">{{ i18n.t('settings.localOnly') }}</p>
-              </div>
-            }
           </section>
 
           <div class="form-actions profile-editor-save-actions">
@@ -150,6 +114,41 @@ interface ProfileFormModel {
         </form>
 
         @if (isEditing) {
+          <section class="profile-entry-panel profile-editor-section profile-editor-local-section">
+            <header class="profile-editor-section-heading profile-editor-category-heading">
+              <div>
+                <p class="eyebrow">{{ i18n.t('settings.eyebrow') }}</p>
+                <h2>{{ i18n.t('settings.categories.title') }}</h2>
+                <p class="muted profile-editor-section-description">{{ i18n.t('settings.categories.description') }}</p>
+              </div>
+              @if (hiddenCategoryIds().length > 0) {
+                <button class="button secondary profile-editor-compact-action" type="button" (click)="showAllCategories()">
+                  {{ i18n.t('settings.categories.showAll') }}
+                </button>
+              }
+            </header>
+
+            @if (categories().length > 0) {
+              <div class="profile-editor-category-list" [attr.aria-label]="i18n.t('settings.categories.aria')">
+                @for (category of categories(); track category.id) {
+                  <label class="profile-editor-category-row">
+                    <input
+                      type="checkbox"
+                      [checked]="!preferences.isCategoryHidden(profileId!, category.id)"
+                      (change)="toggleCategory(category.id, $event)"
+                    />
+                    <span>
+                      <strong>{{ catalogueText.categoryLabel(category) }}</strong>
+                      <small>{{ catalogueText.categoryDescription(category) }}</small>
+                    </span>
+                  </label>
+                }
+              </div>
+            }
+
+            <p class="muted profile-editor-local-note">{{ i18n.t('settings.localOnly') }}</p>
+          </section>
+
           <section class="panel profile-editor-danger" aria-labelledby="profile-editor-delete-title">
             <div>
               <p class="eyebrow">{{ i18n.t('settings.danger.eyebrow') }}</p>
@@ -179,10 +178,11 @@ interface ProfileFormModel {
     .profile-editor-section-heading { padding-bottom: 0.7rem; border-bottom: 1px solid rgba(105, 130, 183, 0.18); }
     .profile-editor-section-heading .eyebrow { margin-bottom: 0.25rem; }
     .profile-editor-section-heading h2 { margin: 0; font-size: 1.15rem; }
+    .profile-editor-section-description { margin: 0.3rem 0 0; font-size: 0.78rem; line-height: 1.45; }
     .profile-editor-field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-    .profile-editor-category-section { display: grid; gap: 0.8rem; margin-top: 0.15rem; padding-top: 1rem; border-top: 1px solid rgba(105, 130, 183, 0.18); }
+    .profile-editor-save-actions { margin-top: 0; padding: 1rem; border: 1px solid color-mix(in srgb, var(--border-subtle) 52%, transparent); border-radius: 0.8rem; background: rgba(9, 18, 41, 0.44); }
+    .profile-editor-local-section { margin-top: 1.25rem; }
     .profile-editor-category-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
-    .profile-editor-category-heading p { margin: 0.25rem 0 0; font-size: 0.78rem; line-height: 1.45; }
     .profile-editor-compact-action { flex: 0 0 auto; min-height: 2.2rem; padding: 0.4rem 0.7rem; font-size: 0.72rem; }
     .profile-editor-category-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
     .profile-editor-category-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: flex-start; gap: 0.6rem; padding: 0.7rem; border: 1px solid color-mix(in srgb, var(--border-subtle) 68%, transparent); border-radius: 0.6rem; background: rgba(7, 18, 43, 0.34); cursor: pointer; }
@@ -191,8 +191,7 @@ interface ProfileFormModel {
     .profile-editor-category-row strong { font-size: 0.76rem; }
     .profile-editor-category-row small { color: var(--text-secondary); font-size: 0.68rem; line-height: 1.35; }
     .profile-editor-local-note { margin: 0; font-size: 0.72rem; }
-    .profile-editor-save-actions { margin-top: 0; padding: 1rem; border: 1px solid color-mix(in srgb, var(--border-subtle) 52%, transparent); border-radius: 0.8rem; background: rgba(9, 18, 41, 0.44); }
-    .profile-editor-danger { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; margin-top: 1.25rem; border-color: color-mix(in srgb, var(--preference-boundary) 36%, transparent); }
+    .profile-editor-danger { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; margin-top: 1rem; border-color: color-mix(in srgb, var(--preference-boundary) 36%, transparent); }
     .profile-editor-danger p:last-child { margin-bottom: 0; line-height: 1.5; }
     .profile-editor-danger .button { flex: 0 0 auto; }
     @media (max-width: 640px) {
