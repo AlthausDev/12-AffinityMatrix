@@ -30,7 +30,8 @@ import { findRouteParam } from '../shared/route-param';
     >
       <header class="questionnaire-top-dock">
         <div class="questionnaire-dock-inner toolbar-primary">
-          <span class="pending-label">{{ pendingLabel(pendingCount()) }}</span>
+          <span class="pending-label pending-label-full">{{ pendingLabel(pendingCount()) }}</span>
+          <span class="pending-label pending-label-short">{{ pendingShortLabel(pendingCount()) }}</span>
 
           <nav
             class="toolbar-global-actions"
@@ -194,6 +195,12 @@ export class QuestionnaireShellComponent {
     return count === 0
       ? this.i18n.t('questionnaire.pending.complete')
       : this.i18n.plural(count, 'questionnaire.pending.one', 'questionnaire.pending.other');
+  }
+
+  pendingShortLabel(count: number): string {
+    return count === 0
+      ? this.i18n.t('questionnaire.pending.short.complete')
+      : this.i18n.plural(count, 'questionnaire.pending.short.one', 'questionnaire.pending.short.other');
   }
 
   finishDescription(count: number): string {
