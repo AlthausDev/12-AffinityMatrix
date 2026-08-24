@@ -1,70 +1,43 @@
-.profile-dashboard .dashboard-mobile-settings-link {
-  display: none;
-}
-
 @media (max-width: 700px) {
   .profile-dashboard .dashboard-settings-link {
-    display: none;
-  }
-
-  .profile-dashboard .dashboard-topbar {
-    justify-content: flex-start;
-  }
-
-  .profile-dashboard .dashboard-hero-kicker-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 0.45rem;
-  }
-
-  .profile-dashboard .dashboard-hero-kicker-row .eyebrow {
-    margin: 0;
-  }
-
-  .profile-dashboard .dashboard-mobile-settings-link {
-    display: inline-grid;
+    position: relative;
+    top: calc(100% + 2.2rem);
+    right: 1.2rem;
+    z-index: 5;
     width: 2.15rem;
+    min-width: 2.15rem;
+    min-height: 2.15rem;
     aspect-ratio: 1;
-    flex: 0 0 auto;
-    place-items: center;
-    border: 1px solid color-mix(in srgb, var(--neon-violet) 34%, var(--border-subtle));
+    flex: 0 0 2.15rem;
+    padding: 0;
+    border-color: color-mix(in srgb, var(--neon-violet) 34%, var(--border-subtle));
     border-radius: 50%;
     background: rgba(22, 33, 68, 0.52);
     color: color-mix(in srgb, var(--text-primary) 88%, var(--neon-cyan));
-    text-decoration: none;
+    font-size: 0;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
-    transition: border-color 150ms ease, color 150ms ease, box-shadow 180ms ease, transform 150ms ease;
   }
 
-  .profile-dashboard .dashboard-mobile-settings-link svg {
-    width: 1.05rem;
-    height: 1.05rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 1.7;
+  .profile-dashboard .dashboard-settings-link::before {
+    content: '⚙';
+    font-size: 1.05rem;
+    line-height: 1;
   }
 
-  .profile-dashboard .dashboard-mobile-settings-link:hover,
-  .profile-dashboard .dashboard-mobile-settings-link:focus-visible {
+  .profile-dashboard .dashboard-settings-link:hover,
+  .profile-dashboard .dashboard-settings-link:focus-visible {
+    top: calc(100% + 2.2rem);
+    right: 1.2rem;
     border-color: color-mix(in srgb, var(--neon-cyan) 52%, var(--neon-violet));
     color: var(--text-primary);
     box-shadow: 0 0 0.8rem rgba(108, 112, 255, 0.14);
-    transform: translateY(-1px);
+    transform: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .profile-dashboard .dashboard-mobile-settings-link {
+  .profile-dashboard .dashboard-settings-link {
     transition: none;
-  }
-
-  .profile-dashboard .dashboard-mobile-settings-link:hover,
-  .profile-dashboard .dashboard-mobile-settings-link:focus-visible {
-    transform: none;
   }
 }
