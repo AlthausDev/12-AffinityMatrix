@@ -27,13 +27,14 @@
               "src/profile-hub-layout.css",
               "src/profile-entry.css",
               "src/profile-editor.css",
+              "src/profile-editor-danger-zone.css",
               "src/profile-dashboard.css",
               "src/profile-dashboard-category-details.css",
               "src/profile-dashboard-role-profile.css",
               "src/profile-dashboard-progress-gradient.css",
               "src/profile-dashboard-insight-polish.css",
-              "src/profile-dashboard-mobile-settings.css",
               "src/ui-preferences.css",
+              "src/profile-dashboard-mobile-settings.css",
               "src/desiresync-brand.css"
             ]
           },
