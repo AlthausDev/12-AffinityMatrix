@@ -12,12 +12,13 @@
     grid-column: 1;
     grid-row: 1;
     justify-self: start;
-    margin-bottom: 1.45rem;
+    margin-bottom: 0;
   }
 
   .profile-dashboard .dashboard-hero {
     grid-column: 1;
     grid-row: 2;
+    margin-top: 1rem;
   }
 
   .profile-dashboard .dashboard-settings-link {
@@ -30,7 +31,7 @@
     min-width: 2.15rem;
     min-height: 2.15rem;
     aspect-ratio: 1;
-    margin: 1.15rem 1.15rem 0 0;
+    margin: 2.15rem 1.15rem 0 0;
     padding: 0;
     border-color: color-mix(in srgb, var(--neon-violet) 34%, var(--border-subtle));
     border-radius: 50%;
