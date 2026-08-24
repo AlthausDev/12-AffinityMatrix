@@ -22,8 +22,8 @@ import { TranslationService } from './translation.service';
         (click)="toggleMenu()"
         (keydown.escape)="closeMenu()"
       >
-        <span class="language-mark" aria-hidden="true">Aa</span>
-        <span>{{ currentLocaleLabel() }}</span>
+        <span class="language-mark" aria-hidden="true">{{ localeFlag(i18n.locale()) }}</span>
+        <span class="language-current-label">{{ currentLocaleLabel() }}</span>
         <span class="language-chevron" aria-hidden="true">⌄</span>
       </button>
 
@@ -42,7 +42,10 @@ import { TranslationService } from './translation.service';
               [class.is-selected]="i18n.locale() === locale.id"
               (click)="selectLanguage(locale.id)"
             >
-              <span>{{ locale.nativeLabel }}</span>
+              <span class="language-option-copy">
+                <span class="language-option-flag" aria-hidden="true">{{ localeFlag(locale.id) }}</span>
+                <span>{{ locale.nativeLabel }}</span>
+              </span>
               @if (i18n.locale() === locale.id) {
                 <span class="language-check" aria-hidden="true">✓</span>
               }
@@ -99,9 +102,8 @@ import { TranslationService } from './translation.service';
       border: 1px solid rgba(54, 186, 255, 0.3);
       border-radius: 50%;
       background: rgba(54, 186, 255, 0.09);
-      color: #d9ecff;
-      font-size: 0.55rem;
-      letter-spacing: -0.05em;
+      font-size: 0.85rem;
+      line-height: 1;
     }
     .language-chevron {
       color: var(--text-secondary);
@@ -161,6 +163,15 @@ import { TranslationService } from './translation.service';
       cursor: pointer;
       transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
     }
+    .language-option-copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .language-option-flag {
+      font-size: 0.95rem;
+      line-height: 1;
+    }
     .language-option:hover,
     .language-option:focus-visible {
       border-color: rgba(54, 186, 255, 0.18);
@@ -176,7 +187,25 @@ import { TranslationService } from './translation.service';
     }
     @media (max-width: 520px) {
       :host { top: 0.5rem; right: 0.5rem; }
-      .language-trigger { min-height: 2.15rem; padding: 0.32rem 0.48rem; }
+      .language-switcher { min-width: 0; }
+      .language-trigger {
+        width: 2.35rem;
+        min-height: 2.35rem;
+        justify-content: center;
+        padding: 0;
+        border-radius: 50%;
+      }
+      .language-current-label,
+      .language-chevron {
+        display: none;
+      }
+      .language-mark {
+        width: 1.6rem;
+        border: 0;
+        background: transparent;
+        font-size: 1.05rem;
+      }
+      .language-menu { min-width: 8.5rem; }
     }
     @media (prefers-reduced-motion: reduce) {
       .language-trigger,
@@ -194,6 +223,10 @@ export class LanguageSwitcherComponent {
   currentLocaleLabel(): string {
     return this.i18n.supportedLocales.find((locale) => locale.id === this.i18n.locale())?.nativeLabel
       ?? this.i18n.locale();
+  }
+
+  localeFlag(locale: Locale): string {
+    return locale === 'es' ? '🇪🇸' : '🇬🇧';
   }
 
   openMenu(): void {
