@@ -1,102 +1,292 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
+import { Preference } from '../../../domain/profile/preference';
 import { Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
 import { CatalogueStore } from '../../core/catalogue.store';
+import { PROFILE_STORAGE_CONTEXT } from '../../core/profile-repository.token';
 import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
 import { UiPreferencesService } from '../../core/ui-preferences.service';
 import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
+import { PointerGlowDirective } from '../../shared/pointer-glow.directive';
+import { buildPreferenceDistribution } from './profile-dashboard-insights';
 
 @Component({
   selector: 'app-profile-dashboard-page',
-  imports: [RouterLink, RouterOutlet, CompletionProgressComponent],
+  imports: [RouterLink, RouterOutlet, CompletionProgressComponent, PointerGlowDirective],
   template: `
-    <main class="page">
-      <a class="back-link" routerLink="/">{{ i18n.t('dashboard.backProfiles') }}</a>
+    <main class="page profile-dashboard">
+      <nav class="dashboard-topbar" [attr.aria-label]="i18n.t('dashboard.actionsLabel')">
+        <a class="dashboard-back-link" routerLink="/">{{ i18n.t('dashboard.backProfiles') }}</a>
+
+        @if (profile(); as currentProfile) {
+          <a class="dashboard-settings-link" [routerLink]="['/profiles', currentProfile.id, 'settings']">
+            {{ i18n.t('dashboard.settings.action') }}
+          </a>
+        }
+      </nav>
 
       @if (profile(); as currentProfile) {
-        <header class="page-header dashboard-header">
-          <div>
+        <header class="dashboard-hero" appPointerGlow>
+          <div class="dashboard-hero-copy">
             <p class="eyebrow">{{ i18n.t('dashboard.localProfile') }}</p>
-            <h1>{{ currentProfile.metadata.alias || i18n.t('common.untitledProfile') }}</h1>
-            <p class="muted profile-meta">{{ sexLabel(currentProfile.metadata.sex) }} · {{ orientationLabel(currentProfile.metadata.orientation) }}</p>
+            <h1 [title]="profileDisplayName()">{{ profileDisplayName() }}</h1>
+
+            <div class="dashboard-profile-chips">
+              <span>{{ sexLabel(currentProfile.metadata.sex) }}</span>
+              <span>{{ orientationLabel(currentProfile.metadata.orientation) }}</span>
+              <span class="dashboard-filter-chip">
+                {{ i18n.t('dashboard.status.questionFilter') }} ·
+                {{ i18n.t(currentProfile.settings.filterQuestionnaireByMetadata ? 'dashboard.status.enabled' : 'dashboard.status.disabled') }}
+              </span>
+            </div>
+
+            <p class="dashboard-updated">
+              {{ i18n.t('dashboard.header.updated', { date: updatedAtLabel(currentProfile.updatedAt) }) }}
+            </p>
           </div>
-          <div class="dashboard-header-actions">
-            <span class="profile-count">{{ answeredLabel(savedAnswerCount()) }}</span>
-            <a class="button secondary settings-button" [routerLink]="['/profiles', currentProfile.id, 'settings']">{{ i18n.t('dashboard.settings.action') }}</a>
+
+          <div class="dashboard-progress-visual">
+            @if (totalQuestions() > 0) {
+              <div
+                [class]="completionRingClass()"
+                [style.--completion]="completionPercentage() + '%'"
+                role="img"
+                [attr.aria-label]="i18n.t('dashboard.header.progressAria', { percentage: completionPercentage() })"
+              >
+                <div class="completion-ring-core">
+                  <strong>{{ completionPercentage() }}%</strong>
+                  <span>{{ i18n.t('dashboard.header.progress') }}</span>
+                </div>
+              </div>
+              <div class="dashboard-progress-caption">
+                <strong>{{ totalAnswered() }} / {{ totalQuestions() }}</strong>
+                <span>{{ i18n.t('dashboard.header.visibleAnswered', { answered: totalAnswered(), total: totalQuestions() }) }}</span>
+              </div>
+            } @else {
+              <div class="completion-ring completion-ring-muted" aria-hidden="true">
+                <div class="completion-ring-core"><strong>—</strong><span>{{ i18n.t('dashboard.header.progress') }}</span></div>
+              </div>
+              <p class="dashboard-progress-message">
+                {{ i18n.t(catalogueStore.loading() ? 'dashboard.status.catalogueLoading' : 'dashboard.status.catalogueUnavailable') }}
+              </p>
+            }
           </div>
         </header>
 
-        @if (profileStore.error()) { <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p> }
+        @if (profileStore.error()) {
+          <p class="alert dashboard-storage-alert" role="alert">{{ i18n.t('homeHub.storage.error') }}</p>
+        } @else if (storageContext.mode !== 'persistent') {
+          <p class="dashboard-storage-notice" role="status">
+            <span aria-hidden="true">◇</span>
+            {{ i18n.t(storageContext.mode === 'session' ? 'homeHub.storage.session' : 'homeHub.storage.memory') }}
+          </p>
+        }
 
-        <section class="action-grid" [attr.aria-label]="i18n.t('dashboard.actionsLabel')">
-          <article class="action-card"><div><p class="eyebrow">{{ i18n.t('dashboard.questionnaire.eyebrow') }}</p><h2>{{ i18n.t(savedAnswerCount() > 0 ? 'dashboard.questionnaire.continueTitle' : 'dashboard.questionnaire.startTitle') }}</h2><p class="muted">{{ i18n.t('dashboard.questionnaire.description') }}</p></div><a class="button" [routerLink]="['/profiles', currentProfile.id, 'questionnaire']">{{ i18n.t(savedAnswerCount() > 0 ? 'dashboard.questionnaire.continue' : 'dashboard.questionnaire.start') }}</a></article>
-          <article class="action-card"><div><p class="eyebrow">{{ i18n.t('dashboard.comparison.eyebrow') }}</p><h2>{{ i18n.t('dashboard.comparison.title') }}</h2><p class="muted">{{ i18n.t('dashboard.comparison.description') }}</p></div><a class="button" [routerLink]="['/profiles', currentProfile.id, 'compare']">{{ i18n.t('dashboard.comparison.action') }}</a></article>
-          <article class="action-card"><div><p class="eyebrow">{{ i18n.t('dashboard.profileData.eyebrow') }}</p><h2>{{ i18n.t('dashboard.profileData.title') }}</h2><p class="muted">{{ i18n.t('dashboard.profileData.description') }}</p></div><a class="button" [routerLink]="['/profiles', currentProfile.id, 'edit']">{{ i18n.t('dashboard.profileData.action') }}</a></article>
-          <article class="action-card"><div><p class="eyebrow">{{ i18n.t('dashboard.portability.eyebrow') }}</p><h2>{{ i18n.t('dashboard.portability.title') }}</h2><p class="muted">{{ i18n.t('dashboard.portability.description') }}</p></div><a class="button" [routerLink]="['/profiles', currentProfile.id, 'export']">{{ i18n.t('dashboard.portability.action') }}</a></article>
-        </section>
-
-        <section class="panel profile-status" aria-labelledby="profile-status-title">
-          <header class="status-heading">
-            <div><p class="eyebrow">{{ i18n.t('dashboard.status.eyebrow') }}</p><h2 id="profile-status-title">{{ i18n.t('dashboard.status.title') }}</h2></div>
-            @if (totalQuestions() > 0) { <div class="overall-percentage"><strong>{{ completionPercentage() }}%</strong><span>{{ i18n.t('dashboard.status.overallProgress') }}</span></div> }
+        <section class="dashboard-actions-section" aria-labelledby="dashboard-actions-title">
+          <header class="dashboard-section-heading">
+            <div>
+              <p class="eyebrow">{{ i18n.t('dashboard.actions.eyebrow') }}</p>
+              <h2 id="dashboard-actions-title">{{ i18n.t('dashboard.actions.title') }}</h2>
+            </div>
           </header>
 
-          @if (totalQuestions() > 0) {
-            <div class="overall-progress-block"><div class="progress-copy"><strong>{{ i18n.t('dashboard.status.overallProgress') }}</strong><span class="muted">{{ i18n.t('dashboard.status.visibleAnswered', { answered: totalAnswered(), total: totalQuestions() }) }}</span></div><app-completion-progress [value]="completionPercentage()" /></div>
-          } @else if (catalogueStore.loading()) { <p class="muted status-message">{{ i18n.t('dashboard.status.catalogueLoading') }}</p> }
-          @else if (catalogueStore.error()) { <p class="muted status-message">{{ i18n.t('dashboard.status.catalogueUnavailable') }}</p> }
+          <div class="dashboard-action-grid">
+            <a
+              class="dashboard-action dashboard-action-primary"
+              appPointerGlow
+              [routerLink]="['/profiles', currentProfile.id, 'questionnaire']"
+            >
+              <span class="dashboard-action-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M7 4.5h10A1.5 1.5 0 0 1 18.5 6v12A1.5 1.5 0 0 1 17 19.5H7A1.5 1.5 0 0 1 5.5 18V6A1.5 1.5 0 0 1 7 4.5Z"/><path d="M9 3.5h6v3H9zM8.5 10h7M8.5 14h4.5"/></svg>
+              </span>
+              <span class="dashboard-action-copy">
+                <span class="eyebrow">{{ i18n.t('dashboard.questionnaire.eyebrow') }}</span>
+                <strong>{{ i18n.t(savedAnswerCount() > 0 ? 'dashboard.questionnaire.continueTitle' : 'dashboard.questionnaire.startTitle') }}</strong>
+                <small>{{ i18n.t('dashboard.questionnaire.description') }}</small>
+              </span>
+              <span class="dashboard-action-arrow" aria-hidden="true">→</span>
+            </a>
 
-          <dl class="status-list">
-            <div><dt>{{ i18n.t('dashboard.status.categoriesComplete') }}</dt><dd>{{ completedCategories() }} / {{ totalCategories() }}</dd></div>
-            <div><dt>{{ i18n.t('dashboard.status.hiddenCategories') }}</dt><dd>{{ hiddenCategoryIds().length }}</dd></div>
-            <div><dt>{{ i18n.t('dashboard.status.savedAnswers') }}</dt><dd>{{ savedAnswerCount() }}</dd></div>
-            <div><dt>{{ i18n.t('dashboard.status.lastUpdated') }}</dt><dd>{{ updatedAtLabel(currentProfile.updatedAt) }}</dd></div>
-            <div><dt>{{ i18n.t('dashboard.status.questionFilter') }}</dt><dd>{{ i18n.t(currentProfile.settings.filterQuestionnaireByMetadata ? 'dashboard.status.enabled' : 'dashboard.status.disabled') }}</dd></div>
-            <div><dt>{{ i18n.t('dashboard.status.catalogue') }}</dt><dd>v{{ currentProfile.catalogueVersion }}</dd></div>
-            <div><dt>{{ i18n.t('dashboard.status.internalVersion') }}</dt><dd>v{{ currentProfile.schemaVersion }}</dd></div>
-            <div class="storage-status"><dt>{{ i18n.t('dashboard.status.storage') }}</dt><dd>{{ i18n.t('dashboard.status.localNotEncrypted') }}</dd></div>
-          </dl>
+            <a
+              class="dashboard-action dashboard-action-compare"
+              appPointerGlow
+              [routerLink]="['/profiles', currentProfile.id, 'compare']"
+            >
+              <span class="dashboard-action-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 8h12M13 5l3 3-3 3M20 16H8M11 13l-3 3 3 3"/></svg>
+              </span>
+              <span class="dashboard-action-copy">
+                <span class="eyebrow">{{ i18n.t('dashboard.comparison.eyebrow') }}</span>
+                <strong>{{ i18n.t('dashboard.comparison.title') }}</strong>
+                <small>{{ i18n.t('dashboard.comparison.description') }}</small>
+              </span>
+              <span class="dashboard-action-arrow" aria-hidden="true">→</span>
+            </a>
 
-          @if (categorySummaries().length > 0) {
-            <section class="category-progress-section" [attr.aria-label]="i18n.t('dashboard.status.categoryProgress')">
-              <h3>{{ i18n.t('dashboard.status.categoryProgress') }}</h3>
-              <div class="category-progress-list">
+            <a
+              class="dashboard-action"
+              appPointerGlow
+              [routerLink]="['/profiles', currentProfile.id, 'edit']"
+            >
+              <span class="dashboard-action-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="m5 19 3.8-.8L18 9l-3-3-9.2 9.2L5 19ZM13.5 7.5l3 3"/></svg>
+              </span>
+              <span class="dashboard-action-copy">
+                <span class="eyebrow">{{ i18n.t('dashboard.profileData.eyebrow') }}</span>
+                <strong>{{ i18n.t('dashboard.profileData.title') }}</strong>
+                <small>{{ i18n.t('dashboard.profileData.description') }}</small>
+              </span>
+              <span class="dashboard-action-arrow" aria-hidden="true">→</span>
+            </a>
+
+            <a
+              class="dashboard-action"
+              appPointerGlow
+              [routerLink]="['/profiles', currentProfile.id, 'export']"
+            >
+              <span class="dashboard-action-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 15V4M8 8l4-4 4 4M5 13v5.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V13"/></svg>
+              </span>
+              <span class="dashboard-action-copy">
+                <span class="eyebrow">{{ i18n.t('dashboard.portability.eyebrow') }}</span>
+                <strong>{{ i18n.t('dashboard.portability.title') }}</strong>
+                <small>{{ i18n.t('dashboard.portability.description') }}</small>
+              </span>
+              <span class="dashboard-action-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="dashboard-insights-section" aria-labelledby="dashboard-insights-title">
+          <header class="dashboard-section-heading dashboard-insights-heading">
+            <div>
+              <p class="eyebrow">{{ i18n.t('dashboard.insights.eyebrow') }}</p>
+              <h2 id="dashboard-insights-title">{{ i18n.t('dashboard.insights.title') }}</h2>
+            </div>
+            <p>{{ i18n.t('dashboard.insights.description') }}</p>
+          </header>
+
+          <div class="dashboard-insight-grid">
+            <article class="dashboard-chart-card dashboard-preference-card">
+              <header class="dashboard-chart-heading">
+                <div>
+                  <h3>{{ i18n.t('dashboard.preference.title') }}</h3>
+                  <p>{{ i18n.t('dashboard.preference.description') }}</p>
+                </div>
+              </header>
+
+              @if (savedAnswerCount() > 0) {
+                <div class="dashboard-preference-layout">
+                  <div class="preference-donut" [style.background]="preferenceChartGradient()" aria-hidden="true">
+                    <div class="preference-donut-core">
+                      <strong>{{ savedAnswerCount() }}</strong>
+                      <span>{{ i18n.t('dashboard.preference.total', { count: savedAnswerCount() }) }}</span>
+                    </div>
+                  </div>
+
+                  <div class="preference-legend">
+                    @for (entry of preferenceDistribution(); track entry.preference) {
+                      <div class="preference-legend-row" [class.preference-legend-zero]="entry.count === 0">
+                        <span class="preference-legend-swatch" [attr.data-preference]="entry.preference" aria-hidden="true"></span>
+                        <span class="preference-legend-label">{{ preferenceLabel(entry.preference) }}</span>
+                        <span class="preference-legend-value">{{ entry.count }} · {{ entry.percentage }}%</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              } @else {
+                <div class="dashboard-chart-empty">
+                  <span aria-hidden="true">◇</span>
+                  <p>{{ i18n.t('dashboard.preference.empty') }}</p>
+                </div>
+              }
+            </article>
+
+            <article class="dashboard-chart-card dashboard-summary-card">
+              <header class="dashboard-chart-heading">
+                <div>
+                  <h3>{{ i18n.t('dashboard.header.progress') }}</h3>
+                  <p>{{ i18n.t('dashboard.status.visibleAnswered', { answered: totalAnswered(), total: totalQuestions() }) }}</p>
+                </div>
+                @if (totalQuestions() > 0) {
+                  <strong class="dashboard-summary-percentage">{{ completionPercentage() }}%</strong>
+                }
+              </header>
+
+              <div class="dashboard-summary-progress">
+                <app-completion-progress [value]="completionPercentage()" />
+              </div>
+
+              <dl class="dashboard-stat-grid">
+                <div>
+                  <dt>{{ i18n.t('dashboard.insights.savedAnswers') }}</dt>
+                  <dd>{{ savedAnswerCount() }}</dd>
+                </div>
+                <div>
+                  <dt>{{ i18n.t('dashboard.insights.categoriesComplete') }}</dt>
+                  <dd>{{ completedCategories() }} / {{ totalCategories() }}</dd>
+                </div>
+                <div>
+                  <dt>{{ i18n.t('dashboard.insights.hiddenCategories') }}</dt>
+                  <dd>{{ hiddenCategoryIds().length }}</dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+
+          <article class="dashboard-chart-card dashboard-category-card">
+            <header class="dashboard-chart-heading dashboard-category-heading">
+              <div>
+                <h3>{{ i18n.t('dashboard.category.title') }}</h3>
+                <p>{{ i18n.t('dashboard.category.description') }}</p>
+              </div>
+              @if (totalCategories() > 0) {
+                <strong>{{ completedCategories() }} / {{ totalCategories() }}</strong>
+              }
+            </header>
+
+            @if (categorySummaries().length > 0) {
+              <div class="dashboard-category-bars">
                 @for (summary of categorySummaries(); track summary.category.id) {
-                  <div class="category-progress-row"><div class="category-progress-copy"><strong>{{ catalogueText.categoryLabel(summary.category) }}</strong><span class="muted">{{ i18n.t('dashboard.status.categoryValue', { answered: summary.answered, total: summary.total, percentage: summary.completionPercentage }) }}</span></div><app-completion-progress [value]="summary.completionPercentage" /></div>
+                  @if (summary.total > 0) {
+                    <div class="dashboard-category-row">
+                      <div class="dashboard-category-copy">
+                        <strong [title]="catalogueText.categoryLabel(summary.category)">{{ catalogueText.categoryLabel(summary.category) }}</strong>
+                        <span>{{ i18n.t('dashboard.status.categoryValue', { answered: summary.answered, total: summary.total, percentage: summary.completionPercentage }) }}</span>
+                      </div>
+                      <app-completion-progress [value]="summary.completionPercentage" />
+                    </div>
+                  }
                 }
               </div>
-            </section>
-          }
+            } @else {
+              <p class="dashboard-category-message">
+                {{ i18n.t(catalogueStore.loading() ? 'dashboard.status.catalogueLoading' : 'dashboard.status.catalogueUnavailable') }}
+              </p>
+            }
+          </article>
+        </section>
+
+        <section class="dashboard-details" aria-labelledby="dashboard-details-title">
+          <h2 id="dashboard-details-title">{{ i18n.t('dashboard.details.title') }}</h2>
+          <dl>
+            <div><dt>{{ i18n.t('dashboard.details.catalogue') }}</dt><dd>v{{ currentProfile.catalogueVersion }}</dd></div>
+            <div><dt>{{ i18n.t('dashboard.details.format') }}</dt><dd>v{{ currentProfile.schemaVersion }}</dd></div>
+            <div><dt>{{ i18n.t('dashboard.details.storage') }}</dt><dd>{{ storageLabel() }}</dd></div>
+          </dl>
         </section>
       } @else {
-        <section class="panel"><h1>{{ i18n.t('common.profileNotFound.title') }}</h1><p class="muted">{{ i18n.t('common.profileNotFound.description') }}</p><a class="button" routerLink="/">{{ i18n.t('common.returnToProfiles') }}</a></section>
+        <section class="panel dashboard-not-found">
+          <h1>{{ i18n.t('common.profileNotFound.title') }}</h1>
+          <p class="muted">{{ i18n.t('common.profileNotFound.description') }}</p>
+          <a class="button" routerLink="/">{{ i18n.t('common.returnToProfiles') }}</a>
+        </section>
       }
     </main>
     <router-outlet />
-  `,
-  styles: `
-    .dashboard-header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.8rem; }
-    .settings-button { min-height: 2.35rem; padding: 0.45rem 0.8rem; font-size: 0.82rem; }
-    .status-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
-    .status-heading h2 { margin-bottom: 0; }
-    .overall-percentage { display: grid; text-align: right; }
-    .overall-percentage strong { font-size: 2rem; line-height: 1; }
-    .overall-percentage span { margin-top: 0.3rem; color: var(--text-secondary); font-size: 0.75rem; }
-    .overall-progress-block { display: grid; gap: 0.7rem; margin-top: 1.35rem; padding: 1rem; border: 1px solid var(--border-subtle); border-radius: 0.7rem; background: color-mix(in srgb, var(--surface-elevated) 58%, transparent); }
-    .progress-copy { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
-    .progress-copy span { font-size: 0.82rem; text-align: right; }
-    .status-message { margin: 1.25rem 0 0; }
-    .storage-status { grid-column: span 2; }
-    .category-progress-section { margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); }
-    .category-progress-section h3 { margin-bottom: 1rem; }
-    .category-progress-list { column-count: 2; column-gap: 1rem; }
-    .category-progress-row { display: grid; break-inside: avoid; gap: 0.48rem; margin-bottom: 0.8rem; padding: 0.8rem; border: 1px solid color-mix(in srgb, var(--border-subtle) 72%, transparent); border-radius: 0.6rem; background: color-mix(in srgb, var(--surface-elevated) 42%, transparent); }
-    .category-progress-copy { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8rem; }
-    .category-progress-copy span { font-size: 0.75rem; white-space: nowrap; }
-    @media (max-width: 720px) { .dashboard-header-actions, .status-heading, .progress-copy, .category-progress-copy { align-items: flex-start; flex-direction: column; } .dashboard-header-actions { width: 100%; } .settings-button { width: 100%; } .overall-percentage { text-align: left; } .category-progress-list { column-count: 1; } .storage-status { grid-column: auto; } }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -105,6 +295,7 @@ export class ProfileDashboardPageComponent {
   readonly catalogueStore = inject(CatalogueStore);
   readonly i18n = inject(TranslationService);
   readonly catalogueText = inject(CatalogueTextService);
+  readonly storageContext = inject(PROFILE_STORAGE_CONTEXT);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
   private readonly preferences = inject(UiPreferencesService);
   private readonly route = inject(ActivatedRoute);
@@ -114,19 +305,90 @@ export class ProfileDashboardPageComponent {
   readonly savedAnswerCount = computed(() => Object.keys(this.profile()?.answers ?? {}).length);
   readonly hiddenCategoryIds = computed(() => this.preferences.hiddenCategoryIds(this.profileId));
   readonly categorySummaries = computed(() => {
-    const profile = this.profile(); const snapshot = this.catalogueStore.snapshot();
-    return profile && snapshot ? this.questionnaireService.getCategorySummaries(snapshot, profile, false, this.hiddenCategoryIds()) : [];
+    const profile = this.profile();
+    const snapshot = this.catalogueStore.snapshot();
+    return profile && snapshot
+      ? this.questionnaireService.getCategorySummaries(snapshot, profile, false, this.hiddenCategoryIds())
+      : [];
   });
   readonly totalAnswered = computed(() => this.categorySummaries().reduce((sum, item) => sum + item.answered, 0));
   readonly totalQuestions = computed(() => this.categorySummaries().reduce((sum, item) => sum + item.total, 0));
-  readonly completionPercentage = computed(() => { const total = this.totalQuestions(); return total === 0 ? 0 : Math.round((this.totalAnswered() / total) * 100); });
+  readonly completionPercentage = computed(() => {
+    const total = this.totalQuestions();
+    return total === 0 ? 0 : Math.round((this.totalAnswered() / total) * 100);
+  });
   readonly totalCategories = computed(() => this.categorySummaries().filter((summary) => summary.total > 0).length);
-  readonly completedCategories = computed(() => this.categorySummaries().filter((summary) => summary.total > 0 && summary.answered === summary.total).length);
+  readonly completedCategories = computed(() =>
+    this.categorySummaries().filter((summary) => summary.total > 0 && summary.answered === summary.total).length,
+  );
+  readonly preferenceDistribution = computed(() => buildPreferenceDistribution(this.profile()));
+  readonly preferenceChartGradient = computed(() => {
+    const active = this.preferenceDistribution().filter((entry) => entry.count > 0);
+    if (active.length === 0) return 'conic-gradient(rgba(107, 122, 166, 0.18) 0% 100%)';
 
-  constructor() { void this.catalogueStore.initialize(); }
+    const segments = active.map((entry) =>
+      `${this.preferenceColor(entry.preference)} ${entry.startPercentage.toFixed(4)}% ${entry.endPercentage.toFixed(4)}%`,
+    );
+    return `conic-gradient(${segments.join(', ')})`;
+  });
 
-  answeredLabel(count: number): string { return this.i18n.plural(count, 'dashboard.answered.one', 'dashboard.answered.other'); }
-  updatedAtLabel(value: string): string { return new Intl.DateTimeFormat(this.i18n.locale(), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)); }
-  sexLabel(sex: Sex | undefined): string { if (!sex) return this.i18n.t('dashboard.sexNotSpecified'); return this.i18n.t(sex === 'male' ? 'profileEditor.sex.male' : 'profileEditor.sex.female'); }
-  orientationLabel(orientation: SexualOrientation | undefined): string { if (!orientation) return this.i18n.t('dashboard.orientationNotSpecified'); if (orientation === 'heterosexual') return this.i18n.t('profileEditor.orientation.heterosexual'); if (orientation === 'homosexual') return this.i18n.t('profileEditor.orientation.homosexual'); return this.i18n.t('profileEditor.orientation.bisexual'); }
+  constructor() {
+    void this.catalogueStore.initialize();
+  }
+
+  profileDisplayName(): string {
+    return this.profile()?.metadata.alias?.trim() || this.i18n.t('common.untitledProfile');
+  }
+
+  completionRingClass(): string {
+    const value = this.completionPercentage();
+    if (value < 20) return 'completion-ring completion-ring-danger';
+    if (value < 40) return 'completion-ring completion-ring-low';
+    if (value < 60) return 'completion-ring completion-ring-mid';
+    if (value < 80) return 'completion-ring completion-ring-high';
+    return 'completion-ring completion-ring-complete';
+  }
+
+  preferenceLabel(preference: Preference): string {
+    if (preference === 'favorite') return this.i18n.t('preference.favorite');
+    if (preference === 'like') return this.i18n.t('preference.like');
+    if (preference === 'depends') return this.i18n.t('preference.depends');
+    if (preference === 'curious') return this.i18n.t('preference.curious');
+    if (preference === 'not-interested') return this.i18n.t('preference.notInterested');
+    return this.i18n.t('preference.boundary');
+  }
+
+  storageLabel(): string {
+    if (this.storageContext.mode === 'persistent') return this.i18n.t('dashboard.details.storagePersistent');
+    if (this.storageContext.mode === 'session') return this.i18n.t('dashboard.details.storageSession');
+    return this.i18n.t('dashboard.details.storageMemory');
+  }
+
+  updatedAtLabel(value: string): string {
+    return new Intl.DateTimeFormat(this.i18n.locale(), {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(new Date(value));
+  }
+
+  sexLabel(sex: Sex | undefined): string {
+    if (!sex) return this.i18n.t('dashboard.sexNotSpecified');
+    return this.i18n.t(sex === 'male' ? 'profileEditor.sex.male' : 'profileEditor.sex.female');
+  }
+
+  orientationLabel(orientation: SexualOrientation | undefined): string {
+    if (!orientation) return this.i18n.t('dashboard.orientationNotSpecified');
+    if (orientation === 'heterosexual') return this.i18n.t('profileEditor.orientation.heterosexual');
+    if (orientation === 'homosexual') return this.i18n.t('profileEditor.orientation.homosexual');
+    return this.i18n.t('profileEditor.orientation.bisexual');
+  }
+
+  private preferenceColor(preference: Preference): string {
+    if (preference === 'favorite') return 'var(--preference-favorite)';
+    if (preference === 'like') return 'var(--preference-positive)';
+    if (preference === 'depends') return 'var(--preference-conditional)';
+    if (preference === 'curious') return 'var(--preference-curious)';
+    if (preference === 'not-interested') return 'var(--preference-negative)';
+    return 'var(--preference-boundary)';
+  }
 }
