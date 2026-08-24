@@ -26,6 +26,7 @@
               "src/profile-hub.css",
               "src/profile-hub-layout.css",
               "src/profile-entry.css",
+              "src/profile-dashboard.css",
               "src/desiresync-brand.css"
             ]
           },
