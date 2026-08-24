@@ -22,7 +22,12 @@ import { TranslationService } from './translation.service';
         (click)="toggleMenu()"
         (keydown.escape)="closeMenu()"
       >
-        <span class="language-mark" aria-hidden="true">{{ localeFlag(i18n.locale()) }}</span>
+        <span
+          class="language-mark locale-flag"
+          [class.locale-flag-es]="i18n.locale() === 'es'"
+          [class.locale-flag-en]="i18n.locale() === 'en'"
+          aria-hidden="true"
+        ></span>
         <span class="language-current-label">{{ currentLocaleLabel() }}</span>
         <span class="language-chevron" aria-hidden="true">⌄</span>
       </button>
@@ -43,7 +48,12 @@ import { TranslationService } from './translation.service';
               (click)="selectLanguage(locale.id)"
             >
               <span class="language-option-copy">
-                <span class="language-option-flag" aria-hidden="true">{{ localeFlag(locale.id) }}</span>
+                <span
+                  class="language-option-flag locale-flag"
+                  [class.locale-flag-es]="locale.id === 'es'"
+                  [class.locale-flag-en]="locale.id === 'en'"
+                  aria-hidden="true"
+                ></span>
                 <span>{{ locale.nativeLabel }}</span>
               </span>
               @if (i18n.locale() === locale.id) {
@@ -95,15 +105,37 @@ import { TranslationService } from './translation.service';
         0 0 1.1rem rgba(140, 92, 255, 0.09);
     }
     .language-mark {
-      display: grid;
       width: 1.45rem;
-      aspect-ratio: 1;
-      place-items: center;
-      border: 1px solid rgba(54, 186, 255, 0.3);
-      border-radius: 50%;
-      background: rgba(54, 186, 255, 0.09);
-      font-size: 0.85rem;
-      line-height: 1;
+      height: 1rem;
+      flex: 0 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 0.18rem;
+      box-shadow: 0 0 0.55rem rgba(54, 186, 255, 0.08);
+    }
+    .locale-flag {
+      display: inline-block;
+      overflow: hidden;
+      background-color: #17336f;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      vertical-align: middle;
+    }
+    .locale-flag-es {
+      background:
+        linear-gradient(
+          to bottom,
+          #aa151b 0 25%,
+          #f1bf00 25% 75%,
+          #aa151b 75% 100%
+        );
+    }
+    .locale-flag-en {
+      background:
+        linear-gradient(33deg, transparent 43%, #fff 43% 49%, #c8102e 49% 53%, #fff 53% 59%, transparent 59%),
+        linear-gradient(-33deg, transparent 43%, #fff 43% 49%, #c8102e 49% 53%, #fff 53% 59%, transparent 59%),
+        linear-gradient(to right, transparent 39%, #fff 39% 45%, #c8102e 45% 55%, #fff 55% 61%, transparent 61%),
+        linear-gradient(to bottom, transparent 35%, #fff 35% 42%, #c8102e 42% 58%, #fff 58% 65%, transparent 65%),
+        #012169;
     }
     .language-chevron {
       color: var(--text-secondary);
@@ -169,8 +201,11 @@ import { TranslationService } from './translation.service';
       gap: 0.5rem;
     }
     .language-option-flag {
-      font-size: 0.95rem;
-      line-height: 1;
+      width: 1.35rem;
+      height: 0.9rem;
+      flex: 0 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 0.14rem;
     }
     .language-option:hover,
     .language-option:focus-visible {
@@ -200,10 +235,9 @@ import { TranslationService } from './translation.service';
         display: none;
       }
       .language-mark {
-        width: 1.6rem;
-        border: 0;
-        background: transparent;
-        font-size: 1.05rem;
+        width: 1.55rem;
+        height: 1.02rem;
+        border-radius: 0.16rem;
       }
       .language-menu { min-width: 8.5rem; }
     }
@@ -223,10 +257,6 @@ export class LanguageSwitcherComponent {
   currentLocaleLabel(): string {
     return this.i18n.supportedLocales.find((locale) => locale.id === this.i18n.locale())?.nativeLabel
       ?? this.i18n.locale();
-  }
-
-  localeFlag(locale: Locale): string {
-    return locale === 'es' ? '🇪🇸' : '🇬🇧';
   }
 
   openMenu(): void {
