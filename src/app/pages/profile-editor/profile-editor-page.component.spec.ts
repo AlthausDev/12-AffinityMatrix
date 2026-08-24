@@ -4,6 +4,7 @@ import { ProfileFactory } from '../../../application/profile/profile-factory';
 import { ProfileConcurrencyError, ProfileRepository } from '../../../application/profile/profile-repository';
 import { ProfileService } from '../../../application/profile/profile-service';
 import { Profile, ProfileId } from '../../../domain/profile/profile';
+import { CatalogueStore } from '../../core/catalogue.store';
 import { PROFILE_SERVICE } from '../../core/profile-service.token';
 import { ProfileStore } from '../../core/profile.store';
 import { ProfileEditorPageComponent } from './profile-editor-page.component';
@@ -37,6 +38,7 @@ describe('ProfileEditorPageComponent', () => {
         ProfileStore,
         provideRouter([]),
         { provide: PROFILE_SERVICE, useValue: service },
+        { provide: CatalogueStore, useValue: { snapshot: () => null, initialize: async () => undefined } },
       ],
     }).compileComponents();
 
