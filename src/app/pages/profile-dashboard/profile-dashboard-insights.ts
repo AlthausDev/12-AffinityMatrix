@@ -1,4 +1,4 @@
-import { Practice } from '../../../domain/catalogue/practice';
+import { Practice, RolePerspective } from '../../../domain/catalogue/practice';
 import { Profile } from '../../../domain/profile/profile';
 import { PREFERENCE_VALUES, Preference } from '../../../domain/profile/preference';
 
@@ -21,6 +21,17 @@ export interface PracticeProgressEntry {
   readonly total: number;
   readonly completionPercentage: number;
 }
+
+export interface RoleProfileEntry {
+  readonly perspective: RolePerspective;
+  readonly answerCount: number;
+  readonly affinityCount: number;
+  readonly favoriteCount: number;
+  readonly affinityPercentage: number;
+  readonly favoritePercentage: number;
+}
+
+const ROLE_PERSPECTIVES: readonly RolePerspective[] = ['active', 'receptive', 'neutral'];
 
 export function buildPreferenceDistribution(
   profile: Pick<Profile, 'answers'> | undefined,
@@ -61,4 +72,49 @@ export function buildPracticeProgress(
       };
     })
     .filter((entry) => entry.total > 0);
+}
+
+export function buildRoleProfile(
+  profile: Pick<Profile, 'answers'> | undefined,
+  practices: readonly Practice[] | undefined,
+): readonly RoleProfileEntry[] {
+  const perspectiveByRole = new Map<string, RolePerspective>();
+  for (const practice of practices ?? []) {
+    for (const role of practice.roles) {
+      perspectiveByRole.set(roleLookupKey(practice.id, role.id), role.perspective);
+    }
+  }
+
+  const counts = new Map<RolePerspective, { answerCount: number; affinityCount: number; favoriteCount: number }>(
+    ROLE_PERSPECTIVES.map((perspective) => [perspective, { answerCount: 0, affinityCount: 0, favoriteCount: 0 }]),
+  );
+
+  for (const answer of Object.values(profile?.answers ?? {})) {
+    const perspective = perspectiveByRole.get(roleLookupKey(answer.practiceId, answer.roleId));
+    if (!perspective) continue;
+
+    const current = counts.get(perspective);
+    if (!current) continue;
+    current.answerCount += 1;
+    if (answer.preference === 'favorite' || answer.preference === 'like') current.affinityCount += 1;
+    if (answer.preference === 'favorite') current.favoriteCount += 1;
+  }
+
+  return ROLE_PERSPECTIVES.map((perspective) => {
+    const current = counts.get(perspective) ?? { answerCount: 0, affinityCount: 0, favoriteCount: 0 };
+    return {
+      perspective,
+      ...current,
+      affinityPercentage: percentage(current.affinityCount, current.answerCount),
+      favoritePercentage: percentage(current.favoriteCount, current.answerCount),
+    };
+  });
+}
+
+function roleLookupKey(practiceId: string, roleId: string): string {
+  return `${practiceId}\u0000${roleId}`;
+}
+
+function percentage(value: number, total: number): number {
+  return total === 0 ? 0 : Math.round((value / total) * 100);
 }
