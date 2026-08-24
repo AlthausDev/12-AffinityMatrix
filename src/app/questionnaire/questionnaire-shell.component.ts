@@ -23,56 +23,65 @@ import { findRouteParam } from '../shared/route-param';
   selector: 'app-questionnaire-shell',
   imports: [RouterLink, RouterOutlet],
   template: `
-    <div #viewport class="questionnaire-overlay">
-      <section class="questionnaire-window" [attr.aria-label]="i18n.t('questionnaire.windowAria')">
-        <header class="questionnaire-window-toolbar">
-          <div class="toolbar-primary">
-            <span class="pending-label">{{ pendingLabel(pendingCount()) }}</span>
+    <div
+      #viewport
+      class="questionnaire-overlay"
+      [class.category-navigation-active]="currentCategoryId()"
+    >
+      <header class="questionnaire-top-dock">
+        <div class="questionnaire-dock-inner toolbar-primary">
+          <span class="pending-label">{{ pendingLabel(pendingCount()) }}</span>
 
-            <nav
-              class="toolbar-global-actions"
-              [class.category-navigation-active]="currentCategoryId()"
-              [attr.aria-label]="i18n.t('questionnaire.navigationAria')"
-            >
-              @if (currentCategoryId()) {
+          <nav
+            class="toolbar-global-actions"
+            [class.category-navigation-active]="currentCategoryId()"
+            [attr.aria-label]="i18n.t('questionnaire.navigationAria')"
+          >
+            @if (currentCategoryId()) {
+              <a
+                class="button secondary compact-button categories-button"
+                [routerLink]="['/profiles', profileId, 'questionnaire']"
+                [queryParams]="includeFiltered() ? { filtered: '1' } : null"
+              >{{ i18n.t('common.categories') }}</a>
+            }
+            <button class="button compact-button exit-button" type="button" (click)="requestFinish()">
+              {{ i18n.t('questionnaire.finish.action') }}
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      @if (currentCategoryId()) {
+        <nav class="questionnaire-bottom-dock" [attr.aria-label]="i18n.t('questionnaire.navigationAria')">
+          <div class="questionnaire-dock-inner toolbar-sequence-actions">
+            <span class="sequence-slot sequence-slot-previous">
+              @if (neighbours().previousCategoryId; as previousId) {
                 <a
-                  class="button secondary compact-button categories-button"
-                  [routerLink]="['/profiles', profileId, 'questionnaire']"
+                  class="button secondary compact-button sequence-button"
+                  [routerLink]="['/profiles', profileId, 'questionnaire', previousId]"
                   [queryParams]="includeFiltered() ? { filtered: '1' } : null"
-                >{{ i18n.t('common.categories') }}</a>
+                >{{ i18n.t('questionnaire.previous') }}</a>
+              } @else {
+                <span class="sequence-placeholder" aria-hidden="true"></span>
               }
-              <button class="button compact-button exit-button" type="button" (click)="requestFinish()">{{ i18n.t('questionnaire.finish.action') }}</button>
-            </nav>
+            </span>
+
+            <span class="sequence-slot sequence-slot-next">
+              @if (neighbours().nextCategoryId; as nextId) {
+                <a
+                  class="button secondary compact-button sequence-button"
+                  [routerLink]="['/profiles', profileId, 'questionnaire', nextId]"
+                  [queryParams]="includeFiltered() ? { filtered: '1' } : null"
+                >{{ i18n.t('questionnaire.next') }}</a>
+              } @else {
+                <span class="sequence-placeholder" aria-hidden="true"></span>
+              }
+            </span>
           </div>
+        </nav>
+      }
 
-          @if (currentCategoryId()) {
-            <nav class="toolbar-sequence-actions" [attr.aria-label]="i18n.t('questionnaire.navigationAria')">
-              <span class="sequence-slot sequence-slot-previous">
-                @if (neighbours().previousCategoryId; as previousId) {
-                  <a
-                    class="button secondary compact-button sequence-button"
-                    [routerLink]="['/profiles', profileId, 'questionnaire', previousId]"
-                    [queryParams]="includeFiltered() ? { filtered: '1' } : null"
-                  ><span aria-hidden="true">←</span> {{ i18n.t('questionnaire.previous') }}</a>
-                } @else {
-                  <span class="sequence-placeholder" aria-hidden="true"></span>
-                }
-              </span>
-
-              <span class="sequence-slot sequence-slot-next">
-                @if (neighbours().nextCategoryId; as nextId) {
-                  <a
-                    class="button secondary compact-button sequence-button"
-                    [routerLink]="['/profiles', profileId, 'questionnaire', nextId]"
-                    [queryParams]="includeFiltered() ? { filtered: '1' } : null"
-                  >{{ i18n.t('questionnaire.next') }} <span aria-hidden="true">→</span></a>
-                } @else {
-                  <span class="sequence-placeholder" aria-hidden="true"></span>
-                }
-              </span>
-            </nav>
-          }
-        </header>
+      <section class="questionnaire-window" [attr.aria-label]="i18n.t('questionnaire.windowAria')">
         <router-outlet />
       </section>
 
