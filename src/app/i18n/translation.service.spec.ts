@@ -58,10 +58,11 @@ describe('TranslationService', () => {
     expect(service.plural(3, 'questionnaire.pending.one', 'questionnaire.pending.other')).toBe(
       'Quedan 3 preguntas visibles pendientes',
     );
+    expect(service.t('questionnaire.finish.action')).toBe('Salir');
 
     service.setLocale('en');
     expect(service.t('questionnaireRole.counterpart', { sex: 'Woman' })).toBe('Partner: Woman');
-    expect(service.t('questionnaire.finish.action')).toBe('Finish');
+    expect(service.t('questionnaire.finish.action')).toBe('Exit');
   });
 
   it('provides the profile hub resources in both locales', () => {
