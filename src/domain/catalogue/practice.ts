@@ -3,6 +3,7 @@ import { Sex, SexualOrientation } from '../profile/profile-metadata';
 
 export type PracticeId = string;
 export type RoleId = string;
+export type SubcategoryId = string;
 export type RolePerspective = 'active' | 'receptive' | 'neutral';
 export type RoleContextAxis = 'counterpartSex' | 'targetSite';
 export type TargetOwner = 'self' | 'partner';
@@ -47,6 +48,8 @@ export interface RoleCompatibilityPair {
 export interface Practice {
   readonly id: PracticeId;
   readonly categoryId: string;
+  /** Optional while the 0.2 catalogue taxonomy is migrated category by category. */
+  readonly subcategoryId?: SubcategoryId;
   readonly label: string;
   readonly description?: string;
   readonly roles: readonly PracticeRole[];
@@ -55,6 +58,14 @@ export interface Practice {
 
 export interface PracticeCategory {
   readonly id: string;
+  readonly label: string;
+  readonly description?: string;
+  readonly order: number;
+}
+
+export interface PracticeSubcategory {
+  readonly id: SubcategoryId;
+  readonly categoryId: string;
   readonly label: string;
   readonly description?: string;
   readonly order: number;
