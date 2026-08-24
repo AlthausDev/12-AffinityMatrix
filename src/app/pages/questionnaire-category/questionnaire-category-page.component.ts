@@ -50,8 +50,8 @@ import { findRouteParam } from '../../shared/route-param';
             <section class="panel"><h2>{{ i18n.t('questionnaire.category.empty.title') }}</h2><p class="muted">{{ i18n.t('questionnaire.category.empty.description') }}</p></section>
           } @else if (sections().length > 0) {
             <section class="subcategory-list" aria-label="Subcategorías">
-              @for (section of sections(); track section.id; let first = $first) {
-                <details class="subcategory-section" [open]="first">
+              @for (section of sections(); track section.id) {
+                <details class="subcategory-section">
                   <summary class="subcategory-summary">
                     <span class="subcategory-summary-copy">
                       <strong>{{ section.label }}</strong>
