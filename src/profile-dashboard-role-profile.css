@@ -6,6 +6,16 @@
   font-weight: 700;
 }
 
+.profile-dashboard .dashboard-progress-caption strong {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Starting the questionnaire is progress, not an error state. */
+.profile-dashboard .completion-ring-danger {
+  --ring-color: color-mix(in srgb, var(--neon-violet) 72%, var(--neon-cyan));
+}
+
 .profile-dashboard .dashboard-role-card {
   display: flex;
   flex-direction: column;
