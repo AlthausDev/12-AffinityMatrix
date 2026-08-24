@@ -28,6 +28,7 @@
               "src/profile-entry.css",
               "src/profile-dashboard.css",
               "src/profile-dashboard-category-details.css",
+              "src/profile-dashboard-role-profile.css",
               "src/desiresync-brand.css"
             ]
           },
@@ -51,8 +52,7 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
-            }
-          },
+            },
           "defaultConfiguration": "production"
         },
         "serve": {
