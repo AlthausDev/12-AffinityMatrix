@@ -29,6 +29,7 @@
               "src/profile-dashboard.css",
               "src/profile-dashboard-category-details.css",
               "src/profile-dashboard-role-profile.css",
+              "src/profile-dashboard-progress-gradient.css",
               "src/desiresync-brand.css"
             ]
           },
