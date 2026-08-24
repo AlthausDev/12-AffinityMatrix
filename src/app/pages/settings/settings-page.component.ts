@@ -39,6 +39,14 @@ import { TranslationService } from '../../i18n/translation.service';
         </div>
 
         <label class="check-field settings-option">
+          <input type="checkbox" [checked]="preferences.reduceVisualEffects()" (change)="toggleVisualEffects($event)" />
+          <span>
+            <strong>{{ i18n.t('settings.visualEffects.title') }}</strong>
+            <small>{{ i18n.t('settings.visualEffects.description') }}</small>
+          </span>
+        </label>
+
+        <label class="check-field settings-option">
           <input type="checkbox" [checked]="preferences.confirmQuestionnaireExit()" (change)="toggleQuestionnaireExitConfirmation($event)" />
           <span>
             <strong>{{ i18n.t('settings.questionnaireExit.title') }}</strong>
@@ -80,6 +88,10 @@ export class SettingsPageComponent {
 
   setFontScale(scale: FontScale): void {
     this.preferences.setFontScale(scale);
+  }
+
+  toggleVisualEffects(event: Event): void {
+    this.preferences.setReduceVisualEffects((event.target as HTMLInputElement).checked);
   }
 
   toggleQuestionnaireExitConfirmation(event: Event): void {
