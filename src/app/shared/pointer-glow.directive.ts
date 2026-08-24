@@ -25,10 +25,12 @@ export class PointerGlowDirective {
     if (!window) return;
 
     this.zone.runOutsideAngular(() => {
-      const hoverPointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+      const hoverPointer = typeof window.matchMedia === 'function'
+        ? window.matchMedia('(hover: hover) and (pointer: fine)')
+        : null;
 
       const handlePointerMove = (event: PointerEvent): void => {
-        if (!hoverPointer.matches) return;
+        if (!hoverPointer?.matches) return;
 
         this.pointerX = event.clientX;
         this.pointerY = event.clientY;
