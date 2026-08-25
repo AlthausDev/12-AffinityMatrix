@@ -29,7 +29,7 @@
 }
 
 .questionnaire-window-toolbar .compact-button {
-  border-radius: 999px;
+  border-radius: 0.72rem;
   border-color: color-mix(in srgb, var(--neon-cyan) 20%, var(--border-subtle));
   background: rgba(19, 34, 67, 0.56);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
