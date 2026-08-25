@@ -180,7 +180,8 @@ import { TranslationService } from './translation.service';
         min-height: 2.35rem;
         justify-content: center;
         padding: 0;
-        border-radius: 50%;
+        border-radius: 0.58rem;
+        clip-path: polygon(14% 0, 86% 0, 100% 14%, 100% 86%, 86% 100%, 14% 100%, 0 86%, 0 14%);
       }
       .language-current-label,
       .language-chevron { display: none; }
