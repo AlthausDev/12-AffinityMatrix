@@ -16,7 +16,7 @@ These signals are groundwork for a future **orientative** trends/profile view. T
 
 ## Current migration
 
-The first thirteen questionnaire categories are fully organised into subcategories and semantically tagged against the final Catalogue V3 projection:
+The first fourteen questionnaire categories are fully organised into subcategories and semantically tagged against the final Catalogue V3 projection:
 
 - `Afecto e intimidad`
 - `Estilo, ritmo y ambiente sexual`
@@ -31,6 +31,7 @@ The first thirteen questionnaire categories are fully organised into subcategori
 - `Parejas, grupos y composición`
 - `Escenarios y roleplay`
 - `Exhibicionismo, voyeurismo y grabación`
+- `Lugares y entornos`
 
 The shared vocabulary includes emotional and interaction signals such as connection, tenderness, romance, sensuality, intensity, pace, spontaneity and playfulness; broader signals such as exploration, visibility, anonymity, power exchange and group/social context; visual/role-oriented signals such as `aesthetic-presentation` and `role-immersion`; and `reciprocity`, introduced for the manual-stimulation migration to distinguish coordinated or mutually shared participation from emotional connection. Oral sex and penetration reuse the existing vocabulary rather than introducing category-specific signals; giving and receiving are represented by role perspective instead. Penetration additionally demonstrates the distinction between semantic intensity, exploratory complexity and explicit pace without turning anatomical routes into profile dimensions.
 
@@ -46,6 +47,8 @@ The partners/groups migration keeps the 17 final practices and separates small-g
 
 The roleplay migration keeps the 23 practices in the final Catalogue V3 projection after late catalogue review has already removed legacy-only entries and moved taboo premises and impossible/surreal fantasies into their own categories. It separates everyday encounters; professions, status and authority; captivity/control/interrogation; fictional characters and archetypes; and pet/primal roles. `role-immersion` is the central reusable signal, combined with power exchange, aesthetic presentation, playfulness, exploration, intensity, sensuality or physicality where those qualities genuinely distinguish the scene. No additional roleplay-specific signal or near-duplicate archetype is added.
 
-The exhibitionism migration keeps the 8 practices in the final Catalogue V3 projection and separates consensual watching/visibility from images, recording and remote digital interaction. It introduces the reusable `anonymity` signal because concealed identity or unfamiliarity is meaningfully different from simple visibility; that signal also enriches previously migrated masks, anonymous-group scenes and strangers roleplay. The twelve location and venue practices found in earlier exhibitionism seeds were not retired: a prior semantic pass moved them into the separate `places-settings` / `Lugares y entornos` category, which remains for the next migration.
+The exhibitionism migration keeps the 8 practices in the final Catalogue V3 projection and separates consensual watching/visibility from images, recording and remote digital interaction. It introduces the reusable `anonymity` signal because concealed identity or unfamiliarity is meaningfully different from simple visibility; that signal also enriches previously migrated masks, anonymous-group scenes and strangers roleplay.
+
+The places/settings migration keeps the 12 practices that a prior semantic pass deliberately moved out of exhibitionism. It separates familiar home and everyday spaces; private or secluded settings away from home; and social or dedicated sexual venues. Existing signals such as exploration, spontaneity, sensuality, physicality, visibility, group/social context and anonymity are enough to distinguish these settings, so no location-specific profile axis is introduced. `glory-hole` demonstrates why anonymity remains distinct from visibility, while sex clubs and dungeon venues reuse social, exploratory and presentation/role signals without becoming special-purpose semantic dimensions.
 
 The eventual UI may combine several semantic signals into user-facing bars or metrics. The chart model is intentionally not fixed yet, and category migration remains independent from saved answer identity.
