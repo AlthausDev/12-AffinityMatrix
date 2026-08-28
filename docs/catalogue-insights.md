@@ -16,12 +16,13 @@ These signals are groundwork for a future **orientative** trends/profile view. T
 
 ## Current migration
 
-The first three questionnaire categories are fully organised into subcategories and semantically tagged against the final Catalogue V3 projection:
+The first four questionnaire categories are fully organised into subcategories and semantically tagged against the final Catalogue V3 projection:
 
 - `Afecto e intimidad`
 - `Estilo, ritmo y ambiente sexual`
 - `Ropa, apariencia y lencería`
+- `Estimulación manual y masturbación`
 
-The shared vocabulary includes emotional and interaction signals such as connection, tenderness, romance, sensuality, intensity, pace, spontaneity and playfulness; broader signals such as exploration, visibility, power exchange and group/social context; and visual/role-oriented signals introduced for the clothing migration: `aesthetic-presentation` and `role-immersion`.
+The shared vocabulary includes emotional and interaction signals such as connection, tenderness, romance, sensuality, intensity, pace, spontaneity and playfulness; broader signals such as exploration, visibility, power exchange and group/social context; visual/role-oriented signals such as `aesthetic-presentation` and `role-immersion`; and `reciprocity`, introduced for the manual-stimulation migration to distinguish coordinated or mutually shared participation from emotional connection.
 
 The eventual UI may combine several semantic signals into user-facing bars or metrics. The chart model is intentionally not fixed yet, and category migration remains independent from saved answer identity.
