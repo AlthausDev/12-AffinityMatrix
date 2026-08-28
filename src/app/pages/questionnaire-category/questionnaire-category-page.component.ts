@@ -133,19 +133,28 @@ import { findRouteParam } from '../../shared/route-param';
   `,
   styles: `
     .questionnaire-page { max-width: 66rem; }
-    .category-header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(11rem, 15rem); gap: 2rem; align-items: center; }
+    .category-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(15rem, 18rem);
+      gap: clamp(1.4rem, 3vw, 2.4rem);
+      align-items: center;
+    }
     .category-progress-summary {
       display: grid;
-      gap: 0.46rem;
-      padding: 0.3rem 0 0.22rem 1.25rem;
-      border-left: 1px solid color-mix(in srgb, var(--border-strong) 54%, var(--neon-violet));
+      align-self: center;
+      gap: 0.48rem;
+      padding: 0.72rem 0.82rem 0.68rem;
+      border: 1px solid color-mix(in srgb, var(--border-strong) 54%, var(--neon-violet));
+      border-radius: 0.76rem;
+      background: linear-gradient(145deg, rgba(18, 46, 91, 0.36), rgba(74, 38, 104, 0.32));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.045);
       font-variant-numeric: tabular-nums;
     }
     .category-progress-label {
-      color: color-mix(in srgb, var(--text-secondary) 86%, #eef7ff);
-      font-size: 0.68rem;
-      font-weight: 750;
-      letter-spacing: 0.085em;
+      color: color-mix(in srgb, var(--text-secondary) 84%, #eef7ff);
+      font-size: 0.62rem;
+      font-weight: 720;
+      letter-spacing: 0.065em;
       line-height: 1.2;
       text-transform: uppercase;
     }
@@ -153,23 +162,26 @@ import { findRouteParam } from '../../shared/route-param';
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      gap: 1rem;
+      gap: 0.9rem;
+      min-width: 0;
     }
     .category-progress-count {
+      min-width: 0;
       color: var(--text-primary);
-      font-size: 0.84rem;
-      font-weight: 720;
+      font-size: 0.79rem;
+      font-weight: 700;
       line-height: 1.25;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.008em;
     }
     .category-progress-percentage {
+      flex: 0 0 auto;
       color: color-mix(in srgb, var(--text-primary) 92%, var(--neon-cyan));
-      font-size: 1.42rem;
+      font-size: 1.3rem;
       font-weight: 800;
       line-height: 1;
-      letter-spacing: -0.035em;
+      letter-spacing: -0.03em;
     }
-    .category-progress-summary app-completion-progress { display: block; margin-top: 0.05rem; }
+    .category-progress-summary app-completion-progress { display: block; margin-top: 0.02rem; }
     .questionnaire-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
     .compact-toggle { min-width: min(100%, 24rem); padding: 0.75rem; }
     .save-state { margin: 0; font-size: 0.85rem; }
@@ -213,17 +225,18 @@ import { findRouteParam } from '../../shared/route-param';
     .question-card-header p { max-width: 50rem; margin-bottom: 0; font-size: 0.84rem; line-height: 1.5; }
     @media (max-width: 720px) {
       .questionnaire-page { width: min(100% - 1rem, 66rem); }
-      .category-header { grid-template-columns: 1fr; gap: 0.8rem; align-items: stretch; }
+      .category-header { grid-template-columns: 1fr; gap: 0.72rem; align-items: stretch; }
       .category-header .lead { font-size: 0.88rem; line-height: 1.5; }
       .category-progress-summary {
-        gap: 0.5rem;
-        padding: 0.82rem 0 0;
-        border-top: 1px solid color-mix(in srgb, var(--border-strong) 48%, var(--neon-violet));
-        border-left: 0;
+        gap: 0.42rem;
+        padding: 0.68rem 0.72rem 0.64rem;
+        border-color: color-mix(in srgb, var(--border-strong) 46%, var(--neon-violet));
+        border-radius: 0.72rem;
+        background: linear-gradient(145deg, rgba(18, 46, 91, 0.26), rgba(74, 38, 104, 0.24));
       }
-      .category-progress-label { font-size: 0.7rem; }
-      .category-progress-count { font-size: 0.92rem; }
-      .category-progress-percentage { font-size: 1.55rem; }
+      .category-progress-label { font-size: 0.64rem; letter-spacing: 0.06em; }
+      .category-progress-count { font-size: 0.84rem; }
+      .category-progress-percentage { font-size: 1.36rem; }
       .questionnaire-toolbar { align-items: stretch; flex-direction: column; gap: 0.55rem; }
       .subcategory-summary { grid-template-columns: minmax(0, 1fr) 7rem; padding: 0.9rem 0.85rem; gap: 0.65rem; }
       .subcategory-summary::after { right: 0.55rem; }
