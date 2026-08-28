@@ -21,6 +21,7 @@ export type CatalogueInsightTagId =
   | 'visibility'
   | 'aesthetic-presentation'
   | 'role-immersion'
+  | 'reciprocity'
   | 'power-exchange'
   | 'group-social';
 
