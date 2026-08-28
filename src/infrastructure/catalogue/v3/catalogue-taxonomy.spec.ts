@@ -17,6 +17,8 @@ describe('catalogue v3 questionnaire taxonomy', () => {
       'penetration',
       'sexual-positions',
       'toys',
+      'orgasm-control',
+      'body-fetishes',
     ]);
 
     for (const categoryId of migratedCategoryIds) {
@@ -46,5 +48,15 @@ describe('catalogue v3 questionnaire taxonomy', () => {
         .map((subcategory) => subcategory.order);
       expect(new Set(orders).size).toBe(orders.length);
     }
+  });
+
+  it('keeps the dense body-focus category reviewable without changing its final catalogue coverage', () => {
+    const orgasmGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'orgasm-control');
+    const bodyGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'body-fetishes');
+
+    expect(orgasmGroups).toHaveLength(3);
+    expect(orgasmGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(11);
+    expect(bodyGroups).toHaveLength(7);
+    expect(bodyGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(53);
   });
 });
