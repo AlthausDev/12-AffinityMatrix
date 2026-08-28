@@ -3,29 +3,13 @@ import { CATALOGUE_V3_SUBCATEGORIES } from './catalogue-taxonomy';
 import { CATALOGUE_V3_CONTENT } from './content/final';
 
 describe('catalogue v3 questionnaire taxonomy', () => {
-  it('assigns every practice in each migrated final category exactly once', () => {
+  it('assigns every practice in every final category exactly once', () => {
     const migratedCategoryIds = [...new Set(
       CATALOGUE_V3_SUBCATEGORIES.map((subcategory) => subcategory.categoryId),
     )];
+    const finalCategoryIds = CATALOGUE_V3_CONTENT.map((category) => category.id);
 
-    expect(migratedCategoryIds).toEqual([
-      'affection-intimacy',
-      'sexual-style',
-      'clothing-appearance',
-      'manual-masturbation',
-      'oral',
-      'penetration',
-      'sexual-positions',
-      'toys',
-      'orgasm-control',
-      'body-fetishes',
-      'groups',
-      'roleplay',
-      'exhibitionism',
-      'places-settings',
-      'power',
-      'restraint',
-    ]);
+    expect(migratedCategoryIds).toEqual(finalCategoryIds);
 
     for (const categoryId of migratedCategoryIds) {
       const category = CATALOGUE_V3_CONTENT.find((entry) => entry.id === categoryId);
@@ -56,31 +40,29 @@ describe('catalogue v3 questionnaire taxonomy', () => {
     }
   });
 
-  it('keeps migrated categories reviewable without changing final coverage', () => {
-    const orgasmGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'orgasm-control');
-    const bodyGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'body-fetishes');
-    const socialGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'groups');
-    const roleplayGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'roleplay');
-    const exhibitionismGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'exhibitionism');
-    const placeGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'places-settings');
-    const powerGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'power');
-    const restraintGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'restraint');
+  it('keeps the larger final categories reviewable without changing coverage', () => {
+    const expected: Readonly<Record<string, readonly [number, number]>> = {
+      'orgasm-control': [3, 11],
+      'body-fetishes': [7, 53],
+      groups: [4, 17],
+      roleplay: [5, 23],
+      exhibitionism: [2, 8],
+      'places-settings': [3, 12],
+      power: [4, 24],
+      restraint: [6, 34],
+      psychological: [4, 22],
+      sensation: [4, 29],
+      fluids: [5, 29],
+      'taboo-fantasies': [2, 12],
+      surrealism: [2, 10],
+      edge: [4, 22],
+    };
 
-    expect(orgasmGroups).toHaveLength(3);
-    expect(orgasmGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(11);
-    expect(bodyGroups).toHaveLength(7);
-    expect(bodyGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(53);
-    expect(socialGroups).toHaveLength(4);
-    expect(socialGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(17);
-    expect(roleplayGroups).toHaveLength(5);
-    expect(roleplayGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(23);
-    expect(exhibitionismGroups).toHaveLength(2);
-    expect(exhibitionismGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(8);
-    expect(placeGroups).toHaveLength(3);
-    expect(placeGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(12);
-    expect(powerGroups).toHaveLength(4);
-    expect(powerGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(24);
-    expect(restraintGroups).toHaveLength(6);
-    expect(restraintGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(34);
+    for (const [categoryId, [subcategoryCount, practiceCount]] of Object.entries(expected)) {
+      const groups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === categoryId);
+      expect(groups, `Unexpected subcategory count for ${categoryId}`).toHaveLength(subcategoryCount);
+      expect(groups.flatMap((entry) => entry.practiceIds), `Unexpected practice count for ${categoryId}`)
+        .toHaveLength(practiceCount);
+    }
   });
 });
