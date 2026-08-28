@@ -22,6 +22,7 @@ describe('catalogue v3 questionnaire taxonomy', () => {
       'groups',
       'roleplay',
       'exhibitionism',
+      'places-settings',
     ]);
 
     for (const categoryId of migratedCategoryIds) {
@@ -53,12 +54,13 @@ describe('catalogue v3 questionnaire taxonomy', () => {
     }
   });
 
-  it('keeps dense and socially complex categories reviewable without changing final coverage', () => {
+  it('keeps migrated categories reviewable without changing final coverage', () => {
     const orgasmGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'orgasm-control');
     const bodyGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'body-fetishes');
     const socialGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'groups');
     const roleplayGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'roleplay');
     const exhibitionismGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'exhibitionism');
+    const placeGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'places-settings');
 
     expect(orgasmGroups).toHaveLength(3);
     expect(orgasmGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(11);
@@ -70,5 +72,7 @@ describe('catalogue v3 questionnaire taxonomy', () => {
     expect(roleplayGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(23);
     expect(exhibitionismGroups).toHaveLength(2);
     expect(exhibitionismGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(8);
+    expect(placeGroups).toHaveLength(3);
+    expect(placeGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(12);
   });
 });
