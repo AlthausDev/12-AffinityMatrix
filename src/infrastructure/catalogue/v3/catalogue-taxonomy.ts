@@ -341,4 +341,23 @@ export const CATALOGUE_V3_SUBCATEGORIES: readonly CatalogueSubcategorySeed[] = [
     'Imágenes eróticas consensuadas, grabaciones e interacción remota en directo donde una cámara o pantalla forma parte del contexto sexual.', 1,
     ['private-recording', 'taking-erotic-photos', 'video-call-sex', 'webcam-performance-private'],
   ),
+
+  subcategory(
+    'places-home-everyday', 'places-settings', 'Home & everyday spaces', 'Espacios cotidianos del hogar',
+    'Familiar domestic settings where the room, surface or water changes the physical context of sex without making social exposure central.',
+    'Entornos domésticos familiares donde la estancia, la superficie o el agua cambian el contexto físico del sexo sin convertir la exposición social en el elemento central.', 0,
+    ['sex-in-shower', 'sex-in-bath', 'sex-in-kitchen', 'sex-on-sofa', 'sex-on-floor'],
+  ),
+  subcategory(
+    'places-away-secluded', 'places-settings', 'Away from home & secluded settings', 'Fuera de casa y entornos apartados',
+    'Private or secluded settings away from the usual domestic space, where novelty, improvisation or a change of environment matters.',
+    'Entornos privados o apartados fuera del espacio doméstico habitual, donde importan la novedad, la improvisación o el cambio de ambiente.', 1,
+    ['sex-in-car', 'sex-in-hotel', 'sex-outdoors-private'],
+  ),
+  subcategory(
+    'places-social-sexual-venues', 'places-settings', 'Social & sexual venues', 'Entornos sociales y locales sexuales',
+    'Settings where controlled social visibility, a dedicated sexual venue or reduced personal identification is part of the experience.',
+    'Entornos donde la visibilidad social controlada, un local sexual específico o una menor identificación personal forman parte de la experiencia.', 2,
+    ['semi-public-consensual-scene', 'sex-club', 'dungeon-venue', 'glory-hole'],
+  ),
 ];
