@@ -385,4 +385,41 @@ export const CATALOGUE_V3_SUBCATEGORIES: readonly CatalogueSubcategorySeed[] = [
     'Dinámicas consensuadas de pertenencia y símbolos como el collaring o el control con correa que hacen explícito un rol continuado de poder.', 3,
     ['ownership', 'collaring', 'leash-control'],
   ),
+
+  subcategory(
+    'restraint-rope-foundations', 'restraint', 'Bondage & rope foundations', 'Bondage y fundamentos con cuerdas',
+    'General bondage and rope-focused restraint where tying, structure, body lines or rope aesthetics are central.',
+    'Bondage general y restricción con cuerdas donde las ataduras, la estructura, las líneas corporales o la estética de la cuerda son centrales.', 0,
+    ['bondage', 'rope-bondage', 'shibari', 'chest-harness-bondage'],
+  ),
+  subcategory(
+    'restraint-cuffs-materials', 'restraint', 'Cuffs & restraint materials', 'Esposas y materiales de restricción',
+    'Cuffs, straps, tape, chains and similar equipment used to limit movement without defining one exact full-body position.',
+    'Esposas, correas, cinta, cadenas y equipamiento similar utilizado para limitar el movimiento sin definir una postura corporal completa concreta.', 1,
+    ['wrist-cuffs', 'ankle-cuffs', 'handcuffs', 'thumb-cuffs', 'leather-restraints', 'velcro-restraints', 'tape-restraint', 'chain-restraint', 'bondage-mitts'],
+  ),
+  subcategory(
+    'restraint-body-positioning', 'restraint', 'Body positioning & immobilisation', 'Posicionamiento e inmovilización corporal',
+    'Restraint systems and ties that fix limbs, posture or most of the body into a more deliberately constrained position.',
+    'Sistemas de restricción y ataduras que fijan extremidades, postura o gran parte del cuerpo en una posición deliberadamente más limitada.', 2,
+    ['bed-restraints', 'under-bed-restraints', 'spreader-bar', 'hogtie', 'frogtie', 'box-tie', 'full-body-bondage', 'mummification', 'straightjacket'],
+  ),
+  subcategory(
+    'restraint-sensory-access', 'restraint', 'Sensory restriction & access', 'Restricción sensorial y de acceso',
+    'Restraint that changes what a person can see, hear or physically access, adding uncertainty or reduced sensory control to the scene.',
+    'Restricción que cambia lo que una persona puede ver, oír o alcanzar físicamente, añadiendo incertidumbre o menor control sensorial a la escena.', 3,
+    ['blindfold', 'earplugs-sensory-deprivation', 'hood', 'hand-over-mouth'],
+  ),
+  subcategory(
+    'restraint-gags-mouth', 'restraint', 'Gags & mouth restraint', 'Mordazas y restricción de la boca',
+    'General and specialised gags where restricting speech or controlling the mouth is the defining physical element.',
+    'Mordazas generales y especializadas donde restringir el habla o controlar la boca constituye el elemento físico definitorio.', 4,
+    ['gag', 'ball-gag', 'bit-gag', 'ring-gag', 'rope-gag'],
+  ),
+  subcategory(
+    'restraint-furniture-confinement', 'restraint', 'Furniture & confinement', 'Mobiliario y confinamiento',
+    'Restraint using fixed furniture, stocks or cages where the environment itself limits movement, position or freedom of physical access.',
+    'Restricción mediante mobiliario fijo, cepos o jaulas donde el propio entorno limita el movimiento, la postura o la libertad de acceso físico.', 5,
+    ['furniture-restraint', 'stocks-restraint', 'cage-confinement'],
+  ),
 ];
