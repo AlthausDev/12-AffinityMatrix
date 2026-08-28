@@ -213,4 +213,22 @@ export const CATALOGUE_V3_PRACTICE_INSIGHTS: readonly PracticeInsightSignals[] =
   { practiceId: 'oral-breasts', signals: { sensuality: 0.75, tenderness: 0.25 } },
   { practiceId: 'oral-fingers', signals: { sensuality: 0.5, playfulness: 0.25 } },
   { practiceId: 'oral-toes', signals: { sensuality: 0.5, exploration: 0.5 } },
+
+  // Penetration
+  { practiceId: 'vaginal-penetration', signals: { sensuality: 0.75 } },
+  { practiceId: 'anal-penetration', signals: { sensuality: 0.5, exploration: 0.25 } },
+  { practiceId: 'prostate-penetration', signals: { sensuality: 0.75, exploration: 0.25 } },
+  { practiceId: 'cervix-contact', signals: { sensuality: 0.5, intensity: 0.5, exploration: 0.25 } },
+  { practiceId: 'shallow-penetration', signals: { sensuality: 0.5 } },
+  { practiceId: 'deep-penetration', signals: { sensuality: 0.5, intensity: 0.5 } },
+  { practiceId: 'slow-penetration', signals: { sensuality: 0.75, 'slow-pace': 1 } },
+  { practiceId: 'rough-penetration', signals: { intensity: 1, sensuality: 0.25 } },
+  { practiceId: 'double-vaginal-penetration', signals: { intensity: 0.75, exploration: 0.75 } },
+  { practiceId: 'double-anal-penetration', signals: { intensity: 1, exploration: 0.75 } },
+  { practiceId: 'fisting-vaginal', signals: { intensity: 0.75, exploration: 1, 'slow-pace': 0.25 } },
+  { practiceId: 'fisting-anal', signals: { intensity: 1, exploration: 1, 'slow-pace': 0.25 } },
+  { practiceId: 'simultaneous-vaginal-anal-penetration', signals: { intensity: 0.75, exploration: 0.75 } },
+  { practiceId: 'simultaneous-vaginal-oral-penetration', signals: { intensity: 0.75, exploration: 0.75 } },
+  { practiceId: 'simultaneous-anal-oral-penetration', signals: { intensity: 0.75, exploration: 0.75 } },
+  { practiceId: 'simultaneous-vaginal-anal-oral-penetration', signals: { intensity: 1, exploration: 1 } },
 ] as const;
