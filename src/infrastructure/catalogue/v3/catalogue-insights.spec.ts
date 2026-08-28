@@ -8,12 +8,12 @@ describe('catalogue v3 insight signals', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('tags every practice in the migrated affection category exactly once', () => {
+  it('tags every practice in every migrated category exactly once', () => {
     const migratedPracticeIds = CATALOGUE_V3_SUBCATEGORIES
-      .filter((subcategory) => subcategory.categoryId === 'affection-intimacy')
       .flatMap((subcategory) => subcategory.practiceIds);
     const taggedPracticeIds = CATALOGUE_V3_PRACTICE_INSIGHTS.map((entry) => entry.practiceId);
 
+    expect(new Set(migratedPracticeIds).size).toBe(migratedPracticeIds.length);
     expect(new Set(taggedPracticeIds).size).toBe(taggedPracticeIds.length);
     expect([...taggedPracticeIds].sort()).toEqual([...migratedPracticeIds].sort());
   });

@@ -19,6 +19,8 @@ export type CatalogueInsightTagId =
   | 'playfulness'
   | 'exploration'
   | 'visibility'
+  | 'aesthetic-presentation'
+  | 'role-immersion'
   | 'power-exchange'
   | 'group-social';
 
