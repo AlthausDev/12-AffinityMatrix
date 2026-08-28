@@ -16,7 +16,7 @@ These signals are groundwork for a future **orientative** trends/profile view. T
 
 ## Current migration
 
-The first eleven questionnaire categories are fully organised into subcategories and semantically tagged against the final Catalogue V3 projection:
+The first twelve questionnaire categories are fully organised into subcategories and semantically tagged against the final Catalogue V3 projection:
 
 - `Afecto e intimidad`
 - `Estilo, ritmo y ambiente sexual`
@@ -29,6 +29,7 @@ The first eleven questionnaire categories are fully organised into subcategories
 - `Orgasmo, teasing y control sexual`
 - `Fetiches y foco corporal`
 - `Parejas, grupos y composición`
+- `Escenarios y roleplay`
 
 The shared vocabulary includes emotional and interaction signals such as connection, tenderness, romance, sensuality, intensity, pace, spontaneity and playfulness; broader signals such as exploration, visibility, power exchange and group/social context; visual/role-oriented signals such as `aesthetic-presentation` and `role-immersion`; and `reciprocity`, introduced for the manual-stimulation migration to distinguish coordinated or mutually shared participation from emotional connection. Oral sex and penetration reuse the existing vocabulary rather than introducing category-specific signals; giving and receiving are represented by role perspective instead. Penetration additionally demonstrates the distinction between semantic intensity, exploratory complexity and explicit pace without turning anatomical routes into profile dimensions.
 
@@ -41,5 +42,7 @@ The orgasm-control migration keeps the 11 final practices and groups them into e
 The body-focus migration organises 53 final preferences into seven reviewable groups covering face and hair; torso, build and stature; limbs, abdomen and buttocks; genitals and pubic traits; body hair, scent and sweat; underwear; and tattoos/piercings. These entries reuse sensuality, aesthetic presentation, exploration and occasional physicality/intensity where appropriate. Anatomical targets and visual traits remain catalogue content rather than becoming one semantic signal per body part.
 
 The partners/groups migration keeps the 17 final practices and separates small-group configurations, larger group scenes, swinging/partner exchange and watching or relationship-framed dynamics involving third parties. `group-social` remains the main reusable signal, while exploration, reciprocity, visibility and intensity distinguish the different forms without adding a category-specific non-monogamy axis.
+
+The roleplay migration keeps the 23 practices in the final Catalogue V3 projection after late catalogue review has already removed legacy-only entries and moved taboo premises and impossible/surreal fantasies into their own categories. It separates everyday encounters; professions, status and authority; captivity/control/interrogation; fictional characters and archetypes; and pet/primal roles. `role-immersion` is the central reusable signal, combined with power exchange, aesthetic presentation, playfulness, exploration, intensity, sensuality or physicality where those qualities genuinely distinguish the scene. No additional roleplay-specific signal or near-duplicate archetype is added.
 
 The eventual UI may combine several semantic signals into user-facing bars or metrics. The chart model is intentionally not fixed yet, and category migration remains independent from saved answer identity.
