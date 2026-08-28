@@ -202,4 +202,15 @@ export const CATALOGUE_V3_PRACTICE_INSIGHTS: readonly PracticeInsightSignals[] =
   { practiceId: 'nipple-stimulation-by-hand', signals: { sensuality: 0.75 } },
   { practiceId: 'perineum-massage', signals: { sensuality: 0.75, 'slow-pace': 0.25 } },
   { practiceId: 'prostate-massage-manual', signals: { sensuality: 0.75, exploration: 0.25 } },
+
+  // Oral sex
+  { practiceId: 'cunnilingus', signals: { sensuality: 0.75, connection: 0.25 } },
+  { practiceId: 'fellatio', signals: { sensuality: 0.75, connection: 0.25 } },
+  { practiceId: 'deep-throat', signals: { sensuality: 0.5, intensity: 0.75, exploration: 0.25 } },
+  { practiceId: 'oral-teasing', signals: { sensuality: 0.75, playfulness: 0.5, 'slow-pace': 0.25 } },
+  { practiceId: 'oral-anal', signals: { sensuality: 0.5, exploration: 0.75 } },
+  { practiceId: 'oral-nipples', signals: { sensuality: 0.75, tenderness: 0.25 } },
+  { practiceId: 'oral-breasts', signals: { sensuality: 0.75, tenderness: 0.25 } },
+  { practiceId: 'oral-fingers', signals: { sensuality: 0.5, playfulness: 0.25 } },
+  { practiceId: 'oral-toes', signals: { sensuality: 0.5, exploration: 0.5 } },
 ] as const;
