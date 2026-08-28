@@ -422,4 +422,18 @@ export const CATALOGUE_V3_PRACTICE_INSIGHTS: readonly PracticeInsightSignals[] =
   { practiceId: 'taking-erotic-photos', signals: { visibility: 0.75, 'aesthetic-presentation': 0.75, playfulness: 0.25 } },
   { practiceId: 'video-call-sex', signals: { visibility: 0.75, reciprocity: 0.5, exploration: 0.5 } },
   { practiceId: 'webcam-performance-private', signals: { visibility: 1, 'aesthetic-presentation': 0.5, playfulness: 0.25 } },
+
+  // Places & settings
+  { practiceId: 'sex-in-shower', signals: { sensuality: 0.75, physicality: 0.25 } },
+  { practiceId: 'sex-in-bath', signals: { sensuality: 0.75, 'slow-pace': 0.25 } },
+  { practiceId: 'sex-in-kitchen', signals: { spontaneity: 0.5, exploration: 0.25 } },
+  { practiceId: 'sex-on-sofa', signals: { sensuality: 0.25, spontaneity: 0.25 } },
+  { practiceId: 'sex-on-floor', signals: { physicality: 0.5, intensity: 0.25, exploration: 0.25 } },
+  { practiceId: 'sex-in-car', signals: { spontaneity: 0.75, exploration: 0.25, intensity: 0.25 } },
+  { practiceId: 'sex-in-hotel', signals: { exploration: 0.5 } },
+  { practiceId: 'sex-outdoors-private', signals: { exploration: 0.75, sensuality: 0.5, spontaneity: 0.25 } },
+  { practiceId: 'semi-public-consensual-scene', signals: { visibility: 1, exploration: 0.75, intensity: 0.5 } },
+  { practiceId: 'sex-club', signals: { 'group-social': 0.75, visibility: 0.75, exploration: 0.75 } },
+  { practiceId: 'dungeon-venue', signals: { 'group-social': 0.5, visibility: 0.5, exploration: 0.75, 'aesthetic-presentation': 0.5, 'role-immersion': 0.25 } },
+  { practiceId: 'glory-hole', signals: { anonymity: 1, visibility: 0.5, exploration: 0.75, intensity: 0.25 } },
 ] as const;
