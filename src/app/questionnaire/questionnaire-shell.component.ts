@@ -70,7 +70,8 @@ import { findRouteParam } from '../shared/route-param';
             @if (currentCategoryProgress(); as categoryProgress) {
               <span
                 class="category-dock-progress"
-                [style.--category-progress]="categoryProgress.completionPercentage"
+                [style.--category-progress]="categoryProgress.completionPercentage + '%'"
+                [style.--category-progress-color]="categoryProgressColor(categoryProgress.completionPercentage)"
                 [attr.aria-label]="i18n.t('questionnaire.category.progressAria', {
                   answered: categoryProgress.answered,
                   total: categoryProgress.total,
@@ -234,6 +235,12 @@ export class QuestionnaireShellComponent {
     return count === 0
       ? this.i18n.t('questionnaire.finish.complete')
       : this.i18n.plural(count, 'questionnaire.finish.remaining.one', 'questionnaire.finish.remaining.other');
+  }
+
+  categoryProgressColor(percentage: number): string {
+    const boundedPercentage = Math.max(0, Math.min(100, percentage));
+    const hue = 345 - (boundedPercentage * 2);
+    return `hsl(${hue} 92% 62%)`;
   }
 
   scrollToTop(): void {
