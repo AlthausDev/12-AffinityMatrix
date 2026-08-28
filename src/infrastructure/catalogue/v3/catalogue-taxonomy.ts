@@ -328,4 +328,17 @@ export const CATALOGUE_V3_SUBCATEGORIES: readonly CatalogueSubcategorySeed[] = [
     'Roleplay adulto inspirado en animales, desde dinámicas afectuosas mascota/guía hasta temas de entrenamiento inmersivo y dinámicas primal guiadas por el instinto.', 4,
     ['pet-play-soft', 'pet-play-intense', 'primal-play'],
   ),
+
+  subcategory(
+    'exhibitionism-watching-visibility', 'exhibitionism', 'Watching & being seen', 'Mirar y ser visto',
+    'Visual exposure inside a consensual intimate setting, from watching each other to deliberately increasing how visible the encounter feels.',
+    'Exposición visual dentro de un contexto íntimo consensuado, desde observarse hasta aumentar deliberadamente cuánto se siente visible el encuentro.', 0,
+    ['voyeurism', 'mirrors', 'lights-on', 'risk-of-being-seen'],
+  ),
+  subcategory(
+    'exhibitionism-image-digital', 'exhibitionism', 'Images, recording & digital distance', 'Imagen, grabación y distancia digital',
+    'Consensual erotic images, recordings and live remote interaction where a camera or screen becomes part of the sexual context.',
+    'Imágenes eróticas consensuadas, grabaciones e interacción remota en directo donde una cámara o pantalla forma parte del contexto sexual.', 1,
+    ['private-recording', 'taking-erotic-photos', 'video-call-sex', 'webcam-performance-private'],
+  ),
 ];
