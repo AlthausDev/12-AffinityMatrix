@@ -68,7 +68,7 @@ describe('catalogue v3 questionnaire taxonomy', () => {
     expect(socialGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(17);
     expect(roleplayGroups).toHaveLength(5);
     expect(roleplayGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(23);
-    expect(exhibitionismGroups).toHaveLength(4);
-    expect(exhibitionismGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(20);
+    expect(exhibitionismGroups).toHaveLength(2);
+    expect(exhibitionismGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(8);
   });
 });
