@@ -4,12 +4,39 @@
   gap: clamp(.85rem, 2vw, 1.5rem);
 }
 
-/* The dock itself owns the edge line. Suppress generated inner lines so
-   top and bottom bars never read as a nested box with a second border. */
+/* The dock itself owns the edge line. Suppress generated inner/outer lines so
+   each bar has exactly one visual boundary: its real CSS border. */
 .questionnaire-dock-inner::before,
-.questionnaire-dock-inner::after {
+.questionnaire-dock-inner::after,
+.questionnaire-top-dock::before,
+.questionnaire-top-dock::after,
+.questionnaire-bottom-dock::before,
+.questionnaire-bottom-dock::after {
   content: none !important;
   display: none !important;
+}
+
+.questionnaire-top-dock,
+.questionnaire-bottom-dock {
+  --questionnaire-dock-edge-gradient: linear-gradient(
+    90deg,
+    rgba(76, 190, 255, .38),
+    rgba(91, 196, 255, .76) 24%,
+    rgba(139, 145, 255, .78) 52%,
+    rgba(209, 106, 255, .76) 78%,
+    rgba(255, 113, 193, .38)
+  );
+  border-style: solid;
+  border-color: transparent;
+  border-image: var(--questionnaire-dock-edge-gradient) 1;
+}
+
+.questionnaire-top-dock {
+  border-width: 0 0 1px;
+}
+
+.questionnaire-bottom-dock {
+  border-width: 1px 0 0;
 }
 
 .category-dock-progress {
@@ -64,9 +91,25 @@
 }
 
 @media (min-width: 721px) {
-  /* The questionnaire frame is the visual lower edge of the top dock. */
-  .questionnaire-top-dock::after {
-    display: none;
+  /* Keep the desktop bars compact and vertically balanced around their controls. */
+  .questionnaire-overlay {
+    --questionnaire-top-space: 4rem;
+  }
+
+  .questionnaire-overlay.category-navigation-active {
+    --questionnaire-bottom-space: 4rem;
+  }
+
+  .questionnaire-top-dock,
+  .questionnaire-bottom-dock {
+    height: 4rem;
+  }
+
+  .questionnaire-top-dock .questionnaire-dock-inner,
+  .questionnaire-bottom-dock .questionnaire-dock-inner {
+    min-height: 4rem;
+    padding-top: .55rem;
+    padding-bottom: .55rem;
   }
 }
 
@@ -100,7 +143,7 @@
     width: max(.5rem, var(--category-progress));
   }
 
-  /* Keep the mobile silhouette, but soften its inner edge so the lower frame line reads as the border. */
+  /* Keep the mobile silhouette, but soften its inner edge so the real dock border reads cleanly. */
   .questionnaire-top-dock .questionnaire-dock-inner {
     background:
       radial-gradient(circle at 14% 0%, rgba(38,185,255,.09), transparent 30%),
