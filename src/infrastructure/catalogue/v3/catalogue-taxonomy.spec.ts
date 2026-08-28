@@ -16,6 +16,7 @@ describe('catalogue v3 questionnaire taxonomy', () => {
       'oral',
       'penetration',
       'sexual-positions',
+      'toys',
     ]);
 
     for (const categoryId of migratedCategoryIds) {
