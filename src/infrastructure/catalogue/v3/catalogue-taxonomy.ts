@@ -314,13 +314,13 @@ export const CATALOGUE_V3_SUBCATEGORIES: readonly CatalogueSubcategorySeed[] = [
     'roleplay-captivity-control-interrogation', 'roleplay', 'Captivity, control & interrogation', 'Cautiverio, control e interrogatorio',
     'Pre-agreed adult scenarios whose fictional tension comes from confinement, capture, guarding, interrogation or a strong directed-control dynamic.',
     'Escenarios adultos previamente acordados cuya tensión ficticia procede del confinamiento, captura, vigilancia, interrogatorio o una dinámica fuerte de control dirigido.', 2,
-    ['prisoner-guard-roleplay', 'captor-captive-roleplay', 'kidnapping-roleplay', 'interrogation-roleplay'],
+    ['prisoner-guard-roleplay', 'captor-captive-roleplay', 'interrogation-roleplay'],
   ),
   subcategory(
     'roleplay-fictional-archetypes', 'roleplay', 'Fictional characters & archetypes', 'Personajes y arquetipos ficticios',
-    'Character-driven scenes centred on fictional identities, heightened archetypes, supernatural personas or ceremonial framing.',
-    'Escenas centradas en identidades ficticias, arquetipos intensificados, personajes sobrenaturales o un marco ceremonial.', 3,
-    ['fantasy-character-roleplay', 'superhero-roleplay', 'vampire-roleplay', 'ritual-roleplay'],
+    'Character-driven scenes centred on heightened archetypes, supernatural personas or ceremonial framing.',
+    'Escenas centradas en arquetipos intensificados, personajes sobrenaturales o un marco ceremonial.', 3,
+    ['superhero-roleplay', 'vampire-roleplay', 'ritual-roleplay'],
   ),
   subcategory(
     'roleplay-pet-primal', 'roleplay', 'Pet & primal roles', 'Roles pet y primal',
