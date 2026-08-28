@@ -4,6 +4,14 @@
   gap: clamp(.85rem, 2vw, 1.5rem);
 }
 
+/* The dock itself owns the edge line. Suppress generated inner lines so
+   top and bottom bars never read as a nested box with a second border. */
+.questionnaire-dock-inner::before,
+.questionnaire-dock-inner::after {
+  content: none !important;
+  display: none !important;
+}
+
 .category-dock-progress {
   --category-progress: 0%;
   --category-progress-color: #ff3f78;
@@ -39,14 +47,19 @@
 }
 
 .category-dock-progress-fill {
+  --category-progress-tone: color-mix(
+    in hsl shorter hue,
+    #ff4058 calc(100% - var(--category-progress)),
+    #32d278 var(--category-progress)
+  );
   display: block;
   width: max(.65rem, var(--category-progress));
   height: 100%;
   border-radius: inherit;
-  background: var(--category-progress-color);
+  background: var(--category-progress-tone);
   box-shadow:
-    0 0 .55rem color-mix(in srgb, var(--category-progress-color) 52%, transparent),
-    0 0 .95rem color-mix(in srgb, var(--category-progress-color) 24%, transparent);
+    0 0 .55rem color-mix(in srgb, var(--category-progress-tone) 52%, transparent),
+    0 0 .95rem color-mix(in srgb, var(--category-progress-tone) 24%, transparent);
   transition: width 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
 }
 
