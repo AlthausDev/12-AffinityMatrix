@@ -24,6 +24,8 @@ export type CatalogueInsightTagId =
   | 'role-immersion'
   | 'reciprocity'
   | 'physicality'
+  | 'physical-restraint'
+  | 'sensory-restriction'
   | 'structure'
   | 'power-exchange'
   | 'service-orientation'
