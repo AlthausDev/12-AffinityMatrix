@@ -16,7 +16,7 @@ These signals are groundwork for a future **orientative** trends/profile view. T
 
 ## Current migration
 
-The first fifteen questionnaire categories are fully organised into subcategories and semantically tagged against the final Catalogue V3 projection:
+The first sixteen questionnaire categories are fully organised into subcategories and semantically tagged against the final Catalogue V3 projection:
 
 - `Afecto e intimidad`
 - `Estilo, ritmo y ambiente sexual`
@@ -33,6 +33,7 @@ The first fifteen questionnaire categories are fully organised into subcategorie
 - `Exhibicionismo, voyeurismo y grabación`
 - `Lugares y entornos`
 - `Dominación, sumisión y disciplina`
+- `Ataduras y restricción`
 
 The shared vocabulary includes emotional and interaction signals such as connection, tenderness, romance, sensuality, intensity, pace, spontaneity and playfulness; broader signals such as exploration, visibility, anonymity, power exchange and group/social context; visual/role-oriented signals such as `aesthetic-presentation` and `role-immersion`; and `reciprocity`, introduced for the manual-stimulation migration to distinguish coordinated or mutually shared participation from emotional connection. Oral sex and penetration reuse the existing vocabulary rather than introducing category-specific signals; giving and receiving are represented by role perspective instead. Penetration additionally demonstrates the distinction between semantic intensity, exploratory complexity and explicit pace without turning anatomical routes into profile dimensions.
 
@@ -53,5 +54,7 @@ The exhibitionism migration keeps the 8 practices in the final Catalogue V3 proj
 The places/settings migration keeps the 12 practices that a prior semantic pass deliberately moved out of exhibitionism. It separates familiar home and everyday spaces; private or secluded settings away from home; and social or dedicated sexual venues. Existing signals such as exploration, spontaneity, sensuality, physicality, visibility, group/social context and anonymity are enough to distinguish these settings, so no location-specific profile axis is introduced. `glory-hole` demonstrates why anonymity remains distinct from visibility, while sex clubs and dungeon venues reuse social, exploratory and presentation/role signals without becoming special-purpose semantic dimensions.
 
 The power migration keeps the 24 practices in the final Catalogue V3 projection after earlier curation retired redundant umbrella entries such as `obedience`, `behavior-control`, `chores-service`, `formal-protocol` and `orgasm-authority`, while `brat-dynamic` had already been moved here from psychological play. The category is organised into authority/control; protocol, training and discipline; service; and ownership/symbolic submission. `power-exchange` remains the central signal, but two reusable signals are added because the final practices expose meaningful distinctions that power alone cannot represent: `structure` for explicit rules, protocol, routines and training frameworks, and `service-orientation` for dynamics where serving, performing duties or deliberately pleasing another person is itself central. Existing signals such as role immersion, playfulness, intensity, physicality, visibility, aesthetic presentation and connection further distinguish particular practices without creating a separate semantic axis for every D/s convention.
+
+The restraint migration keeps the 34 practices in the final Catalogue V3 projection, including `hand-over-mouth`, which a prior semantic pass deliberately moved here from manual stimulation. It separates rope/bondage foundations; cuffs and restraint materials; body positioning and immobilisation; sensory restriction; gags; and furniture/confinement. Two reusable signals are introduced because restraint is not synonymous with dominance: `physical-restraint` describes reduced movement, fixed positioning or confinement, while `sensory-restriction` describes deliberately reduced sight, hearing or sensory access. `power-exchange`, intensity, exploration, physicality, aesthetics, role immersion and other existing signals remain independent, allowing shibari, a blindfold, handcuffs and cage confinement to differ meaningfully instead of collapsing into one BDSM axis. Higher-intensity suspension, predicament, long-duration and vacuum practices remain in Edge rather than being duplicated here.
 
 The eventual UI may combine several semantic signals into user-facing bars or metrics. The chart model is intentionally not fixed yet, and category migration remains independent from saved answer identity.
