@@ -129,9 +129,22 @@ import { findRouteParam } from '../../shared/route-param';
   styles: `
     .questionnaire-page { max-width: 66rem; }
     .category-header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(10rem, 14rem); gap: 2rem; align-items: end; }
-    .category-progress-summary { display: grid; gap: 0.42rem; text-align: right; }
-    .category-progress-summary strong { font-size: 1.55rem; }
-    .category-progress-summary span { font-size: 0.8rem; }
+    .category-progress-summary {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: baseline;
+      gap: 0.28rem 0.7rem;
+      padding: 0.78rem 0.9rem 0.72rem;
+      border: 1px solid color-mix(in srgb, var(--border-strong) 68%, var(--neon-violet));
+      border-radius: 0.78rem;
+      background: linear-gradient(145deg, color-mix(in srgb, var(--surface-panel) 90%, #17346a 10%), color-mix(in srgb, var(--surface-panel) 90%, #492561 10%));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.055);
+      text-align: left;
+      font-variant-numeric: tabular-nums;
+    }
+    .category-progress-summary strong { font-size: 1.75rem; line-height: 1; letter-spacing: -0.035em; }
+    .category-progress-summary span { align-self: center; font-size: 0.78rem; font-weight: 650; letter-spacing: 0.02em; }
+    .category-progress-summary app-completion-progress { grid-column: 1 / -1; margin-top: 0.12rem; }
     .questionnaire-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
     .compact-toggle { min-width: min(100%, 24rem); padding: 0.75rem; }
     .save-state { margin: 0; font-size: 0.85rem; }
@@ -177,8 +190,8 @@ import { findRouteParam } from '../../shared/route-param';
       .questionnaire-page { width: min(100% - 1rem, 66rem); }
       .category-header { grid-template-columns: 1fr; gap: 0.8rem; align-items: stretch; }
       .category-header .lead { font-size: 0.88rem; line-height: 1.5; }
-      .category-progress-summary { grid-template-columns: auto 1fr; align-items: center; gap: 0.35rem 0.7rem; text-align: left; }
-      .category-progress-summary app-completion-progress { grid-column: 1 / -1; }
+      .category-progress-summary { gap: 0.3rem 0.75rem; padding: 0.85rem 0.9rem 0.8rem; }
+      .category-progress-summary strong { font-size: 1.9rem; }
       .questionnaire-toolbar { align-items: stretch; flex-direction: column; gap: 0.55rem; }
       .subcategory-summary { grid-template-columns: minmax(0, 1fr) 7rem; padding: 0.9rem 0.85rem; gap: 0.65rem; }
       .subcategory-summary::after { right: 0.55rem; }

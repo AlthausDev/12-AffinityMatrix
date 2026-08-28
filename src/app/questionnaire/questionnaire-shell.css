@@ -206,16 +206,16 @@
     border-radius: 0;
     clip-path: none;
     background:
-      radial-gradient(circle at 14% 0%, rgba(38,185,255,.15), transparent 28%),
-      radial-gradient(circle at 84% 0%, rgba(211,82,255,.13), transparent 26%),
+      radial-gradient(circle at 14% 0%, rgba(38,185,255,.17), transparent 28%),
+      radial-gradient(circle at 84% 0%, rgba(211,82,255,.15), transparent 26%),
       linear-gradient(
         to bottom,
-        rgba(12,38,82,.94) 0%,
-        rgba(27,39,100,.88) 28%,
-        rgba(58,35,106,.58) 45%,
-        rgba(76,38,111,.26) 60%,
-        rgba(76,38,111,.08) 72%,
-        rgba(76,38,111,.02) 82%,
+        rgba(12,38,82,.97) 0%,
+        rgba(27,39,100,.91) 28%,
+        rgba(58,35,106,.64) 45%,
+        rgba(76,38,111,.32) 60%,
+        rgba(76,38,111,.11) 72%,
+        rgba(76,38,111,.03) 82%,
         transparent 94%
       );
     box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
@@ -229,16 +229,16 @@
     border-radius: 0;
     clip-path: none;
     background:
-      radial-gradient(circle at 14% 100%, rgba(38,185,255,.13), transparent 28%),
-      radial-gradient(circle at 84% 100%, rgba(211,82,255,.15), transparent 26%),
+      radial-gradient(circle at 14% 100%, rgba(38,185,255,.15), transparent 28%),
+      radial-gradient(circle at 84% 100%, rgba(211,82,255,.17), transparent 26%),
       linear-gradient(
         to top,
-        rgba(12,38,82,.94) 0%,
-        rgba(27,39,100,.88) 28%,
-        rgba(58,35,106,.58) 45%,
-        rgba(76,38,111,.26) 60%,
-        rgba(76,38,111,.08) 72%,
-        rgba(76,38,111,.02) 82%,
+        rgba(12,38,82,.97) 0%,
+        rgba(27,39,100,.91) 28%,
+        rgba(58,35,106,.64) 45%,
+        rgba(76,38,111,.32) 60%,
+        rgba(76,38,111,.11) 72%,
+        rgba(76,38,111,.03) 82%,
         transparent 94%
       );
     box-shadow: inset 0 -1px 0 rgba(255,255,255,.06);
@@ -275,19 +275,34 @@
     width: auto;
     transform: none;
   }
-  .questionnaire-top-dock { padding-bottom:1.25rem; }
-  .questionnaire-bottom-dock { padding-top:1.25rem; padding-bottom:env(safe-area-inset-bottom); }
+  .questionnaire-top-dock {
+    padding-bottom:1.25rem;
+    background: linear-gradient(to bottom, rgba(7,16,42,.90), rgba(17,24,69,.78) 38%, rgba(46,27,86,.46) 64%, rgba(61,27,91,.16) 82%, transparent);
+  }
+  .questionnaire-bottom-dock {
+    padding-top:1.25rem;
+    padding-bottom:env(safe-area-inset-bottom);
+    background: linear-gradient(to top, rgba(7,16,42,.90), rgba(17,24,69,.78) 38%, rgba(46,27,86,.46) 64%, rgba(61,27,91,.16) 82%, transparent);
+  }
   .questionnaire-top-dock .questionnaire-dock-inner {
     min-height:3.25rem;
     padding:.52rem .7rem .64rem;
     border-radius:0;
     clip-path:polygon(0 0,100% 0,100% 80%,97% 100%,3% 100%,0 80%);
+    background:
+      radial-gradient(circle at 14% 0%, rgba(38,185,255,.12), transparent 30%),
+      radial-gradient(circle at 84% 100%, rgba(211,82,255,.11), transparent 28%),
+      linear-gradient(105deg, rgba(15,48,91,.85), rgba(34,31,88,.82) 52%, rgba(72,31,91,.80));
   }
   .questionnaire-bottom-dock .questionnaire-dock-inner {
     min-height:3.15rem;
     padding:.48rem .7rem .42rem;
     border-radius:0;
     clip-path:polygon(3% 0,97% 0,100% 20%,100% 100%,0 100%,0 20%);
+    background:
+      radial-gradient(circle at 14% 0%, rgba(38,185,255,.12), transparent 30%),
+      radial-gradient(circle at 84% 100%, rgba(211,82,255,.11), transparent 28%),
+      linear-gradient(105deg, rgba(15,48,91,.85), rgba(34,31,88,.82) 52%, rgba(72,31,91,.80));
   }
   .toolbar-primary { gap:.5rem; }
   .pending-label-full { display:none; }
