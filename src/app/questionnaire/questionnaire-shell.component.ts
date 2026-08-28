@@ -70,6 +70,7 @@ import { findRouteParam } from '../shared/route-param';
             @if (currentCategoryProgress(); as categoryProgress) {
               <span
                 class="category-dock-progress"
+                [style.--category-progress]="categoryProgress.completionPercentage"
                 [attr.aria-label]="i18n.t('questionnaire.category.progressAria', {
                   answered: categoryProgress.answered,
                   total: categoryProgress.total,
@@ -80,10 +81,7 @@ import { findRouteParam } from '../shared/route-param';
                   {{ i18n.t('questionnaire.category.dockProgress', { answered: categoryProgress.answered, total: categoryProgress.total }) }}
                 </span>
                 <span class="category-dock-progress-track" aria-hidden="true">
-                  <span
-                    class="category-dock-progress-fill"
-                    [style.width.%]="categoryProgress.completionPercentage"
-                  ></span>
+                  <span class="category-dock-progress-fill"></span>
                 </span>
               </span>
             }
