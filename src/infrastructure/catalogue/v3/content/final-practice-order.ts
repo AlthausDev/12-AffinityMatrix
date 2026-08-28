@@ -78,6 +78,29 @@ const PENETRATION_FINAL_ORDER = insertAfter(base('penetration'), 'double-anal-pe
   'simultaneous-vaginal-anal-oral-penetration',
 ]);
 
+const SEXUAL_POSITIONS_FINAL_ORDER = [
+  'missionary',
+  'side-by-side-face-to-face',
+  'kneeling-face-to-face',
+  'seated-penetration',
+  'lotus-position',
+  'cowgirl',
+  'reverse-cowgirl',
+  'doggy-style',
+  'prone-rear-entry',
+  'spooning-penetration',
+  'legs-on-shoulders',
+  'butterfly-position',
+  't-position',
+  'standing-penetration',
+  'against-wall',
+  'standing-carry',
+  'wheelbarrow-position',
+  'bridge-position',
+  'sixty-nine',
+  'face-sitting',
+] as const;
+
 const TOYS_FINAL_ORDER = insertAfter(
   without(base('toys'), ['realistic-dildo', 'glass-dildo', 'metal-dildo']),
   'dildo',
@@ -160,6 +183,7 @@ export const FINAL_CATALOGUE_PRACTICE_GROUP_ORDER: Readonly<Record<string, reado
   ...CATALOGUE_PRACTICE_GROUP_ORDER,
   'manual-masturbation': without(base('manual-masturbation'), ['hand-over-mouth']),
   penetration: PENETRATION_FINAL_ORDER,
+  'sexual-positions': SEXUAL_POSITIONS_FINAL_ORDER,
   toys: TOYS_FINAL_ORDER,
   'body-fetishes': BODY_FOCUS_FINAL_ORDER,
   roleplay: ROLEPLAY_FINAL_ORDER,
