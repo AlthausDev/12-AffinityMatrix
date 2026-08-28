@@ -143,12 +143,31 @@
     width: max(.5rem, var(--category-progress));
   }
 
-  /* Keep the mobile silhouette, but soften its inner edge so the real dock border reads cleanly. */
+  /* On mobile the visible bar is the clipped inner surface, while the fixed
+     dock also contains the transparent fade. Put the colored edge on that
+     real silhouette instead of on the outer dock boundary. */
+  .questionnaire-top-dock,
+  .questionnaire-bottom-dock {
+    border: 0;
+    border-image: none;
+  }
+
   .questionnaire-top-dock .questionnaire-dock-inner {
+    border-style: solid;
+    border-color: transparent;
+    border-width: 0 0 1px;
+    border-image: var(--questionnaire-dock-edge-gradient) 1;
     background:
       radial-gradient(circle at 14% 0%, rgba(38,185,255,.09), transparent 30%),
       radial-gradient(circle at 84% 100%, rgba(211,82,255,.08), transparent 28%),
       linear-gradient(105deg, rgba(15,48,91,.72), rgba(34,31,88,.69) 52%, rgba(72,31,91,.67));
+  }
+
+  .questionnaire-bottom-dock .questionnaire-dock-inner {
+    border-style: solid;
+    border-color: transparent;
+    border-width: 1px 0 0;
+    border-image: var(--questionnaire-dock-edge-gradient) 1;
   }
 }
 
