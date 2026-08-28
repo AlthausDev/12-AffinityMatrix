@@ -8,7 +8,7 @@
   display: grid;
   min-width: 0;
   align-content: center;
-  gap: .3rem;
+  gap: .38rem;
   color: color-mix(in srgb, var(--text-secondary) 90%, #edf8ff);
   text-align: center;
   pointer-events: none;
@@ -16,7 +16,7 @@
 
 .category-dock-progress-text {
   overflow: hidden;
-  font-size: .72rem;
+  font-size: .74rem;
   font-weight: 700;
   letter-spacing: .025em;
   line-height: 1.2;
@@ -28,19 +28,20 @@
 .category-dock-progress-track {
   display: block;
   width: 100%;
-  height: .2rem;
+  height: .42rem;
   overflow: hidden;
-  border: 1px solid rgba(113, 167, 240, .18);
-  border-radius: 2px;
-  background: rgba(3, 9, 27, .62);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.38);
+  border: 1px solid rgba(113, 167, 240, .22);
+  border-radius: 999px;
+  background: rgba(3, 9, 27, .72);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.42), 0 0 .45rem rgba(74, 119, 210, .08);
 }
 
 .category-dock-progress-fill {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, rgba(65, 190, 255, .9), rgba(150, 101, 255, .92), rgba(235, 91, 197, .9));
-  box-shadow: 0 0 .55rem rgba(112, 142, 255, .28);
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff5f6d 0%, #ff9948 36%, #ffd166 62%, #78d96b 82%, #34d17b 100%);
+  box-shadow: 0 0 .7rem rgba(255, 122, 88, .26), 0 0 .85rem rgba(68, 210, 124, .18);
   transition: width 160ms ease;
 }
 
@@ -53,7 +54,7 @@
 
   .category-dock-progress {
     position: absolute;
-    top: .08rem;
+    top: .04rem;
     left: 1.25rem;
     right: 1.25rem;
     display: block;
@@ -64,10 +65,10 @@
   }
 
   .category-dock-progress-track {
-    height: 2px;
+    height: 4px;
     border: 0;
-    background: rgba(113, 167, 240, .13);
-    box-shadow: none;
+    background: rgba(5, 11, 30, .72);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.34);
   }
 }
 
