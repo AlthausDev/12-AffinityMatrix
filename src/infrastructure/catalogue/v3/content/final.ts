@@ -19,6 +19,7 @@ import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
 import { applyPatchReleaseCorrections } from './patch-release-corrections';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
+import { addExpandedSexualPositions } from './sexual-position-additions';
 import { CatalogueCategorySeed } from './types';
 
 const ALL_RETIRED_V3_PRACTICE_IDS = [
@@ -59,7 +60,8 @@ const RELEASE_COPY_CONTENT = applyFinalReleaseCopy(RELEASE_TAXONOMY_CONTENT);
 const APPLICABILITY_REVIEWED_CONTENT = applyFinalApplicabilityReview(RELEASE_COPY_CONTENT);
 const FINAL_ROLE_CONTENT = applyFinalRolePolish(APPLICABILITY_REVIEWED_CONTENT);
 const ROLE_ADDED_CONTENT = addFinalRolePractices(FINAL_ROLE_CONTENT);
-const SANITIZED_CONTENT = sanitizeFinalCatalogueSeeds(ROLE_ADDED_CONTENT);
+const POSITION_EXPANDED_CONTENT = addExpandedSexualPositions(ROLE_ADDED_CONTENT);
+const SANITIZED_CONTENT = sanitizeFinalCatalogueSeeds(POSITION_EXPANDED_CONTENT);
 const PATCH_CORRECTED_CONTENT = applyPatchReleaseCorrections(SANITIZED_CONTENT);
 const GROUPED_CONTENT = groupFinalCataloguePractices(PATCH_CORRECTED_CONTENT);
 const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(GROUPED_CONTENT);
