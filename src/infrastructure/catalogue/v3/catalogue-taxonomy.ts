@@ -341,16 +341,4 @@ export const CATALOGUE_V3_SUBCATEGORIES: readonly CatalogueSubcategorySeed[] = [
     'Imágenes eróticas consensuadas, grabaciones e interacción remota en directo donde una cámara o pantalla forma parte del contexto sexual.', 1,
     ['private-recording', 'taking-erotic-photos', 'video-call-sex', 'webcam-performance-private'],
   ),
-  subcategory(
-    'exhibitionism-private-places', 'exhibitionism', 'Private places & changes of setting', 'Lugares privados y cambio de ambiente',
-    'Changing the physical setting while keeping the encounter fundamentally private, from domestic spaces to hotels, cars or secluded outdoors.',
-    'Cambiar el escenario físico manteniendo el encuentro esencialmente privado, desde espacios domésticos hasta hoteles, coches o exteriores apartados.', 2,
-    ['sex-in-car', 'sex-in-shower', 'sex-in-bath', 'sex-in-kitchen', 'sex-on-sofa', 'sex-on-floor', 'sex-in-hotel', 'sex-outdoors-private'],
-  ),
-  subcategory(
-    'exhibitionism-controlled-social-venues', 'exhibitionism', 'Controlled exposure & sexual venues', 'Exposición controlada y locales sexuales',
-    'Settings where social visibility, controlled public-like exposure or a dedicated sexual venue is central to the experience.',
-    'Entornos donde la visibilidad social, una exposición controlada con apariencia pública o un local sexual específico son parte central de la experiencia.', 3,
-    ['semi-public-consensual-scene', 'sex-club', 'dungeon-venue', 'glory-hole'],
-  ),
 ];
