@@ -153,19 +153,29 @@ describe('catalogue v3 snapshot', () => {
 
     expect(positionIds).toEqual([
       'missionary',
-      'legs-on-shoulders',
+      'side-by-side-face-to-face',
+      'kneeling-face-to-face',
+      'seated-penetration',
+      'lotus-position',
       'cowgirl',
       'reverse-cowgirl',
       'doggy-style',
+      'prone-rear-entry',
       'spooning-penetration',
-      'seated-penetration',
-      'lotus-position',
+      'legs-on-shoulders',
+      'butterfly-position',
+      't-position',
       'standing-penetration',
       'against-wall',
+      'standing-carry',
+      'wheelbarrow-position',
+      'bridge-position',
       'sixty-nine',
       'face-sitting',
     ]);
     expect(snapshotPractice('missionary')?.categoryId).toBe('sexual-positions');
+    expect(snapshotPractice('side-by-side-face-to-face')?.categoryId).toBe('sexual-positions');
+    expect(snapshotPractice('wheelbarrow-position')?.categoryId).toBe('sexual-positions');
     expect(snapshotPractice('sixty-nine')?.categoryId).toBe('sexual-positions');
     expect(snapshotPractice('vaginal-penetration')?.categoryId).toBe('penetration');
   });
