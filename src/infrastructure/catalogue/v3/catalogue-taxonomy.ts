@@ -360,4 +360,29 @@ export const CATALOGUE_V3_SUBCATEGORIES: readonly CatalogueSubcategorySeed[] = [
     'Entornos donde la visibilidad social controlada, un local sexual específico o una menor identificación personal forman parte de la experiencia.', 2,
     ['semi-public-consensual-scene', 'sex-club', 'dungeon-venue', 'glory-hole'],
   ),
+
+  subcategory(
+    'power-authority-control', 'power', 'Authority & control', 'Autoridad y control',
+    'Core dominance/submission authority expressed through commands, rules, permissions and directed control over choices or behaviour.',
+    'Autoridad básica de dominación/sumisión expresada mediante órdenes, reglas, permisos y control dirigido sobre decisiones o comportamiento.', 0,
+    ['domination', 'commands', 'rules', 'permission-dynamic', 'clothing-control', 'speech-control', 'position-control', 'financial-control-roleplay', 'brat-dynamic'],
+  ),
+  subcategory(
+    'power-protocol-training-discipline', 'power', 'Protocol, training & discipline', 'Protocolo, entrenamiento y disciplina',
+    'Structured hierarchy expressed through protocol, titles, training, correction or reward, formal postures and inspection.',
+    'Jerarquía estructurada expresada mediante protocolo, títulos, entrenamiento, corrección o recompensa, posturas formales e inspección.', 1,
+    ['protocol', 'addressing-with-titles', 'training', 'discipline', 'punishment', 'reward-system', 'kneeling', 'standing-at-attention', 'inspection'],
+  ),
+  subcategory(
+    'power-service', 'power', 'Service dynamics', 'Dinámicas de servicio',
+    'General, sexual and domestic service where doing things for another person is itself a meaningful part of the power dynamic.',
+    'Servicio general, sexual y doméstico donde hacer cosas para otra persona constituye en sí mismo una parte significativa de la dinámica de poder.', 2,
+    ['service', 'sexual-service', 'domestic-service'],
+  ),
+  subcategory(
+    'power-ownership-symbols', 'power', 'Ownership & symbolic submission', 'Pertenencia y sumisión simbólica',
+    'Consensual ownership-style dynamics and symbols such as collaring or leash control that make an ongoing power role explicit.',
+    'Dinámicas consensuadas de pertenencia y símbolos como el collaring o el control con correa que hacen explícito un rol continuado de poder.', 3,
+    ['ownership', 'collaring', 'leash-control'],
+  ),
 ];

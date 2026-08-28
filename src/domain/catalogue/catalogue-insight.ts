@@ -24,7 +24,9 @@ export type CatalogueInsightTagId =
   | 'role-immersion'
   | 'reciprocity'
   | 'physicality'
+  | 'structure'
   | 'power-exchange'
+  | 'service-orientation'
   | 'group-social';
 
 export type CatalogueInsightStrength = 0.25 | 0.5 | 0.75 | 1;

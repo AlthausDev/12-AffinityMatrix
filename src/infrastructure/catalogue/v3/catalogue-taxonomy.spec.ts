@@ -23,6 +23,7 @@ describe('catalogue v3 questionnaire taxonomy', () => {
       'roleplay',
       'exhibitionism',
       'places-settings',
+      'power',
     ]);
 
     for (const categoryId of migratedCategoryIds) {
@@ -61,6 +62,7 @@ describe('catalogue v3 questionnaire taxonomy', () => {
     const roleplayGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'roleplay');
     const exhibitionismGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'exhibitionism');
     const placeGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'places-settings');
+    const powerGroups = CATALOGUE_V3_SUBCATEGORIES.filter((entry) => entry.categoryId === 'power');
 
     expect(orgasmGroups).toHaveLength(3);
     expect(orgasmGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(11);
@@ -74,5 +76,7 @@ describe('catalogue v3 questionnaire taxonomy', () => {
     expect(exhibitionismGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(8);
     expect(placeGroups).toHaveLength(3);
     expect(placeGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(12);
+    expect(powerGroups).toHaveLength(4);
+    expect(powerGroups.flatMap((entry) => entry.practiceIds)).toHaveLength(24);
   });
 });
