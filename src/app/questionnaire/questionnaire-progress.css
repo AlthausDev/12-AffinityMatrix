@@ -7,11 +7,6 @@
 .category-dock-progress {
   --category-progress: 0%;
   --category-progress-color: #ff3f78;
-  --category-progress-visual-color: color-mix(
-    in hsl shorter hue,
-    #ff3b50 calc(100% - var(--category-progress)),
-    #35d97a var(--category-progress)
-  );
   display: grid;
   min-width: 0;
   align-content: center;
@@ -48,59 +43,17 @@
   width: max(.65rem, var(--category-progress));
   height: 100%;
   border-radius: inherit;
-  background: var(--category-progress-visual-color);
+  background: var(--category-progress-color);
   box-shadow:
-    0 0 .55rem color-mix(in srgb, var(--category-progress-visual-color) 52%, transparent),
-    0 0 .95rem color-mix(in srgb, var(--category-progress-visual-color) 24%, transparent);
+    0 0 .55rem color-mix(in srgb, var(--category-progress-color) 52%, transparent),
+    0 0 .95rem color-mix(in srgb, var(--category-progress-color) 24%, transparent);
   transition: width 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
 }
 
 @media (min-width: 721px) {
-  /* The dock itself is the visual surface; the inner toolbar only lays out controls. */
-  .questionnaire-top-dock {
-    background:
-      radial-gradient(circle at 14% 0%, rgba(38,185,255,.17), transparent 28%),
-      radial-gradient(circle at 84% 0%, rgba(211,82,255,.15), transparent 26%),
-      linear-gradient(
-        to bottom,
-        rgba(12,38,82,.97) 0%,
-        rgba(27,39,100,.91) 28%,
-        rgba(58,35,106,.64) 45%,
-        rgba(76,38,111,.32) 60%,
-        rgba(76,38,111,.11) 72%,
-        rgba(76,38,111,.03) 82%,
-        transparent 94%
-      );
-  }
-
-  .questionnaire-bottom-dock {
-    background:
-      radial-gradient(circle at 14% 100%, rgba(38,185,255,.15), transparent 28%),
-      radial-gradient(circle at 84% 100%, rgba(211,82,255,.17), transparent 26%),
-      linear-gradient(
-        to top,
-        rgba(12,38,82,.97) 0%,
-        rgba(27,39,100,.91) 28%,
-        rgba(58,35,106,.64) 45%,
-        rgba(76,38,111,.32) 60%,
-        rgba(76,38,111,.11) 72%,
-        rgba(76,38,111,.03) 82%,
-        transparent 94%
-      );
-  }
-
-  .questionnaire-top-dock .questionnaire-dock-inner,
-  .questionnaire-bottom-dock .questionnaire-dock-inner {
-    background: transparent;
-  }
-
-  .questionnaire-top-dock::after,
-  .questionnaire-bottom-dock::after {
-    display: block;
-    left: 0;
-    right: 0;
-    width: auto;
-    transform: none;
+  /* The questionnaire frame is the visual lower edge of the top dock. */
+  .questionnaire-top-dock::after {
+    display: none;
   }
 }
 
@@ -134,69 +87,13 @@
     width: max(.5rem, var(--category-progress));
   }
 
-  /* Keep the same content layout, but let the outer dock own the shape and final edge. */
-  .questionnaire-top-dock {
-    height: var(--questionnaire-top-space);
-    box-sizing: border-box;
-    clip-path: polygon(0 0, 100% 0, 100% 80%, 97% 100%, 3% 100%, 0 80%);
+  /* Keep the mobile silhouette, but soften its inner edge so the lower frame line reads as the border. */
+  .questionnaire-top-dock .questionnaire-dock-inner {
     background:
-      radial-gradient(circle at 14% 0%, rgba(38,185,255,.11), transparent 30%),
-      radial-gradient(circle at 84% 20%, rgba(211,82,255,.10), transparent 28%),
-      linear-gradient(
-        to bottom,
-        rgba(15,48,91,.86) 0%,
-        rgba(34,31,88,.77) 42%,
-        rgba(72,31,91,.42) 68%,
-        rgba(61,27,91,.14) 84%,
-        transparent 100%
-      );
+      radial-gradient(circle at 14% 0%, rgba(38,185,255,.09), transparent 30%),
+      radial-gradient(circle at 84% 100%, rgba(211,82,255,.08), transparent 28%),
+      linear-gradient(105deg, rgba(15,48,91,.72), rgba(34,31,88,.69) 52%, rgba(72,31,91,.67));
   }
-
-  .questionnaire-bottom-dock {
-    height: calc(var(--questionnaire-bottom-space) + env(safe-area-inset-bottom));
-    box-sizing: border-box;
-    clip-path: polygon(3% 0, 97% 0, 100% 20%, 100% 100%, 0 100%, 0 20%);
-    background:
-      radial-gradient(circle at 14% 100%, rgba(38,185,255,.11), transparent 30%),
-      radial-gradient(circle at 84% 80%, rgba(211,82,255,.10), transparent 28%),
-      linear-gradient(
-        to top,
-        rgba(15,48,91,.86) 0%,
-        rgba(34,31,88,.77) 42%,
-        rgba(72,31,91,.42) 68%,
-        rgba(61,27,91,.14) 84%,
-        transparent 100%
-      );
-  }
-
-  .questionnaire-top-dock .questionnaire-dock-inner,
-  .questionnaire-bottom-dock .questionnaire-dock-inner {
-    clip-path: none;
-    background: transparent;
-  }
-
-  .questionnaire-top-dock::after,
-  .questionnaire-bottom-dock::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    z-index: 3;
-    display: block;
-    width: auto;
-    height: 1px;
-    pointer-events: none;
-    background: linear-gradient(90deg,
-      rgba(76,190,255,.12),
-      rgba(91,196,255,.46) 24%,
-      rgba(139,145,255,.48) 52%,
-      rgba(209,106,255,.44) 78%,
-      rgba(255,113,193,.12));
-    box-shadow: 0 0 .4rem rgba(116,153,255,.12);
-  }
-
-  .questionnaire-top-dock::after { bottom: 0; }
-  .questionnaire-bottom-dock::after { top: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
