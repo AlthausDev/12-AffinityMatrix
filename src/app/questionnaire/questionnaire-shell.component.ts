@@ -67,6 +67,27 @@ import { findRouteParam } from '../shared/route-param';
               }
             </span>
 
+            @if (currentCategoryProgress(); as categoryProgress) {
+              <span
+                class="category-dock-progress"
+                [attr.aria-label]="i18n.t('questionnaire.category.progressAria', {
+                  answered: categoryProgress.answered,
+                  total: categoryProgress.total,
+                  percentage: categoryProgress.completionPercentage
+                })"
+              >
+                <span class="category-dock-progress-text">
+                  {{ i18n.t('questionnaire.category.dockProgress', { answered: categoryProgress.answered, total: categoryProgress.total }) }}
+                </span>
+                <span class="category-dock-progress-track" aria-hidden="true">
+                  <span
+                    class="category-dock-progress-fill"
+                    [style.width.%]="categoryProgress.completionPercentage"
+                  ></span>
+                </span>
+              </span>
+            }
+
             <span class="sequence-slot sequence-slot-next">
               @if (neighbours().nextCategoryId; as nextId) {
                 <a
@@ -111,7 +132,7 @@ import { findRouteParam } from '../shared/route-param';
       </div>
     }
   `,
-  styleUrl: './questionnaire-shell.css',
+  styleUrls: ['./questionnaire-shell.css', './questionnaire-progress.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuestionnaireShellComponent {
@@ -141,6 +162,14 @@ export class QuestionnaireShellComponent {
     return snapshot && categoryId
       ? this.questionnaireService.getNeighbours(snapshot, categoryId, this.hiddenCategoryIds())
       : {};
+  });
+  readonly currentCategoryProgress = computed(() => {
+    const profile = this.profile();
+    const snapshot = this.catalogueStore.snapshot();
+    const categoryId = this.currentCategoryId();
+    return profile && snapshot && categoryId
+      ? this.questionnaireService.getCategory(snapshot, profile, categoryId, this.includeFiltered())
+      : undefined;
   });
   readonly pendingCount = computed(() => {
     const profile = this.profile();
