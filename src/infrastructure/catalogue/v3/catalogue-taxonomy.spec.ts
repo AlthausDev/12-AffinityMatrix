@@ -12,6 +12,7 @@ describe('catalogue v3 questionnaire taxonomy', () => {
       'affection-intimacy',
       'sexual-style',
       'clothing-appearance',
+      'manual-masturbation',
     ]);
 
     for (const categoryId of migratedCategoryIds) {

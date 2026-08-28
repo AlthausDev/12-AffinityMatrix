@@ -100,6 +100,13 @@ export const CATALOGUE_INSIGHT_TAGS: readonly CatalogueInsightTagDefinition[] = 
     descriptionEs: 'Apariencia, comportamiento o marco utilizados para encarnar una personalidad, arquetipo o rol imaginado.',
   },
   {
+    id: 'reciprocity',
+    en: 'Reciprocity',
+    es: 'Reciprocidad',
+    descriptionEn: 'Practices where reciprocal participation, coordinated giving and receiving or actively sharing the same interaction is central.',
+    descriptionEs: 'Prácticas donde la participación recíproca, coordinar dar y recibir o compartir activamente la misma interacción es central.',
+  },
+  {
     id: 'power-exchange',
     en: 'Power exchange',
     es: 'Intercambio de poder',
@@ -176,4 +183,23 @@ export const CATALOGUE_V3_PRACTICE_INSIGHTS: readonly PracticeInsightSignals[] =
   { practiceId: 'cosplay', signals: { 'aesthetic-presentation': 1, 'role-immersion': 1, playfulness: 0.75, exploration: 0.5 } },
   { practiceId: 'cross-dressing', signals: { 'aesthetic-presentation': 0.75, 'role-immersion': 0.25, exploration: 0.75 } },
   { practiceId: 'body-paint', signals: { 'aesthetic-presentation': 1, visibility: 0.75, exploration: 0.75, playfulness: 0.25, sensuality: 0.5 } },
+
+  // Manual stimulation & masturbation
+  { practiceId: 'solo-masturbation', signals: { sensuality: 0.5 } },
+  { practiceId: 'hands-free-masturbation', signals: { sensuality: 0.5, exploration: 0.75 } },
+  { practiceId: 'masturbating-together', signals: { reciprocity: 1, connection: 0.5, visibility: 0.5, sensuality: 0.5 } },
+  { practiceId: 'watch-partner-masturbate', signals: { visibility: 1, sensuality: 0.5, connection: 0.25 } },
+  { practiceId: 'guided-touch', signals: { reciprocity: 0.75, connection: 0.5, sensuality: 0.75 } },
+  { practiceId: 'touching-over-clothes', signals: { sensuality: 0.5, playfulness: 0.25 } },
+  { practiceId: 'touching-under-clothes', signals: { sensuality: 0.75, playfulness: 0.25 } },
+  { practiceId: 'mutual-handjobs', signals: { reciprocity: 1, sensuality: 0.75, connection: 0.25 } },
+  { practiceId: 'handjob', signals: { sensuality: 0.5 } },
+  { practiceId: 'vulva-hand-stimulation', signals: { sensuality: 0.5 } },
+  { practiceId: 'clitoral-stimulation', signals: { sensuality: 0.75 } },
+  { practiceId: 'fingering-vaginal', signals: { sensuality: 0.75 } },
+  { practiceId: 'fingering-anal', signals: { sensuality: 0.5, exploration: 0.25 } },
+  { practiceId: 'breast-stimulation-by-hand', signals: { sensuality: 0.75 } },
+  { practiceId: 'nipple-stimulation-by-hand', signals: { sensuality: 0.75 } },
+  { practiceId: 'perineum-massage', signals: { sensuality: 0.75, 'slow-pace': 0.25 } },
+  { practiceId: 'prostate-massage-manual', signals: { sensuality: 0.75, exploration: 0.25 } },
 ] as const;
