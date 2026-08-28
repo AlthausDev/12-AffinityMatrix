@@ -272,4 +272,29 @@ export const CATALOGUE_V3_SUBCATEGORIES: readonly CatalogueSubcategorySeed[] = [
     'Atracción por tatuajes y piercings, incluida su colocación en el rostro, cuerpo, pezones o genitales.', 6,
     ['tattoos', 'piercings', 'facial-piercings', 'body-piercings', 'nipple-piercings', 'genital-piercings'],
   ),
+
+  subcategory(
+    'groups-trios-small', 'groups', 'Threesomes & small groups', 'Tríos y grupos pequeños',
+    'Three- and four-person configurations, including a couple inviting one additional participant.',
+    'Configuraciones de tres o cuatro personas, incluida una pareja que incorpora a una persona invitada.', 0,
+    ['couple-plus-guest', 'threesome-mmf', 'threesome-mff', 'threesome-mmm', 'threesome-fff', 'foursome'],
+  ),
+  subcategory(
+    'groups-larger-scenes', 'groups', 'Larger group scenes', 'Escenas de grupo amplias',
+    'Sexual scenes involving a broader group, a concentrated many-to-one dynamic or consensual anonymity.',
+    'Escenas sexuales con un grupo más amplio, una dinámica concentrada de varias personas con una o anonimato consensuado.', 1,
+    ['group-sex', 'gangbang', 'anonymous-group-scene'],
+  ),
+  subcategory(
+    'groups-swinging-exchange', 'groups', 'Swinging & partner exchange', 'Swinging e intercambio de parejas',
+    'Couple-based non-monogamous formats ranging from sharing a room to soft or full partner exchange.',
+    'Formatos no monógamos centrados en parejas, desde compartir habitación hasta el intercambio suave o completo.', 2,
+    ['swinging', 'soft-swap', 'full-swap', 'same-room-sex'],
+  ),
+  subcategory(
+    'groups-watching-relationship-dynamics', 'groups', 'Watching & third-person relationship dynamics', 'Observación y dinámicas de pareja con terceros',
+    'Consensual dynamics where seeing a partner with someone else, or the relationship framing around that experience, is central.',
+    'Dinámicas consensuadas donde ver a la pareja con otra persona, o el marco relacional alrededor de esa experiencia, es central.', 3,
+    ['watching-partner-with-other', 'hotwife-dynamic', 'cuckold-dynamic', 'cuckquean-dynamic'],
+  ),
 ];

@@ -361,4 +361,23 @@ export const CATALOGUE_V3_PRACTICE_INSIGHTS: readonly PracticeInsightSignals[] =
   { practiceId: 'body-piercings', signals: { 'aesthetic-presentation': 0.75, exploration: 0.5 } },
   { practiceId: 'nipple-piercings', signals: { 'aesthetic-presentation': 0.75, sensuality: 0.5, exploration: 0.5 } },
   { practiceId: 'genital-piercings', signals: { 'aesthetic-presentation': 0.75, sensuality: 0.5, exploration: 0.75 } },
+
+  // Partners, groups & composition
+  { practiceId: 'couple-plus-guest', signals: { 'group-social': 1, exploration: 0.75, reciprocity: 0.5 } },
+  { practiceId: 'threesome-mmf', signals: { 'group-social': 1, exploration: 0.75, reciprocity: 0.5 } },
+  { practiceId: 'threesome-mff', signals: { 'group-social': 1, exploration: 0.75, reciprocity: 0.5 } },
+  { practiceId: 'threesome-mmm', signals: { 'group-social': 1, exploration: 0.75, reciprocity: 0.5 } },
+  { practiceId: 'threesome-fff', signals: { 'group-social': 1, exploration: 0.75, reciprocity: 0.5 } },
+  { practiceId: 'foursome', signals: { 'group-social': 1, exploration: 0.75, reciprocity: 0.75 } },
+  { practiceId: 'group-sex', signals: { 'group-social': 1, exploration: 0.75, intensity: 0.5, reciprocity: 0.5 } },
+  { practiceId: 'gangbang', signals: { 'group-social': 1, exploration: 0.75, intensity: 1 } },
+  { practiceId: 'anonymous-group-scene', signals: { 'group-social': 1, exploration: 1, visibility: 0.25 } },
+  { practiceId: 'swinging', signals: { 'group-social': 1, exploration: 0.75, reciprocity: 0.75 } },
+  { practiceId: 'soft-swap', signals: { 'group-social': 0.75, exploration: 0.5, reciprocity: 0.75 } },
+  { practiceId: 'full-swap', signals: { 'group-social': 1, exploration: 0.75, reciprocity: 0.75 } },
+  { practiceId: 'same-room-sex', signals: { 'group-social': 0.75, visibility: 0.75, reciprocity: 0.5 } },
+  { practiceId: 'watching-partner-with-other', signals: { 'group-social': 0.5, visibility: 1, exploration: 0.5 } },
+  { practiceId: 'hotwife-dynamic', signals: { 'group-social': 0.75, exploration: 0.75, visibility: 0.5 } },
+  { practiceId: 'cuckold-dynamic', signals: { 'group-social': 0.75, exploration: 0.75, visibility: 0.75 } },
+  { practiceId: 'cuckquean-dynamic', signals: { 'group-social': 0.75, exploration: 0.75, visibility: 0.75 } },
 ] as const;
