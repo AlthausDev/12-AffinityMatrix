@@ -328,4 +328,29 @@ export const CATALOGUE_V3_SUBCATEGORIES: readonly CatalogueSubcategorySeed[] = [
     'Roleplay adulto inspirado en animales, desde dinámicas afectuosas mascota/guía hasta temas de entrenamiento inmersivo y dinámicas primal guiadas por el instinto.', 4,
     ['pet-play-soft', 'pet-play-intense', 'primal-play'],
   ),
+
+  subcategory(
+    'exhibitionism-watching-visibility', 'exhibitionism', 'Watching & being seen', 'Mirar y ser visto',
+    'Visual exposure inside a consensual intimate setting, from watching each other to deliberately increasing how visible the encounter feels.',
+    'Exposición visual dentro de un contexto íntimo consensuado, desde observarse hasta aumentar deliberadamente cuánto se siente visible el encuentro.', 0,
+    ['voyeurism', 'mirrors', 'lights-on', 'risk-of-being-seen'],
+  ),
+  subcategory(
+    'exhibitionism-image-digital', 'exhibitionism', 'Images, recording & digital distance', 'Imagen, grabación y distancia digital',
+    'Consensual erotic images, recordings and live remote interaction where a camera or screen becomes part of the sexual context.',
+    'Imágenes eróticas consensuadas, grabaciones e interacción remota en directo donde una cámara o pantalla forma parte del contexto sexual.', 1,
+    ['private-recording', 'taking-erotic-photos', 'video-call-sex', 'webcam-performance-private'],
+  ),
+  subcategory(
+    'exhibitionism-private-places', 'exhibitionism', 'Private places & changes of setting', 'Lugares privados y cambio de ambiente',
+    'Changing the physical setting while keeping the encounter fundamentally private, from domestic spaces to hotels, cars or secluded outdoors.',
+    'Cambiar el escenario físico manteniendo el encuentro esencialmente privado, desde espacios domésticos hasta hoteles, coches o exteriores apartados.', 2,
+    ['sex-in-car', 'sex-in-shower', 'sex-in-bath', 'sex-in-kitchen', 'sex-on-sofa', 'sex-on-floor', 'sex-in-hotel', 'sex-outdoors-private'],
+  ),
+  subcategory(
+    'exhibitionism-controlled-social-venues', 'exhibitionism', 'Controlled exposure & sexual venues', 'Exposición controlada y locales sexuales',
+    'Settings where social visibility, controlled public-like exposure or a dedicated sexual venue is central to the experience.',
+    'Entornos donde la visibilidad social, una exposición controlada con apariencia pública o un local sexual específico son parte central de la experiencia.', 3,
+    ['semi-public-consensual-scene', 'sex-club', 'dungeon-venue', 'glory-hole'],
+  ),
 ];
