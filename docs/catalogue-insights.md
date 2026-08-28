@@ -12,9 +12,16 @@ These signals are groundwork for a future **orientative** trends/profile view. T
 - Signal strength describes how strongly a practice represents a trait, not how the user feels about it.
 - A negative answer must not automatically imply preference for an opposite trait.
 - Future scoring should combine preference, coverage/confidence, semantic signals and role perspective explicitly.
+- Semantic tags should be reusable across categories rather than mirror one questionnaire group or one specific practice.
 
-## Current pilot
+## Current migration
 
-`Afecto e intimidad` is fully tagged as the first migrated category. The vocabulary already includes signals that will become useful as later categories are migrated, such as exploration, visibility, power exchange and group/social context.
+The first three questionnaire categories are fully organised into subcategories and semantically tagged against the final Catalogue V3 projection:
 
-The eventual UI may combine several semantic signals into user-facing bars or metrics. The chart model is intentionally not fixed yet.
+- `Afecto e intimidad`
+- `Estilo, ritmo y ambiente sexual`
+- `Ropa, apariencia y lencería`
+
+The shared vocabulary includes emotional and interaction signals such as connection, tenderness, romance, sensuality, intensity, pace, spontaneity and playfulness; broader signals such as exploration, visibility, power exchange and group/social context; and visual/role-oriented signals introduced for the clothing migration: `aesthetic-presentation` and `role-immersion`.
+
+The eventual UI may combine several semantic signals into user-facing bars or metrics. The chart model is intentionally not fixed yet, and category migration remains independent from saved answer identity.
