@@ -297,4 +297,35 @@ export const CATALOGUE_V3_SUBCATEGORIES: readonly CatalogueSubcategorySeed[] = [
     'Dinámicas consensuadas donde ver a la pareja con otra persona, o el marco relacional alrededor de esa experiencia, es central.', 3,
     ['watching-partner-with-other', 'hotwife-dynamic', 'cuckold-dynamic', 'cuckquean-dynamic'],
   ),
+
+  subcategory(
+    'roleplay-everyday-encounters', 'roleplay', 'Everyday encounters & situations', 'Encuentros y situaciones cotidianas',
+    'Roleplay built around plausible adult encounters, familiar places or ordinary social situations rather than a strong authority hierarchy.',
+    'Roleplay basado en encuentros adultos plausibles, lugares familiares o situaciones sociales cotidianas, sin que una jerarquía fuerte sea el elemento central.', 0,
+    ['roleplay-general', 'strangers-roleplay', 'first-date-roleplay', 'massage-roleplay', 'delivery-person-roleplay', 'hotel-roleplay', 'office-roleplay'],
+  ),
+  subcategory(
+    'roleplay-professions-status-authority', 'roleplay', 'Professions, status & authority', 'Profesiones, estatus y autoridad',
+    'Adult occupational or status-based roles where profession, rank, social standing or an authority contrast defines the scene.',
+    'Roles adultos basados en profesiones o estatus donde el oficio, rango, posición social o contraste de autoridad define la escena.', 1,
+    ['boss-employee-roleplay', 'teacher-student-adult-roleplay', 'medical-professional-patient-roleplay', 'doctor-nurse-roleplay', 'police-roleplay', 'royalty-servant-roleplay', 'celebrity-fan-roleplay'],
+  ),
+  subcategory(
+    'roleplay-captivity-control-interrogation', 'roleplay', 'Captivity, control & interrogation', 'Cautiverio, control e interrogatorio',
+    'Pre-agreed adult scenarios whose fictional tension comes from confinement, capture, guarding, interrogation or a strong directed-control dynamic.',
+    'Escenarios adultos previamente acordados cuya tensión ficticia procede del confinamiento, captura, vigilancia, interrogatorio o una dinámica fuerte de control dirigido.', 2,
+    ['prisoner-guard-roleplay', 'captor-captive-roleplay', 'kidnapping-roleplay', 'interrogation-roleplay'],
+  ),
+  subcategory(
+    'roleplay-fictional-archetypes', 'roleplay', 'Fictional characters & archetypes', 'Personajes y arquetipos ficticios',
+    'Character-driven scenes centred on fictional identities, heightened archetypes, supernatural personas or ceremonial framing.',
+    'Escenas centradas en identidades ficticias, arquetipos intensificados, personajes sobrenaturales o un marco ceremonial.', 3,
+    ['fantasy-character-roleplay', 'superhero-roleplay', 'vampire-roleplay', 'ritual-roleplay'],
+  ),
+  subcategory(
+    'roleplay-pet-primal', 'roleplay', 'Pet & primal roles', 'Roles pet y primal',
+    'Animal-inspired adult roleplay ranging from affectionate pet/handler play to immersive training themes and instinct-driven primal dynamics.',
+    'Roleplay adulto inspirado en animales, desde dinámicas afectuosas mascota/guía hasta temas de entrenamiento inmersivo y dinámicas primal guiadas por el instinto.', 4,
+    ['pet-play-soft', 'pet-play-intense', 'primal-play'],
+  ),
 ];
