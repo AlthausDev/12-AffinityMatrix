@@ -171,13 +171,13 @@
 
 @media (min-width:721px) {
   .questionnaire-overlay {
-    --questionnaire-top-space: 4.15rem;
+    --questionnaire-top-space: 3.65rem;
     --questionnaire-content-max-width: 76rem;
     --questionnaire-dock-inline-padding: max(1rem, calc((100vw - var(--questionnaire-content-max-width)) / 2 + 1rem));
     scrollbar-gutter: stable;
   }
 
-  .questionnaire-overlay.category-navigation-active { --questionnaire-bottom-space: 4rem; }
+  .questionnaire-overlay.category-navigation-active { --questionnaire-bottom-space: 3.55rem; }
 
   .questionnaire-top-dock,
   .questionnaire-bottom-dock {
@@ -190,54 +190,58 @@
   }
 
   .questionnaire-top-dock {
-    height: 5.6rem;
+    height: 4.55rem;
     padding-bottom: 0;
   }
 
   .questionnaire-bottom-dock {
-    height: 5.4rem;
+    height: 4.4rem;
     padding-top: 0;
   }
 
   .questionnaire-top-dock .questionnaire-dock-inner {
-    min-height: 5.6rem;
-    padding: .52rem var(--questionnaire-dock-inline-padding) 2rem;
+    min-height: 4.55rem;
+    padding: .42rem var(--questionnaire-dock-inline-padding) 1.35rem;
     border: 0;
-    clip-path: polygon(0 0, 100% 0, 100% 72%, 98% 88%, 98% 100%, 2% 100%, 2% 88%, 0 72%);
+    border-radius: 0;
+    clip-path: none;
     background:
-      radial-gradient(circle at 14% 0%, rgba(38,185,255,.18), transparent 30%),
-      radial-gradient(circle at 84% 0%, rgba(211,82,255,.16), transparent 28%),
+      radial-gradient(circle at 14% 0%, rgba(38,185,255,.15), transparent 28%),
+      radial-gradient(circle at 84% 0%, rgba(211,82,255,.13), transparent 26%),
       linear-gradient(
         to bottom,
-        rgba(12,38,82,.97) 0%,
-        rgba(27,39,100,.92) 38%,
-        rgba(58,35,106,.70) 58%,
-        rgba(76,38,111,.38) 76%,
-        rgba(76,38,111,.12) 88%,
-        transparent 100%
+        rgba(12,38,82,.94) 0%,
+        rgba(27,39,100,.88) 28%,
+        rgba(58,35,106,.58) 45%,
+        rgba(76,38,111,.26) 60%,
+        rgba(76,38,111,.08) 72%,
+        rgba(76,38,111,.02) 82%,
+        transparent 94%
       );
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
     backdrop-filter: none;
   }
 
   .questionnaire-bottom-dock .questionnaire-dock-inner {
-    min-height: 5.4rem;
-    padding: 2rem var(--questionnaire-dock-inline-padding) .48rem;
+    min-height: 4.4rem;
+    padding: 1.35rem var(--questionnaire-dock-inline-padding) .4rem;
     border: 0;
-    clip-path: polygon(2% 0, 98% 0, 98% 12%, 100% 28%, 100% 100%, 0 100%, 0 28%, 2% 12%);
+    border-radius: 0;
+    clip-path: none;
     background:
-      radial-gradient(circle at 14% 100%, rgba(38,185,255,.16), transparent 30%),
-      radial-gradient(circle at 84% 100%, rgba(211,82,255,.18), transparent 28%),
+      radial-gradient(circle at 14% 100%, rgba(38,185,255,.13), transparent 28%),
+      radial-gradient(circle at 84% 100%, rgba(211,82,255,.15), transparent 26%),
       linear-gradient(
         to top,
-        rgba(12,38,82,.97) 0%,
-        rgba(27,39,100,.92) 38%,
-        rgba(58,35,106,.70) 58%,
-        rgba(76,38,111,.38) 76%,
-        rgba(76,38,111,.12) 88%,
-        transparent 100%
+        rgba(12,38,82,.94) 0%,
+        rgba(27,39,100,.88) 28%,
+        rgba(58,35,106,.58) 45%,
+        rgba(76,38,111,.26) 60%,
+        rgba(76,38,111,.08) 72%,
+        rgba(76,38,111,.02) 82%,
+        transparent 94%
       );
-    box-shadow: inset 0 -1px 0 rgba(255,255,255,.07);
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,.06);
     backdrop-filter: none;
   }
 
