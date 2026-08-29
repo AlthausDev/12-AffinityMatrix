@@ -55,13 +55,56 @@ export function applyManualRoleFollowup(content: readonly CatalogueCategorySeed[
 }
 
 function applyRoleWording(practice: CataloguePracticeSeed): CataloguePracticeSeed {
+  const defaults = humanDefaults(practice);
   const extra = ROLE_WORDING[practice.id] ?? ROLE_LABEL_ONLY[practice.id];
-  if (!extra) return practice;
+  if (!defaults && !extra) return practice;
+
   return {
     ...practice,
     roleLabels: {
+      ...(defaults ?? {}),
       ...(practice.roleLabels ?? {}),
-      ...extra,
+      ...(extra ?? {}),
     },
   };
+}
+
+function humanDefaults(practice: CataloguePracticeSeed): CatalogueRoleLabelsSeed | undefined {
+  switch (practice.kind) {
+    case 'directed':
+      return {
+        give: {
+          en: `Do “${practice.en}” to my partner`,
+          es: `Hacer «${practice.es}» a mi pareja`,
+        },
+        receive: {
+          en: `Have my partner do “${practice.en}” to me`,
+          es: `Que mi pareja me haga «${practice.es}»`,
+        },
+      };
+    case 'power':
+      return {
+        lead: {
+          en: `Take the active / controlling role in “${practice.en}”`,
+          es: `Llevar el rol activo / de control en «${practice.es}»`,
+        },
+        follow: {
+          en: `Take the receptive / following role in “${practice.en}”`,
+          es: `Llevar el rol receptivo / de seguimiento en «${practice.es}»`,
+        },
+      };
+    case 'watch':
+      return {
+        watch: {
+          en: `Watch my partner in “${practice.en}”`,
+          es: `Observar a mi pareja en «${practice.es}»`,
+        },
+        'be-watched': {
+          en: `Have my partner watch me in “${practice.en}”`,
+          es: `Que mi pareja me observe en «${practice.es}»`,
+        },
+      };
+    default:
+      return undefined;
+  }
 }
