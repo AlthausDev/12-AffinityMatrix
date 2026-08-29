@@ -168,13 +168,15 @@ const SURREALISM_FINAL_ORDER = [
 const EXHIBITIONISM_FINAL_ORDER = [
   'voyeurism',
   'watching-undressing',
+  'watched-masturbation',
+  'private-striptease',
   'mirrors',
   'lights-on',
   'risk-of-being-seen',
   'erotic-selfies',
   'taking-erotic-photos',
-  'partner-erotic-photography',
   'erotic-photo-session-together',
+  'erotic-media-exchange',
   'private-recording',
   'watch-private-recording-together',
   'video-call-sex',
@@ -183,8 +185,9 @@ const EXHIBITIONISM_FINAL_ORDER = [
 
 const POWER_WITH_SERVICE = insertAfter(base('power'), 'domestic-service', [
   'body-care-service',
-  'hospitality-service',
-  'ritual-attendance-service',
+  'attentive-service',
+  'pleasure-focused-service',
+  'erotic-presentation-service',
 ]);
 const POWER_FINAL_ORDER = insertAfter(POWER_WITH_SERVICE, 'leash-control', [
   'ownership-token',
@@ -225,11 +228,14 @@ const SENSATION_FINAL_ORDER = [
 ] as const;
 
 const RESTRAINT_FINAL_ORDER = insertBefore(base('restraint'), 'gag', ['hand-over-mouth']);
-const FLUIDS_WITH_SQUIRTING = insertAfter(base('fluids'), 'female-ejaculation', ['squirting-on-partner']);
+const FLUIDS_BASE_ORDER = without(base('fluids'), ['creampie-cleanup']);
+const FLUIDS_WITH_SQUIRTING = insertAfter(FLUIDS_BASE_ORDER, 'female-ejaculation', ['squirting-on-partner']);
 const FLUIDS_WITH_EXTERNAL_OTHER = insertAfter(FLUIDS_WITH_SQUIRTING, 'semen-on-buttocks', ['semen-on-other-body']);
-const FLUIDS_WITH_OWN_URINE = insertAfter(FLUIDS_WITH_EXTERNAL_OTHER, 'urine-drinking', ['own-urine-play']);
-const FLUIDS_WITH_OWN_BLOOD = insertAfter(FLUIDS_WITH_OWN_URINE, 'blood-drinking', ['own-blood-play']);
-const FLUIDS_FINAL_ORDER = insertAfter(FLUIDS_WITH_OWN_BLOOD, 'scat-ingestion', ['own-scat-play']);
+const FLUIDS_FINAL_ORDER = insertAfter(FLUIDS_WITH_EXTERNAL_OTHER, 'creampie-anal', [
+  'semen-cleanup-manual',
+  'semen-cleanup-oral',
+  'semen-cleanup-other',
+]);
 const EDGE_WITH_SEPARATE_GENITALS = insertBefore(
   without(base('edge'), ['genital-torture']),
   'cock-and-ball-torture',
