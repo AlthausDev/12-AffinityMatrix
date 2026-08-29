@@ -1,4 +1,9 @@
-import { CatalogueCategorySeed } from './types';
+import { CatalogueCategorySeed, CataloguePracticeSeed } from './types';
+
+const TITLE_OVERRIDES: Readonly<Record<string, Pick<CataloguePracticeSeed, 'en' | 'es'>>> = {
+  'pet-play-soft': { en: 'Soft pet play', es: 'Pet play suave' },
+  'pet-play-intense': { en: 'Intense pet play', es: 'Pet play intenso' },
+};
 
 /**
  * Final display-only cleanup.
@@ -14,11 +19,14 @@ export function applyFinalPresentationCleanup(
     ...category,
     en: cleanDisplayTitle(category.en),
     es: cleanDisplayTitle(category.es),
-    practices: category.practices.map((practice) => ({
-      ...practice,
-      en: cleanDisplayTitle(practice.en),
-      es: cleanDisplayTitle(practice.es),
-    })),
+    practices: category.practices.map((practice) => {
+      const override = TITLE_OVERRIDES[practice.id];
+      return {
+        ...practice,
+        en: cleanDisplayTitle(override?.en ?? practice.en),
+        es: cleanDisplayTitle(override?.es ?? practice.es),
+      };
+    }),
   }));
 }
 
