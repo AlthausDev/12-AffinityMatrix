@@ -11,16 +11,19 @@ const ORAL_POSITION_IDS = [
 export function applyCatalogueTaxonomyNoiseCleanup(
   subcategories: readonly CatalogueSubcategorySeed[],
 ): readonly CatalogueSubcategorySeed[] {
-  return subcategories.map((subcategory) => {
+  const adjusted = subcategories.map((subcategory) => {
     switch (subcategory.id) {
       case 'sexual-style-planning-expression':
         return {
           ...subcategory,
-          en: 'Planning & expression',
-          es: 'Planificación y expresión',
-          descriptionEn: 'Whether sex is spontaneous or planned, quiet or vocal, and how focused the encounter feels.',
-          descriptionEs: 'Si el sexo surge espontáneamente o se planifica, es silencioso o vocal y cuánto se centra la atención en el encuentro.',
-          practiceIds: subcategory.practiceIds.filter((id) => id !== 'energetic-sex'),
+          en: 'Planning, expression & novelty',
+          es: 'Planificación, expresión y novedad',
+          descriptionEn: 'Whether sex is spontaneous or planned, quiet or vocal, focused or deliberately exploratory.',
+          descriptionEs: 'Si el sexo surge espontáneamente o se planifica, es silencioso o vocal, concentrado o deliberadamente exploratorio.',
+          practiceIds: [
+            ...subcategory.practiceIds.filter((id) => id !== 'energetic-sex'),
+            'novelty-focused-sex',
+          ],
         };
       case 'positions-oral':
         return {
@@ -58,4 +61,9 @@ export function applyCatalogueTaxonomyNoiseCleanup(
         return subcategory;
     }
   });
+
+  return [
+    ...adjusted.filter((subcategory) => subcategory.categoryId === 'body-fetishes'),
+    ...adjusted.filter((subcategory) => subcategory.categoryId !== 'body-fetishes'),
+  ];
 }
