@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, OnInit, output } from '@angular/core';
 import { PracticeRole } from '../../domain/catalogue/practice';
 import {
   AnswerDetails,
@@ -15,6 +15,7 @@ import { DETAIL_CAPABLE_PREFERENCES, PREFERENCE_VALUES, Preference } from '../..
 import { CatalogueTextService } from '../i18n/catalogue-text.service';
 import { TranslationService } from '../i18n/translation.service';
 import { PREFERENCE_PRESENTATION } from '../shared/comparison-presentation';
+import { QuestionnaireCounterpartContextService } from './questionnaire-counterpart-context.service';
 import { QuestionnaireRolePromptService } from './questionnaire-role-prompt.service';
 
 const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
@@ -195,10 +196,12 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class QuestionnaireRoleComponent {
+export class QuestionnaireRoleComponent implements OnInit, OnDestroy {
   readonly i18n = inject(TranslationService);
   private readonly catalogueText = inject(CatalogueTextService);
   private readonly prompts = inject(QuestionnaireRolePromptService);
+  private readonly counterpartContext = inject(QuestionnaireCounterpartContextService);
+  private unregisterCounterpart?: () => void;
 
   readonly practiceId = input.required<string>();
   readonly role = input.required<PracticeRole>();
@@ -212,7 +215,12 @@ export class QuestionnaireRoleComponent {
   readonly counterpartSex = computed(() => this.scope()?.counterpartSex);
   readonly targetSite = computed(() => this.scope()?.targetSite);
   readonly roleLabel = computed(() => this.catalogueText.roleLabel(this.practiceId(), this.role()));
-  readonly questionPrompt = computed(() => this.prompts.prompt(this.role(), this.scope(), this.roleLabel()));
+  readonly questionPrompt = computed(() => this.prompts.prompt(
+    this.role(),
+    this.scope(),
+    this.roleLabel(),
+    this.counterpartContext.hasMultipleSexVariants(this.practiceId(), this.role().id),
+  ));
   readonly ariaLabel = computed(() => {
     const parts = [this.questionPrompt()];
     const site = this.targetSite();
@@ -221,6 +229,15 @@ export class QuestionnaireRoleComponent {
   });
   readonly preferenceOptions = PREFERENCE_OPTIONS;
   readonly dependsOnMaxLength = DEPENDS_ON_MAX_LENGTH;
+
+  ngOnInit(): void {
+    const sex = this.scope()?.counterpartSex;
+    if (sex) this.unregisterCounterpart = this.counterpartContext.register(this.practiceId(), this.role().id, sex);
+  }
+
+  ngOnDestroy(): void {
+    this.unregisterCounterpart?.();
+  }
 
   sexLabel(sex: Sex): string {
     return this.i18n.t(sex === 'male' ? 'questionnaireRole.sex.male' : 'questionnaireRole.sex.female');
