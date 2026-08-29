@@ -10,23 +10,39 @@ export function stripRedundantConsentFromRoleLabels(
   return content.map((category) => ({
     ...category,
     practices: category.practices.map((practice) => {
-      if (!practice.roleLabels) return practice;
-      const entries = Object.entries(practice.roleLabels)
-        .filter((entry): entry is [string, NonNullable<CatalogueRoleLabelsSeed[string]>] => entry[1] !== undefined)
-        .map(([roleId, label]) => [roleId, {
-          en: clean(label.en),
-          es: clean(label.es),
-        }] as const);
-      return { ...practice, roleLabels: Object.fromEntries(entries) as CatalogueRoleLabelsSeed };
+      const roleLabels = practice.roleLabels
+        ? Object.fromEntries(
+          Object.entries(practice.roleLabels)
+            .filter((entry): entry is [string, NonNullable<CatalogueRoleLabelsSeed[string]>] => entry[1] !== undefined)
+            .map(([roleId, label]) => [roleId, {
+              en: clean(label.en),
+              es: clean(label.es),
+            }] as const),
+        ) as CatalogueRoleLabelsSeed
+        : undefined;
+
+      const pairedRoles = practice.pairedRoles?.map((role) => ({
+        ...role,
+        en: clean(role.en),
+        es: clean(role.es),
+      }));
+
+      if (!roleLabels && !pairedRoles) return practice;
+      return {
+        ...practice,
+        ...(roleLabels ? { roleLabels } : {}),
+        ...(pairedRoles ? { pairedRoles } : {}),
+      };
     }),
   }));
 }
 
 function clean(value: string): string {
   return value
-    .replace(/\bconsensual\s+/gi, '')
-    .replace(/\bconsensuad[oa]s?\s+/gi, '')
-    .replace(/\bconsentid[oa]s?\s+/gi, '')
+    .replace(/\bconsensual\b\s*/gi, '')
+    .replace(/\bconsensuad[oa]s?\b\s*/gi, '')
+    .replace(/\bconsentid[oa]s?\b\s*/gi, '')
+    .replace(/\s+([,.;:])/g, '$1')
     .replace(/\s{2,}/g, ' ')
     .trim();
 }
