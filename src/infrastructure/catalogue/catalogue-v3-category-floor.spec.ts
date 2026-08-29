@@ -8,6 +8,7 @@ const MIN_VISIBLE_QUESTIONS_PER_CATEGORY = 30;
 describe('Catalogue V3 category depth floor', () => {
   it('keeps every category substantial for every fully specified profile', () => {
     const questionnaire = new QuestionnaireService();
+    const shortages: string[] = [];
 
     for (const sex of SEX_VALUES) {
       for (const orientation of ORIENTATION_VALUES) {
@@ -18,12 +19,14 @@ describe('Catalogue V3 category depth floor', () => {
         });
 
         for (const summary of questionnaire.getCategorySummaries(CURRENT_CATALOGUE_SNAPSHOT, profile)) {
-          expect(
-            summary.total,
-            `${sex}/${orientation} · ${summary.category.id} exposes only ${summary.total} visible questions`,
-          ).toBeGreaterThanOrEqual(MIN_VISIBLE_QUESTIONS_PER_CATEGORY);
+          if (summary.total < MIN_VISIBLE_QUESTIONS_PER_CATEGORY) {
+            shortages.push(`${sex}/${orientation} · ${summary.category.id}: ${summary.total}`);
+          }
         }
       }
     }
+
+    expect(shortages, `Categories below ${MIN_VISIBLE_QUESTIONS_PER_CATEGORY} visible questions:\n${shortages.join('\n')}`)
+      .toEqual([]);
   });
 });
