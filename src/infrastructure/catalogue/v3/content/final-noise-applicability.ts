@@ -19,7 +19,7 @@ export function applyFinalNoiseApplicability(
           roleApplicability: {
             ...(practice.roleApplicability ?? {}),
             self: {
-              ...(practice.roleApplicability?.self ?? {}),
+              ...(practice.roleApplicability?.['self'] ?? {}),
               partnerSex: ['male'] as const,
             },
           },
