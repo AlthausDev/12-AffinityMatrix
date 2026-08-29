@@ -71,30 +71,6 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
       @if (answer(); as currentAnswer) {
         @if (supportsDetails(currentAnswer.preference)) {
           <div class="role-details">
-            @if (refinementGroup(); as refinementGroup) {
-              <section class="trait-refinements" [attr.aria-label]="refinementGroup.prompt">
-                <div class="trait-refinement-copy">
-                  <strong>{{ refinementGroup.prompt }}</strong>
-                  <small>{{ refinementGroup.hint }}</small>
-                </div>
-                <div
-                  class="trait-refinement-options"
-                  role="group"
-                  [attr.aria-label]="refinementGroup.prompt + '. ' + refinementGroup.hint"
-                >
-                  @for (option of refinementGroup.options; track option.id) {
-                    <button
-                      type="button"
-                      class="trait-refinement-option"
-                      [class.selected]="isRefinementSelected(option.id)"
-                      [attr.aria-pressed]="isRefinementSelected(option.id)"
-                      (click)="toggleRefinement(option.id)"
-                    >{{ option.label }}</button>
-                  }
-                </div>
-              </section>
-            }
-
             <details class="answer-details">
               <summary>{{ i18n.t('questionnaireRole.optionalDetails') }}</summary>
               <div class="detail-grid">
@@ -199,35 +175,6 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     }
     .preference-option.selected span:first-child { color: color-mix(in srgb, var(--preference-accent) 84%, white); text-shadow: 0 0 0.65rem color-mix(in srgb, var(--preference-accent) 46%, transparent); }
     .role-details { grid-area: details; display: grid; gap: 0.55rem; margin-top: 0.2rem; }
-    .trait-refinements {
-      padding: 0.62rem 0.68rem;
-      border: 1px solid color-mix(in srgb, var(--neon-violet) 22%, var(--border-subtle));
-      border-radius: 0.62rem;
-      background: linear-gradient(145deg, rgba(22, 48, 88, 0.34), rgba(63, 34, 91, 0.30));
-    }
-    .trait-refinement-copy { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.48rem; }
-    .trait-refinement-copy strong { color: var(--text-primary); font-size: 0.78rem; line-height: 1.25; }
-    .trait-refinement-copy small { color: var(--text-secondary); font-size: 0.68rem; text-align: right; }
-    .trait-refinement-options { display: flex; flex-wrap: wrap; gap: 0.38rem; }
-    .trait-refinement-option {
-      min-height: 2rem;
-      padding: 0.34rem 0.66rem;
-      border: 1px solid color-mix(in srgb, var(--border-strong) 76%, var(--neon-cyan));
-      border-radius: 0.52rem;
-      background: rgba(24, 43, 78, 0.64);
-      color: color-mix(in srgb, var(--text-primary) 88%, var(--text-secondary));
-      cursor: pointer;
-      font-size: 0.72rem;
-      font-weight: 650;
-      transition: border-color 130ms ease, background 130ms ease, box-shadow 130ms ease;
-    }
-    .trait-refinement-option:hover { border-color: color-mix(in srgb, var(--neon-cyan) 62%, var(--neon-violet)); }
-    .trait-refinement-option.selected {
-      border-color: color-mix(in srgb, var(--neon-cyan) 60%, var(--neon-violet));
-      background: linear-gradient(135deg, rgba(38, 103, 146, 0.62), rgba(91, 55, 139, 0.66));
-      color: #fff;
-      box-shadow: inset 0 0 0 1px rgba(160, 211, 255, 0.12), 0 0 0.75rem rgba(96, 139, 255, 0.10);
-    }
     .answer-details { margin-top: 0; }
     .answer-details summary { color: var(--text-secondary); cursor: pointer; font-size: 0.82rem; }
     .detail-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; margin-top: 0.75rem; }
@@ -235,7 +182,7 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     .detail-field select, .detail-field textarea { width: 100%; padding: 0.55rem 0.65rem; border: 1px solid var(--border-strong); border-radius: 0.45rem; background: var(--surface-elevated); color: var(--text-primary); }
     .full-width { grid-column: 1 / -1; }
     @media (prefers-reduced-motion: reduce) {
-      .preference-option, .preference-option span:first-child, .trait-refinement-option { transition: none; }
+      .preference-option, .preference-option span:first-child { transition: none; }
       .preference-option:hover { transform: none; }
     }
     @media (max-width: 920px) {
@@ -247,10 +194,6 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
       .preference-scale { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.42rem; }
       .preference-option { min-height: 3rem; padding: 0.42rem 0.28rem; flex-direction: column; gap: 0.18rem; font-size: 0.67rem; }
       .preference-option span:first-child { font-size: 1rem; }
-      .trait-refinements { padding: 0.65rem; }
-      .trait-refinement-copy { display: grid; gap: 0.18rem; }
-      .trait-refinement-copy small { text-align: left; }
-      .trait-refinement-option { min-height: 2.25rem; padding-inline: 0.72rem; }
       .detail-grid { grid-template-columns: 1fr; }
       .full-width { grid-column: auto; }
     }
@@ -278,9 +221,6 @@ export class QuestionnaireRoleComponent implements OnInit, OnDestroy {
   readonly counterpartSex = computed(() => this.scope()?.counterpartSex);
   readonly targetSite = computed(() => this.scope()?.targetSite);
   readonly roleLabel = computed(() => this.catalogueText.roleLabel(this.practiceId(), this.role()));
-  readonly refinementGroup = computed(() =>
-    this.catalogueText.practiceRefinementGroup(this.practiceId(), this.counterpartSex()),
-  );
   readonly showCounterpartSex = computed(() =>
     !!this.counterpartSex()
       && this.counterpartContext.hasMultipleSexVariants(this.practiceId(), this.role().id),
@@ -326,26 +266,6 @@ export class QuestionnaireRoleComponent implements OnInit, OnDestroy {
 
   supportsDetails(preference: Preference): boolean {
     return DETAIL_CAPABLE_PREFERENCES.includes(preference);
-  }
-
-  isRefinementSelected(refinementId: string): boolean {
-    return this.answer()?.details?.refinements?.includes(refinementId) ?? false;
-  }
-
-  toggleRefinement(refinementId: string): void {
-    const answer = this.answer();
-    const group = this.refinementGroup();
-    if (!answer || !group || !this.supportsDetails(answer.preference)) return;
-    if (!group.options.some((option) => option.id === refinementId)) return;
-
-    const selected = new Set(answer.details?.refinements ?? []);
-    if (selected.has(refinementId)) selected.delete(refinementId);
-    else selected.add(refinementId);
-
-    const refinements = group.options
-      .map((option) => option.id)
-      .filter((optionId) => selected.has(optionId));
-    this.updateDetail('refinements', refinements.length > 0 ? refinements : undefined);
   }
 
   selectPreference(preference: Preference): void {

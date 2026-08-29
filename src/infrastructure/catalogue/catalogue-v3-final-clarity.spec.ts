@@ -1,8 +1,8 @@
 import { QuestionnaireService } from '../../application/questionnaire/questionnaire-service';
 import { createProfile } from '../../domain/profile/profile';
 import { CURRENT_CATALOGUE_SNAPSHOT } from './catalogue-v3';
-import { bodyTraitRefinementGroup } from './v3/content/body-trait-refinements';
 import { CATALOGUE_V3_CONTENT, RETIRED_V3_PRACTICE_IDS } from './v3/content/final';
+import { PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS } from './v3/content/physical-preferences-extraction';
 
 const questionnaire = new QuestionnaireService();
 const seed = (id: string) => CATALOGUE_V3_CONTENT
@@ -77,33 +77,24 @@ describe('Catalogue V3 final clarity pass', () => {
     expect(seed('no-orgasm-sex')?.descriptionEs).toContain('no tiene por qué haber una persona controlando');
   });
 
-  it('unifies generic chest focus and turns repetitive size and piercing cards into refinements', () => {
+  it('keeps erotic body focuses while extracting neutral appearance ratings to the profile', () => {
     expect(seed('breasts')).toBeUndefined();
     expect(seed('chest')).toBeUndefined();
     expect(seed('chest-general')?.es).toBe('Pecho');
-    expect(categoryOf('piercings')).toBe('body-fetishes');
+    expect(categoryOf('chest-general')).toBe('body-fetishes');
+    expect(categoryOf('buttocks')).toBe('body-fetishes');
+    expect(categoryOf('penis')).toBe('body-fetishes');
 
-    expect(bodyTraitRefinementGroup('chest-general')?.options.map((option) => option.id)).toEqual([
-      'breast-size-small', 'breast-size-average', 'breast-size-large',
-    ]);
-    expect(bodyTraitRefinementGroup('buttocks')?.options.map((option) => option.id)).toEqual([
-      'buttocks-size-small', 'buttocks-size-average', 'buttocks-size-large',
-    ]);
-    expect(bodyTraitRefinementGroup('penis')?.options.map((option) => option.id)).toEqual([
-      'penis-size-small', 'penis-size-average', 'penis-size-large',
-    ]);
-    expect(bodyTraitRefinementGroup('piercings')?.options.map((option) => option.id)).toEqual([
-      'facial-piercings', 'body-piercings', 'nipple-piercings', 'genital-piercings',
-    ]);
-
-    for (const id of [
-      'breast-size-small', 'breast-size-average', 'breast-size-large',
-      'penis-size-small', 'penis-size-average', 'penis-size-large',
-      'buttocks-size-small', 'buttocks-size-average', 'buttocks-size-large',
-      'facial-piercings', 'body-piercings', 'nipple-piercings', 'genital-piercings',
-    ]) {
+    for (const id of PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS) {
       expect(seed(id), id).toBeUndefined();
       expect(RETIRED_V3_PRACTICE_IDS.has(id), id).toBe(true);
+    }
+
+    for (const id of [
+      'hair-length-long', 'facial-hair', 'stature-tall', 'muscles', 'curvy-build',
+      'breast-size-large', 'buttocks-size-large', 'penis-size-large', 'tattoos', 'piercings',
+    ]) {
+      expect(PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS.has(id), id).toBe(true);
     }
   });
 

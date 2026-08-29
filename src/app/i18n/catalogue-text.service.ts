@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import { Practice, PracticeCategory, PracticeRole } from '../../domain/catalogue/practice';
 import { Sex } from '../../domain/profile/profile-metadata';
 import { CATALOGUE_V3_CONTENT } from '../../infrastructure/catalogue/v3/content/final';
-import { bodyTraitRefinementGroup } from '../../infrastructure/catalogue/v3/content/body-trait-refinements';
 import { describeCataloguePractice } from '../../infrastructure/catalogue/v3/content/practice-description';
 import { CataloguePracticeSeed } from '../../infrastructure/catalogue/v3/content/types';
 import { EN_CATALOGUE_TRANSLATIONS } from './catalogue/en-catalogue.translations';
@@ -64,17 +63,6 @@ const V3_ROLE_LABELS: Readonly<Record<Locale, Readonly<Record<string, string>>>>
     'partner-uses-on-me': 'My partner uses it on me',
   },
 };
-
-export interface CatalogueRefinementOptionView {
-  readonly id: string;
-  readonly label: string;
-}
-
-export interface CatalogueRefinementGroupView {
-  readonly prompt: string;
-  readonly hint: string;
-  readonly options: readonly CatalogueRefinementOptionView[];
-}
 
 export function categoryLabelKey(categoryId: string): string {
   return `catalogue.category.${categoryId}.label`;
@@ -142,21 +130,6 @@ export class CatalogueTextService {
       return V3_ROLE_LABELS[locale][role.id] ?? role.label;
     }
     return this.translate(roleLabelKey(practiceId, role.id), role.label);
-  }
-
-  practiceRefinementGroup(practiceId: string, counterpartSex?: Sex): CatalogueRefinementGroupView | undefined {
-    const group = bodyTraitRefinementGroup(practiceId);
-    if (!group) return undefined;
-    const locale = this.translations.locale();
-    const options = group.options
-      .filter((option) => !option.partnerSex || !counterpartSex || option.partnerSex === counterpartSex)
-      .map((option) => ({ id: option.id, label: locale === 'es' ? option.es : option.en }));
-    if (options.length === 0) return undefined;
-    return {
-      prompt: locale === 'es' ? group.promptEs : group.promptEn,
-      hint: locale === 'es' ? group.hintEs : group.hintEn,
-      options,
-    };
   }
 
   private translate(key: string, fallback: string): string {
