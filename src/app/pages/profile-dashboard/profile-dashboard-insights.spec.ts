@@ -128,7 +128,7 @@ describe('buildRoleProfile', () => {
     },
   ];
 
-  it('weights the full preference scale and aggregates scoped variants per practice role', () => {
+  it('weights the full preference scale, aggregates scopes and normalizes role presence to 100%', () => {
     const profile = createProfile({
       id: 'profile-role',
       now: '2026-08-24T09:00:00.000Z',
@@ -158,6 +158,7 @@ describe('buildRoleProfile', () => {
         favoriteCount: 1,
         affinityPercentage: 89,
         favoritePercentage: 50,
+        profileWeightPercentage: 37,
       }),
       expect.objectContaining({
         perspective: 'receptive',
@@ -166,6 +167,7 @@ describe('buildRoleProfile', () => {
         favoriteCount: 0,
         affinityPercentage: 50,
         favoritePercentage: 0,
+        profileWeightPercentage: 21,
       }),
       expect.objectContaining({
         perspective: 'neutral',
@@ -174,11 +176,13 @@ describe('buildRoleProfile', () => {
         favoriteCount: 1,
         affinityPercentage: 100,
         favoritePercentage: 100,
+        profileWeightPercentage: 42,
       }),
     ]);
+    expect(profileByRole.reduce((sum, entry) => sum + entry.profileWeightPercentage, 0)).toBe(100);
   });
 
-  it('uses explicit initiative details to position the role coordinate map', () => {
+  it('uses explicit initiative details and only directional roles as active/receptive evidence', () => {
     const profile = createProfile({
       id: 'profile-role-map',
       now: '2026-08-29T19:00:00.000Z',
@@ -206,7 +210,7 @@ describe('buildRoleProfile', () => {
     expect(buildRoleProfileCoordinates(profile, practices)).toEqual({
       roleBalance: 12,
       initiativeBalance: 50,
-      roleEvidenceCount: 3,
+      roleEvidenceCount: 2,
       initiativeEvidenceCount: 2,
     });
   });
@@ -225,6 +229,7 @@ describe('buildRoleProfile', () => {
     const profileByRole = buildRoleProfile(profile, practices);
 
     expect(profileByRole.every((entry) => entry.answerCount === 0)).toBe(true);
+    expect(profileByRole.every((entry) => entry.profileWeightPercentage === 0)).toBe(true);
     expect(buildRoleProfileCoordinates(profile, practices)).toEqual({
       roleBalance: 0,
       initiativeBalance: 0,
