@@ -5,7 +5,7 @@ const REMOVED_IDS = new Set(['energetic-sex']);
 const ADDITIONS: readonly PracticeInsightSignals[] = [
   {
     practiceId: 'novelty-focused-sex',
-    signals: { exploration: 1, novelty: 0.75 },
+    signals: { exploration: 1 },
   },
   {
     practiceId: 'oral-kneeling-standing-position',
