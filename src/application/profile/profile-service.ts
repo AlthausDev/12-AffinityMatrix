@@ -69,16 +69,23 @@ export class ProfileService {
     id: ProfileId,
     metadata: ProfileMetadata,
     settings: ProfileSettings,
-    physicalPreferences: PhysicalPreferences = {},
+    physicalPreferences?: PhysicalPreferences,
   ): Promise<Profile | undefined> {
     const current = await this.repository.findById(id);
     if (!current) return undefined;
 
+    const nextPhysicalPreferences = clonePhysicalPreferences(
+      physicalPreferences ?? current.physicalPreferences,
+    );
+    const { physicalPreferences: _currentPhysicalPreferences, ...profileWithoutPhysicalPreferences } = current;
+
     return this.saveNextRevision(current, {
-      ...current,
+      ...profileWithoutPhysicalPreferences,
       metadata: { ...metadata },
       settings: { ...settings },
-      physicalPreferences: clonePhysicalPreferences(physicalPreferences),
+      ...(Object.keys(nextPhysicalPreferences).length > 0
+        ? { physicalPreferences: nextPhysicalPreferences }
+        : {}),
       updatedAt: this.clock.now(),
     });
   }
