@@ -18,6 +18,7 @@ import { applyFinalNoiseApplicability } from './final-noise-applicability';
 import { applyFinalNoiseCleanup, FINAL_NOISE_RETIRED_PRACTICE_IDS } from './final-noise-cleanup';
 import { addFinalNoiseReplacement } from './final-noise-replacement';
 import { groupFinalCataloguePractices } from './final-practice-order';
+import { applyFinalQuestionnaireFollowup } from './final-questionnaire-followup';
 import { applyFinalReleaseCopy } from './final-release-copy';
 import { applyFinalReleaseTaxonomy, FINAL_RELEASE_RETIRED_PRACTICE_IDS } from './final-release-taxonomy';
 import { addFinalRolePractices, REACTIVATED_V3_PRACTICE_IDS } from './final-role-additions';
@@ -94,6 +95,7 @@ const CONSENT_CLEANED_CONTENT = stripRedundantConsentFromRoleLabels(ROLE_REVIEWE
 const NOISE_CLEANED_CONTENT = applyFinalNoiseCleanup(CONSENT_CLEANED_CONTENT);
 const REPLACEMENT_CONTENT = addFinalNoiseReplacement(NOISE_CLEANED_CONTENT);
 const NOISE_APPLICABILITY_CONTENT = applyFinalNoiseApplicability(REPLACEMENT_CONTENT);
-const NATURAL_ROLE_CONTENT = applyMutualRoleNoiseCleanup(NOISE_APPLICABILITY_CONTENT);
+const QUESTIONNAIRE_FOLLOWUP_CONTENT = applyFinalQuestionnaireFollowup(NOISE_APPLICABILITY_CONTENT);
+const NATURAL_ROLE_CONTENT = applyMutualRoleNoiseCleanup(QUESTIONNAIRE_FOLLOWUP_CONTENT);
 
 export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(NATURAL_ROLE_CONTENT);
