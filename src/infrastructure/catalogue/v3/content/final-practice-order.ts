@@ -165,8 +165,15 @@ const SURREALISM_FINAL_ORDER = [
   'vore-fantasy',
 ] as const;
 
+const GROUPS_FINAL_ORDER = insertAfter(
+  without(base('groups'), ['hotwife-dynamic']),
+  'watching-partner-with-other',
+  ['erotic-compersion'],
+);
+
 const EXHIBITIONISM_FINAL_ORDER = [
   'voyeurism',
+  'preagreed-unannounced-watching',
   'watching-undressing',
   'watched-masturbation',
   'private-striptease',
@@ -183,11 +190,20 @@ const EXHIBITIONISM_FINAL_ORDER = [
   'webcam-performance-private',
 ] as const;
 
-const POWER_WITH_SERVICE = insertAfter(base('power'), 'domestic-service', [
+const PLACES_FINAL_ORDER = insertAfter(base('places-settings'), 'sex-in-hotel', [
+  'sex-in-office-after-hours',
+  'sex-in-abandoned-place',
+  'sex-on-secluded-beach',
+  'sex-while-camping',
+]);
+
+const POWER_BASE_WITHOUT_UMBRELLA = without(base('power'), ['service']);
+const POWER_WITH_SERVICE = insertAfter(POWER_BASE_WITHOUT_UMBRELLA, 'domestic-service', [
   'body-care-service',
   'attentive-service',
-  'pleasure-focused-service',
   'erotic-presentation-service',
+  'footwear-service',
+  'fetish-gear-service',
 ]);
 const POWER_FINAL_ORDER = insertAfter(POWER_WITH_SERVICE, 'leash-control', [
   'ownership-token',
@@ -227,13 +243,21 @@ const SENSATION_FINAL_ORDER = [
   'caning',
 ] as const;
 
-const RESTRAINT_FINAL_ORDER = insertBefore(base('restraint'), 'gag', ['hand-over-mouth']);
+const RESTRAINT_BASE_WITHOUT_GENERIC_FURNITURE = without(base('restraint'), ['furniture-restraint']);
+const RESTRAINT_WITH_MOUTH = insertBefore(RESTRAINT_BASE_WITHOUT_GENERIC_FURNITURE, 'gag', ['hand-over-mouth']);
+const RESTRAINT_FINAL_ORDER = insertBefore(RESTRAINT_WITH_MOUTH, 'stocks-restraint', [
+  'st-andrews-cross-restraint',
+  'bondage-bench-restraint',
+  'bondage-chair-restraint',
+]);
+
 const FLUIDS_BASE_ORDER = without(base('fluids'), ['creampie-cleanup']);
 const FLUIDS_WITH_SQUIRTING = insertAfter(FLUIDS_BASE_ORDER, 'female-ejaculation', ['squirting-on-partner']);
 const FLUIDS_WITH_EXTERNAL_OTHER = insertAfter(FLUIDS_WITH_SQUIRTING, 'semen-on-buttocks', ['semen-on-other-body']);
 const FLUIDS_FINAL_ORDER = insertAfter(FLUIDS_WITH_EXTERNAL_OTHER, 'creampie-anal', [
   'semen-cleanup-manual',
-  'semen-cleanup-oral',
+  'semen-cleanup-oral-external',
+  'semen-cleanup-oral-creampie',
   'semen-cleanup-other',
 ]);
 const EDGE_WITH_SEPARATE_GENITALS = insertBefore(
@@ -251,8 +275,10 @@ export const FINAL_CATALOGUE_PRACTICE_GROUP_ORDER: Readonly<Record<string, reado
   'sexual-positions': SEXUAL_POSITIONS_FINAL_ORDER,
   toys: TOYS_FINAL_ORDER,
   'body-fetishes': BODY_FOCUS_FINAL_ORDER,
+  groups: GROUPS_FINAL_ORDER,
   roleplay: ROLEPLAY_FINAL_ORDER,
   exhibitionism: EXHIBITIONISM_FINAL_ORDER,
+  'places-settings': PLACES_FINAL_ORDER,
   power: POWER_FINAL_ORDER,
   restraint: RESTRAINT_FINAL_ORDER,
   sensation: SENSATION_FINAL_ORDER,
