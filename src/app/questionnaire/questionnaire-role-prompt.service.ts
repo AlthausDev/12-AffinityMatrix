@@ -8,9 +8,14 @@ import { TranslationService } from '../i18n/translation.service';
 export class QuestionnaireRolePromptService {
   private readonly i18n = inject(TranslationService);
 
-  prompt(role: PracticeRole, scope: AnswerScope | undefined, fallbackRoleLabel: string): string {
+  prompt(
+    role: PracticeRole,
+    scope: AnswerScope | undefined,
+    fallbackRoleLabel: string,
+    showCounterpartSex = true,
+  ): string {
     const sex = scope?.counterpartSex;
-    if (!sex) return fallbackRoleLabel;
+    if (!sex || !showCounterpartSex) return fallbackRoleLabel;
 
     const person = this.person(sex);
     const locale = this.i18n.locale();
