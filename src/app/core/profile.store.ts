@@ -53,7 +53,7 @@ export class ProfileStore {
     id: ProfileId,
     metadata: ProfileMetadata,
     settings: ProfileSettings,
-    physicalPreferences: PhysicalPreferences = {},
+    physicalPreferences?: PhysicalPreferences,
   ): Promise<Profile | undefined> {
     return this.enqueueProfileMutation(() => this.service.updateProfile(id, metadata, settings, physicalPreferences));
   }
