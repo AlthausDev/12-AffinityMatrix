@@ -29,8 +29,8 @@ export function applyFinalNoiseApplicability(
       if (practice.id === 'family-role-taboo-fantasy') {
         return {
           ...practice,
-          descriptionEn: 'A fictional incest-themed roleplay between adults. The family relationship belongs to the imagined characters; it does not involve minors and does not require a real family relationship.',
-          descriptionEs: 'Roleplay ficticio de temática incestuosa entre adultos. La relación familiar pertenece a los personajes imaginados; no implica a menores ni requiere una relación familiar real.',
+          descriptionEn: 'A fictional incest-themed roleplay between adults. It refers to adult characters, not minors, and does not require a real family relationship.',
+          descriptionEs: 'Roleplay ficticio de temática incestuosa entre adultos. Se refiere a personajes adultos, no a menores, y no requiere una relación familiar real.',
         };
       }
 
