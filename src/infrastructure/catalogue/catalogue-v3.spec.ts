@@ -16,6 +16,7 @@ const CATEGORY_IDS = [
   'penetration',
   'sexual-positions',
   'toys',
+  'sexual-accessories',
   'orgasm-control',
   'body-fetishes',
   'groups',
@@ -196,11 +197,13 @@ describe('catalogue v3 snapshot', () => {
     expect(sites('pinwheel')).toEqual(['body']);
   });
 
-  it('groups toys by family rather than mixing unrelated accessories', () => {
-    const ids = CATALOGUE_V3_CONTENT.find((category) => category.id === 'toys')
+  it('groups toys and accessories by family instead of mixing both categories', () => {
+    const toyIds = CATALOGUE_V3_CONTENT.find((category) => category.id === 'toys')
+      ?.practices.map((practice) => practice.id) ?? [];
+    const accessoryIds = CATALOGUE_V3_CONTENT.find((category) => category.id === 'sexual-accessories')
       ?.practices.map((practice) => practice.id) ?? [];
 
-    expect(ids.slice(0, 6)).toEqual([
+    expect(toyIds.slice(0, 6)).toEqual([
       'vibrator',
       'wand-vibrator',
       'bullet-vibrator',
@@ -208,9 +211,13 @@ describe('catalogue v3 snapshot', () => {
       'wearable-vibrator',
       'remote-control-toy',
     ]);
-    expect(ids.indexOf('dildo')).toBeLessThan(ids.indexOf('anal-plug'));
-    expect(ids.indexOf('anal-plug')).toBeLessThan(ids.indexOf('strap-on'));
-    expect(ids.indexOf('strap-on')).toBeLessThan(ids.indexOf('cock-ring'));
+    expect(toyIds.indexOf('dildo')).toBeLessThan(toyIds.indexOf('anal-plug'));
+    expect(toyIds.indexOf('anal-plug')).toBeLessThan(toyIds.indexOf('strap-on'));
+    expect(toyIds).not.toContain('cock-ring');
+    expect(accessoryIds).toContain('cock-ring');
+    expect(accessoryIds).toContain('sex-machine');
+    expect(snapshotPractice('cock-ring')?.categoryId).toBe('sexual-accessories');
+    expect(snapshotPractice('everyday-object-play')?.categoryId).toBe('sexual-accessories');
   });
 
   it('adds blood and scat preferences to fluids while leaving cutting itself in Edge', () => {
