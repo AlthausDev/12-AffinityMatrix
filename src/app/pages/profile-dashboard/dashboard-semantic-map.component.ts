@@ -43,10 +43,12 @@ import {
             ) }}
           </p>
 
-          <div class="semantic-scale-legend" aria-hidden="true">
-            <span>{{ text('Baja', 'Low') }}</span>
-            <span>{{ text('Media', 'Medium') }}</span>
-            <span>{{ text('Alta', 'High') }}</span>
+          <div class="semantic-scale-bands" [attr.aria-label]="text('Límites de afinidad', 'Affinity thresholds')">
+            <span><strong>0–19</strong><small>{{ text('Muy baja', 'Very low') }}</small></span>
+            <span><strong>20–39</strong><small>{{ text('Baja', 'Low') }}</small></span>
+            <span><strong>40–59</strong><small>{{ text('Moderada', 'Moderate') }}</small></span>
+            <span><strong>60–79</strong><small>{{ text('Alta', 'High') }}</small></span>
+            <span><strong>80–100</strong><small>{{ text('Muy alta', 'Very high') }}</small></span>
           </div>
 
           <div class="semantic-theme-list">
@@ -68,18 +70,13 @@ import {
                   }
                 </div>
 
-                <div
-                  class="semantic-spectrum"
-                  role="img"
-                  [attr.aria-label]="themeAriaLabel(entry)"
-                >
-                  <span class="semantic-spectrum-midline" aria-hidden="true"></span>
+                <div class="semantic-spectrum" role="img" [attr.aria-label]="themeAriaLabel(entry)">
+                  <span class="semantic-threshold threshold-20" aria-hidden="true"></span>
+                  <span class="semantic-threshold threshold-40" aria-hidden="true"></span>
+                  <span class="semantic-threshold threshold-60" aria-hidden="true"></span>
+                  <span class="semantic-threshold threshold-80" aria-hidden="true"></span>
                   @if (entry.evidenceCount > 0) {
-                    <span
-                      class="semantic-spectrum-marker"
-                      [style.left.%]="scorePosition(entry.score)"
-                      aria-hidden="true"
-                    ></span>
+                    <span class="semantic-spectrum-marker" [style.left.%]="scorePosition(entry.score)" aria-hidden="true"></span>
                   }
                 </div>
 
@@ -91,43 +88,89 @@ import {
           </div>
         </section>
 
-        @if (primaryCoordinateMap(); as entry) {
+        @if (coordinateMaps().length > 0) {
           <section class="semantic-relative-section" [attr.aria-label]="i18n.t('dashboard.semantic.coordinates')">
             <header class="semantic-relative-heading">
               <div>
                 <p class="semantic-kicker">{{ i18n.t('dashboard.semantic.coordinates') }}</p>
-                <h4>{{ coordinateMapLabel(entry) }}</h4>
-                <p>{{ i18n.t('dashboard.semantic.coordinatesDescription') }}</p>
+                <h4>{{ text('Cuatro comparaciones rápidas', 'Four quick comparisons') }}</h4>
+                <p>{{ text(
+                  'Los marcadores amplifican ligeramente las diferencias para que una inclinación real sea visible sin convertir cada pequeña variación en un extremo.',
+                  'Markers gently amplify differences so a real lean is visible without turning every small variation into an extreme.'
+                ) }}</p>
               </div>
-              <small>{{ evidenceLabel(entry.evidenceCount) }}</small>
             </header>
 
-            <div class="semantic-relative-grid">
-              <article class="semantic-relative-axis">
-                <div class="semantic-relative-labels" aria-hidden="true">
-                  <strong>{{ axisLabel(entry.map.x, 'low') }}</strong>
-                  <span>{{ i18n.t('dashboard.semantic.coordinatesCenter') }}</span>
-                  <strong>{{ axisLabel(entry.map.x, 'high') }}</strong>
-                </div>
-                <div class="semantic-relative-rail" role="img" [attr.aria-label]="relativeAxisAriaLabel(entry.x, entry.map.x)">
-                  <span class="semantic-relative-midline" aria-hidden="true"></span>
-                  <span class="semantic-relative-marker" [style.left.%]="coordinateLeft(entry.x)" aria-hidden="true"></span>
-                </div>
-                <small>{{ relativeDiagnosis(entry.x, entry.map.x) }}</small>
-              </article>
+            <div class="semantic-relative-groups">
+              @for (entry of coordinateMaps(); track entry.map.id) {
+                <article class="semantic-relative-group">
+                  <header>
+                    <strong>{{ coordinateMapLabel(entry) }}</strong>
+                    <small>{{ evidenceLabel(entry.evidenceCount) }}</small>
+                  </header>
+                  <div class="semantic-relative-grid">
+                    <div class="semantic-relative-axis">
+                      <div class="semantic-relative-labels" aria-hidden="true">
+                        <strong>{{ axisLabel(entry.map.x, 'low') }}</strong>
+                        <span>{{ i18n.t('dashboard.semantic.coordinatesCenter') }}</span>
+                        <strong>{{ axisLabel(entry.map.x, 'high') }}</strong>
+                      </div>
+                      <div class="semantic-relative-rail" role="img" [attr.aria-label]="relativeAxisAriaLabel(entry.x, entry.map.x)">
+                        <span class="semantic-relative-midline" aria-hidden="true"></span>
+                        <span class="semantic-relative-marker" [style.left.%]="coordinateLeft(entry.x)" aria-hidden="true"></span>
+                      </div>
+                      <small>{{ relativeDiagnosis(entry.x, entry.map.x) }}</small>
+                    </div>
 
-              <article class="semantic-relative-axis semantic-relative-axis-secondary">
-                <div class="semantic-relative-labels" aria-hidden="true">
-                  <strong>{{ axisLabel(entry.map.y, 'low') }}</strong>
-                  <span>{{ i18n.t('dashboard.semantic.coordinatesCenter') }}</span>
-                  <strong>{{ axisLabel(entry.map.y, 'high') }}</strong>
-                </div>
-                <div class="semantic-relative-rail" role="img" [attr.aria-label]="relativeAxisAriaLabel(entry.y, entry.map.y)">
-                  <span class="semantic-relative-midline" aria-hidden="true"></span>
-                  <span class="semantic-relative-marker semantic-relative-marker-secondary" [style.left.%]="coordinateLeft(entry.y)" aria-hidden="true"></span>
-                </div>
-                <small>{{ relativeDiagnosis(entry.y, entry.map.y) }}</small>
-              </article>
+                    <div class="semantic-relative-axis">
+                      <div class="semantic-relative-labels" aria-hidden="true">
+                        <strong>{{ axisLabel(entry.map.y, 'low') }}</strong>
+                        <span>{{ i18n.t('dashboard.semantic.coordinatesCenter') }}</span>
+                        <strong>{{ axisLabel(entry.map.y, 'high') }}</strong>
+                      </div>
+                      <div class="semantic-relative-rail semantic-relative-rail-secondary" role="img" [attr.aria-label]="relativeAxisAriaLabel(entry.y, entry.map.y)">
+                        <span class="semantic-relative-midline" aria-hidden="true"></span>
+                        <span class="semantic-relative-marker semantic-relative-marker-secondary" [style.left.%]="coordinateLeft(entry.y)" aria-hidden="true"></span>
+                      </div>
+                      <small>{{ relativeDiagnosis(entry.y, entry.map.y) }}</small>
+                    </div>
+                  </div>
+                </article>
+              }
+            </div>
+          </section>
+
+          <section class="semantic-coordinate-section" [attr.aria-label]="text('Mapas de coordenadas', 'Coordinate maps')">
+            <div class="semantic-panel-kicker">
+              <div>
+                <p class="semantic-kicker">{{ text('Mapas de coordenadas', 'Coordinate maps') }}</p>
+                <strong>{{ text('Una lectura visual de cómo se combinan dos tendencias a la vez', 'A visual reading of how two tendencies combine at once') }}</strong>
+              </div>
+            </div>
+
+            <div class="semantic-coordinate-grid">
+              @for (entry of coordinateMaps(); track entry.map.id) {
+                <article class="semantic-coordinate-card">
+                  <header>
+                    <strong>{{ coordinateMapLabel(entry) }}</strong>
+                    <small>{{ evidenceLabel(entry.evidenceCount) }}</small>
+                  </header>
+                  <div class="semantic-coordinate-plane" role="img" [attr.aria-label]="coordinateMapAriaLabel(entry)">
+                    <span class="semantic-coordinate-axis axis-x" aria-hidden="true"></span>
+                    <span class="semantic-coordinate-axis axis-y" aria-hidden="true"></span>
+                    <span class="coordinate-label label-left">{{ axisLabel(entry.map.x, 'low') }}</span>
+                    <span class="coordinate-label label-right">{{ axisLabel(entry.map.x, 'high') }}</span>
+                    <span class="coordinate-label label-top">{{ axisLabel(entry.map.y, 'high') }}</span>
+                    <span class="coordinate-label label-bottom">{{ axisLabel(entry.map.y, 'low') }}</span>
+                    <span
+                      class="semantic-coordinate-marker"
+                      [style.left.%]="coordinateLeft(entry.x)"
+                      [style.top.%]="coordinateTop(entry.y)"
+                      aria-hidden="true"
+                    ></span>
+                  </div>
+                </article>
+              }
             </div>
           </section>
         }
@@ -173,7 +216,8 @@ import {
     .semantic-heading { position: relative; z-index: 1; }
     .semantic-theme-panel,
     .semantic-highlight-panel,
-    .semantic-relative-section {
+    .semantic-relative-section,
+    .semantic-coordinate-section {
       min-width: 0;
       padding: 0.9rem;
       border: 1px solid color-mix(in srgb, var(--border-subtle) 74%, transparent);
@@ -181,15 +225,12 @@ import {
       background: linear-gradient(145deg, rgba(15, 33, 69, 0.48), rgba(38, 24, 63, 0.36));
     }
     .semantic-highlight-panel,
-    .semantic-relative-section { margin-top: 0.8rem; }
+    .semantic-relative-section,
+    .semantic-coordinate-section { margin-top: 0.8rem; }
     .semantic-panel-kicker { margin-bottom: 0.6rem; }
     .semantic-panel-kicker > div { display: grid; gap: 0.12rem; }
     .semantic-panel-kicker strong,
-    .semantic-relative-heading > small {
-      color: var(--text-secondary);
-      font-size: 0.62rem;
-      font-weight: 620;
-    }
+    .semantic-relative-heading > small { color: var(--text-secondary); font-size: 0.62rem; font-weight: 620; }
     .semantic-kicker {
       margin: 0;
       color: color-mix(in srgb, var(--text-secondary) 78%, var(--neon-cyan));
@@ -207,16 +248,15 @@ import {
       font-size: 0.62rem;
       line-height: 1.45;
     }
-    .semantic-scale-legend {
+    .semantic-scale-bands {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      margin: 0 0.18rem 0.35rem;
-      color: color-mix(in srgb, var(--text-secondary) 76%, white);
-      font-size: 0.54rem;
-      font-weight: 700;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.2rem;
+      margin: 0 0.15rem 0.48rem;
     }
-    .semantic-scale-legend span:nth-child(2) { text-align: center; }
-    .semantic-scale-legend span:last-child { text-align: right; }
+    .semantic-scale-bands span { display: grid; gap: 0.02rem; min-width: 0; text-align: center; }
+    .semantic-scale-bands strong { color: color-mix(in srgb, var(--text-secondary) 86%, white); font-size: 0.52rem; }
+    .semantic-scale-bands small { color: var(--text-secondary); font-size: 0.48rem; line-height: 1.15; }
     .semantic-theme-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.72rem 1rem; }
     .semantic-theme {
       --semantic-accent: #69d9ff;
@@ -242,11 +282,8 @@ import {
     .semantic-theme-heading small,
     .semantic-evidence,
     .semantic-highlight small,
-    .semantic-relative-axis small {
-      color: var(--text-secondary);
-      font-size: 0.6rem;
-      line-height: 1.35;
-    }
+    .semantic-relative-axis small,
+    .semantic-coordinate-card small { color: var(--text-secondary); font-size: 0.6rem; line-height: 1.35; }
     .semantic-theme-heading > span {
       color: color-mix(in srgb, var(--semantic-accent) 82%, white);
       font-size: 0.66rem;
@@ -262,58 +299,54 @@ import {
       border: 1px solid color-mix(in srgb, var(--border-subtle) 62%, transparent);
       border-radius: 0.24rem;
       background: linear-gradient(90deg,
-        rgba(37, 52, 84, 0.58) 0%,
-        color-mix(in srgb, var(--semantic-accent) 10%, rgba(46, 44, 91, 0.58)) 50%,
-        color-mix(in srgb, var(--semantic-accent) 30%, rgba(36, 48, 82, 0.64)) 100%);
+        rgba(28, 43, 76, 0.62) 0% 20%,
+        rgba(41, 48, 87, 0.62) 20% 40%,
+        rgba(49, 44, 91, 0.62) 40% 60%,
+        color-mix(in srgb, var(--semantic-accent) 18%, rgba(48, 40, 83, 0.64)) 60% 80%,
+        color-mix(in srgb, var(--semantic-accent) 32%, rgba(39, 47, 79, 0.66)) 80% 100%);
       box-shadow: inset 0 1px 2px rgba(2, 7, 22, 0.28);
     }
-    .semantic-spectrum-midline,
-    .semantic-relative-midline {
-      position: absolute;
-      top: -0.18rem;
-      bottom: -0.18rem;
-      left: 50%;
-      width: 1px;
-      background: color-mix(in srgb, var(--border-strong) 46%, transparent);
-    }
+    .semantic-threshold { position: absolute; top: -0.12rem; bottom: -0.12rem; width: 1px; background: rgba(190, 205, 235, 0.18); }
+    .threshold-20 { left: 20%; } .threshold-40 { left: 40%; } .threshold-60 { left: 60%; } .threshold-80 { left: 80%; }
     .semantic-spectrum-marker,
-    .semantic-relative-marker {
+    .semantic-relative-marker,
+    .semantic-coordinate-marker {
       position: absolute;
       z-index: 2;
-      top: 50%;
-      width: 0.72rem;
-      height: 0.72rem;
+      width: 0.76rem;
+      height: 0.76rem;
       transform: translate(-50%, -50%) rotate(45deg);
       border: 2px solid #f5f2ff;
       border-radius: 0.13rem;
-      background: var(--semantic-accent);
-      box-shadow: 0 0 0.55rem color-mix(in srgb, var(--semantic-accent) 52%, transparent);
+      background: var(--semantic-accent, var(--neon-violet));
+      box-shadow: 0 0 0.55rem color-mix(in srgb, var(--semantic-accent, var(--neon-violet)) 52%, transparent);
     }
+    .semantic-spectrum-marker { top: 50%; }
 
     .semantic-relative-section { background: linear-gradient(155deg, rgba(13, 31, 65, 0.58), rgba(34, 23, 62, 0.46)); }
-    .semantic-relative-heading {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: end;
-      gap: 1rem;
-      margin-bottom: 0.72rem;
-    }
+    .semantic-relative-heading { margin-bottom: 0.72rem; }
     .semantic-relative-heading > div { display: grid; gap: 0.14rem; }
     .semantic-relative-heading h4 { margin: 0; font-size: 0.86rem; }
     .semantic-relative-heading p:last-child { max-width: 54rem; margin: 0; color: var(--text-secondary); font-size: 0.62rem; line-height: 1.42; }
-    .semantic-relative-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.68rem; }
-    .semantic-relative-axis {
+    .semantic-relative-groups { display: grid; gap: 0.68rem; }
+    .semantic-relative-group {
       display: grid;
-      gap: 0.34rem;
-      min-width: 0;
+      gap: 0.55rem;
       padding: 0.68rem;
-      border: 1px solid color-mix(in srgb, var(--border-subtle) 60%, transparent);
+      border: 1px solid color-mix(in srgb, var(--border-subtle) 58%, transparent);
       border-radius: 0.62rem;
-      background: rgba(11, 25, 54, 0.42);
+      background: rgba(11, 25, 54, 0.34);
     }
+    .semantic-relative-group > header,
+    .semantic-coordinate-card > header { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; }
+    .semantic-relative-group > header strong,
+    .semantic-coordinate-card > header strong { font-size: 0.7rem; }
+    .semantic-relative-group > header small { color: var(--text-secondary); font-size: 0.56rem; }
+    .semantic-relative-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; }
+    .semantic-relative-axis { display: grid; gap: 0.34rem; min-width: 0; }
     .semantic-relative-labels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.35rem; align-items: end; }
-    .semantic-relative-labels strong { font-size: 0.6rem; line-height: 1.22; }
-    .semantic-relative-labels span { color: var(--text-secondary); font-size: 0.52rem; text-align: center; }
+    .semantic-relative-labels strong { font-size: 0.58rem; line-height: 1.22; }
+    .semantic-relative-labels span { color: var(--text-secondary); font-size: 0.5rem; text-align: center; }
     .semantic-relative-labels strong:last-child { text-align: right; }
     .semantic-relative-rail {
       position: relative;
@@ -321,17 +354,37 @@ import {
       margin: 0.12rem 0.1rem;
       border: 1px solid color-mix(in srgb, var(--border-subtle) 66%, transparent);
       border-radius: 0.25rem;
-      background: linear-gradient(90deg, rgba(49, 116, 166, 0.28), rgba(45, 38, 86, 0.58) 50%, rgba(159, 71, 179, 0.25));
+      background: linear-gradient(90deg, rgba(49, 116, 166, 0.32), rgba(45, 38, 86, 0.58) 50%, rgba(159, 71, 179, 0.3));
       box-shadow: inset 0 1px 3px rgba(2, 7, 22, 0.3);
     }
-    .semantic-relative-marker {
-      --semantic-accent: var(--neon-violet);
-      width: 0.82rem;
-      height: 0.82rem;
-      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet) 58%, var(--neon-magenta));
-    }
+    .semantic-relative-rail-secondary { background: linear-gradient(90deg, rgba(72, 161, 142, 0.28), rgba(45, 38, 86, 0.58) 50%, rgba(218, 85, 132, 0.27)); }
+    .semantic-relative-midline { position: absolute; top: -0.18rem; bottom: -0.18rem; left: 50%; width: 1px; background: color-mix(in srgb, var(--border-strong) 46%, transparent); }
+    .semantic-relative-marker { top: 50%; --semantic-accent: var(--neon-violet); width: 0.84rem; height: 0.84rem; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet) 58%, var(--neon-magenta)); }
     .semantic-relative-marker-secondary { background: linear-gradient(135deg, var(--preference-positive), var(--neon-violet), var(--preference-boundary)); }
     .semantic-relative-axis small { justify-self: center; color: color-mix(in srgb, var(--text-secondary) 82%, white); font-weight: 680; text-align: center; }
+
+    .semantic-coordinate-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.68rem; }
+    .semantic-coordinate-card { display: grid; gap: 0.48rem; min-width: 0; }
+    .semantic-coordinate-plane {
+      position: relative;
+      min-height: 12rem;
+      overflow: hidden;
+      border: 1px solid color-mix(in srgb, var(--border-subtle) 66%, transparent);
+      border-radius: 0.62rem;
+      background:
+        linear-gradient(90deg, transparent 24.8%, rgba(130, 150, 205, 0.05) 25%, transparent 25.2%, transparent 74.8%, rgba(130, 150, 205, 0.05) 75%, transparent 75.2%),
+        linear-gradient(0deg, transparent 24.8%, rgba(130, 150, 205, 0.05) 25%, transparent 25.2%, transparent 74.8%, rgba(130, 150, 205, 0.05) 75%, transparent 75.2%),
+        linear-gradient(145deg, rgba(10, 23, 52, 0.78), rgba(31, 20, 54, 0.7));
+    }
+    .semantic-coordinate-axis { position: absolute; background: color-mix(in srgb, var(--neon-violet) 40%, var(--border-strong)); }
+    .axis-x { left: 8%; right: 8%; top: 50%; height: 1px; }
+    .axis-y { top: 10%; bottom: 10%; left: 50%; width: 1px; }
+    .coordinate-label { position: absolute; z-index: 1; padding: 0.12rem 0.24rem; background: rgba(8, 16, 36, 0.76); color: color-mix(in srgb, var(--text-secondary) 88%, white); font-size: 0.5rem; font-weight: 700; line-height: 1.15; }
+    .label-left { left: 0.25rem; top: 50%; transform: translateY(-50%); }
+    .label-right { right: 0.25rem; top: 50%; transform: translateY(-50%); text-align: right; }
+    .label-top { top: 0.25rem; left: 50%; transform: translateX(-50%); text-align: center; }
+    .label-bottom { bottom: 0.25rem; left: 50%; transform: translateX(-50%); text-align: center; }
+    .semantic-coordinate-marker { --semantic-accent: var(--neon-violet); width: 0.9rem; height: 0.9rem; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet) 55%, var(--neon-magenta)); }
 
     .semantic-highlight-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.55rem; }
     .semantic-highlight {
@@ -367,19 +420,22 @@ import {
     .semantic-empty { min-height: 9rem; }
 
     @media (max-width: 920px) {
-      .semantic-theme-list { grid-template-columns: 1fr; }
-      .semantic-relative-grid { grid-template-columns: 1fr; }
+      .semantic-theme-list,
+      .semantic-relative-grid,
+      .semantic-coordinate-grid { grid-template-columns: 1fr; }
       .semantic-highlight-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 620px) {
       .semantic-theme-panel,
       .semantic-highlight-panel,
-      .semantic-relative-section { padding: 0.72rem; }
+      .semantic-relative-section,
+      .semantic-coordinate-section { padding: 0.72rem; }
       .semantic-theme-heading small { display: none; }
       .semantic-theme-heading { gap: 0.45rem; }
       .semantic-theme-heading > span { font-size: 0.62rem; }
-      .semantic-relative-heading { grid-template-columns: 1fr; gap: 0.2rem; }
-      .semantic-relative-heading > small { text-align: left; }
+      .semantic-scale-bands strong { font-size: 0.48rem; }
+      .semantic-scale-bands small { font-size: 0.44rem; }
+      .semantic-coordinate-plane { min-height: 11rem; }
       .semantic-highlight { min-height: 6.35rem; }
     }
     @media (max-width: 370px) {
@@ -398,9 +454,8 @@ export class DashboardSemanticMapComponent {
   readonly themes = computed(() => buildSemanticThemes(this.insights()));
   readonly highlights = computed(() => strongestSemanticInsights(this.insights(), 10));
   readonly coordinateMaps = computed(() =>
-    buildSemanticCoordinateMaps(this.insights()).filter((entry) => entry.evidenceCount > 0),
+    buildSemanticCoordinateMaps(this.insights()).filter((entry) => entry.evidenceCount >= 3),
   );
-  readonly primaryCoordinateMap = computed(() => this.coordinateMaps()[0]);
   readonly semanticTagCount = computed(() => CATALOGUE_INSIGHT_TAGS.length);
   readonly hasEvidence = computed(() => this.themes().some((entry) => entry.evidenceCount > 0));
 
@@ -438,29 +493,37 @@ export class DashboardSemanticMapComponent {
   }
 
   affinityDiagnosis(score: number): string {
-    if (score < 20) return this.text('Casi sin afinidad', 'Almost no affinity');
+    if (score < 15) return this.text('Sin afinidad apreciable', 'No meaningful affinity');
+    if (score < 25) return this.text('Interés muy leve', 'Very slight interest');
     if (score < 35) return this.text('Interés leve', 'Slight interest');
-    if (score < 50) return this.text('Te genera curiosidad', 'It sparks curiosity');
-    if (score < 60) return this.text('Te atrae moderadamente', 'Moderate attraction');
-    if (score < 70) return this.text('Te gusta', 'You like it');
+    if (score < 45) return this.text('Te genera curiosidad', 'It sparks curiosity');
+    if (score < 55) return this.text('Curiosidad marcada', 'Marked curiosity');
+    if (score < 65) return this.text('Te atrae moderadamente', 'Moderate attraction');
+    if (score < 75) return this.text('Te gusta', 'You like it');
     if (score < 85) return this.text('Te gusta bastante', 'You like it quite a lot');
+    if (score < 95) return this.text('Preferencia fuerte', 'Strong preference');
     return this.text('Preferencia muy marcada', 'Very strong preference');
   }
 
   scorePosition(score: number): number {
-    return Math.max(5, Math.min(95, 5 + score * 0.9));
+    return Math.max(3, Math.min(97, score));
   }
 
   coordinateLeft(value: number): number {
-    return Math.max(5, Math.min(95, 50 + value * 0.45));
+    return Math.max(5, Math.min(95, 50 + this.sensitiveBalance(value) * 0.45));
+  }
+
+  coordinateTop(value: number): number {
+    return Math.max(5, Math.min(95, 50 - this.sensitiveBalance(value) * 0.45));
   }
 
   relativeDiagnosis(value: number, axis: SemanticAxisDefinition): string {
-    const magnitude = Math.abs(value);
-    if (magnitude < 10) return this.text('Muy equilibrado entre ambos lados', 'Very balanced between both sides');
-    const target = this.axisLabel(axis, value < 0 ? 'low' : 'high');
-    if (magnitude < 25) return this.text(`Ligera inclinación hacia ${target}`, `Slight lean toward ${target}`);
-    if (magnitude < 50) return this.text(`Tendencia hacia ${target}`, `Tendency toward ${target}`);
+    const sensitive = this.sensitiveBalance(value);
+    const magnitude = Math.abs(sensitive);
+    if (magnitude < 7) return this.text('Muy equilibrado entre ambos lados', 'Very balanced between both sides');
+    const target = this.axisLabel(axis, sensitive < 0 ? 'low' : 'high');
+    if (magnitude < 22) return this.text(`Ligera inclinación hacia ${target}`, `Slight lean toward ${target}`);
+    if (magnitude < 45) return this.text(`Tendencia hacia ${target}`, `Tendency toward ${target}`);
     return this.text(`Tendencia clara hacia ${target}`, `Clear tendency toward ${target}`);
   }
 
@@ -470,7 +533,11 @@ export class DashboardSemanticMapComponent {
   }
 
   relativeAxisAriaLabel(value: number, axis: SemanticAxisDefinition): string {
-    return `${this.axisLabel(axis, 'low')} ↔ ${this.axisLabel(axis, 'high')}: ${value}`;
+    return `${this.axisLabel(axis, 'low')} ↔ ${this.axisLabel(axis, 'high')}: ${this.sensitiveBalance(value)}`;
+  }
+
+  coordinateMapAriaLabel(entry: SemanticCoordinateMapEntry): string {
+    return `${this.coordinateMapLabel(entry)} · ${this.axisLabel(entry.map.x, 'low')} ↔ ${this.axisLabel(entry.map.x, 'high')}: ${this.sensitiveBalance(entry.x)}; ${this.axisLabel(entry.map.y, 'low')} ↔ ${this.axisLabel(entry.map.y, 'high')}: ${this.sensitiveBalance(entry.y)}`;
   }
 
   evidenceLabel(count: number): string {
@@ -483,5 +550,9 @@ export class DashboardSemanticMapComponent {
 
   text(es: string, en: string): string {
     return this.i18n.locale() === 'es' ? es : en;
+  }
+
+  private sensitiveBalance(value: number): number {
+    return Math.max(-100, Math.min(100, Math.round(value * 2.4)));
   }
 }
