@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CatalogueStore } from '../../core/catalogue.store';
@@ -34,7 +35,7 @@ import { findRouteParam } from '../../shared/route-param';
             </div>
           </header>
 
-          <p class="consent-note">{{ i18n.t('questionnaire.categories.consentNotice') }}</p>
+          <p class="consent-note" role="note">{{ i18n.t('questionnaire.categories.consentNotice') }}</p>
 
           @if (profileStore.error()) { <p class="alert" role="alert">{{ i18n.t('common.profileStorageError') }}</p> }
           @if (catalogueRelationship() === 'profile-older') { <p class="alert">{{ i18n.t('questionnaire.profileOlder') }}</p> }
@@ -52,7 +53,12 @@ import { findRouteParam } from '../../shared/route-param';
             <section class="category-list" [attr.aria-label]="i18n.t('questionnaire.categoriesAria')">
               @for (summary of summaries(); track summary.category.id) {
                 <article class="category-card">
-                  <a class="category-main-link" [routerLink]="['/profiles', profileId, 'questionnaire', summary.category.id]" [queryParams]="includeFiltered() ? { filtered: '1' } : null">
+                  <a
+                    class="category-main-link"
+                    [id]="'category-link-' + summary.category.id"
+                    [routerLink]="['/profiles', profileId, 'questionnaire', summary.category.id]"
+                    [queryParams]="includeFiltered() ? { filtered: '1' } : null"
+                  >
                     <div class="category-card-heading">
                       <h2>{{ catalogueText.categoryLabel(summary.category) }}</h2>
                       <strong class="category-percentage">{{ summary.completionPercentage }}%</strong>
@@ -79,7 +85,7 @@ import { findRouteParam } from '../../shared/route-param';
             <section class="panel all-hidden-panel">
               <h2>{{ i18n.t('questionnaire.categories.allHidden.title') }}</h2>
               <p class="muted">{{ i18n.t('questionnaire.categories.allHidden.description') }}</p>
-              <button class="button" type="button" (click)="showAllCategories()">{{ i18n.t('questionnaire.categories.showAll') }}</button>
+              <button id="show-all-hidden-categories" class="button" type="button" (click)="showAllCategories()">{{ i18n.t('questionnaire.categories.showAll') }}</button>
             </section>
           }
 
@@ -175,7 +181,7 @@ import { findRouteParam } from '../../shared/route-param';
       background: linear-gradient(color-mix(in srgb, var(--surface-panel) 91%, transparent), color-mix(in srgb, var(--surface-panel) 91%, transparent)) padding-box, var(--window-border-gradient-soft) border-box;
       transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
     }
-    .category-card:hover {
+    .category-card:hover, .category-card:focus-within {
       background: linear-gradient(color-mix(in srgb, var(--surface-elevated) 96%, transparent), color-mix(in srgb, var(--surface-elevated) 96%, transparent)) padding-box, var(--window-border-gradient) border-box;
       box-shadow: 0 0.55rem 1.4rem rgba(5, 10, 28, 0.18);
       transform: translateY(-1px);
@@ -222,8 +228,10 @@ import { findRouteParam } from '../../shared/route-param';
     .category-main-link app-completion-progress { display: block; margin-top: 0.12rem; }
     .category-visibility-action {
       position: absolute;
-      right: 0.62rem;
-      bottom: 0.42rem;
+      right: 0.48rem;
+      bottom: 0.2rem;
+      min-width: 2.75rem;
+      min-height: 1.65rem;
       padding: 0.18rem 0.28rem;
       border: 0;
       background: transparent;
@@ -234,18 +242,22 @@ import { findRouteParam } from '../../shared/route-param';
       text-decoration: underline;
       text-underline-offset: 0.16em;
     }
-    .category-visibility-action:hover, .text-action:hover { color: var(--text-primary); }
+    .category-visibility-action:hover, .category-visibility-action:focus-visible, .text-action:hover, .text-action:focus-visible { color: var(--text-primary); }
     .hidden-categories { margin-top: 1rem; padding: 0.9rem; }
     .hidden-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
     .hidden-heading h2, .hidden-heading p { margin-top: 0; }
     .hidden-heading p { margin-bottom: 0; font-size: 0.8rem; }
     .hidden-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1rem; margin-top: 0.65rem; }
     .hidden-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; border-top: 1px solid var(--border-subtle); font-size: 0.82rem; }
-    .text-action { padding: 0; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; text-decoration: underline; }
+    .text-action { min-height: 1.75rem; padding: 0 0.2rem; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; text-decoration: underline; }
     .compact-action { min-height: 2.1rem; padding: 0.35rem 0.62rem; font-size: 0.74rem; }
     .all-hidden-panel { display: grid; gap: 0.8rem; }
     .all-hidden-panel h2, .all-hidden-panel p { margin: 0; }
     .all-hidden-panel .button { width: fit-content; }
+    @media (prefers-reduced-motion: reduce) {
+      .category-card { transition: none; }
+      .category-card:hover, .category-card:focus-within { transform: none; }
+    }
     @media (max-width: 1100px) {
       .categories-page { max-width: 66rem; }
       .category-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -274,6 +286,7 @@ export class QuestionnaireCategoriesPageComponent {
   private readonly preferences = inject(UiPreferencesService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly document = inject(DOCUMENT);
 
   readonly profileId = findRouteParam(this.route, 'id') ?? '';
   readonly includeFiltered = signal(this.route.snapshot.queryParamMap.get('filtered') === '1');
@@ -312,7 +325,19 @@ export class QuestionnaireCategoriesPageComponent {
 
   constructor() { void this.catalogueStore.initialize(); }
 
-  hideCategory(categoryId: string): void { this.preferences.setCategoryHidden(this.profileId, categoryId, true); }
+  hideCategory(categoryId: string): void {
+    const visible = this.summaries();
+    const index = visible.findIndex((summary) => summary.category.id === categoryId);
+    const focusId = visible[index + 1]?.category.id ?? visible[index - 1]?.category.id;
+    this.preferences.setCategoryHidden(this.profileId, categoryId, true);
+    queueMicrotask(() => {
+      const target = focusId
+        ? this.document.getElementById(`category-link-${focusId}`)
+        : this.document.getElementById('show-all-hidden-categories');
+      target?.focus({ preventScroll: true });
+    });
+  }
+
   showCategory(categoryId: string): void { this.preferences.setCategoryHidden(this.profileId, categoryId, false); }
   showAllCategories(): void { this.preferences.showAllCategories(this.profileId); }
 

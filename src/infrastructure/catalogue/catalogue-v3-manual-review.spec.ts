@@ -73,8 +73,9 @@ describe('Catalogue V3 final manual review', () => {
   it('keeps unannounced watching inside an explicit prior-consent frame', () => {
     const watched = seed('preagreed-unannounced-watching');
     expect(watched?.kind).toBe('watch');
-    expect(watched?.descriptionEs).toContain('acordaron previamente');
-    expect(watched?.descriptionEs).toContain('No incluye espiar');
+    expect(watched?.es).toBe('Observación sin aviso');
+    expect(watched?.descriptionEs).toContain('acuerdo previo explícito');
+    expect(watched?.descriptionEs).toContain('No incluye observar a alguien');
     expect(seed('voyeurism')?.descriptionEs).toContain('sabe que está siendo observada');
   });
 
@@ -147,8 +148,12 @@ describe('Catalogue V3 final manual review', () => {
     expect(practice('urine-drinking')?.roles.find((role) => role.id === 'self')?.label).toBe('Drink my own urine');
   });
 
-  it('uses a cleaner name for female external-genital pain play', () => {
-    expect(seed('pussy-torture')?.es).toBe('Juego intenso de dolor vulvar');
-    expect(seed('pussy-torture')?.descriptionEs).toContain('no se refiere a la vagina interna');
+  it('uses distinct names for vulvar, vaginal and urethral torture', () => {
+    expect(seed('pussy-torture')?.es).toBe('Tortura vulvar');
+    expect(seed('pussy-torture')?.descriptionEs).toContain('genitales externos');
+    expect(seed('vaginal-torture')?.es).toBe('Tortura vaginal');
+    expect(seed('vaginal-torture')?.descriptionEs).toContain('canal vaginal');
+    expect(seed('urethral-torture')?.es).toBe('Tortura uretral');
+    expect(seed('urethral-torture')?.descriptionEs).toContain('uretra');
   });
 });

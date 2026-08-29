@@ -19,6 +19,8 @@ interface GlossaryPopupPlacement {
   readonly above: boolean;
 }
 
+let glossaryPopupSequence = 0;
+
 @Component({
   selector: 'app-catalogue-glossary-text',
   template: `
@@ -28,11 +30,13 @@ interface GlossaryPopupPlacement {
           type="button"
           class="glossary-term"
           [attr.aria-expanded]="isVisible(segment.termId!)"
+          [attr.aria-describedby]="isVisible(segment.termId!) ? popupId : null"
           (mouseenter)="showHover(segment.termId!, segment.definition ?? '', $event)"
           (mouseleave)="clearHover(segment.termId!)"
           (focus)="showHover(segment.termId!, segment.definition ?? '', $event)"
           (blur)="clearHover(segment.termId!)"
           (click)="togglePinned(segment.termId!, segment.definition ?? '', $event)"
+          (keydown.escape)="closeOnEscape($event)"
           (pointerdown)="startLongPress(segment.termId!, segment.definition ?? '', $event)"
           (pointerup)="cancelLongPress()"
           (pointercancel)="cancelLongPress()"
@@ -45,6 +49,7 @@ interface GlossaryPopupPlacement {
 
     <span
       #popup
+      [id]="popupId"
       class="glossary-popup"
       popover="manual"
       role="tooltip"
@@ -124,6 +129,7 @@ export class CatalogueGlossaryTextComponent {
 
   @ViewChild('popup', { static: true }) private popup?: ElementRef<HTMLElement>;
 
+  readonly popupId = `catalogue-glossary-popup-${++glossaryPopupSequence}`;
   readonly text = input.required<string>();
   readonly hoveredTerm = signal<string | null>(null);
   readonly pinnedTerm = signal<string | null>(null);
@@ -147,7 +153,7 @@ export class CatalogueGlossaryTextComponent {
     const host = this.host.nativeElement;
     if (!host.closest('p')) return true;
     const card = host.closest('.question-card');
-    const heading = card?.querySelector('h2');
+    const heading = card?.querySelector('.question-card-header h2, .question-card-header h3');
     if (!heading?.textContent) return true;
     return !heading.textContent.toLocaleLowerCase().includes(termText.toLocaleLowerCase());
   }
@@ -182,6 +188,15 @@ export class CatalogueGlossaryTextComponent {
 
     this.pinnedTerm.set(termId);
     this.openPopup(definition, event.currentTarget);
+  }
+
+  closeOnEscape(event: Event): void {
+    if (!this.hoveredTerm() && !this.pinnedTerm()) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.hoveredTerm.set(null);
+    this.pinnedTerm.set(null);
+    this.hidePopup();
   }
 
   startLongPress(termId: string, definition: string, event: PointerEvent): void {

@@ -28,7 +28,11 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     <section class="role-block" [class.filtered-role]="filtered()">
       <div class="role-heading">
         <div>
-          <h3>{{ questionPrompt() }}</h3>
+          @if (headingLevel() === 4) {
+            <h4>{{ questionPrompt() }}</h4>
+          } @else {
+            <h3>{{ questionPrompt() }}</h3>
+          }
           @if (targetSite(); as site) {
             <p class="scope-note">{{ i18n.t('questionnaireRole.targetSite', { site: targetSiteLabel(site) }) }}</p>
           }
@@ -126,7 +130,7 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     .role-block:first-child { border-top: 0; padding-top: 0; }
     .filtered-role { opacity: 0.82; }
     .role-heading { grid-area: heading; display: flex; align-items: flex-start; justify-content: space-between; gap: 0.6rem; }
-    .role-heading h3 { margin: 0; font-size: 1rem; line-height: 1.25; letter-spacing: -0.01em; }
+    .role-heading :is(h3, h4) { margin: 0; font-size: 1rem; line-height: 1.25; letter-spacing: -0.01em; }
     .scope-note, .filtered-note { margin: 0.2rem 0 0; color: var(--text-secondary); font-size: 0.72rem; }
     .scope-note { font-weight: 700; }
     .text-button { padding: 0; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.72rem; text-decoration: underline; }
@@ -169,12 +173,16 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     .detail-field { display: grid; gap: 0.35rem; color: var(--text-secondary); font-size: 0.82rem; }
     .detail-field select, .detail-field textarea { width: 100%; padding: 0.55rem 0.65rem; border: 1px solid var(--border-strong); border-radius: 0.45rem; background: var(--surface-elevated); color: var(--text-primary); }
     .full-width { grid-column: 1 / -1; }
+    @media (prefers-reduced-motion: reduce) {
+      .preference-option, .preference-option span:first-child { transition: none; }
+      .preference-option:hover { transform: none; }
+    }
     @media (max-width: 920px) {
       .role-block { grid-template-columns: 1fr; grid-template-areas: "heading" "scale" "details"; gap: 0.6rem; }
     }
     @media (max-width: 760px) {
       .role-block { padding: 0.9rem 0; }
-      .role-heading h3 { font-size: 1.02rem; }
+      .role-heading :is(h3, h4) { font-size: 1.02rem; }
       .preference-scale { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.42rem; }
       .preference-option { min-height: 3rem; padding: 0.42rem 0.28rem; flex-direction: column; gap: 0.18rem; font-size: 0.67rem; }
       .preference-option span:first-child { font-size: 1rem; }
@@ -197,6 +205,7 @@ export class QuestionnaireRoleComponent {
   readonly scope = input<AnswerScope | undefined>();
   readonly answer = input<PracticeAnswer | undefined>();
   readonly filtered = input(false);
+  readonly headingLevel = input<3 | 4>(3);
   readonly answerChange = output<PracticeAnswer>();
   readonly answerRemove = output<{ readonly practiceId: string; readonly roleId: string; readonly scope?: AnswerScope }>();
 

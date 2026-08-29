@@ -20,7 +20,7 @@ export interface LocalizedFinalCatalogueGlossaryEntry {
   readonly aliases: readonly string[];
 }
 
-const REPLACED_BASE_IDS = new Set(['hotwife', 'cuckold', 'voyeurism', 'glory-hole']);
+const REPLACED_BASE_IDS = new Set(['hotwife', 'cuckold', 'voyeurism', 'glory-hole', 'vulva-pain-play']);
 
 const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
   term(
@@ -37,6 +37,27 @@ const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
     'visibility-media', 'voyeurism', 'Voyeurism', 'Voyeurismo', ['voyeurism', 'voyeurismo'],
     'Erotic interest in watching another person. In DesireSync the open-voyeurism entry means the observed partner knows they are being watched at that moment; pre-agreed unannounced watching is a separate entry.',
     'Interés erótico en observar a otra persona. En DesireSync la entrada de voyeurismo abierto implica que la pareja sabe que está siendo observada en ese momento; la observación sin aviso preacordada se pregunta aparte.',
+  ),
+
+  term(
+    'anatomy', 'urethra', 'Urethra', 'Uretra', ['urethra', 'urethral', 'uretra', 'uretral'],
+    'The tube that carries urine from the bladder to the outside of the body. Urethral-focused interests are anatomically distinct from vaginal or general external-genital play.',
+    'Conducto que lleva la orina desde la vejiga hasta el exterior del cuerpo. Los intereses centrados en la uretra son anatómicamente distintos del juego vaginal o genital externo general.',
+  ),
+  term(
+    'edge', 'vulvar-torture', 'Vulvar / pussy torture', 'Tortura vulvar / pussy torture', ['vulvar torture', 'vulva torture', 'pussy torture', 'tortura vulvar'],
+    'High-intensity pain-focused play centred on the vulva or external female genitals. It refers to the external anatomy rather than the internal vaginal canal.',
+    'Juego de dolor de alta intensidad centrado en la vulva o genitales externos femeninos. Se refiere a la anatomía externa, no al canal vaginal interno.',
+  ),
+  term(
+    'edge', 'vaginal-torture', 'Vaginal torture', 'Tortura vaginal', ['vaginal torture', 'tortura vaginal'],
+    'High-intensity pain-focused play where the internal vaginal canal is the specific focus, distinct from external vulvar pain play.',
+    'Juego de dolor de alta intensidad donde el canal vaginal interno es el foco específico, distinto del juego de dolor sobre la vulva externa.',
+  ),
+  term(
+    'edge', 'urethral-torture', 'Urethral torture', 'Tortura uretral', ['urethral torture', 'tortura uretral'],
+    'High-intensity edge play where pain, control or vulnerability of the urethra is itself the erotic focus.',
+    'Juego edge de alta intensidad donde el dolor, el control o la vulnerabilidad de la uretra constituyen el propio foco erótico.',
   ),
 
   term(

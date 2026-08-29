@@ -1,5 +1,7 @@
 export const ES_QUESTIONNAIRE_UX_TRANSLATIONS = {
+  'a11y.skipToMain': 'Saltar al contenido principal',
   'questionnaire.windowAria': 'Cuestionario',
+  'questionnaire.subcategoriesAria': 'Subcategorías del cuestionario',
   'questionnaire.pending.complete': 'No quedan preguntas visibles pendientes',
   'questionnaire.pending.one': 'Queda {count} pregunta visible pendiente',
   'questionnaire.pending.other': 'Quedan {count} preguntas visibles pendientes',
@@ -24,7 +26,7 @@ export const ES_QUESTIONNAIRE_UX_TRANSLATIONS = {
   'questionnaire.category.dockProgress': 'Categoría · {answered} de {total}',
   'questionnaire.category.progressAria': 'Progreso de la categoría: {answered} de {total} respondidas, {percentage}%',
   'questionnaire.categories.description': 'Responde a tu ritmo. Las preguntas sin responder no expresan ninguna preferencia y cada respuesta se guarda inmediatamente.',
-  'questionnaire.categories.consentNotice': 'Todas las prácticas y escenarios del catálogo se entienden entre adultos y con consentimiento de todas las personas implicadas. Ese marco se da por supuesto en cada entrada.',
+  'questionnaire.categories.consentNotice': 'En todo el catálogo se presupone que todas las personas son adultas y consienten. Si una práctica juega con sorpresa, desconocimiento del momento, exposición, disponibilidad o pérdida de control, se entiende dentro de límites y un acuerdo previo explícito; cuando esa distinción cambia la práctica, se aclara en su descripción.',
   'questionnaire.categories.hide': 'Ocultar',
   'questionnaire.categories.hideAria': 'Ocultar la categoría {category}',
   'questionnaire.categories.show': 'Mostrar',
@@ -56,7 +58,9 @@ export const ES_QUESTIONNAIRE_UX_TRANSLATIONS = {
 export type QuestionnaireUxTranslationKey = keyof typeof ES_QUESTIONNAIRE_UX_TRANSLATIONS;
 
 export const EN_QUESTIONNAIRE_UX_TRANSLATIONS = {
+  'a11y.skipToMain': 'Skip to main content',
   'questionnaire.windowAria': 'Questionnaire',
+  'questionnaire.subcategoriesAria': 'Questionnaire subcategories',
   'questionnaire.pending.complete': 'No visible questions remain unanswered',
   'questionnaire.pending.one': '{count} visible question remains unanswered',
   'questionnaire.pending.other': '{count} visible questions remain unanswered',
@@ -81,7 +85,7 @@ export const EN_QUESTIONNAIRE_UX_TRANSLATIONS = {
   'questionnaire.category.dockProgress': 'Category · {answered} of {total}',
   'questionnaire.category.progressAria': 'Category progress: {answered} of {total} answered, {percentage}%',
   'questionnaire.categories.description': 'Answer at your own pace. Unanswered questions do not express a preference, and every answer is saved immediately.',
-  'questionnaire.categories.consentNotice': 'Every practice and scenario in the catalogue is understood to involve adults and the consent of everyone involved. That framework is assumed for every entry.',
+  'questionnaire.categories.consentNotice': 'Throughout the catalogue, everyone is assumed to be an adult and consenting. If a practice plays with surprise, not knowing the exact moment, exposure, availability or loss of control, it is understood to occur within defined limits and an explicit prior agreement; when that distinction changes the practice, its description says so.',
   'questionnaire.categories.hide': 'Hide',
   'questionnaire.categories.hideAria': 'Hide the {category} category',
   'questionnaire.categories.show': 'Show',

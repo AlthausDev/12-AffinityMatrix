@@ -18,20 +18,23 @@ import { QUESTIONNAIRE_SERVICE } from '../core/questionnaire-service.token';
 import { UiPreferencesService } from '../core/ui-preferences.service';
 import { TranslationService } from '../i18n/translation.service';
 import { findRouteParam } from '../shared/route-param';
+import { ModalFocusTrapDirective } from '../shared/modal-focus-trap.directive';
 
 @Component({
   selector: 'app-questionnaire-shell',
-  imports: [RouterLink, RouterOutlet],
+  imports: [RouterLink, RouterOutlet, ModalFocusTrapDirective],
   template: `
     <div
       #viewport
       class="questionnaire-overlay"
       [class.category-navigation-active]="currentCategoryId()"
+      [attr.inert]="finishDialogOpen() ? '' : null"
+      [attr.aria-hidden]="finishDialogOpen() ? 'true' : null"
     >
       <header class="questionnaire-top-dock">
         <div class="questionnaire-dock-inner toolbar-primary">
-          <span class="pending-label pending-label-full">{{ pendingLabel(pendingCount()) }}</span>
-          <span class="pending-label pending-label-short">{{ pendingShortLabel(pendingCount()) }}</span>
+          <span class="pending-label pending-label-full" aria-live="polite">{{ pendingLabel(pendingCount()) }}</span>
+          <span class="pending-label pending-label-short" aria-live="polite">{{ pendingShortLabel(pendingCount()) }}</span>
 
           <nav
             class="toolbar-global-actions"
@@ -113,18 +116,25 @@ import { findRouteParam } from '../shared/route-param';
     </div>
 
     @if (finishDialogOpen()) {
-      <div class="questionnaire-exit-backdrop">
-        <section class="questionnaire-exit-dialog" role="dialog" aria-modal="true" aria-labelledby="questionnaire-exit-title" aria-describedby="questionnaire-exit-description">
+      <div class="questionnaire-exit-backdrop" (keydown.escape)="continueQuestionnaire()">
+        <section
+          appModalFocusTrap
+          class="questionnaire-exit-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="questionnaire-exit-title"
+          aria-describedby="questionnaire-exit-description questionnaire-exit-saved"
+        >
           <p class="eyebrow">{{ i18n.t('questionnaire.finish.eyebrow') }}</p>
           <h2 id="questionnaire-exit-title">{{ i18n.t('questionnaire.finish.title') }}</h2>
           <p id="questionnaire-exit-description" class="muted">{{ finishDescription(pendingCount()) }}</p>
-          <p class="muted">{{ i18n.t('questionnaire.finish.saved') }}</p>
+          <p id="questionnaire-exit-saved" class="muted">{{ i18n.t('questionnaire.finish.saved') }}</p>
           <label class="check-field exit-preference">
             <input type="checkbox" [checked]="dontAskAgain()" (change)="toggleDontAskAgain($event)" />
             <span><strong>{{ i18n.t('questionnaire.finish.dontAskAgain') }}</strong><small>{{ i18n.t('questionnaire.finish.dontAskAgainHint') }}</small></span>
           </label>
           <div class="form-actions">
-            <button class="button secondary" type="button" (click)="continueQuestionnaire()">{{ i18n.t('questionnaire.finish.continue') }}</button>
+            <button class="button secondary" type="button" autofocus (click)="continueQuestionnaire()">{{ i18n.t('questionnaire.finish.continue') }}</button>
             <button class="button" type="button" (click)="confirmFinish()">{{ i18n.t('questionnaire.finish.exit') }}</button>
           </div>
         </section>

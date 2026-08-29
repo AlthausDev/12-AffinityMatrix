@@ -5,6 +5,8 @@ import {
 import { applyCatalogueFinalPass, FINAL_PASS_RETIRED_PRACTICE_IDS } from './catalogue-final-pass';
 import { applyCatalogueClosingPass, CLOSING_PASS_RETIRED_PRACTICE_IDS } from './catalogue-closing-pass';
 import { applyCatalogueClosingOrder } from './catalogue-closing-order';
+import { applyCatalogueReleaseAudit, applyCatalogueReleaseAuditCategoryCopy } from './catalogue-release-audit';
+import { applyCatalogueReleaseAuditOrder } from './catalogue-release-order';
 import { applyFinalCategoryCopy } from './category-copy-overrides';
 import { polishCatalogue } from './content-polish';
 import { materializeContextualDescriptions } from './contextual-description';
@@ -25,6 +27,7 @@ import { applyManualRoleFollowup } from './manual-role-followup';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
 import { applyPatchReleaseCorrections } from './patch-release-corrections';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
+import { stripRedundantConsentFromRoleLabels } from './role-label-consent-cleanup';
 import { addExpandedSexualPositions } from './sexual-position-additions';
 import { CatalogueCategorySeed } from './types';
 
@@ -74,10 +77,14 @@ const PATCH_CORRECTED_CONTENT = applyPatchReleaseCorrections(SANITIZED_CONTENT);
 const MANUALLY_REVIEWED_CONTENT = applyManualReleaseReview(PATCH_CORRECTED_CONTENT);
 const FINAL_PASS_CONTENT = applyCatalogueFinalPass(MANUALLY_REVIEWED_CONTENT);
 const CLOSING_PASS_CONTENT = applyCatalogueClosingPass(FINAL_PASS_CONTENT);
-const GROUPED_CONTENT = groupFinalCataloguePractices(CLOSING_PASS_CONTENT);
+const RELEASE_AUDITED_CONTENT = applyCatalogueReleaseAudit(CLOSING_PASS_CONTENT);
+const GROUPED_CONTENT = groupFinalCataloguePractices(RELEASE_AUDITED_CONTENT);
 const CLOSING_ORDERED_CONTENT = applyCatalogueClosingOrder(GROUPED_CONTENT);
-const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(CLOSING_ORDERED_CONTENT);
+const RELEASE_ORDERED_CONTENT = applyCatalogueReleaseAuditOrder(CLOSING_ORDERED_CONTENT);
+const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(RELEASE_ORDERED_CONTENT);
 const CONCISE_CONTENT = applyConciseCategoryCopy(CATEGORY_COPY_CONTENT);
-const ROLE_REVIEWED_CONTENT = applyManualRoleFollowup(CONCISE_CONTENT);
+const RELEASE_COPY_AUDITED_CONTENT = applyCatalogueReleaseAuditCategoryCopy(CONCISE_CONTENT);
+const ROLE_REVIEWED_CONTENT = applyManualRoleFollowup(RELEASE_COPY_AUDITED_CONTENT);
+const CONSENT_CLEANED_CONTENT = stripRedundantConsentFromRoleLabels(ROLE_REVIEWED_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(ROLE_REVIEWED_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(CONSENT_CLEANED_CONTENT);
