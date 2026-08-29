@@ -13,6 +13,7 @@ import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { PointerGlowDirective } from '../../shared/pointer-glow.directive';
+import { DashboardSemanticMapComponent } from './dashboard-semantic-map.component';
 import {
   buildPreferenceDistribution,
   buildRoleProfile,
@@ -21,7 +22,13 @@ import {
 
 @Component({
   selector: 'app-profile-dashboard-page',
-  imports: [RouterLink, RouterOutlet, CompletionProgressComponent, PointerGlowDirective],
+  imports: [
+    RouterLink,
+    RouterOutlet,
+    CompletionProgressComponent,
+    PointerGlowDirective,
+    DashboardSemanticMapComponent,
+  ],
   template: `
     <main class="page profile-dashboard">
       <nav class="dashboard-topbar" [attr.aria-label]="i18n.t('dashboard.actionsLabel')">
@@ -296,6 +303,8 @@ import {
               }
             </article>
           </div>
+
+          <app-dashboard-semantic-map [profile]="profile()" />
 
           <article class="dashboard-chart-card dashboard-category-card">
             <header class="dashboard-chart-heading dashboard-category-heading">
