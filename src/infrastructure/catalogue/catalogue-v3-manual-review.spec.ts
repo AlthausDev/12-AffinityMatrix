@@ -33,43 +33,74 @@ describe('Catalogue V3 final manual review', () => {
     ]);
   });
 
-  it('uses distinct exhibitionism, service and cleanup questions instead of release-review duplicates', () => {
+  it('uses distinct visibility, service and semen-cleanup questions instead of umbrella duplicates', () => {
     for (const id of [
       'erotic-selfies', 'erotic-photo-session-together', 'erotic-media-exchange',
       'watch-private-recording-together', 'watching-undressing', 'watched-masturbation', 'private-striptease',
-      'body-care-service', 'attentive-service', 'pleasure-focused-service', 'erotic-presentation-service',
+      'preagreed-unannounced-watching',
+      'body-care-service', 'attentive-service', 'erotic-presentation-service', 'footwear-service', 'fetish-gear-service',
       'ownership-token', 'temporary-ownership-marking', 'assigned-submissive-name',
-      'semen-on-other-body', 'semen-cleanup-manual', 'semen-cleanup-oral', 'semen-cleanup-other',
+      'semen-on-other-body', 'semen-cleanup-manual', 'semen-cleanup-oral-external',
+      'semen-cleanup-oral-creampie', 'semen-cleanup-other',
       'ordeal-scene', 'extreme-helplessness-fantasy',
     ]) expect(seed(id), id).toBeDefined();
 
     for (const retired of [
       'partner-erotic-photography', 'hospitality-service', 'ritual-attendance-service', 'creampie-cleanup',
-      'own-urine-play', 'own-blood-play', 'own-scat-play',
+      'own-urine-play', 'own-blood-play', 'own-scat-play', 'service', 'pleasure-focused-service',
+      'furniture-restraint', 'semen-cleanup-oral',
     ]) expect(seed(retired), retired).toBeUndefined();
 
-    expect(seed('semen-on-other-body')?.descriptionEs).toContain('distinta de cara, pecho, glúteos o boca');
-    expect(subcategory('fluids-semen-cleanup')?.practiceIds)
-      .toEqual(['semen-cleanup-manual', 'semen-cleanup-oral', 'semen-cleanup-other']);
-    expect(subcategory('edge-ordeal-helplessness')?.practiceIds).toEqual(['ordeal-scene', 'extreme-helplessness-fantasy']);
+    expect(subcategory('fluids-semen-cleanup')?.practiceIds).toEqual([
+      'semen-cleanup-manual',
+      'semen-cleanup-oral-external',
+      'semen-cleanup-oral-creampie',
+      'semen-cleanup-other',
+    ]);
   });
 
-  it('makes hotwife, cuckold and cuckquean roles explicit and readable', () => {
+  it('removes hotwife overlap and replaces it with erotic compersion', () => {
+    expect(seed('hotwife-dynamic')).toBeUndefined();
     expect(seed('watching-partner-with-other')?.kind).toBe('paired');
-    expect(seed('hotwife-dynamic')?.pairedRoles?.map((role) => role.id)).toEqual(['hotwife-role', 'hotwife-partner-role']);
+    expect(seed('erotic-compersion')?.pairedRoles?.map((role) => role.id))
+      .toEqual(['experience-compersion', 'be-compersion-focus']);
+    expect(seed('erotic-compersion')?.descriptionEs).toContain('disfrute');
+    expect(seed('erotic-compersion')?.descriptionEs).not.toContain('humillación ni en observar');
     expect(seed('cuckold-dynamic')?.pairedRoles?.map((role) => role.id)).toEqual(['cuckold-role', 'cuckold-partner-role']);
     expect(seed('cuckquean-dynamic')?.pairedRoles?.map((role) => role.id)).toEqual(['cuckquean-role', 'cuckquean-partner-role']);
-    expect(seed('hotwife-dynamic')?.descriptionEs).toContain('foco está en la mujer');
-    expect(seed('hotwife-dynamic')?.descriptionEs).toContain('cuckold');
-    expect(seed('cuckold-dynamic')?.descriptionEs).toContain('foco está en el hombre');
-    expect(seed('cuckold-dynamic')?.descriptionEs).toContain('hotwife');
+  });
+
+  it('keeps unannounced watching inside an explicit prior-consent frame', () => {
+    const watched = seed('preagreed-unannounced-watching');
+    expect(watched?.kind).toBe('watch');
+    expect(watched?.descriptionEs).toContain('acordaron previamente');
+    expect(watched?.descriptionEs).toContain('No incluye espiar');
+    expect(seed('voyeurism')?.descriptionEs).toContain('sabe que está siendo observada');
+  });
+
+  it('expands atmospheric places without duplicating roleplay', () => {
+    for (const id of ['sex-in-abandoned-place', 'sex-in-office-after-hours', 'sex-on-secluded-beach', 'sex-while-camping']) {
+      expect(seed(id)?.kind, id).toBe('mutual');
+      expect(subcategory('places-away-secluded')?.practiceIds, id).toContain(id);
+    }
+    expect(seed('sex-in-office-after-hours')?.descriptionEs).toContain('sin requerir un roleplay');
+  });
+
+  it('turns generic BDSM furniture into concrete restraint choices', () => {
+    expect(seed('furniture-restraint')).toBeUndefined();
+    for (const id of ['st-andrews-cross-restraint', 'bondage-bench-restraint', 'bondage-chair-restraint', 'stocks-restraint', 'cage-confinement']) {
+      expect(seed(id), id).toBeDefined();
+      expect(subcategory('restraint-furniture-confinement')?.practiceIds, id).toContain(id);
+    }
+    expect(seed('stocks-restraint')?.es).toBe('Cepo de inmovilización');
+    expect(seed('stocks-restraint')?.descriptionEs).toContain('aberturas');
   });
 
   it('uses human role wording across the reviewed orgasm, restraint, psychological and advanced sections', () => {
     const reviewedSubcategoryIds = new Set([
       'orgasm-delay-denial', 'orgasm-altered-overstimulation', 'orgasm-command-permission',
       'restraint-rope-foundations', 'restraint-cuffs-materials', 'restraint-body-positioning',
-      'restraint-sensory-access', 'restraint-gags-mouth',
+      'restraint-sensory-access', 'restraint-gags-mouth', 'restraint-furniture-confinement',
       'psychological-praise-worship', 'psychological-humiliation-degradation',
       'psychological-objectification-service', 'psychological-verbal-teasing', 'psychological-anticipation-fear',
       'power-service', 'power-ownership-symbols',
@@ -88,7 +119,7 @@ describe('Catalogue V3 final manual review', () => {
     }
   });
 
-  it('adds useful hidden semantic discriminators and keeps new concepts tagged', () => {
+  it('adds useful hidden semantic discriminators and keeps closing-pass concepts tagged', () => {
     const tagIds = new Set(CATALOGUE_INSIGHT_TAGS.map((tag) => tag.id));
     for (const id of [
       'anatomy-focus', 'orgasm-focus', 'recording-media', 'voyeuristic-focus', 'exhibitionistic-focus',
@@ -97,13 +128,13 @@ describe('Catalogue V3 final manual review', () => {
 
     expect(insight('edging')?.signals['orgasm-focus']).toBe(0.75);
     expect(insight('private-recording')?.signals['recording-media']).toBe(1);
-    expect(insight('hotwife-dynamic')?.signals['non-monogamy']).toBe(0.75);
+    expect(insight('erotic-compersion')?.signals['non-monogamy']).toBe(1);
+    expect(insight('preagreed-unannounced-watching')?.signals['voyeuristic-focus']).toBe(1);
     expect(insight('collaring')?.signals['ownership-symbolism']).toBe(1);
     expect(insight('breath-play')?.signals['edge-risk']).toBe(1);
     expect(insight('vagina')?.signals['anatomy-focus']).toBe(1);
-    expect(insight('semen-on-other-body')?.signals['fluid-focus']).toBe(1);
-    expect(insight('erotic-media-exchange')?.signals['recording-media']).toBe(1);
-    expect(insight('semen-cleanup-oral')?.signals['fluid-focus']).toBe(1);
+    expect(insight('semen-cleanup-oral-creampie')?.signals['fluid-focus']).toBe(1);
+    expect(insight('st-andrews-cross-restraint')?.signals['physical-restraint']).toBe(1);
   });
 
   it('keeps own urine, blood and scat as answer roles inside the relevant practice', () => {
