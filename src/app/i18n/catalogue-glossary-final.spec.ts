@@ -20,6 +20,17 @@ describe('final catalogue glossary', () => {
     expect(glossary.find((entry) => entry.id === 'stocks')?.definition).toContain('aberturas');
   });
 
+  it('distinguishes vulvar, vaginal and urethral terminology', () => {
+    const glossary = localizedFinalCatalogueGlossary('es');
+    expect(glossary.find((entry) => entry.id === 'vulva-pain-play')).toBeUndefined();
+    expect(glossary.find((entry) => entry.id === 'vulvar-torture')?.definition).toContain('externos');
+    expect(glossary.find((entry) => entry.id === 'vaginal-torture')?.definition).toContain('canal vaginal interno');
+    expect(glossary.find((entry) => entry.id === 'urethral-torture')?.definition).toContain('uretra');
+    expect(glossary.find((entry) => entry.id === 'urethra')?.definition).toContain('vejiga');
+    expect(splitFinalCatalogueGlossaryText('Tortura uretral', 'es').find((part) => part.termId)?.termId)
+      .toBe('urethral-torture');
+  });
+
   it('keeps place-specific vocabulary reusable for a future glossary screen', () => {
     const glossary = localizedFinalCatalogueGlossary('es');
     expect(glossary.find((entry) => entry.id === 'dungeon')?.category).toBe('places-settings');
