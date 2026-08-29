@@ -16,7 +16,7 @@ import {
   CATALOGUE_V3_REMAINING_PRACTICE_INSIGHTS,
 } from './catalogue-insights-remaining';
 import { applyCatalogueInsightReleaseAudit } from './catalogue-insights-release-audit';
-import { BODY_TRAIT_REFINEMENT_RETIRED_PRACTICE_IDS } from './content/body-trait-refinements';
+import { PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS } from './content/physical-preferences-extraction';
 
 /** Complete reusable semantic vocabulary for Catalogue V3. */
 export const CATALOGUE_INSIGHT_TAGS = [
@@ -42,5 +42,5 @@ const QUESTIONNAIRE_FOLLOWUP_INSIGHTS = applyCatalogueInsightQuestionnaireFollow
 
 /** Semantic signals for every first-class practice in every final 0.2 questionnaire category. */
 export const CATALOGUE_V3_PRACTICE_INSIGHTS = QUESTIONNAIRE_FOLLOWUP_INSIGHTS.filter(
-  (entry) => !BODY_TRAIT_REFINEMENT_RETIRED_PRACTICE_IDS.has(entry.practiceId),
+  (entry) => !PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS.has(entry.practiceId),
 );
