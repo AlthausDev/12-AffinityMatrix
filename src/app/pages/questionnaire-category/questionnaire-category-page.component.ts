@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AnswerScope, PracticeAnswer } from '../../../domain/profile/profile-answer';
@@ -59,8 +59,18 @@ import {
           } @else if (sections().length > 0) {
             <section class="subcategory-list" aria-label="Subcategorías">
               @for (section of sections(); track section.id) {
-                <details class="subcategory-section" [open]="isSubcategoryOpen(section.id)">
-                  <summary class="subcategory-summary" (click)="toggleSubcategory(section.id, $event)">
+                <div
+                  class="subcategory-section"
+                  [class.is-open]="isSubcategoryOpen(section.id)"
+                  [id]="'subcategory-' + section.id"
+                >
+                  <button
+                    type="button"
+                    class="subcategory-summary"
+                    [attr.aria-expanded]="isSubcategoryOpen(section.id)"
+                    [attr.aria-controls]="'subcategory-content-' + section.id"
+                    (click)="toggleSubcategory(section.id)"
+                  >
                     <span class="subcategory-summary-copy">
                       <strong>{{ section.label }}</strong>
                       <small>{{ section.answered }} / {{ section.total }}</small>
@@ -69,34 +79,43 @@ import {
                       <strong>{{ section.percentage }}%</strong>
                       <app-completion-progress [value]="section.percentage" />
                     </span>
-                  </summary>
-                  <div class="subcategory-content">
-                    <p class="subcategory-description">{{ section.description }}</p>
-                    <div class="question-list">
-                      @for (item of section.practices; track item.practice.id) {
-                        <article class="panel question-card">
-                          <header class="question-card-header">
-                            <h2>{{ catalogueText.practiceLabel(item.practice) }}</h2>
-                            @if (catalogueText.practiceDescription(item.practice)) {
-                              <p class="muted">{{ catalogueText.practiceDescription(item.practice) }}</p>
-                            }
-                          </header>
-                          @for (roleView of item.roles; track roleView.answerKey) {
-                            <app-questionnaire-role
-                              [practiceId]="item.practice.id"
-                              [role]="roleView.role"
-                              [scope]="roleView.scope"
-                              [answer]="roleView.answer"
-                              [filtered]="roleView.filtered"
-                              (answerChange)="saveAnswer($event)"
-                              (answerRemove)="removeAnswer($event)"
-                            />
+                  </button>
+                  <div
+                    class="subcategory-reveal"
+                    [id]="'subcategory-content-' + section.id"
+                    [attr.aria-hidden]="!isSubcategoryOpen(section.id)"
+                    [attr.inert]="isSubcategoryOpen(section.id) ? null : ''"
+                  >
+                    <div class="subcategory-reveal-inner">
+                      <div class="subcategory-content">
+                        <p class="subcategory-description">{{ section.description }}</p>
+                        <div class="question-list">
+                          @for (item of section.practices; track item.practice.id) {
+                            <article class="panel question-card">
+                              <header class="question-card-header">
+                                <h2>{{ catalogueText.practiceLabel(item.practice) }}</h2>
+                                @if (catalogueText.practiceDescription(item.practice)) {
+                                  <p class="muted">{{ catalogueText.practiceDescription(item.practice) }}</p>
+                                }
+                              </header>
+                              @for (roleView of item.roles; track roleView.answerKey) {
+                                <app-questionnaire-role
+                                  [practiceId]="item.practice.id"
+                                  [role]="roleView.role"
+                                  [scope]="roleView.scope"
+                                  [answer]="roleView.answer"
+                                  [filtered]="roleView.filtered"
+                                  (answerChange)="saveAnswer($event)"
+                                  (answerRemove)="removeAnswer($event)"
+                                />
+                              }
+                            </article>
                           }
-                        </article>
-                      }
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </details>
+                </div>
               }
             </section>
           } @else {
@@ -193,34 +212,57 @@ import {
     .subcategory-list { display: grid; gap: 0.9rem; }
     .subcategory-section {
       overflow: clip;
+      scroll-margin-top: calc(var(--questionnaire-top-space, 5.25rem) + 0.75rem);
       border: 1px solid color-mix(in srgb, var(--border-strong) 68%, var(--neon-violet));
       border-radius: 0.9rem;
       background: linear-gradient(145deg, color-mix(in srgb, var(--surface-panel) 94%, #17346a 6%), color-mix(in srgb, var(--surface-panel) 94%, #492561 6%));
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.055);
+      transition: border-color 220ms ease, box-shadow 220ms ease;
+    }
+    .subcategory-section.is-open {
+      border-color: color-mix(in srgb, var(--border-strong) 52%, var(--neon-violet));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.065), 0 0 1rem rgba(111, 101, 255, 0.035);
     }
     .subcategory-summary {
+      position: relative;
       display: grid;
+      width: 100%;
       grid-template-columns: minmax(0, 1fr) minmax(8rem, 12rem);
       align-items: center;
       gap: 1rem;
       padding: 1rem 1.1rem;
+      border: 0;
+      appearance: none;
       cursor: pointer;
-      list-style: none;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
     }
-    .subcategory-summary::-webkit-details-marker { display: none; }
     .subcategory-summary::after {
       content: '⌄';
       position: absolute;
       right: 0.85rem;
       color: var(--text-secondary);
-      transition: transform 140ms ease;
+      transition: transform 220ms cubic-bezier(.2,.72,.2,1);
     }
-    .subcategory-section[open] > .subcategory-summary::after { transform: rotate(180deg); }
+    .subcategory-section.is-open > .subcategory-summary::after { transform: rotate(180deg); }
     .subcategory-summary-copy { display: grid; gap: 0.18rem; min-width: 0; }
     .subcategory-summary-copy > strong { font-size: 1.08rem; letter-spacing: -0.015em; }
     .subcategory-summary-copy small { color: var(--text-secondary); font-size: 0.72rem; }
     .subcategory-progress { display: grid; gap: 0.28rem; padding-right: 1.35rem; text-align: right; }
     .subcategory-progress > strong { font-size: 0.82rem; }
+    .subcategory-reveal {
+      display: grid;
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transition: grid-template-rows 280ms cubic-bezier(.2,.72,.2,1), opacity 180ms ease;
+    }
+    .subcategory-section.is-open > .subcategory-reveal {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+    .subcategory-reveal-inner { min-height: 0; overflow: hidden; }
     .subcategory-content { padding: 0 1rem 1rem; border-top: 1px solid color-mix(in srgb, var(--border-subtle) 72%, transparent); }
     .subcategory-description { max-width: 48rem; margin: 0.85rem 0 1rem; color: var(--text-secondary); font-size: 0.82rem; line-height: 1.5; }
     .question-list { display: grid; gap: 0.85rem; }
@@ -228,6 +270,11 @@ import {
     .question-card-header { margin-bottom: 0.7rem; }
     .question-card-header h2 { margin-bottom: 0.35rem; font-size: 1.18rem; letter-spacing: -0.015em; }
     .question-card-header p { max-width: 50rem; margin-bottom: 0; font-size: 0.84rem; line-height: 1.5; }
+    @media (prefers-reduced-motion: reduce) {
+      .subcategory-section,
+      .subcategory-summary::after,
+      .subcategory-reveal { transition: none; }
+    }
     @media (max-width: 720px) {
       .questionnaire-page { width: min(100% - 1rem, 66rem); }
       .category-header { grid-template-columns: 1fr; gap: 0.72rem; align-items: stretch; }
@@ -265,10 +312,12 @@ export class QuestionnaireCategoryPageComponent {
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly params = toSignal(this.route.paramMap, { initialValue: this.route.snapshot.paramMap });
-  private readonly openSubcategoryIds = signal<ReadonlySet<string>>(new Set());
+  private readonly openSubcategoryId = signal<string | null>(null);
   private previousSubcategoryCompletion = new Map<string, boolean>();
   private subcategoryFlowKey = '';
+  private scrollTimer: ReturnType<typeof setTimeout> | undefined;
 
   readonly profileId = findRouteParam(this.route, 'id') ?? '';
   readonly includeFiltered = signal(this.route.snapshot.queryParamMap.get('filtered') === '1');
@@ -320,6 +369,10 @@ export class QuestionnaireCategoryPageComponent {
   constructor() {
     void this.catalogueStore.initialize();
 
+    this.destroyRef.onDestroy(() => {
+      if (this.scrollTimer !== undefined) clearTimeout(this.scrollTimer);
+    });
+
     effect(() => {
       const sections = this.sections();
       const flowKey = `${this.categoryId()}|${this.includeFiltered() ? 'filtered' : 'default'}`;
@@ -330,8 +383,7 @@ export class QuestionnaireCategoryPageComponent {
       if (needsInitialSelection) {
         this.subcategoryFlowKey = flowKey;
         this.previousSubcategoryCompletion = completion;
-        const firstPending = firstPendingSubcategoryId(sections);
-        this.openSubcategoryIds.set(firstPending ? new Set([firstPending]) : new Set());
+        this.openSubcategoryId.set(firstPendingSubcategoryId(sections));
         return;
       }
 
@@ -342,34 +394,32 @@ export class QuestionnaireCategoryPageComponent {
       this.previousSubcategoryCompletion = completion;
 
       if (justCompleted.length > 0) {
-        const open = new Set(this.openSubcategoryIds());
-        for (const section of justCompleted) open.delete(section.id);
-
         const completed = justCompleted.at(-1)!;
         const nextPending = nextPendingSubcategoryId(sections, completed.id);
-        if (nextPending) open.add(nextPending);
-        this.openSubcategoryIds.set(open);
+        this.openSubcategoryId.set(nextPending);
+        if (nextPending) this.scheduleSubcategoryScroll(nextPending);
         return;
       }
 
-      const visibleIds = new Set(sections.map((section) => section.id));
-      const currentOpen = this.openSubcategoryIds();
-      if ([...currentOpen].some((id) => !visibleIds.has(id))) {
-        this.openSubcategoryIds.set(new Set([...currentOpen].filter((id) => visibleIds.has(id))));
+      const currentOpen = this.openSubcategoryId();
+      if (currentOpen && !sections.some((section) => section.id === currentOpen)) {
+        this.openSubcategoryId.set(firstPendingSubcategoryId(sections));
       }
     });
   }
 
   isSubcategoryOpen(sectionId: string): boolean {
-    return this.openSubcategoryIds().has(sectionId);
+    return this.openSubcategoryId() === sectionId;
   }
 
-  toggleSubcategory(sectionId: string, event: Event): void {
-    event.preventDefault();
-    const open = new Set(this.openSubcategoryIds());
-    if (open.has(sectionId)) open.delete(sectionId);
-    else open.add(sectionId);
-    this.openSubcategoryIds.set(open);
+  toggleSubcategory(sectionId: string): void {
+    if (this.openSubcategoryId() === sectionId) {
+      this.openSubcategoryId.set(null);
+      return;
+    }
+
+    this.openSubcategoryId.set(sectionId);
+    this.scheduleSubcategoryScroll(sectionId);
   }
 
   toggleFiltered(event: Event): void {
@@ -394,5 +444,20 @@ export class QuestionnaireCategoryPageComponent {
 
   removeAnswer(target: { readonly practiceId: string; readonly roleId: string; readonly scope?: AnswerScope }): void {
     void this.profileStore.removeAnswer(this.profileId, target.practiceId, target.roleId, target.scope);
+  }
+
+  private scheduleSubcategoryScroll(sectionId: string): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    if (this.scrollTimer !== undefined) clearTimeout(this.scrollTimer);
+
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    this.scrollTimer = setTimeout(() => {
+      this.scrollTimer = undefined;
+      if (this.openSubcategoryId() !== sectionId) return;
+      document.getElementById(`subcategory-${sectionId}`)?.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    }, reduceMotion ? 0 : 300);
   }
 }
