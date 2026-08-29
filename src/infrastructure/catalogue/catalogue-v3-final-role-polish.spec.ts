@@ -29,9 +29,9 @@ function snapshotPractice(id: string) {
 }
 
 describe('Catalogue V3 final role polish', () => {
-  it('removes irrelevant semen roles for heterosexual men while keeping distinct cleanup semantics', () => {
+  it('keeps semen cleanup semantics distinct without treating heterosexual male orientation as a preference', () => {
     const man = profile('hetero-man-fluids-final', 'male', 'heterosexual');
-    expect(practiceIds('fluids', man)).not.toContain('snowballing');
+    expect(practiceIds('fluids', man)).toContain('snowballing');
     expect(snapshotPractice('creampie-cleanup')).toBeUndefined();
     expect(snapshotPractice('semen-cleanup-oral')).toBeUndefined();
 
@@ -50,13 +50,13 @@ describe('Catalogue V3 final role polish', () => {
     ]);
   });
 
-  it('filters gangbang center/participant roles for heterosexual profiles', () => {
+  it('keeps generic gangbang roles available instead of assigning them from orientation stereotypes', () => {
     const man = profile('hetero-man-gangbang', 'male', 'heterosexual');
     const woman = profile('hetero-woman-gangbang', 'female', 'heterosexual');
     const gayMan = profile('gay-man-gangbang', 'male', 'homosexual');
 
-    expect(roleIds('groups', 'gangbang', man)).toEqual(['participate']);
-    expect(roleIds('groups', 'gangbang', woman)).toEqual(['center']);
+    expect(roleIds('groups', 'gangbang', man)).toEqual(['center', 'participate']);
+    expect(roleIds('groups', 'gangbang', woman)).toEqual(['center', 'participate']);
     expect(roleIds('groups', 'gangbang', gayMan)).toEqual(['center', 'participate']);
   });
 
