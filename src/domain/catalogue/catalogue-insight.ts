@@ -32,7 +32,16 @@ export type CatalogueInsightTagId =
   | 'structure'
   | 'power-exchange'
   | 'service-orientation'
-  | 'group-social';
+  | 'group-social'
+  | 'anatomy-focus'
+  | 'orgasm-focus'
+  | 'recording-media'
+  | 'voyeuristic-focus'
+  | 'exhibitionistic-focus'
+  | 'non-monogamy'
+  | 'fluid-focus'
+  | 'ownership-symbolism'
+  | 'edge-risk';
 
 export type CatalogueInsightStrength = 0.25 | 0.5 | 0.75 | 1;
 

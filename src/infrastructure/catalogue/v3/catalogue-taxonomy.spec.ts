@@ -40,22 +40,22 @@ describe('catalogue v3 questionnaire taxonomy', () => {
     }
   });
 
-  it('keeps the larger final categories reviewable without changing coverage', () => {
+  it('keeps the larger final categories reviewable with the final release coverage', () => {
     const expected: Readonly<Record<string, readonly [number, number]>> = {
       'orgasm-control': [3, 11],
-      'body-fetishes': [7, 53],
+      'body-fetishes': [7, 54],
       groups: [4, 17],
       roleplay: [5, 23],
-      exhibitionism: [2, 8],
+      exhibitionism: [2, 13],
       'places-settings': [3, 12],
-      power: [4, 24],
+      power: [4, 30],
       restraint: [6, 34],
       psychological: [4, 22],
       sensation: [4, 29],
-      fluids: [5, 29],
+      fluids: [5, 33],
       'taboo-fantasies': [2, 12],
       surrealism: [2, 10],
-      edge: [4, 22],
+      edge: [5, 24],
     };
 
     for (const [categoryId, [subcategoryCount, practiceCount]] of Object.entries(expected)) {

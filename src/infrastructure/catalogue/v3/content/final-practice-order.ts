@@ -56,6 +56,7 @@ const BODY_FOCUS_FINAL_ORDER = [
   'penis-size-large',
   'testicles',
   'vulva',
+  'vagina',
   'pubic-hair',
   'body-hair',
   'armpits',
@@ -164,19 +165,77 @@ const SURREALISM_FINAL_ORDER = [
   'vore-fantasy',
 ] as const;
 
-const EXHIBITIONISM_FINAL_ORDER = insertAfter(
-  without(base('exhibitionism'), ['curtains-open-private']),
+const EXHIBITIONISM_FINAL_ORDER = [
   'voyeurism',
-  ['risk-of-being-seen'],
-);
+  'watching-undressing',
+  'mirrors',
+  'lights-on',
+  'risk-of-being-seen',
+  'erotic-selfies',
+  'taking-erotic-photos',
+  'partner-erotic-photography',
+  'erotic-photo-session-together',
+  'private-recording',
+  'watch-private-recording-together',
+  'video-call-sex',
+  'webcam-performance-private',
+] as const;
+
+const POWER_WITH_SERVICE = insertAfter(base('power'), 'domestic-service', [
+  'body-care-service',
+  'hospitality-service',
+  'ritual-attendance-service',
+]);
+const POWER_FINAL_ORDER = insertAfter(POWER_WITH_SERVICE, 'leash-control', [
+  'ownership-token',
+  'temporary-ownership-marking',
+  'assigned-submissive-name',
+]);
+
+const SENSATION_FINAL_ORDER = [
+  'feather-sensation',
+  'tickling',
+  'sensory-deprivation',
+  'sensory-overload',
+  'ice-play',
+  'temperature-contrast',
+  'warm-wax',
+  'electrostimulation-mild',
+  'rough-grabbing',
+  'scratching',
+  'biting',
+  'pinching',
+  'hair-pulling',
+  'pressure-points',
+  'nipple-pinching',
+  'clothespins',
+  'nipple-clamp-sensation',
+  'breast-slapping',
+  'genital-slapping',
+  'spanking',
+  'wooden-spoon-impact',
+  'slapping-body',
+  'paddling',
+  'flogging',
+  'cropping',
+  'belting',
+  'face-slapping',
+  'whipping',
+  'caning',
+] as const;
 
 const RESTRAINT_FINAL_ORDER = insertBefore(base('restraint'), 'gag', ['hand-over-mouth']);
-const FLUIDS_FINAL_ORDER = insertAfter(base('fluids'), 'female-ejaculation', ['squirting-on-partner']);
-const EDGE_FINAL_ORDER = insertBefore(
+const FLUIDS_WITH_SQUIRTING = insertAfter(base('fluids'), 'female-ejaculation', ['squirting-on-partner']);
+const FLUIDS_WITH_EXTERNAL_OTHER = insertAfter(FLUIDS_WITH_SQUIRTING, 'semen-on-buttocks', ['semen-on-other-body']);
+const FLUIDS_WITH_OWN_URINE = insertAfter(FLUIDS_WITH_EXTERNAL_OTHER, 'urine-drinking', ['own-urine-play']);
+const FLUIDS_WITH_OWN_BLOOD = insertAfter(FLUIDS_WITH_OWN_URINE, 'blood-drinking', ['own-blood-play']);
+const FLUIDS_FINAL_ORDER = insertAfter(FLUIDS_WITH_OWN_BLOOD, 'scat-ingestion', ['own-scat-play']);
+const EDGE_WITH_SEPARATE_GENITALS = insertBefore(
   without(base('edge'), ['genital-torture']),
   'cock-and-ball-torture',
   ['pussy-torture'],
 );
+const EDGE_FINAL_ORDER = [...EDGE_WITH_SEPARATE_GENITALS, 'ordeal-scene', 'extreme-helplessness-fantasy'];
 
 /** Final deliberate order, extending the base grouping only where final review changes content. */
 export const FINAL_CATALOGUE_PRACTICE_GROUP_ORDER: Readonly<Record<string, readonly string[]>> = {
@@ -188,7 +247,9 @@ export const FINAL_CATALOGUE_PRACTICE_GROUP_ORDER: Readonly<Record<string, reado
   'body-fetishes': BODY_FOCUS_FINAL_ORDER,
   roleplay: ROLEPLAY_FINAL_ORDER,
   exhibitionism: EXHIBITIONISM_FINAL_ORDER,
+  power: POWER_FINAL_ORDER,
   restraint: RESTRAINT_FINAL_ORDER,
+  sensation: SENSATION_FINAL_ORDER,
   fluids: FLUIDS_FINAL_ORDER,
   'taboo-fantasies': TABOO_FINAL_ORDER,
   surrealism: SURREALISM_FINAL_ORDER,

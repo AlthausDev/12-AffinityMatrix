@@ -9,6 +9,7 @@ import { CatalogueTaxonomyService } from '../../i18n/catalogue-taxonomy.service'
 import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-role.component';
+import { CatalogueGlossaryTextComponent } from '../../shared/catalogue-glossary-text.component';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { findRouteParam } from '../../shared/route-param';
 import {
@@ -19,7 +20,7 @@ import {
 
 @Component({
   selector: 'app-questionnaire-category-page',
-  imports: [RouterLink, QuestionnaireRoleComponent, CompletionProgressComponent],
+  imports: [RouterLink, QuestionnaireRoleComponent, CatalogueGlossaryTextComponent, CompletionProgressComponent],
   template: `
     <main class="questionnaire-modal-page questionnaire-page">
       @if (profile()) {
@@ -27,8 +28,8 @@ import {
           <header class="page-header category-header">
             <div>
               <p class="eyebrow">{{ i18n.t('questionnaire.category.eyebrow', { answered: currentCategory.answered, total: currentCategory.total }) }}</p>
-              <h1>{{ catalogueText.categoryLabel(currentCategory.category) }}</h1>
-              <p class="muted lead">{{ catalogueText.categoryDescription(currentCategory.category) }}</p>
+              <h1><app-catalogue-glossary-text [text]="catalogueText.categoryLabel(currentCategory.category)" /></h1>
+              <p class="muted lead"><app-catalogue-glossary-text [text]="catalogueText.categoryDescription(currentCategory.category)" /></p>
             </div>
             <div class="category-progress-summary">
               <span class="category-progress-label">{{ i18n.t('questionnaire.category.progressLabel') }}</span>
@@ -88,14 +89,14 @@ import {
                   >
                     <div class="subcategory-reveal-inner">
                       <div class="subcategory-content">
-                        <p class="subcategory-description">{{ section.description }}</p>
+                        <p class="subcategory-description"><app-catalogue-glossary-text [text]="section.description" /></p>
                         <div class="question-list">
                           @for (item of section.practices; track item.practice.id) {
                             <article class="panel question-card">
                               <header class="question-card-header">
-                                <h2>{{ catalogueText.practiceLabel(item.practice) }}</h2>
-                                @if (catalogueText.practiceDescription(item.practice)) {
-                                  <p class="muted">{{ catalogueText.practiceDescription(item.practice) }}</p>
+                                <h2><app-catalogue-glossary-text [text]="catalogueText.practiceLabel(item.practice, profile()?.metadata.sex)" /></h2>
+                                @if (catalogueText.practiceDescription(item.practice); as practiceDescription) {
+                                  <p class="muted"><app-catalogue-glossary-text [text]="practiceDescription" /></p>
                                 }
                               </header>
                               @for (roleView of item.roles; track roleView.answerKey) {
@@ -123,9 +124,9 @@ import {
               @for (item of currentCategory.practices; track item.practice.id) {
                 <article class="panel question-card">
                   <header class="question-card-header">
-                    <h2>{{ catalogueText.practiceLabel(item.practice) }}</h2>
-                    @if (catalogueText.practiceDescription(item.practice)) {
-                      <p class="muted">{{ catalogueText.practiceDescription(item.practice) }}</p>
+                    <h2><app-catalogue-glossary-text [text]="catalogueText.practiceLabel(item.practice, profile()?.metadata.sex)" /></h2>
+                    @if (catalogueText.practiceDescription(item.practice); as practiceDescription) {
+                      <p class="muted"><app-catalogue-glossary-text [text]="practiceDescription" /></p>
                     }
                   </header>
                   @for (roleView of item.roles; track roleView.answerKey) {
