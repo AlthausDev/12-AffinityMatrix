@@ -73,7 +73,7 @@ import {
                     (click)="toggleSubcategory(section.id)"
                   >
                     <span class="subcategory-summary-copy">
-                      <strong><app-catalogue-glossary-text [text]="section.label" /></strong>
+                      <strong>{{ section.label }}</strong>
                       <small>{{ section.answered }} / {{ section.total }}</small>
                     </span>
                     <span class="subcategory-progress">
