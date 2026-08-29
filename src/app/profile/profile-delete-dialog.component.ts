@@ -2,12 +2,15 @@ import { ChangeDetectionStrategy, Component, inject, input, output, signal } fro
 import { ProfileStore } from '../core/profile.store';
 import { UiPreferencesService } from '../core/ui-preferences.service';
 import { TranslationService } from '../i18n/translation.service';
+import { ModalFocusTrapDirective } from '../shared/modal-focus-trap.directive';
 
 @Component({
   selector: 'app-profile-delete-dialog',
+  imports: [ModalFocusTrapDirective],
   template: `
     <div class="delete-backdrop" (keydown.escape)="cancel()">
       <section
+        appModalFocusTrap
         class="delete-dialog"
         role="dialog"
         aria-modal="true"
