@@ -39,7 +39,15 @@ const SEXUAL_STYLE_RELEASE_ORDER = [
   'quiet-sex',
   'vocal-expressive-sex',
   'immersive-focused-sex',
-  'energetic-sex',
+  'novelty-focused-sex',
+];
+
+const SEXUAL_POSITIONS_RELEASE_ORDER = [
+  ...FINAL_CATALOGUE_PRACTICE_GROUP_ORDER['sexual-positions'],
+  'oral-kneeling-standing-position',
+  'oral-lying-between-legs-position',
+  'oral-side-lying-position',
+  'oral-edge-position',
 ];
 
 const TOYS_RELEASE_AUDIT_ORDER = without(
@@ -116,19 +124,33 @@ const FLUIDS_RELEASE_AUDIT_ORDER = insertBefore(FLUIDS_WITHOUT_FOOD_BODY, 'sweat
   'food-body-play',
   'erotic-feeding',
   'food-from-body',
+  'sexual-fluids-in-food-drink',
   'food-vaginal-penetration',
   'food-anal-penetration',
 ]);
 
-const EDGE_RELEASE_AUDIT_ORDER = insertAfter(
-  FINAL_CATALOGUE_PRACTICE_GROUP_ORDER['edge'],
+const EDGE_GENITAL_IDS = [
   'pussy-torture',
-  ['vaginal-torture', 'urethral-torture'],
+  'vaginal-torture',
+  'cock-and-ball-torture',
+  'urethral-torture',
+  'breast-torture',
+  'nipple-torture',
+] as const;
+const EDGE_WITHOUT_GENITAL_BLOCK = without(
+  FINAL_CATALOGUE_PRACTICE_GROUP_ORDER['edge'],
+  EDGE_GENITAL_IDS,
+);
+const EDGE_RELEASE_AUDIT_ORDER = insertBefore(
+  EDGE_WITHOUT_GENITAL_BLOCK,
+  'suspension-bondage',
+  EDGE_GENITAL_IDS,
 );
 
 export const RELEASE_AUDIT_CATALOGUE_PRACTICE_GROUP_ORDER: Readonly<Record<string, readonly string[]>> = {
   ...FINAL_CATALOGUE_PRACTICE_GROUP_ORDER,
   'sexual-style': SEXUAL_STYLE_RELEASE_ORDER,
+  'sexual-positions': SEXUAL_POSITIONS_RELEASE_ORDER,
   toys: TOYS_RELEASE_AUDIT_ORDER,
   'sexual-accessories': SEXUAL_ACCESSORIES_RELEASE_AUDIT_ORDER,
   'orgasm-control': ORGASM_RELEASE_ORDER,
