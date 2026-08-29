@@ -1,0 +1,31 @@
+.sequence-button {
+  position: relative;
+  gap: 0.45rem;
+}
+
+.sequence-label { line-height: 1.2; }
+.sequence-arrow {
+  flex: 0 0 auto;
+  color: color-mix(in srgb, var(--text-primary) 88%, var(--neon-cyan));
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.88;
+}
+
+@media (max-width: 720px) {
+  .sequence-button {
+    min-height: 3.15rem;
+    padding-inline: 2.65rem;
+  }
+
+  .sequence-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.15rem;
+  }
+
+  .sequence-arrow-previous { left: 1rem; }
+  .sequence-arrow-next { right: 1rem; }
+}
