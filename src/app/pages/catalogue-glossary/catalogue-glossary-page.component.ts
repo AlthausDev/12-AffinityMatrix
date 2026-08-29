@@ -50,7 +50,10 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
   template: `
     <main class="page glossary-page">
       <nav class="glossary-topbar" [attr.aria-label]="text('Navegación del glosario', 'Glossary navigation')">
-        <a class="back-link" [routerLink]="['/profiles', profileId]">{{ text('← Perfil', '← Profile') }}</a>
+        <a class="back-link glossary-profile-link" [routerLink]="['/profiles', profileId]">
+          <span aria-hidden="true">←</span>
+          <span>{{ text('Perfil', 'Profile') }}</span>
+        </a>
       </nav>
 
       <header class="page-header glossary-header">
@@ -67,12 +70,27 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
 
         <label class="glossary-search">
           <span>{{ text('Buscar término', 'Search terms') }}</span>
-          <input
-            type="search"
-            [placeholder]="text('Nombre, alias o definición…', 'Name, alias or definition…')"
-            [value]="query()"
-            (input)="setQuery($event)"
-          />
+          <span class="glossary-search-field">
+            <svg class="glossary-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m20 20-4.4-4.4M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" />
+            </svg>
+            <input
+              type="search"
+              [placeholder]="text('Nombre, alias o definición…', 'Name, alias or definition…')"
+              [value]="query()"
+              (input)="setQuery($event)"
+            />
+            @if (query()) {
+              <button
+                class="glossary-search-clear"
+                type="button"
+                [attr.aria-label]="text('Borrar búsqueda', 'Clear search')"
+                (click)="clearQuery()"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            }
+          </span>
         </label>
       </header>
 
@@ -106,7 +124,38 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
   `,
   styles: `
     .glossary-page { width: min(100% - 2rem, 72rem); }
-    .glossary-topbar { display: flex; justify-content: flex-start; margin-bottom: 1.2rem; }
+    .glossary-topbar {
+      position: sticky;
+      z-index: 12;
+      top: max(0.65rem, env(safe-area-inset-top));
+      display: flex;
+      width: max-content;
+      justify-content: flex-start;
+      margin-bottom: 1.2rem;
+    }
+    .glossary-profile-link {
+      display: inline-flex;
+      min-height: 2.45rem;
+      align-items: center;
+      gap: 0.42rem;
+      margin: 0;
+      padding: 0.42rem 0.72rem;
+      border: 1px solid color-mix(in srgb, var(--neon-violet) 26%, var(--border-subtle));
+      border-radius: 0.58rem;
+      background: linear-gradient(145deg, rgba(13, 28, 58, 0.88), rgba(34, 22, 61, 0.86));
+      box-shadow: 0 0.45rem 1.2rem rgba(2, 7, 22, 0.2);
+      color: color-mix(in srgb, var(--text-secondary) 90%, white);
+      font-size: 0.75rem;
+      font-weight: 760;
+      backdrop-filter: blur(14px) saturate(120%);
+      transition: border-color 150ms ease, color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+    }
+    .glossary-profile-link:hover {
+      transform: translateY(-1px);
+      border-color: color-mix(in srgb, var(--neon-cyan) 48%, var(--neon-violet));
+      box-shadow: 0 0.55rem 1.4rem rgba(74, 91, 210, 0.18);
+      color: var(--text-primary);
+    }
     .glossary-header {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(17rem, 24rem);
@@ -115,14 +164,74 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
     }
     .glossary-header .lead { max-width: 52rem; }
     .glossary-search { display: grid; gap: 0.45rem; }
-    .glossary-search > span {
+    .glossary-search > span:first-child {
       color: var(--text-secondary);
       font-size: 0.72rem;
       font-weight: 760;
       letter-spacing: 0.055em;
       text-transform: uppercase;
     }
-    .glossary-search input { width: 100%; }
+    .glossary-search-field {
+      display: grid;
+      min-height: 3rem;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.28rem 0.34rem 0.28rem 0.78rem;
+      border: 1px solid color-mix(in srgb, var(--neon-violet) 30%, var(--border-strong));
+      border-radius: 0.68rem;
+      background:
+        linear-gradient(145deg, rgba(18, 38, 75, 0.76), rgba(40, 24, 68, 0.76)) padding-box,
+        linear-gradient(135deg, rgba(54, 186, 255, 0.22), rgba(140, 92, 255, 0.34), rgba(230, 80, 197, 0.18)) border-box;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055), 0 0.45rem 1.2rem rgba(2, 7, 22, 0.13);
+      color: var(--text-secondary);
+      transition: border-color 150ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+    .glossary-search-field:focus-within {
+      border-color: color-mix(in srgb, var(--neon-cyan) 60%, var(--neon-violet));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.075), 0 0 0.9rem rgba(100, 103, 255, 0.2);
+    }
+    .glossary-search-icon {
+      width: 1.05rem;
+      height: 1.05rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-width: 1.7;
+    }
+    .glossary-search input {
+      width: 100%;
+      min-width: 0;
+      min-height: 2.25rem;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 0.82rem;
+    }
+    .glossary-search input::placeholder { color: color-mix(in srgb, var(--text-secondary) 62%, transparent); }
+    .glossary-search input::-webkit-search-cancel-button { display: none; }
+    .glossary-search-clear {
+      display: grid;
+      width: 2.15rem;
+      height: 2.15rem;
+      padding: 0;
+      border: 1px solid color-mix(in srgb, var(--border-subtle) 72%, transparent);
+      border-radius: 0.48rem;
+      background: rgba(36, 46, 78, 0.52);
+      color: var(--text-secondary);
+      cursor: pointer;
+      place-items: center;
+      font-size: 1.05rem;
+      line-height: 1;
+      transition: color 140ms ease, border-color 140ms ease, background 140ms ease;
+    }
+    .glossary-search-clear:hover {
+      border-color: color-mix(in srgb, var(--neon-magenta) 38%, var(--border-strong));
+      background: rgba(66, 39, 82, 0.66);
+      color: var(--text-primary);
+    }
     .glossary-groups { display: grid; gap: 1rem; }
     .glossary-group { padding: 1.05rem 1.1rem; }
     .glossary-group-heading {
@@ -146,7 +255,7 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
       gap: 1.1rem;
       padding: 0.8rem 0.15rem;
       border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 58%, transparent);
-      scroll-margin-top: 1rem;
+      scroll-margin-top: 4.5rem;
     }
     .glossary-entry:last-child { border-bottom: 0; }
     .glossary-entry dt {
@@ -159,6 +268,12 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
       .glossary-page { width: min(100% - 1rem, 72rem); }
       .glossary-header { grid-template-columns: 1fr; gap: 1rem; }
       .glossary-entry { grid-template-columns: 1fr; gap: 0.25rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .glossary-profile-link,
+      .glossary-search-field,
+      .glossary-search-clear { transition: none; }
+      .glossary-profile-link:hover { transform: none; }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -193,6 +308,10 @@ export class CatalogueGlossaryPageComponent {
 
   setQuery(event: Event): void {
     this.query.set((event.target as HTMLInputElement).value);
+  }
+
+  clearQuery(): void {
+    this.query.set('');
   }
 
   text(es: string, en: string): string {
