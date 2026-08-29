@@ -13,6 +13,27 @@ import { TranslationService } from './i18n/translation.service';
     <app-language-switcher />
     <router-outlet />
   `,
+  styles: `
+    .skip-link {
+      position: fixed;
+      z-index: 2000;
+      top: 0.55rem;
+      left: 0.55rem;
+      padding: 0.6rem 0.8rem;
+      transform: translateY(calc(-100% - 1rem));
+      border: 2px solid var(--focus-ring);
+      border-radius: 0.5rem;
+      background: var(--surface-elevated);
+      color: var(--text-primary);
+      font-weight: 750;
+      text-decoration: none;
+      transition: transform 120ms ease;
+    }
+    .skip-link:focus { transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      .skip-link { transition: none; }
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
