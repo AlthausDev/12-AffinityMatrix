@@ -36,13 +36,14 @@ export function toPortableProfile(
       ? { orientation: profile.metadata.orientation }
       : {}),
   };
+  const physicalPreferences = clonePhysicalPreferences(profile.physicalPreferences);
 
   return {
     formatVersion: PORTABLE_PROFILE_V6_FORMAT_VERSION,
     profileSchemaVersion: PORTABLE_PROFILE_V6_PROFILE_SCHEMA_VERSION,
     catalogueVersion: profile.catalogueVersion,
     metadata,
-    physicalPreferences: clonePhysicalPreferences(profile.physicalPreferences),
+    ...(Object.keys(physicalPreferences).length > 0 ? { physicalPreferences } : {}),
     answers: cloneAnswers(profile.answers),
   };
 }
