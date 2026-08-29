@@ -19,18 +19,10 @@ const BODY_FOCUS_FINAL_ORDER = [
   'lips',
   'tongue',
   'hair',
-  'facial-hair',
   'ears',
   'neck',
   'chest-general',
   'nipples',
-  'muscles',
-  'slim-build',
-  'curvy-build',
-  'stocky-build',
-  'stature-short',
-  'stature-average',
-  'stature-tall',
   'hands',
   'fingers',
   'bellies',
@@ -51,8 +43,6 @@ const BODY_FOCUS_FINAL_ORDER = [
   'sweat',
   'underwear',
   'worn-underwear',
-  'tattoos',
-  'piercings',
 ] as const;
 
 const PENETRATION_FINAL_ORDER = insertAfter(base('penetration'), 'double-anal-penetration', [
