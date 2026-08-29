@@ -1,12 +1,12 @@
 import { CATALOGUE_V3_CONTENT } from './v3/content/final';
-import { FINAL_CATALOGUE_PRACTICE_GROUP_ORDER } from './v3/content/final-practice-order';
+import { RELEASE_AUDIT_CATALOGUE_PRACTICE_GROUP_ORDER } from './v3/content/catalogue-release-order';
 
 describe('Catalogue V3 in-category grouping', () => {
   it('defines an explicit complete order for every final category', () => {
-    expect(Object.keys(FINAL_CATALOGUE_PRACTICE_GROUP_ORDER)).toHaveLength(CATALOGUE_V3_CONTENT.length);
+    expect(Object.keys(RELEASE_AUDIT_CATALOGUE_PRACTICE_GROUP_ORDER)).toHaveLength(CATALOGUE_V3_CONTENT.length);
 
     for (const category of CATALOGUE_V3_CONTENT) {
-      const expected = FINAL_CATALOGUE_PRACTICE_GROUP_ORDER[category.id];
+      const expected = RELEASE_AUDIT_CATALOGUE_PRACTICE_GROUP_ORDER[category.id];
       const actual = category.practices.map((practice) => practice.id);
 
       expect(expected, `${category.id} is missing an explicit group order`).toBeDefined();
