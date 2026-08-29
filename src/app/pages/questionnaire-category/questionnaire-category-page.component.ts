@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AnswerScope, PracticeAnswer } from '../../../domain/profile/profile-answer';
@@ -11,6 +11,11 @@ import { TranslationService } from '../../i18n/translation.service';
 import { QuestionnaireRoleComponent } from '../../questionnaire/questionnaire-role.component';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { findRouteParam } from '../../shared/route-param';
+import {
+  firstPendingSubcategoryId,
+  isSubcategoryComplete,
+  nextPendingSubcategoryId,
+} from './questionnaire-subcategory-flow';
 
 @Component({
   selector: 'app-questionnaire-category-page',
@@ -54,8 +59,8 @@ import { findRouteParam } from '../../shared/route-param';
           } @else if (sections().length > 0) {
             <section class="subcategory-list" aria-label="Subcategorías">
               @for (section of sections(); track section.id) {
-                <details class="subcategory-section">
-                  <summary class="subcategory-summary">
+                <details class="subcategory-section" [open]="isSubcategoryOpen(section.id)">
+                  <summary class="subcategory-summary" (click)="toggleSubcategory(section.id, $event)">
                     <span class="subcategory-summary-copy">
                       <strong>{{ section.label }}</strong>
                       <small>{{ section.answered }} / {{ section.total }}</small>
@@ -261,6 +266,9 @@ export class QuestionnaireCategoryPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly params = toSignal(this.route.paramMap, { initialValue: this.route.snapshot.paramMap });
+  private readonly openSubcategoryIds = signal<ReadonlySet<string>>(new Set());
+  private previousSubcategoryCompletion = new Map<string, boolean>();
+  private subcategoryFlowKey = '';
 
   readonly profileId = findRouteParam(this.route, 'id') ?? '';
   readonly includeFiltered = signal(this.route.snapshot.queryParamMap.get('filtered') === '1');
@@ -311,6 +319,57 @@ export class QuestionnaireCategoryPageComponent {
 
   constructor() {
     void this.catalogueStore.initialize();
+
+    effect(() => {
+      const sections = this.sections();
+      const flowKey = `${this.categoryId()}|${this.includeFiltered() ? 'filtered' : 'default'}`;
+      const completion = new Map(sections.map((section) => [section.id, isSubcategoryComplete(section)]));
+      const needsInitialSelection = flowKey !== this.subcategoryFlowKey
+        || (this.previousSubcategoryCompletion.size === 0 && sections.length > 0);
+
+      if (needsInitialSelection) {
+        this.subcategoryFlowKey = flowKey;
+        this.previousSubcategoryCompletion = completion;
+        const firstPending = firstPendingSubcategoryId(sections);
+        this.openSubcategoryIds.set(firstPending ? new Set([firstPending]) : new Set());
+        return;
+      }
+
+      const justCompleted = sections.filter((section) =>
+        this.previousSubcategoryCompletion.get(section.id) === false
+        && completion.get(section.id) === true,
+      );
+      this.previousSubcategoryCompletion = completion;
+
+      if (justCompleted.length > 0) {
+        const open = new Set(this.openSubcategoryIds());
+        for (const section of justCompleted) open.delete(section.id);
+
+        const completed = justCompleted.at(-1)!;
+        const nextPending = nextPendingSubcategoryId(sections, completed.id);
+        if (nextPending) open.add(nextPending);
+        this.openSubcategoryIds.set(open);
+        return;
+      }
+
+      const visibleIds = new Set(sections.map((section) => section.id));
+      const currentOpen = this.openSubcategoryIds();
+      if ([...currentOpen].some((id) => !visibleIds.has(id))) {
+        this.openSubcategoryIds.set(new Set([...currentOpen].filter((id) => visibleIds.has(id))));
+      }
+    });
+  }
+
+  isSubcategoryOpen(sectionId: string): boolean {
+    return this.openSubcategoryIds().has(sectionId);
+  }
+
+  toggleSubcategory(sectionId: string, event: Event): void {
+    event.preventDefault();
+    const open = new Set(this.openSubcategoryIds());
+    if (open.has(sectionId)) open.delete(sectionId);
+    else open.add(sectionId);
+    this.openSubcategoryIds.set(open);
   }
 
   toggleFiltered(event: Event): void {
