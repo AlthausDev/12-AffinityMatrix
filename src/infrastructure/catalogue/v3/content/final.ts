@@ -13,6 +13,7 @@ import { materializeContextualDescriptions } from './contextual-description';
 import { applyFinalApplicabilityReview, FINAL_APPLICABILITY_RETIRED_PRACTICE_IDS } from './final-applicability-review';
 import { applyFinalClarityReview, FINAL_CLARITY_RETIRED_PRACTICE_IDS } from './final-clarity-review';
 import { applyFinalContentReview } from './final-content-review';
+import { applyFinalFilterAudit } from './final-filter-audit';
 import { applyFinalLastMileReview, FINAL_LAST_MILE_RETIRED_PRACTICE_IDS } from './final-last-mile-review';
 import { applyFinalNoiseApplicability } from './final-noise-applicability';
 import { applyFinalNoiseCleanup, FINAL_NOISE_RETIRED_PRACTICE_IDS } from './final-noise-cleanup';
@@ -97,5 +98,6 @@ const REPLACEMENT_CONTENT = addFinalNoiseReplacement(NOISE_CLEANED_CONTENT);
 const NOISE_APPLICABILITY_CONTENT = applyFinalNoiseApplicability(REPLACEMENT_CONTENT);
 const QUESTIONNAIRE_FOLLOWUP_CONTENT = applyFinalQuestionnaireFollowup(NOISE_APPLICABILITY_CONTENT);
 const NATURAL_ROLE_CONTENT = applyMutualRoleNoiseCleanup(QUESTIONNAIRE_FOLLOWUP_CONTENT);
+const FILTER_AUDITED_CONTENT = applyFinalFilterAudit(NATURAL_ROLE_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(NATURAL_ROLE_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(FILTER_AUDITED_CONTENT);
