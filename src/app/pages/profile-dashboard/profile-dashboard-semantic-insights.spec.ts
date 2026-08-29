@@ -52,7 +52,10 @@ describe('semantic dashboard insights', () => {
     const connection = result.find((entry) => entry.tag.id === 'connection');
 
     // shared contributes 50% after averaging favorite + not-interested; second contributes 78%.
-    expect(connection).toMatchObject({ evidenceCount: 2 });
+    expect(connection).toMatchObject({
+      evidenceCount: 2,
+      evidencePracticeIds: ['second', 'shared'],
+    });
     expect(connection?.score).toBe(59);
   });
 
@@ -71,10 +74,11 @@ describe('semantic dashboard insights', () => {
     expect(result.find((entry) => entry.tag.id === 'intensity')).toMatchObject({
       score: 0,
       evidenceCount: 1,
+      evidencePracticeIds: ['third'],
     });
   });
 
-  it('builds thematic scores from the reusable semantic tags', () => {
+  it('builds thematic scores without double-counting one practice across several tags', () => {
     const profile = createProfile({
       id: 'theme-profile',
       now: '2026-08-29T18:00:00.000Z',
@@ -101,13 +105,17 @@ describe('semantic dashboard insights', () => {
 
     expect(themes).toHaveLength(1);
     expect(themes[0]?.score).toBeGreaterThan(0);
-    expect(themes[0]?.evidenceCount).toBe(3);
+    expect(themes[0]?.evidenceCount).toBe(2);
   });
 
   it('prefers signals backed by more than one practice when selecting highlights', () => {
     const insights = [
-      { tag: tags[0]!, score: 70, evidenceCount: 2, weightedEvidence: 1.5 },
-      { tag: tags[1]!, score: 100, evidenceCount: 1, weightedEvidence: 1 },
+      {
+        tag: tags[0]!, score: 70, evidenceCount: 2, evidencePracticeIds: ['a', 'b'], weightedEvidence: 1.5,
+      },
+      {
+        tag: tags[1]!, score: 100, evidenceCount: 1, evidencePracticeIds: ['c'], weightedEvidence: 1,
+      },
     ];
 
     expect(strongestSemanticInsights(insights, 4).map((entry) => entry.tag.id)).toEqual(['connection']);
