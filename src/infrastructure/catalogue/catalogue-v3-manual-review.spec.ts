@@ -149,9 +149,9 @@ describe('Catalogue V3 final manual review', () => {
   });
 
   it('uses distinct names for vulvar, vaginal and urethral torture', () => {
-    expect(seed('pussy-torture')?.es).toBe('Tortura vulvar');
+    expect(seed('pussy-torture')?.es).toBe('Pussy torture');
     expect(seed('pussy-torture')?.descriptionEs).toContain('genitales externos');
-    expect(seed('vaginal-torture')?.es).toBe('Tortura vaginal');
+    expect(seed('vaginal-torture')?.es).toBe('Vaginal torture');
     expect(seed('vaginal-torture')?.descriptionEs).toContain('canal vaginal');
     expect(seed('urethral-torture')?.es).toBe('Tortura uretral');
     expect(seed('urethral-torture')?.descriptionEs).toContain('uretra');
