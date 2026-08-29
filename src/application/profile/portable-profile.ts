@@ -1,5 +1,6 @@
 import { CatalogueVersion } from '../../domain/catalogue/catalogue-version';
 import { AnswerKey, cloneAnswers, PracticeAnswer } from '../../domain/profile/profile-answer';
+import { clonePhysicalPreferences, PhysicalPreferences } from '../../domain/profile/physical-preferences';
 import { createProfile, Profile } from '../../domain/profile/profile';
 import { ProfileMetadata } from '../../domain/profile/profile-metadata';
 
@@ -18,6 +19,7 @@ export interface PortableProfileV6 {
   readonly profileSchemaVersion: typeof PORTABLE_PROFILE_V6_PROFILE_SCHEMA_VERSION;
   readonly catalogueVersion: CatalogueVersion;
   readonly metadata: ProfileMetadata;
+  readonly physicalPreferences?: PhysicalPreferences;
   readonly answers: Readonly<Record<AnswerKey, PracticeAnswer>>;
 }
 
@@ -40,6 +42,7 @@ export function toPortableProfile(
     profileSchemaVersion: PORTABLE_PROFILE_V6_PROFILE_SCHEMA_VERSION,
     catalogueVersion: profile.catalogueVersion,
     metadata,
+    physicalPreferences: clonePhysicalPreferences(profile.physicalPreferences),
     answers: cloneAnswers(profile.answers),
   };
 }
@@ -50,6 +53,7 @@ export function restorePortableProfile(portable: PortableProfile, id: string, no
     now,
     catalogueVersion: portable.catalogueVersion,
     metadata: { ...portable.metadata },
+    physicalPreferences: clonePhysicalPreferences(portable.physicalPreferences),
     answers: cloneAnswers(portable.answers),
   });
 }
