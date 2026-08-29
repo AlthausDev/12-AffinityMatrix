@@ -42,8 +42,8 @@ export function extractPhysicalPreferencesFromCatalogue(
     if (category.id !== 'body-fetishes') return category;
     return {
       ...category,
-      labelEn: 'Body fetishes & sensory attraction',
-      labelEs: 'Fetiches corporales y sensoriales',
+      en: 'Body fetishes & sensory attraction',
+      es: 'Fetiches corporales y sensoriales',
       descriptionEn: 'Erotic focus on body areas, natural bodily traits, scent, sweat and personal items where the body itself carries a specific fetish or sensory charge.',
       descriptionEs: 'Foco erótico en zonas del cuerpo, rasgos corporales naturales, olor, sudor y objetos personales cuando el propio cuerpo tiene una carga fetichista o sensorial específica.',
       practices: category.practices.filter((practice) => !PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS.has(practice.id)),
