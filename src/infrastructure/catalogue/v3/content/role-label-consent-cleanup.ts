@@ -21,11 +21,20 @@ export function stripRedundantConsentFromRoleLabels(
         ) as CatalogueRoleLabelsSeed
         : undefined;
 
-      const pairedRoles = practice.pairedRoles?.map((role) => ({
-        ...role,
-        en: clean(role.en),
-        es: clean(role.es),
-      }));
+      const pairedRoles = practice.pairedRoles
+        ? [
+          {
+            ...practice.pairedRoles[0],
+            en: clean(practice.pairedRoles[0].en),
+            es: clean(practice.pairedRoles[0].es),
+          },
+          {
+            ...practice.pairedRoles[1],
+            en: clean(practice.pairedRoles[1].en),
+            es: clean(practice.pairedRoles[1].es),
+          },
+        ] as const
+        : undefined;
 
       if (!roleLabels && !pairedRoles) return practice;
       return {
