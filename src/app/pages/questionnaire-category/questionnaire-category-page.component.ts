@@ -13,7 +13,7 @@ import { CatalogueGlossaryTextComponent } from '../../shared/catalogue-glossary-
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { findRouteParam } from '../../shared/route-param';
 import {
-  firstPendingSubcategoryId,
+  initialSubcategoryId,
   isSubcategoryComplete,
   nextPendingSubcategoryId,
 } from './questionnaire-subcategory-flow';
@@ -322,6 +322,7 @@ export class QuestionnaireCategoryPageComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly params = toSignal(this.route.paramMap, { initialValue: this.route.snapshot.paramMap });
+  private readonly queryParams = toSignal(this.route.queryParamMap, { initialValue: this.route.snapshot.queryParamMap });
   private readonly openSubcategoryId = signal<string | null>(null);
   private previousSubcategoryCompletion = new Map<string, boolean>();
   private subcategoryFlowKey = '';
@@ -330,6 +331,7 @@ export class QuestionnaireCategoryPageComponent {
   readonly profileId = findRouteParam(this.route, 'id') ?? '';
   readonly includeFiltered = signal(this.route.snapshot.queryParamMap.get('filtered') === '1');
   readonly categoryId = computed(() => this.params().get('category') ?? '');
+  readonly requestedSubcategoryId = computed(() => this.queryParams().get('subcategory'));
   readonly profile = computed(() => this.profileStore.findById(this.profileId));
   readonly snapshot = computed(() => this.catalogueStore.snapshot());
   readonly category = computed(() => {
@@ -390,7 +392,10 @@ export class QuestionnaireCategoryPageComponent {
       if (needsInitialSelection) {
         this.subcategoryFlowKey = flowKey;
         this.previousSubcategoryCompletion = completion;
-        this.openSubcategoryId.set(firstPendingSubcategoryId(sections));
+        const requested = this.requestedSubcategoryId();
+        const initial = initialSubcategoryId(sections, requested);
+        this.openSubcategoryId.set(initial);
+        if (requested && initial === requested) this.scheduleSubcategoryScroll(requested);
         return;
       }
 
@@ -411,7 +416,7 @@ export class QuestionnaireCategoryPageComponent {
 
       const currentOpen = this.openSubcategoryId();
       if (currentOpen && !sections.some((section) => section.id === currentOpen)) {
-        this.openSubcategoryId.set(firstPendingSubcategoryId(sections));
+        this.openSubcategoryId.set(initialSubcategoryId(sections, this.requestedSubcategoryId()));
       }
     });
   }
