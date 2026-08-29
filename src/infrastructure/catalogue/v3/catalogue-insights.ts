@@ -2,6 +2,7 @@ import {
   CATALOGUE_INSIGHT_TAGS as CATALOGUE_CORE_INSIGHT_TAGS,
   CATALOGUE_V3_PRACTICE_INSIGHTS as CATALOGUE_CORE_PRACTICE_INSIGHTS,
 } from './catalogue-insights-core';
+import { applyCatalogueInsightFinalPass } from './catalogue-insights-final-pass';
 import {
   applyManualInsightReview,
   MANUAL_REVIEW_INSIGHT_TAGS,
@@ -24,8 +25,10 @@ const BASE_PRACTICE_INSIGHTS = [
   ...CATALOGUE_V3_REMAINING_PRACTICE_INSIGHTS,
 ] as const;
 
-/** Semantic signals for every practice in every final 0.2 questionnaire category. */
-export const CATALOGUE_V3_PRACTICE_INSIGHTS = [
+const MANUALLY_REVIEWED_INSIGHTS = [
   ...applyManualInsightReview(BASE_PRACTICE_INSIGHTS),
   ...MANUAL_REVIEW_NEW_PRACTICE_INSIGHTS,
 ] as const;
+
+/** Semantic signals for every practice in every final 0.2 questionnaire category. */
+export const CATALOGUE_V3_PRACTICE_INSIGHTS = applyCatalogueInsightFinalPass(MANUALLY_REVIEWED_INSIGHTS);
