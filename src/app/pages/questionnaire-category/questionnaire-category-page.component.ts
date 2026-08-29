@@ -58,29 +58,33 @@ import {
           @if (currentCategory.practices.length === 0) {
             <section class="panel"><h2>{{ i18n.t('questionnaire.category.empty.title') }}</h2><p class="muted">{{ i18n.t('questionnaire.category.empty.description') }}</p></section>
           } @else if (sections().length > 0) {
-            <section class="subcategory-list" aria-label="Subcategorías">
+            <section class="subcategory-list" [attr.aria-label]="i18n.t('questionnaire.subcategoriesAria')">
               @for (section of sections(); track section.id) {
-                <div
+                <section
                   class="subcategory-section"
                   [class.is-open]="isSubcategoryOpen(section.id)"
                   [id]="'subcategory-' + section.id"
+                  [attr.aria-labelledby]="'subcategory-label-' + section.id"
                 >
-                  <button
-                    type="button"
-                    class="subcategory-summary"
-                    [attr.aria-expanded]="isSubcategoryOpen(section.id)"
-                    [attr.aria-controls]="'subcategory-content-' + section.id"
-                    (click)="toggleSubcategory(section.id)"
-                  >
-                    <span class="subcategory-summary-copy">
-                      <strong>{{ section.label }}</strong>
-                      <small>{{ section.answered }} / {{ section.total }}</small>
-                    </span>
-                    <span class="subcategory-progress">
-                      <strong>{{ section.percentage }}%</strong>
-                      <app-completion-progress [value]="section.percentage" />
-                    </span>
-                  </button>
+                  <h2 class="subcategory-heading">
+                    <button
+                      type="button"
+                      class="subcategory-summary"
+                      [id]="'subcategory-summary-' + section.id"
+                      [attr.aria-expanded]="isSubcategoryOpen(section.id)"
+                      [attr.aria-controls]="'subcategory-content-' + section.id"
+                      (click)="toggleSubcategory(section.id)"
+                    >
+                      <span class="subcategory-summary-copy">
+                        <span class="subcategory-title" [id]="'subcategory-label-' + section.id">{{ section.label }}</span>
+                        <small>{{ section.answered }} / {{ section.total }}</small>
+                      </span>
+                      <span class="subcategory-progress">
+                        <strong>{{ section.percentage }}%</strong>
+                        <app-completion-progress [value]="section.percentage" />
+                      </span>
+                    </button>
+                  </h2>
                   <div
                     class="subcategory-reveal"
                     [id]="'subcategory-content-' + section.id"
@@ -94,7 +98,7 @@ import {
                           @for (item of section.practices; track item.practice.id) {
                             <article class="panel question-card">
                               <header class="question-card-header">
-                                <h2><app-catalogue-glossary-text [text]="catalogueText.practiceLabel(item.practice, profile()?.metadata.sex)" /></h2>
+                                <h3><app-catalogue-glossary-text [text]="catalogueText.practiceLabel(item.practice, profile()?.metadata.sex)" /></h3>
                                 @if (catalogueText.practiceDescription(item.practice); as practiceDescription) {
                                   <p class="muted"><app-catalogue-glossary-text [text]="practiceDescription" /></p>
                                 }
@@ -106,6 +110,7 @@ import {
                                   [scope]="roleView.scope"
                                   [answer]="roleView.answer"
                                   [filtered]="roleView.filtered"
+                                  [headingLevel]="4"
                                   (answerChange)="saveAnswer($event)"
                                   (answerRemove)="removeAnswer($event)"
                                 />
@@ -116,7 +121,7 @@ import {
                       </div>
                     </div>
                   </div>
-                </div>
+                </section>
               }
             </section>
           } @else {
@@ -136,6 +141,7 @@ import {
                       [scope]="roleView.scope"
                       [answer]="roleView.answer"
                       [filtered]="roleView.filtered"
+                      [headingLevel]="3"
                       (answerChange)="saveAnswer($event)"
                       (answerRemove)="removeAnswer($event)"
                     />
@@ -224,6 +230,7 @@ import {
       border-color: color-mix(in srgb, var(--border-strong) 52%, var(--neon-violet));
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.065), 0 0 1rem rgba(111, 101, 255, 0.035);
     }
+    .subcategory-heading { margin: 0; font: inherit; }
     .subcategory-summary {
       position: relative;
       display: grid;
@@ -247,9 +254,9 @@ import {
       color: var(--text-secondary);
       transition: transform 220ms cubic-bezier(.2,.72,.2,1);
     }
-    .subcategory-section.is-open > .subcategory-summary::after { transform: rotate(180deg); }
+    .subcategory-section.is-open > .subcategory-heading .subcategory-summary::after { transform: rotate(180deg); }
     .subcategory-summary-copy { display: grid; gap: 0.18rem; min-width: 0; }
-    .subcategory-summary-copy > strong { font-size: 1.08rem; letter-spacing: -0.015em; }
+    .subcategory-title { font-size: 1.08rem; font-weight: 700; letter-spacing: -0.015em; }
     .subcategory-summary-copy small { color: var(--text-secondary); font-size: 0.72rem; }
     .subcategory-progress { display: grid; gap: 0.28rem; padding-right: 1.35rem; text-align: right; }
     .subcategory-progress > strong { font-size: 0.82rem; }
@@ -269,7 +276,7 @@ import {
     .question-list { display: grid; gap: 0.85rem; }
     .question-card { background: color-mix(in srgb, var(--surface-panel) 94%, transparent); }
     .question-card-header { margin-bottom: 0.7rem; }
-    .question-card-header h2 { margin-bottom: 0.35rem; font-size: 1.18rem; letter-spacing: -0.015em; }
+    .question-card-header :is(h2, h3) { margin-bottom: 0.35rem; font-size: 1.18rem; letter-spacing: -0.015em; }
     .question-card-header p { max-width: 50rem; margin-bottom: 0; font-size: 0.84rem; line-height: 1.5; }
     @media (prefers-reduced-motion: reduce) {
       .subcategory-section,
@@ -298,7 +305,7 @@ import {
       .subcategory-description { margin: 0.75rem 0.35rem 0.85rem; }
       .question-list { gap: 0.65rem; }
       .question-card { padding: 0.9rem; border-radius: 0.72rem; }
-      .question-card-header h2 { font-size: 1.12rem; }
+      .question-card-header :is(h2, h3) { font-size: 1.12rem; }
       .question-card-header p { font-size: 0.8rem; line-height: 1.45; }
     }
   `,
@@ -398,7 +405,8 @@ export class QuestionnaireCategoryPageComponent {
         const completed = justCompleted.at(-1)!;
         const nextPending = nextPendingSubcategoryId(sections, completed.id);
         this.openSubcategoryId.set(nextPending);
-        if (nextPending) this.scheduleSubcategoryScroll(nextPending);
+        if (nextPending) this.scheduleSubcategoryScroll(nextPending, true);
+        else this.scheduleSubcategorySummaryFocus(completed.id);
         return;
       }
 
@@ -447,18 +455,37 @@ export class QuestionnaireCategoryPageComponent {
     void this.profileStore.removeAnswer(this.profileId, target.practiceId, target.roleId, target.scope);
   }
 
-  private scheduleSubcategoryScroll(sectionId: string): void {
+  private scheduleSubcategoryScroll(sectionId: string, focusSummary = false): void {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
-    if (this.scrollTimer !== undefined) clearTimeout(this.scrollTimer);
+    this.clearScrollTimer();
 
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     this.scrollTimer = setTimeout(() => {
       this.scrollTimer = undefined;
       if (this.openSubcategoryId() !== sectionId) return;
-      document.getElementById(`subcategory-${sectionId}`)?.scrollIntoView({
+      const section = document.getElementById(`subcategory-${sectionId}`);
+      section?.scrollIntoView({
         behavior: reduceMotion ? 'auto' : 'smooth',
         block: 'start',
       });
+      if (focusSummary) {
+        document.getElementById(`subcategory-summary-${sectionId}`)?.focus({ preventScroll: true });
+      }
     }, reduceMotion ? 0 : 300);
+  }
+
+  private scheduleSubcategorySummaryFocus(sectionId: string): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    this.clearScrollTimer();
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    this.scrollTimer = setTimeout(() => {
+      this.scrollTimer = undefined;
+      document.getElementById(`subcategory-summary-${sectionId}`)?.focus({ preventScroll: true });
+    }, reduceMotion ? 0 : 300);
+  }
+
+  private clearScrollTimer(): void {
+    if (this.scrollTimer !== undefined) clearTimeout(this.scrollTimer);
+    this.scrollTimer = undefined;
   }
 }
