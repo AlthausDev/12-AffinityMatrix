@@ -43,6 +43,7 @@ export class AppComponent {
 
   constructor() {
     this.uiPreferences.initialize();
+    this.installMobileScrollRecovery();
   }
 
   skipToMain(event: Event): void {
@@ -59,6 +60,38 @@ export class AppComponent {
       if (previousTabIndex === null) main.removeAttribute('tabindex');
       else main.setAttribute('tabindex', previousTabIndex);
     }, { once: true });
+  }
+
+  private installMobileScrollRecovery(): void {
+    const window = this.document.defaultView;
+    if (!window?.matchMedia?.('(max-width: 760px)').matches) return;
+
+    const storageKey = `desiresync-scroll:${window.location.pathname}${window.location.search}`;
+    const savePosition = (): void => {
+      try {
+        window.sessionStorage.setItem(storageKey, String(Math.round(window.scrollY)));
+      } catch {
+        // Storage can be unavailable in hardened/private browser contexts; scrolling still works.
+      }
+    };
+
+    this.document.addEventListener('visibilitychange', () => {
+      if (this.document.visibilityState === 'hidden') savePosition();
+    }, { passive: true });
+    window.addEventListener('pagehide', savePosition, { passive: true });
+
+    let savedPosition = 0;
+    try {
+      savedPosition = Number(window.sessionStorage.getItem(storageKey) ?? 0);
+    } catch {
+      return;
+    }
+    if (!Number.isFinite(savedPosition) || savedPosition <= 0) return;
+
+    // A discarded Android tab recreates the Angular tree asynchronously. Retry once after the
+    // dashboard has had time to recover its real height instead of restoring against a short shell.
+    window.setTimeout(() => window.scrollTo({ top: savedPosition, behavior: 'auto' }), 180);
+    window.setTimeout(() => window.scrollTo({ top: savedPosition, behavior: 'auto' }), 650);
   }
 
   private reducedMotion(): boolean {
