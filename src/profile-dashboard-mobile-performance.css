@@ -1,0 +1,41 @@
+/*
+ * The dashboard is intentionally visually rich, but mobile Chromium browsers can promote every
+ * translucent blur to a separate composited layer. On long profiles that becomes surprisingly
+ * expensive. Keep the visual language while avoiding the filters and fixed repaint surface that
+ * are most likely to exhaust GPU memory or make the tab unstable.
+ */
+@media (max-width: 760px) {
+  .profile-dashboard::before {
+    display: none;
+  }
+
+  .profile-dashboard .dashboard-hero,
+  .profile-dashboard .dashboard-action,
+  .profile-dashboard .dashboard-chart-card,
+  .profile-dashboard .dashboard-settings-link,
+  .profile-dashboard .dashboard-profile-chips > span,
+  .profile-dashboard .dashboard-storage-notice {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Let Chromium skip layout/paint work for the long parts of the dashboard until they approach
+     the viewport. `auto` lets the browser remember the real size after first render. */
+  .profile-dashboard .dashboard-action,
+  .profile-dashboard .dashboard-chart-card,
+  .profile-dashboard .dashboard-category-row,
+  .profile-dashboard .dashboard-details {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 18rem;
+  }
+
+  .profile-dashboard .dashboard-semantic-card,
+  .profile-dashboard .dashboard-role-card {
+    contain-intrinsic-size: auto 42rem;
+  }
+
+  .profile-dashboard .dashboard-action,
+  .profile-dashboard .dashboard-role-fill {
+    transition-duration: 0ms !important;
+  }
+}
