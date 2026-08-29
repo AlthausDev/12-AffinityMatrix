@@ -35,6 +35,7 @@
               "src/profile-dashboard-insight-polish.css",
               "src/ui-preferences.css",
               "src/profile-dashboard-mobile-settings.css",
+              "src/profile-dashboard-mobile-performance.css",
               "src/desiresync-brand.css",
               "src/back-navigation.css",
               "src/questionnaire-v2.css",
