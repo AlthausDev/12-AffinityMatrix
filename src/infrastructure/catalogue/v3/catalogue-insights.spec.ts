@@ -18,10 +18,11 @@ describe('catalogue v3 insight signals', () => {
     expect([...taggedPracticeIds].sort()).toEqual([...migratedPracticeIds].sort());
   });
 
-  it('uses bounded non-zero semantic strengths', () => {
+  it('keeps every final practice between one and four useful semantic tags', () => {
     for (const entry of CATALOGUE_V3_PRACTICE_INSIGHTS) {
       const strengths = Object.values(entry.signals);
-      expect(strengths.length).toBeGreaterThan(0);
+      expect(strengths.length, `${entry.practiceId} has no semantic tags`).toBeGreaterThanOrEqual(1);
+      expect(strengths.length, `${entry.practiceId} has too many semantic tags`).toBeLessThanOrEqual(4);
       for (const strength of strengths) {
         expect(strength).toBeGreaterThan(0);
         expect(strength).toBeLessThanOrEqual(1);
