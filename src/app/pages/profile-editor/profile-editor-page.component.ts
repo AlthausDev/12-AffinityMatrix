@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormField, form, maxLength } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { PhysicalPreferences } from '../../../domain/profile/physical-preferences';
 import {
   PROFILE_ALIAS_MAX_LENGTH,
   ProfileMetadata,
@@ -13,6 +14,7 @@ import { ProfileStore } from '../../core/profile.store';
 import { UiPreferencesService } from '../../core/ui-preferences.service';
 import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
+import { PhysicalPreferencesEditorComponent } from '../../profile/physical-preferences-editor.component';
 import { ProfileDeleteDialogComponent } from '../../profile/profile-delete-dialog.component';
 import { BrandMarkComponent } from '../../shared/brand-mark.component';
 
@@ -25,7 +27,13 @@ interface ProfileFormModel {
 
 @Component({
   selector: 'app-profile-editor-page',
-  imports: [FormField, RouterLink, BrandMarkComponent, ProfileDeleteDialogComponent],
+  imports: [
+    FormField,
+    RouterLink,
+    BrandMarkComponent,
+    PhysicalPreferencesEditorComponent,
+    ProfileDeleteDialogComponent,
+  ],
   template: `
     <main
       class="page narrow-page profile-entry-page profile-editor-page"
@@ -103,6 +111,13 @@ interface ProfileFormModel {
                   </div>
                 </div>
               </section>
+
+              <app-physical-preferences-editor
+                [value]="physicalPreferences()"
+                [sex]="model().sex"
+                [orientation]="model().orientation"
+                (valueChange)="physicalPreferences.set($event)"
+              />
 
               <section class="profile-entry-panel profile-editor-section">
                 <header class="profile-editor-section-heading">
@@ -255,6 +270,9 @@ export class ProfileEditorPageComponent {
     filterQuestionnaireByMetadata:
       this.existingProfile?.settings.filterQuestionnaireByMetadata ?? true,
   });
+  readonly physicalPreferences = signal<PhysicalPreferences>(
+    this.existingProfile?.physicalPreferences ?? {},
+  );
 
   readonly profileForm = form(this.model, (schemaPath) => {
     maxLength(schemaPath.alias, PROFILE_ALIAS_MAX_LENGTH, {
@@ -306,8 +324,8 @@ export class ProfileEditorPageComponent {
     };
 
     const saved = this.profileId
-      ? await this.profileStore.updateProfile(this.profileId, metadata, settings)
-      : await this.profileStore.create(metadata, settings);
+      ? await this.profileStore.updateProfile(this.profileId, metadata, settings, this.physicalPreferences())
+      : await this.profileStore.create(metadata, settings, this.physicalPreferences());
 
     if (saved) {
       await this.router.navigate(['/profiles', saved.id]);
