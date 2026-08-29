@@ -62,7 +62,7 @@ import {
                 </div>
 
                 <small class="semantic-evidence">
-                  {{ entry.evidenceCount > 0 ? evidenceLabel(entry.evidenceCount) : i18n.t('dashboard.semantic.noData') }}
+                  {{ entry.evidenceCount > 0 ? evidenceLabel(entry.evidenceCount) : text('Sin datos', 'No data') }}
                 </small>
               </div>
             }
@@ -431,7 +431,7 @@ export class DashboardSemanticMapComponent {
 
   themeAriaLabel(entry: SemanticThemeEntry): string {
     if (entry.evidenceCount === 0) {
-      return `${this.themeLabel(entry)} · ${this.i18n.t('dashboard.semantic.noData')}`;
+      return `${this.themeLabel(entry)} · ${this.text('Sin datos', 'No data')}`;
     }
     return `${this.themeLabel(entry)} · ${this.i18n.t('dashboard.semantic.score')} ${entry.score}%`;
   }
