@@ -60,7 +60,7 @@ const DESCRIBED_CONTENT = materializeContextualDescriptions(ROLE_POLISHED_CONTEN
 const POLISHED_CONTENT = polishCatalogue(DESCRIBED_CONTENT);
 const ACTIVE_CONTENT = POLISHED_CONTENT.map((category) => ({
   ...category,
-  practices: category.practices.filter((practice) => !FINAL_CONTENT_RETIRED_V3_PRACTICE_IDS.has(practice.id)),
+  practices: category.practices.filter((practice) => !FINAL_CONTENT_RETIRED_PRACTICE_IDS.has(practice.id)),
 }));
 const REVIEWED_CONTENT = applyFinalContentReview(ACTIVE_CONTENT);
 const CLARIFIED_CONTENT = applyFinalClarityReview(REVIEWED_CONTENT);
