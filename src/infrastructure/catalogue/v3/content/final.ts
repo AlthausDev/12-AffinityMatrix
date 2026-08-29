@@ -27,6 +27,7 @@ import { applyManualRoleFollowup } from './manual-role-followup';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
 import { applyPatchReleaseCorrections } from './patch-release-corrections';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
+import { stripRedundantConsentFromRoleLabels } from './role-label-consent-cleanup';
 import { addExpandedSexualPositions } from './sexual-position-additions';
 import { CatalogueCategorySeed } from './types';
 
@@ -84,5 +85,6 @@ const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(RELEASE_ORDERED_CONTENT);
 const CONCISE_CONTENT = applyConciseCategoryCopy(CATEGORY_COPY_CONTENT);
 const RELEASE_COPY_AUDITED_CONTENT = applyCatalogueReleaseAuditCategoryCopy(CONCISE_CONTENT);
 const ROLE_REVIEWED_CONTENT = applyManualRoleFollowup(RELEASE_COPY_AUDITED_CONTENT);
+const CONSENT_CLEANED_CONTENT = stripRedundantConsentFromRoleLabels(ROLE_REVIEWED_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(ROLE_REVIEWED_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(CONSENT_CLEANED_CONTENT);
