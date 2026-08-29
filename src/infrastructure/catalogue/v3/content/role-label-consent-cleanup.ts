@@ -48,9 +48,14 @@ export function stripRedundantConsentFromRoleLabels(
 
 function clean(value: string): string {
   return value
+    .replace(/\bconsensually\b\s*/gi, '')
     .replace(/\bconsensual\b\s*/gi, '')
+    .replace(/\bde forma consensuada\b\s*/gi, '')
+    .replace(/\bconsensuadamente\b\s*/gi, '')
     .replace(/\bconsensuad[oa]s?\b\s*/gi, '')
     .replace(/\bconsentid[oa]s?\b\s*/gi, '')
+    .replace(/\bpre[- ]?agreed\b\s*/gi, '')
+    .replace(/\bpreacordad[oa]s?\b\s*/gi, '')
     .replace(/\s+([,.;:])/g, '$1')
     .replace(/\s{2,}/g, ' ')
     .trim();
