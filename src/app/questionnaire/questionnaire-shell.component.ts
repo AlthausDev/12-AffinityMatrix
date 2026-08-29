@@ -64,7 +64,10 @@ import { ModalFocusTrapDirective } from '../shared/modal-focus-trap.directive';
                   class="button secondary compact-button sequence-button"
                   [routerLink]="['/profiles', profileId, 'questionnaire', previousId]"
                   [queryParams]="includeFiltered() ? { filtered: '1' } : null"
-                >{{ i18n.t('questionnaire.previous') }}</a>
+                >
+                  <span class="sequence-arrow sequence-arrow-previous" aria-hidden="true">←</span>
+                  <span class="sequence-label">{{ previousNavigationLabel() }}</span>
+                </a>
               } @else {
                 <span class="sequence-placeholder" aria-hidden="true"></span>
               }
@@ -73,6 +76,10 @@ import { ModalFocusTrapDirective } from '../shared/modal-focus-trap.directive';
             @if (currentCategoryProgress(); as categoryProgress) {
               <span
                 class="category-dock-progress"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                [attr.aria-valuenow]="categoryProgress.completionPercentage"
                 [style.--category-progress]="categoryProgress.completionPercentage + '%'"
                 [style.--category-progress-color]="categoryProgressColor(categoryProgress.completionPercentage)"
                 [attr.aria-label]="i18n.t('questionnaire.category.progressAria', {
@@ -96,7 +103,10 @@ import { ModalFocusTrapDirective } from '../shared/modal-focus-trap.directive';
                   class="button secondary compact-button sequence-button"
                   [routerLink]="['/profiles', profileId, 'questionnaire', nextId]"
                   [queryParams]="includeFiltered() ? { filtered: '1' } : null"
-                >{{ i18n.t('questionnaire.next') }}</a>
+                >
+                  <span class="sequence-label">{{ nextNavigationLabel() }}</span>
+                  <span class="sequence-arrow sequence-arrow-next" aria-hidden="true">→</span>
+                </a>
               } @else {
                 <span class="sequence-placeholder" aria-hidden="true"></span>
               }
@@ -141,7 +151,11 @@ import { ModalFocusTrapDirective } from '../shared/modal-focus-trap.directive';
       </div>
     }
   `,
-  styleUrls: ['./questionnaire-shell.css', './questionnaire-progress.css'],
+  styleUrls: [
+    './questionnaire-shell.css',
+    './questionnaire-progress.css',
+    './questionnaire-navigation-polish.css',
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuestionnaireShellComponent {
@@ -247,6 +261,14 @@ export class QuestionnaireShellComponent {
       : this.i18n.plural(count, 'questionnaire.finish.remaining.one', 'questionnaire.finish.remaining.other');
   }
 
+  previousNavigationLabel(): string {
+    return this.navigationLabel('questionnaire.previous');
+  }
+
+  nextNavigationLabel(): string {
+    return this.navigationLabel('questionnaire.next');
+  }
+
   categoryProgressColor(percentage: number): string {
     const boundedPercentage = Math.max(0, Math.min(100, percentage));
     const hue = 345 - (boundedPercentage * 2);
@@ -260,6 +282,10 @@ export class QuestionnaireShellComponent {
   scrollToBottom(): void {
     const viewport = this.viewport?.nativeElement;
     if (viewport) viewport.scrollTo({ top: viewport.scrollHeight, behavior: this.scrollBehavior() });
+  }
+
+  private navigationLabel(key: 'questionnaire.previous' | 'questionnaire.next'): string {
+    return this.i18n.t(key).replace(/[←→]/g, '').trim();
   }
 
   private navigateToProfile(): void {
