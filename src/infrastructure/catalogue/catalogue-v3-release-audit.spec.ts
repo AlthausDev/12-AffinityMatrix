@@ -10,7 +10,7 @@ const subcategory = (id: string) => CATALOGUE_V3_SUBCATEGORIES.find((item) => it
 
 describe('Catalogue V3 final release audit', () => {
   it('uses clear vulvar, vaginal and urethral torture concepts', () => {
-    expect(seed('pussy-torture')?.es).toBe('Tortura vulvar');
+    expect(seed('pussy-torture')?.es).toBe('Pussy torture');
     expect(seed('pussy-torture')?.descriptionEs).toContain('genitales externos');
 
     expect(seed('vaginal-torture')?.anatomySex).toBe('female');
@@ -30,10 +30,12 @@ describe('Catalogue V3 final release audit', () => {
       'food-from-body',
       'food-vaginal-penetration',
       'food-anal-penetration',
+      'sexual-fluids-in-food-drink',
     ]);
     expect(seed('food-vaginal-penetration')?.kind).toBe('directed-self');
     expect(seed('food-vaginal-penetration')?.anatomySex).toBe('female');
     expect(seed('food-anal-penetration')?.kind).toBe('directed-self');
+    expect(seed('sexual-fluids-in-food-drink')?.kind).toBe('directed-self');
   });
 
   it('splits purpose-made toys from accessories, equipment and improvised objects', () => {
@@ -114,14 +116,15 @@ describe('Catalogue V3 final release audit', () => {
 
   it('keeps the final additions concise and semantically tagged', () => {
     const newIds = [
-      'spontaneous-sex', 'planned-sex', 'quiet-sex', 'vocal-expressive-sex', 'immersive-focused-sex', 'energetic-sex',
+      'spontaneous-sex', 'planned-sex', 'quiet-sex', 'vocal-expressive-sex', 'immersive-focused-sex', 'novelty-focused-sex',
       'orgasm-on-command', 'orgasm-permission', 'orgasm-count-control',
       'group-oral-focus', 'group-worship-focus', 'group-masturbation-circle', 'group-shared-toy-play',
       'oral-service', 'manual-pleasure-service', 'orgasm-service', 'intimate-grooming-service', 'fetish-scent-service', 'toilet-service-fantasy',
       'clone-duplication-fantasy', 'possession-fantasy', 'slime-creature-fantasy', 'oviposition-fantasy', 'object-transformation-fantasy', 'living-symbiote-fantasy',
       'vaginal-torture', 'urethral-torture',
-      'erotic-feeding', 'food-from-body', 'food-vaginal-penetration', 'food-anal-penetration',
+      'erotic-feeding', 'food-from-body', 'food-vaginal-penetration', 'food-anal-penetration', 'sexual-fluids-in-food-drink',
       'everyday-object-play', 'everyday-object-vaginal-penetration', 'everyday-object-anal-penetration',
+      'oral-kneeling-standing-position', 'oral-lying-between-legs-position', 'oral-side-lying-position', 'oral-edge-position',
     ];
     const insightIds = new Set(CATALOGUE_V3_PRACTICE_INSIGHTS.map((item) => item.practiceId));
 
