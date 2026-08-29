@@ -15,7 +15,7 @@ const FOCUSABLE_SELECTOR = [
   standalone: true,
 })
 export class ModalFocusTrapDirective implements AfterViewInit, OnDestroy {
-  private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly document = inject(DOCUMENT);
   private readonly previouslyFocused = this.document.activeElement instanceof HTMLElement
     ? this.document.activeElement
