@@ -14,6 +14,14 @@ export function firstPendingSubcategoryId(
   return sections.find((section) => !isSubcategoryComplete(section))?.id ?? null;
 }
 
+export function initialSubcategoryId(
+  sections: readonly QuestionnaireSubcategoryProgress[],
+  requestedId?: string | null,
+): string | null {
+  if (requestedId && sections.some((section) => section.id === requestedId)) return requestedId;
+  return firstPendingSubcategoryId(sections);
+}
+
 export function nextPendingSubcategoryId(
   sections: readonly QuestionnaireSubcategoryProgress[],
   completedId: string,

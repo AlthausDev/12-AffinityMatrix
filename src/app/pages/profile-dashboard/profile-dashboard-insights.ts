@@ -15,8 +15,17 @@ export interface DashboardPracticeProgressSource {
   readonly roles: readonly { readonly answer?: unknown }[];
 }
 
-export interface PracticeProgressEntry {
-  readonly practice: Practice;
+export interface DashboardSubcategorySource {
+  readonly id: string;
+  readonly label: string;
+  readonly description: string;
+  readonly practiceIds: readonly string[];
+}
+
+export interface SubcategoryProgressEntry {
+  readonly id: string;
+  readonly label: string;
+  readonly description: string;
   readonly answered: number;
   readonly total: number;
   readonly completionPercentage: number;
@@ -57,21 +66,32 @@ export function buildPreferenceDistribution(
   });
 }
 
-export function buildPracticeProgress(
+export function buildSubcategoryProgress(
+  subcategories: readonly DashboardSubcategorySource[],
   practices: readonly DashboardPracticeProgressSource[] | undefined,
-): readonly PracticeProgressEntry[] {
-  return (practices ?? [])
-    .map(({ practice, roles }) => {
-      const total = roles.length;
-      const answered = roles.filter((role) => role.answer !== undefined).length;
-      return {
-        practice,
-        answered,
-        total,
-        completionPercentage: total === 0 ? 0 : Math.round((answered / total) * 100),
-      };
-    })
-    .filter((entry) => entry.total > 0);
+): readonly SubcategoryProgressEntry[] {
+  const practiceById = new Map((practices ?? []).map((practice) => [practice.practice.id, practice]));
+
+  return subcategories.flatMap((subcategory): SubcategoryProgressEntry[] => {
+    const visiblePractices = subcategory.practiceIds
+      .map((practiceId) => practiceById.get(practiceId))
+      .filter((practice): practice is DashboardPracticeProgressSource => practice !== undefined);
+    const total = visiblePractices.length;
+    if (total === 0) return [];
+
+    const answered = visiblePractices.filter((practice) =>
+      practice.roles.some((role) => role.answer !== undefined),
+    ).length;
+
+    return [{
+      id: subcategory.id,
+      label: subcategory.label,
+      description: subcategory.description,
+      answered,
+      total,
+      completionPercentage: percentage(answered, total),
+    }];
+  });
 }
 
 export function buildRoleProfile(

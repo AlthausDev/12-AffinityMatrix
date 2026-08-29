@@ -2,9 +2,9 @@ import { Practice } from '../../../domain/catalogue/practice';
 import { createProfile } from '../../../domain/profile/profile';
 import { createAnswerKey } from '../../../domain/profile/profile-answer';
 import {
-  buildPracticeProgress,
   buildPreferenceDistribution,
   buildRoleProfile,
+  buildSubcategoryProgress,
 } from './profile-dashboard-insights';
 
 describe('buildPreferenceDistribution', () => {
@@ -55,7 +55,7 @@ describe('buildPreferenceDistribution', () => {
   });
 });
 
-describe('buildPracticeProgress', () => {
+describe('buildSubcategoryProgress', () => {
   const practice = (id: string): Practice => ({
     id,
     categoryId: 'category-1',
@@ -64,32 +64,45 @@ describe('buildPracticeProgress', () => {
     compatibleRolePairs: [],
   });
 
-  it('calculates completion from visible projected roles only', () => {
-    const progress = buildPracticeProgress([
+  it('counts questionnaire questions at practice level inside each subcategory', () => {
+    const progress = buildSubcategoryProgress([
+      {
+        id: 'subcategory-a',
+        label: 'Subcategory A',
+        description: 'A',
+        practiceIds: ['practice-a', 'practice-b'],
+      },
+    ], [
       {
         practice: practice('practice-a'),
         roles: [{ answer: {} }, {}, {}],
       },
       {
         practice: practice('practice-b'),
-        roles: [{ answer: {} }, { answer: {} }],
+        roles: [{}, {}],
       },
     ]);
 
     expect(progress).toEqual([
-      expect.objectContaining({ answered: 1, total: 3, completionPercentage: 33 }),
-      expect.objectContaining({ answered: 2, total: 2, completionPercentage: 100 }),
+      expect.objectContaining({
+        id: 'subcategory-a',
+        answered: 1,
+        total: 2,
+        completionPercentage: 50,
+      }),
     ]);
   });
 
-  it('omits practices without visible roles', () => {
-    const progress = buildPracticeProgress([
-      { practice: practice('hidden'), roles: [] },
-      { practice: practice('visible'), roles: [{}] },
+  it('omits taxonomy groups with no visible practices', () => {
+    const progress = buildSubcategoryProgress([
+      { id: 'hidden', label: 'Hidden', description: '', practiceIds: ['hidden-practice'] },
+      { id: 'visible', label: 'Visible', description: '', practiceIds: ['visible-practice'] },
+    ], [
+      { practice: practice('visible-practice'), roles: [{}] },
     ]);
 
     expect(progress).toHaveLength(1);
-    expect(progress[0]?.practice.id).toBe('visible');
+    expect(progress[0]?.id).toBe('visible');
   });
 });
 

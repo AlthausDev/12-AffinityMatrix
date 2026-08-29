@@ -83,8 +83,23 @@
   display: grid;
   gap: 0.34rem;
   padding: 0.48rem 0.54rem;
+  border: 1px solid transparent;
   border-radius: 0.5rem;
   background: rgba(12, 27, 55, 0.38);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.profile-dashboard .dashboard-subcategory-row:hover {
+  border-color: color-mix(in srgb, var(--neon-cyan) 22%, var(--border-subtle));
+  background: rgba(26, 49, 92, 0.5);
+  transform: translateY(-1px);
+}
+
+.profile-dashboard .dashboard-subcategory-row:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--neon-cyan) 58%, var(--neon-violet));
+  outline-offset: 2px;
 }
 
 .profile-dashboard .dashboard-subcategory-copy {
@@ -143,7 +158,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .profile-dashboard .dashboard-category-row,
-  .profile-dashboard .dashboard-category-chevron {
+  .profile-dashboard .dashboard-category-chevron,
+  .profile-dashboard .dashboard-subcategory-row {
     transition: none;
   }
 }

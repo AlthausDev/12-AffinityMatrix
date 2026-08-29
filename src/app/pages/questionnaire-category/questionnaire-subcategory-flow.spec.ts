@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   firstPendingSubcategoryId,
+  initialSubcategoryId,
   isSubcategoryComplete,
   nextPendingSubcategoryId,
 } from './questionnaire-subcategory-flow';
@@ -19,6 +20,15 @@ describe('questionnaire subcategory progression', () => {
 
   it('opens the first pending subcategory when entering a category', () => {
     expect(firstPendingSubcategoryId(sections)).toBe('second');
+  });
+
+  it('honours a visible direct subcategory target before normal progression', () => {
+    expect(initialSubcategoryId(sections, 'third')).toBe('third');
+    expect(initialSubcategoryId(sections, 'first')).toBe('first');
+  });
+
+  it('falls back to the first pending section when a direct target is unknown', () => {
+    expect(initialSubcategoryId(sections, 'missing')).toBe('second');
   });
 
   it('returns no initial section when the category is complete', () => {

@@ -30,6 +30,13 @@ export const routes: Routes = [
     title: brandedTitle('Edit profile'),
   },
   {
+    path: 'profiles/:id/glossary',
+    loadComponent: () =>
+      import('./pages/catalogue-glossary/catalogue-glossary-page.component')
+        .then((module) => module.CatalogueGlossaryPageComponent),
+    title: brandedTitle('Glossary'),
+  },
+  {
     path: 'profiles/:id/settings',
     loadComponent: () =>
       import('./pages/settings/settings-page.component')
