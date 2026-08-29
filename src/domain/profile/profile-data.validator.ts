@@ -7,6 +7,7 @@ import {
   DESIRED_FREQUENCY_VALUES,
   EXPERIENCE_CONTEXT_VALUES,
   INITIATIVE_PREFERENCE_VALUES,
+  MAX_ANSWER_REFINEMENTS,
   PracticeAnswer,
   TARGET_SITE_VALUES,
 } from './profile-answer';
@@ -22,7 +23,7 @@ const MAX_ANSWER_COUNT = 10_000;
 const METADATA_KEYS = ['alias', 'sex', 'orientation'] as const;
 const ANSWER_KEYS = ['practiceId', 'roleId', 'scope', 'preference', 'details'] as const;
 const SCOPE_KEYS = ['counterpartSex', 'targetSite'] as const;
-const DETAIL_KEYS = ['context', 'desiredFrequency', 'initiative', 'dependsOn'] as const;
+const DETAIL_KEYS = ['context', 'desiredFrequency', 'initiative', 'dependsOn', 'refinements'] as const;
 
 export interface ProfileDataShape {
   readonly metadata: ProfileMetadata;
@@ -108,6 +109,7 @@ export abstract class ProfileDataValidator<T extends ProfileDataShape> extends V
     const desiredFrequency = value['desiredFrequency'];
     const initiative = value['initiative'];
     const dependsOn = value['dependsOn'];
+    const refinements = value['refinements'];
     if (isPreference(preference) && !DETAIL_CAPABLE_PREFERENCES.includes(preference) && Object.keys(value).length > 0) {
       issues.push({ path: detailsPath, message: 'Optional experience details only apply to favorite, like, depends, or curious answers.' });
     }
@@ -118,6 +120,28 @@ export abstract class ProfileDataValidator<T extends ProfileDataShape> extends V
       if (preference !== 'depends') issues.push({ path: `${detailsPath}.dependsOn`, message: 'A dependency note only applies to a depends answer.' });
       if (typeof dependsOn !== 'string' || dependsOn.trim().length === 0) issues.push({ path: `${detailsPath}.dependsOn`, message: 'Dependency note must be non-empty when provided.' });
       else if (dependsOn.length > DEPENDS_ON_MAX_LENGTH) issues.push({ path: `${detailsPath}.dependsOn`, message: `Dependency note cannot exceed ${DEPENDS_ON_MAX_LENGTH} characters.` });
+    }
+    if (refinements !== undefined) issues.push(...this.validateRefinements(detailsPath, refinements));
+    return issues;
+  }
+
+  private validateRefinements(detailsPath: string, value: unknown): ValidationIssue[] {
+    const path = `${detailsPath}.refinements`;
+    if (!Array.isArray(value)) return [{ path, message: 'Answer refinements must be an array.' }];
+    if (value.length === 0) return [{ path, message: 'Answer refinements must be omitted instead of stored as an empty array.' }];
+    if (value.length > MAX_ANSWER_REFINEMENTS) {
+      return [{ path, message: `An answer cannot contain more than ${MAX_ANSWER_REFINEMENTS} refinements.` }];
+    }
+    const issues: ValidationIssue[] = [];
+    const seen = new Set<string>();
+    for (let index = 0; index < value.length; index += 1) {
+      const refinement = value[index];
+      if (!isStableId(refinement)) {
+        issues.push({ path: `${path}.${index}`, message: 'Refinement id must be a stable lowercase identifier.' });
+        continue;
+      }
+      if (seen.has(refinement)) issues.push({ path: `${path}.${index}`, message: 'Refinement ids must be unique.' });
+      seen.add(refinement);
     }
     return issues;
   }
