@@ -6,6 +6,7 @@ export interface SemanticInsightEntry {
   readonly tag: CatalogueInsightTagDefinition;
   readonly score: number;
   readonly evidenceCount: number;
+  readonly evidencePracticeIds: readonly string[];
   readonly weightedEvidence: number;
 }
 
@@ -129,10 +130,12 @@ export function buildSemanticInsights(
     .flatMap(([tagId, value]): SemanticInsightEntry[] => {
       const tag = definitionById.get(tagId);
       if (!tag || value.weight <= 0) return [];
+      const evidencePracticeIds = [...value.evidence].sort();
       return [{
         tag,
         score: Math.round((value.weightedScore / value.weight) * 100),
-        evidenceCount: value.evidence.size,
+        evidenceCount: evidencePracticeIds.length,
+        evidencePracticeIds,
         weightedEvidence: value.weight,
       }];
     })
@@ -159,10 +162,11 @@ export function buildSemanticThemes(
     const score = weight === 0
       ? 0
       : Math.round(entries.reduce((sum, entry) => sum + entry.score * entry.weightedEvidence, 0) / weight);
+    const evidence = new Set(entries.flatMap((entry) => entry.evidencePracticeIds));
     return {
       theme,
       score,
-      evidenceCount: entries.reduce((sum, entry) => sum + entry.evidenceCount, 0),
+      evidenceCount: evidence.size,
     };
   });
 }
@@ -171,8 +175,9 @@ export function strongestSemanticInsights(
   insights: readonly SemanticInsightEntry[],
   limit = 8,
 ): readonly SemanticInsightEntry[] {
-  const withEvidence = insights.filter((entry) => entry.evidenceCount >= 2);
-  return (withEvidence.length > 0 ? withEvidence : insights).slice(0, limit);
+  const positive = insights.filter((entry) => entry.score > 0);
+  const withEvidence = positive.filter((entry) => entry.evidenceCount >= 2);
+  return (withEvidence.length > 0 ? withEvidence : positive).slice(0, limit);
 }
 
 function semanticRank(entry: SemanticInsightEntry): number {
