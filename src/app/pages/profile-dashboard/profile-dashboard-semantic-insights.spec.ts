@@ -1,9 +1,13 @@
 import { CatalogueInsightTagDefinition, PracticeInsightSignals } from '../../../domain/catalogue/catalogue-insight';
 import { createProfile } from '../../../domain/profile/profile';
 import { createAnswerKey } from '../../../domain/profile/profile-answer';
+import { CATALOGUE_INSIGHT_TAGS } from '../../../infrastructure/catalogue/v3/catalogue-insights';
 import {
+  buildSemanticCoordinateMaps,
   buildSemanticInsights,
   buildSemanticThemes,
+  DASHBOARD_SEMANTIC_THEMES,
+  SemanticCoordinateMapDefinition,
   strongestSemanticInsights,
 } from './profile-dashboard-semantic-insights';
 
@@ -106,6 +110,46 @@ describe('semantic dashboard insights', () => {
     expect(themes).toHaveLength(1);
     expect(themes[0]?.score).toBeGreaterThan(0);
     expect(themes[0]?.evidenceCount).toBe(2);
+  });
+
+  it('keeps every catalogue semantic tag in exactly one dashboard dimension', () => {
+    const themedTags = DASHBOARD_SEMANTIC_THEMES.flatMap((theme) => theme.tags);
+    const uniqueThemedTags = new Set(themedTags);
+    const catalogueTagIds = CATALOGUE_INSIGHT_TAGS.map((tag) => tag.id);
+
+    expect(themedTags).toHaveLength(uniqueThemedTags.size);
+    expect(uniqueThemedTags.size).toBe(catalogueTagIds.length);
+    expect(catalogueTagIds.every((tagId) => uniqueThemedTags.has(tagId))).toBe(true);
+  });
+
+  it('places coordinate maps from positive evidence on both sides of each axis', () => {
+    const insights = [
+      {
+        tag: tags[0]!, score: 80, evidenceCount: 1, evidencePracticeIds: ['a'], weightedEvidence: 1,
+      },
+      {
+        tag: tags[1]!, score: 40, evidenceCount: 1, evidencePracticeIds: ['b'], weightedEvidence: 1,
+      },
+    ];
+    const maps: readonly SemanticCoordinateMapDefinition[] = [{
+      id: 'test-map',
+      en: 'Test map',
+      es: 'Mapa de prueba',
+      descriptionEn: 'Test',
+      descriptionEs: 'Prueba',
+      x: {
+        lowEn: 'Connection', lowEs: 'Conexión', highEn: 'Intensity', highEs: 'Intensidad',
+        lowTags: ['connection'], highTags: ['intensity'],
+      },
+      y: {
+        lowEn: 'Connection', lowEs: 'Conexión', highEn: 'Intensity', highEs: 'Intensidad',
+        lowTags: ['connection'], highTags: ['intensity'],
+      },
+    }];
+
+    expect(buildSemanticCoordinateMaps(insights, maps)).toEqual([
+      expect.objectContaining({ x: -33, y: -33, evidenceCount: 2 }),
+    ]);
   });
 
   it('prefers signals backed by more than one practice when selecting highlights', () => {

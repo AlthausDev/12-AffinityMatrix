@@ -39,7 +39,7 @@
 .profile-dashboard .dashboard-role-legend-swatch {
   width: 0.52rem;
   height: 0.52rem;
-  border-radius: 999px;
+  border-radius: 0.14rem;
   box-shadow: 0 0 0.5rem color-mix(in srgb, currentColor 18%, transparent);
 }
 
@@ -117,7 +117,7 @@
 .profile-dashboard .dashboard-role-track {
   overflow: hidden;
   height: 0.38rem;
-  border-radius: 999px;
+  border-radius: 0.18rem;
   background: rgba(70, 88, 134, 0.2);
   box-shadow: inset 0 1px 2px rgba(2, 7, 20, 0.32);
 }
@@ -138,10 +138,137 @@
   background: linear-gradient(90deg, color-mix(in srgb, var(--preference-favorite) 70%, var(--neon-violet)), var(--preference-favorite));
 }
 
+.profile-dashboard .dashboard-role-compass {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--border-subtle) 58%, transparent);
+}
+
+.profile-dashboard .dashboard-role-compass-heading {
+  display: grid;
+  gap: 0.16rem;
+}
+
+.profile-dashboard .dashboard-role-compass-heading strong {
+  font-size: 0.76rem;
+}
+
+.profile-dashboard .dashboard-role-compass-heading small,
+.profile-dashboard .dashboard-role-compass-evidence {
+  color: var(--text-secondary);
+  font-size: 0.62rem;
+  line-height: 1.38;
+}
+
+.profile-dashboard .dashboard-role-plane {
+  position: relative;
+  min-height: 11.5rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 70%, transparent);
+  border-radius: 0.62rem;
+  background:
+    linear-gradient(90deg, transparent 24.75%, rgba(116, 146, 204, 0.05) 25%, transparent 25.25%, transparent 74.75%, rgba(116, 146, 204, 0.05) 75%, transparent 75.25%),
+    linear-gradient(0deg, transparent 24.75%, rgba(116, 146, 204, 0.05) 25%, transparent 25.25%, transparent 74.75%, rgba(116, 146, 204, 0.05) 75%, transparent 75.25%),
+    linear-gradient(145deg, rgba(11, 26, 55, 0.78), rgba(31, 20, 54, 0.72));
+  box-shadow: inset 0 0 1.2rem rgba(2, 7, 21, 0.22);
+}
+
+.profile-dashboard .dashboard-role-axis {
+  position: absolute;
+  background: color-mix(in srgb, var(--neon-violet) 36%, var(--border-strong));
+}
+
+.profile-dashboard .dashboard-role-axis-x {
+  left: 9%;
+  right: 9%;
+  top: 50%;
+  height: 1px;
+}
+
+.profile-dashboard .dashboard-role-axis-y {
+  top: 9%;
+  bottom: 9%;
+  left: 50%;
+  width: 1px;
+}
+
+.profile-dashboard .dashboard-role-axis-label {
+  position: absolute;
+  z-index: 1;
+  max-width: 6rem;
+  padding: 0.12rem 0.26rem;
+  background: rgba(9, 18, 40, 0.8);
+  color: color-mix(in srgb, var(--text-secondary) 88%, white);
+  font-size: 0.55rem;
+  font-weight: 720;
+  line-height: 1.18;
+}
+
+.profile-dashboard .dashboard-role-axis-left {
+  left: 0.3rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.profile-dashboard .dashboard-role-axis-right {
+  right: 0.3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: right;
+}
+
+.profile-dashboard .dashboard-role-axis-top {
+  top: 0.3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.profile-dashboard .dashboard-role-axis-bottom {
+  bottom: 0.3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.profile-dashboard .dashboard-role-axis-center {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 0.38rem);
+  transform: translateX(-50%);
+  color: color-mix(in srgb, var(--text-secondary) 46%, transparent);
+  font-size: 0.5rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.profile-dashboard .dashboard-role-coordinate-marker {
+  position: absolute;
+  z-index: 3;
+  width: 0.82rem;
+  height: 0.82rem;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border: 2px solid #f5f2ff;
+  border-radius: 0.14rem;
+  background: linear-gradient(135deg, var(--preference-positive), var(--neon-violet) 62%, var(--preference-favorite));
+  box-shadow: 0 0 0.25rem rgba(255, 255, 255, 0.32), 0 0 0.85rem rgba(140, 92, 255, 0.5);
+}
+
+.profile-dashboard .dashboard-role-compass-evidence {
+  justify-self: end;
+  text-align: right;
+}
+
 @media (max-width: 480px) {
   .profile-dashboard .dashboard-role-metrics {
     grid-template-columns: 1fr;
     gap: 0.42rem;
+  }
+
+  .profile-dashboard .dashboard-role-plane {
+    min-height: 10.5rem;
   }
 }
 

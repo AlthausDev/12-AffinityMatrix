@@ -1,6 +1,6 @@
 import { CatalogueInsightTagDefinition, CatalogueInsightTagId, PracticeInsightSignals } from '../../../domain/catalogue/catalogue-insight';
 import { Profile } from '../../../domain/profile/profile';
-import { Preference } from '../../../domain/profile/preference';
+import { preferenceAffinity } from './profile-preference-affinity';
 
 export interface SemanticInsightEntry {
   readonly tag: CatalogueInsightTagDefinition;
@@ -25,65 +25,174 @@ export interface SemanticThemeEntry {
   readonly evidenceCount: number;
 }
 
+export interface SemanticAxisDefinition {
+  readonly lowEn: string;
+  readonly lowEs: string;
+  readonly highEn: string;
+  readonly highEs: string;
+  readonly lowTags: readonly CatalogueInsightTagId[];
+  readonly highTags: readonly CatalogueInsightTagId[];
+}
+
+export interface SemanticCoordinateMapDefinition {
+  readonly id: string;
+  readonly en: string;
+  readonly es: string;
+  readonly descriptionEn: string;
+  readonly descriptionEs: string;
+  readonly x: SemanticAxisDefinition;
+  readonly y: SemanticAxisDefinition;
+}
+
+export interface SemanticCoordinateMapEntry {
+  readonly map: SemanticCoordinateMapDefinition;
+  /** Relative balance from -100 (low family) to +100 (high family). */
+  readonly x: number;
+  /** Relative balance from -100 (low family) to +100 (high family). */
+  readonly y: number;
+  readonly evidenceCount: number;
+}
+
+/**
+ * User-facing dimensions are intentionally more granular than the first dashboard pass. Every
+ * reusable Catalogue V3 tag belongs to exactly one dimension, while the raw tags remain available
+ * as highlighted signals and for the coordinate maps below.
+ */
 export const DASHBOARD_SEMANTIC_THEMES: readonly SemanticThemeDefinition[] = [
   {
     id: 'connection',
-    en: 'Connection & sensuality',
-    es: 'Conexión y sensualidad',
-    descriptionEn: 'Emotional closeness, tenderness, romance, sensuality and reciprocal interaction.',
-    descriptionEs: 'Cercanía emocional, ternura, romanticismo, sensualidad e interacción recíproca.',
-    tags: ['connection', 'tenderness', 'romance', 'sensuality', 'reciprocity', 'slow-pace'],
+    en: 'Connection & affection',
+    es: 'Conexión y afecto',
+    descriptionEn: 'Emotional closeness, tenderness, romance and reciprocal interaction.',
+    descriptionEs: 'Cercanía emocional, ternura, romanticismo e interacción recíproca.',
+    tags: ['connection', 'tenderness', 'romance', 'reciprocity'],
+  },
+  {
+    id: 'sensuality',
+    en: 'Sensuality & pace',
+    es: 'Sensualidad y ritmo',
+    descriptionEn: 'Sensory enjoyment and preferences around slower or faster pacing.',
+    descriptionEs: 'Disfrute sensorial y preferencias alrededor de ritmos más lentos o rápidos.',
+    tags: ['sensuality', 'slow-pace', 'fast-pace'],
+  },
+  {
+    id: 'play',
+    en: 'Play & spontaneity',
+    es: 'Juego y espontaneidad',
+    descriptionEn: 'Playful interaction, teasing, lightness and unplanned experiences.',
+    descriptionEs: 'Interacción juguetona, provocación, ligereza y experiencias no planificadas.',
+    tags: ['playfulness', 'spontaneity'],
   },
   {
     id: 'exploration',
-    en: 'Exploration & play',
-    es: 'Exploración y juego',
-    descriptionEn: 'Novelty, spontaneity, playful interaction, imagination and role immersion.',
-    descriptionEs: 'Novedad, espontaneidad, interacción juguetona, imaginación e inmersión en roles.',
-    tags: ['exploration', 'spontaneity', 'playfulness', 'fantasy-imagination', 'role-immersion', 'anonymity'],
+    en: 'Exploration & fantasy',
+    es: 'Exploración y fantasía',
+    descriptionEn: 'Novelty, imagination, role immersion, anonymity and transgressive framing.',
+    descriptionEs: 'Novedad, imaginación, inmersión en roles, anonimato y marcos transgresores.',
+    tags: ['exploration', 'fantasy-imagination', 'role-immersion', 'anonymity', 'transgression'],
   },
   {
     id: 'intensity',
     en: 'Intensity & physicality',
     es: 'Intensidad y fisicalidad',
-    descriptionEn: 'Energetic interaction, active body involvement, sensation and higher-intensity interests.',
-    descriptionEs: 'Interacción enérgica, implicación corporal activa, sensaciones e intereses de mayor intensidad.',
-    tags: ['intensity', 'fast-pace', 'physicality', 'pain-sensation', 'edge-risk'],
+    descriptionEn: 'Energetic body involvement, stronger sensation and higher-risk themes.',
+    descriptionEs: 'Implicación corporal enérgica, sensaciones fuertes y temas de mayor riesgo.',
+    tags: ['intensity', 'physicality', 'pain-sensation', 'edge-risk'],
   },
   {
     id: 'power',
-    en: 'Power & structure',
-    es: 'Poder y estructura',
-    descriptionEn: 'Power exchange, rules, service, ownership symbolism and restriction.',
-    descriptionEs: 'Intercambio de poder, reglas, servicio, simbolismo de pertenencia y restricción.',
-    tags: ['power-exchange', 'structure', 'service-orientation', 'ownership-symbolism', 'physical-restraint', 'sensory-restriction'],
+    en: 'Power & service',
+    es: 'Poder y servicio',
+    descriptionEn: 'Power exchange, explicit structure, service and ownership symbolism.',
+    descriptionEs: 'Intercambio de poder, estructura explícita, servicio y simbología de pertenencia.',
+    tags: ['power-exchange', 'structure', 'service-orientation', 'ownership-symbolism'],
+  },
+  {
+    id: 'restraint',
+    en: 'Restraint & restriction',
+    es: 'Restricción y limitación',
+    descriptionEn: 'Physical restraint and deliberate reduction of sensory access.',
+    descriptionEs: 'Restricción física y reducción deliberada del acceso sensorial.',
+    tags: ['physical-restraint', 'sensory-restriction'],
   },
   {
     id: 'visibility',
-    en: 'Visibility & social context',
-    es: 'Exposición y contexto social',
-    descriptionEn: 'Being seen or watching, recording, groups and consensual non-monogamous settings.',
-    descriptionEs: 'Ser visto u observar, grabación, grupos y contextos de no monogamia consensuada.',
-    tags: ['visibility', 'voyeuristic-focus', 'exhibitionistic-focus', 'recording-media', 'group-social', 'non-monogamy'],
+    en: 'Visibility & media',
+    es: 'Exposición y contenido',
+    descriptionEn: 'Being seen or watching, exhibitionism, voyeurism and erotic recording.',
+    descriptionEs: 'Ser visto u observar, exhibicionismo, voyeurismo y grabación erótica.',
+    tags: ['visibility', 'voyeuristic-focus', 'exhibitionistic-focus', 'recording-media'],
+  },
+  {
+    id: 'social',
+    en: 'Social & non-monogamous context',
+    es: 'Contexto social y no monógamo',
+    descriptionEn: 'Group participation and consensual non-monogamous settings.',
+    descriptionEs: 'Participación grupal y contextos de no monogamia consensuada.',
+    tags: ['group-social', 'non-monogamy'],
   },
   {
     id: 'body-focus',
     en: 'Body & erotic focus',
     es: 'Cuerpo y foco erótico',
-    descriptionEn: 'Aesthetic presentation and focused interest in anatomy, orgasm or sexual fluids.',
-    descriptionEs: 'Presentación estética e interés focalizado en anatomía, orgasmo o fluidos sexuales.',
-    tags: ['aesthetic-presentation', 'anatomy-focus', 'orgasm-focus', 'fluid-focus', 'transgression'],
+    descriptionEn: 'Aesthetic presentation and focused interest in anatomy, orgasm or bodily fluids.',
+    descriptionEs: 'Presentación estética e interés focalizado en anatomía, orgasmo o fluidos corporales.',
+    tags: ['aesthetic-presentation', 'anatomy-focus', 'orgasm-focus', 'fluid-focus'],
   },
 ] as const;
 
-const PREFERENCE_AFFINITY: Readonly<Record<Preference, number>> = {
-  favorite: 1,
-  like: 0.78,
-  depends: 0.38,
-  curious: 0.5,
-  'not-interested': 0,
-  boundary: 0,
-};
+/**
+ * Coordinate maps compare positive evidence between signal families. They deliberately do not
+ * define literal opposites: a low score on one family never creates affinity for the other side.
+ */
+export const DASHBOARD_SEMANTIC_COORDINATE_MAPS: readonly SemanticCoordinateMapDefinition[] = [
+  {
+    id: 'style',
+    en: 'Experience style',
+    es: 'Estilo de experiencia',
+    descriptionEn: 'Places the strongest answered signals between relational/sensual and exploratory/intense families.',
+    descriptionEs: 'Sitúa las señales respondidas entre familias relacionales/sensuales y exploratorias/intensas.',
+    x: {
+      lowEn: 'Connection',
+      lowEs: 'Conexión',
+      highEn: 'Exploration',
+      highEs: 'Exploración',
+      lowTags: ['connection', 'tenderness', 'romance', 'reciprocity'],
+      highTags: ['exploration', 'spontaneity', 'playfulness', 'fantasy-imagination', 'role-immersion', 'anonymity', 'transgression'],
+    },
+    y: {
+      lowEn: 'Sensual / slow',
+      lowEs: 'Sensual / pausado',
+      highEn: 'Intense / physical',
+      highEs: 'Intenso / físico',
+      lowTags: ['sensuality', 'slow-pace', 'tenderness'],
+      highTags: ['intensity', 'fast-pace', 'physicality', 'pain-sensation', 'edge-risk'],
+    },
+  },
+  {
+    id: 'dynamic',
+    en: 'Dynamic & context',
+    es: 'Dinámica y contexto',
+    descriptionEn: 'Compares reciprocal/playful signals with structured power, and body-focused signals with visible/social ones.',
+    descriptionEs: 'Compara señales recíprocas/juguetonas con poder estructurado, y focos corporales con exposición/contexto social.',
+    x: {
+      lowEn: 'Reciprocal / playful',
+      lowEs: 'Recíproco / juguetón',
+      highEn: 'Power / structure',
+      highEs: 'Poder / estructura',
+      lowTags: ['reciprocity', 'connection', 'playfulness'],
+      highTags: ['power-exchange', 'structure', 'service-orientation', 'ownership-symbolism', 'physical-restraint', 'sensory-restriction'],
+    },
+    y: {
+      lowEn: 'Body focus',
+      lowEs: 'Foco corporal',
+      highEn: 'Visible / social',
+      highEs: 'Visible / social',
+      lowTags: ['sensuality', 'aesthetic-presentation', 'anatomy-focus', 'orgasm-focus', 'fluid-focus'],
+      highTags: ['visibility', 'voyeuristic-focus', 'exhibitionistic-focus', 'recording-media', 'group-social', 'non-monogamy'],
+    },
+  },
+] as const;
 
 /**
  * Builds orientative semantic tendencies from saved answers. Each practice contributes at most
@@ -99,7 +208,7 @@ export function buildSemanticInsights(
   const answersByPractice = new Map<string, number[]>();
   for (const answer of Object.values(profile?.answers ?? {})) {
     const values = answersByPractice.get(answer.practiceId) ?? [];
-    values.push(PREFERENCE_AFFINITY[answer.preference]);
+    values.push(preferenceAffinity(answer.preference));
     answersByPractice.set(answer.practiceId, values);
   }
 
@@ -171,13 +280,62 @@ export function buildSemanticThemes(
   });
 }
 
+export function buildSemanticCoordinateMaps(
+  insights: readonly SemanticInsightEntry[],
+  maps: readonly SemanticCoordinateMapDefinition[] = DASHBOARD_SEMANTIC_COORDINATE_MAPS,
+): readonly SemanticCoordinateMapEntry[] {
+  const byTag = new Map(insights.map((entry) => [entry.tag.id, entry]));
+
+  return maps.map((map) => {
+    const x = axisBalance(map.x, byTag);
+    const y = axisBalance(map.y, byTag);
+    return {
+      map,
+      x: x.balance,
+      y: y.balance,
+      evidenceCount: new Set([...x.evidencePracticeIds, ...y.evidencePracticeIds]).size,
+    };
+  });
+}
+
 export function strongestSemanticInsights(
   insights: readonly SemanticInsightEntry[],
-  limit = 8,
+  limit = 10,
 ): readonly SemanticInsightEntry[] {
   const positive = insights.filter((entry) => entry.score > 0);
   const withEvidence = positive.filter((entry) => entry.evidenceCount >= 2);
   return (withEvidence.length > 0 ? withEvidence : positive).slice(0, limit);
+}
+
+function axisBalance(
+  axis: SemanticAxisDefinition,
+  byTag: ReadonlyMap<CatalogueInsightTagId, SemanticInsightEntry>,
+): { readonly balance: number; readonly evidencePracticeIds: readonly string[] } {
+  const low = familyScore(axis.lowTags, byTag);
+  const high = familyScore(axis.highTags, byTag);
+  const total = low.score + high.score;
+  const balance = total <= 0 ? 0 : Math.round(((high.score - low.score) / total) * 100);
+  return {
+    balance: Math.max(-100, Math.min(100, balance)),
+    evidencePracticeIds: [...new Set([...low.evidencePracticeIds, ...high.evidencePracticeIds])],
+  };
+}
+
+function familyScore(
+  tagIds: readonly CatalogueInsightTagId[],
+  byTag: ReadonlyMap<CatalogueInsightTagId, SemanticInsightEntry>,
+): { readonly score: number; readonly evidencePracticeIds: readonly string[] } {
+  const entries = tagIds.flatMap((tagId) => {
+    const entry = byTag.get(tagId);
+    return entry ? [entry] : [];
+  });
+  const weight = entries.reduce((sum, entry) => sum + entry.weightedEvidence, 0);
+  return {
+    score: weight <= 0
+      ? 0
+      : entries.reduce((sum, entry) => sum + entry.score * entry.weightedEvidence, 0) / weight,
+    evidencePracticeIds: [...new Set(entries.flatMap((entry) => entry.evidencePracticeIds))],
+  };
 }
 
 function semanticRank(entry: SemanticInsightEntry): number {

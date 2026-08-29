@@ -4,6 +4,7 @@ import { createAnswerKey } from '../../../domain/profile/profile-answer';
 import {
   buildPreferenceDistribution,
   buildRoleProfile,
+  buildRoleProfileCoordinates,
   buildSubcategoryProgress,
 } from './profile-dashboard-insights';
 
@@ -127,7 +128,7 @@ describe('buildRoleProfile', () => {
     },
   ];
 
-  it('groups saved answers by role perspective and separates affinity from favorites', () => {
+  it('weights the full preference scale and aggregates scoped variants per practice role', () => {
     const profile = createProfile({
       id: 'profile-role',
       now: '2026-08-24T09:00:00.000Z',
@@ -152,10 +153,10 @@ describe('buildRoleProfile', () => {
     expect(profileByRole).toEqual([
       expect.objectContaining({
         perspective: 'active',
-        answerCount: 2,
-        affinityCount: 2,
+        answerCount: 1,
+        affinityCount: 1,
         favoriteCount: 1,
-        affinityPercentage: 100,
+        affinityPercentage: 89,
         favoritePercentage: 50,
       }),
       expect.objectContaining({
@@ -163,7 +164,7 @@ describe('buildRoleProfile', () => {
         answerCount: 1,
         affinityCount: 0,
         favoriteCount: 0,
-        affinityPercentage: 0,
+        affinityPercentage: 50,
         favoritePercentage: 0,
       }),
       expect.objectContaining({
@@ -175,6 +176,39 @@ describe('buildRoleProfile', () => {
         favoritePercentage: 100,
       }),
     ]);
+  });
+
+  it('uses explicit initiative details to position the role coordinate map', () => {
+    const profile = createProfile({
+      id: 'profile-role-map',
+      now: '2026-08-29T19:00:00.000Z',
+      answers: {
+        [createAnswerKey('paired', 'give')]: {
+          practiceId: 'paired',
+          roleId: 'give',
+          preference: 'favorite',
+          details: { initiative: 'prefer-initiate' },
+        },
+        [createAnswerKey('paired', 'receive')]: {
+          practiceId: 'paired',
+          roleId: 'receive',
+          preference: 'like',
+          details: { initiative: 'either' },
+        },
+        [createAnswerKey('shared', 'participate')]: {
+          practiceId: 'shared',
+          roleId: 'participate',
+          preference: 'curious',
+        },
+      },
+    });
+
+    expect(buildRoleProfileCoordinates(profile, practices)).toEqual({
+      roleBalance: 12,
+      initiativeBalance: 50,
+      roleEvidenceCount: 3,
+      initiativeEvidenceCount: 2,
+    });
   });
 
   it('ignores saved answers that can no longer be mapped to the current catalogue', () => {
@@ -191,5 +225,11 @@ describe('buildRoleProfile', () => {
     const profileByRole = buildRoleProfile(profile, practices);
 
     expect(profileByRole.every((entry) => entry.answerCount === 0)).toBe(true);
+    expect(buildRoleProfileCoordinates(profile, practices)).toEqual({
+      roleBalance: 0,
+      initiativeBalance: 0,
+      roleEvidenceCount: 0,
+      initiativeEvidenceCount: 0,
+    });
   });
 });

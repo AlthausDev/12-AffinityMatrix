@@ -17,6 +17,7 @@ import { DashboardSemanticMapComponent } from './dashboard-semantic-map.componen
 import {
   buildPreferenceDistribution,
   buildRoleProfile,
+  buildRoleProfileCoordinates,
   buildSubcategoryProgress,
 } from './profile-dashboard-insights';
 
@@ -295,6 +296,31 @@ import {
                     </div>
                   }
                 </div>
+
+                <div class="dashboard-role-compass">
+                  <div class="dashboard-role-compass-heading">
+                    <strong>{{ i18n.t('dashboard.roleProfile.balanceTitle') }}</strong>
+                    <small>{{ i18n.t('dashboard.roleProfile.balanceDescription') }}</small>
+                  </div>
+                  <div class="dashboard-role-plane" role="img" [attr.aria-label]="roleCompassAriaLabel()">
+                    <span class="dashboard-role-axis dashboard-role-axis-x" aria-hidden="true"></span>
+                    <span class="dashboard-role-axis dashboard-role-axis-y" aria-hidden="true"></span>
+                    <span class="dashboard-role-axis-label dashboard-role-axis-left">{{ i18n.t('dashboard.roleProfile.receptive') }}</span>
+                    <span class="dashboard-role-axis-label dashboard-role-axis-right">{{ i18n.t('dashboard.roleProfile.active') }}</span>
+                    <span class="dashboard-role-axis-label dashboard-role-axis-top">{{ i18n.t('dashboard.roleProfile.initiativeSelf') }}</span>
+                    <span class="dashboard-role-axis-label dashboard-role-axis-bottom">{{ i18n.t('dashboard.roleProfile.initiativePartner') }}</span>
+                    <span class="dashboard-role-axis-center" aria-hidden="true">{{ i18n.t('dashboard.roleProfile.balanceCenter') }}</span>
+                    <span
+                      class="dashboard-role-coordinate-marker"
+                      [style.left.%]="roleCoordinateLeft()"
+                      [style.top.%]="roleCoordinateTop()"
+                      aria-hidden="true"
+                    ></span>
+                  </div>
+                  <small class="dashboard-role-compass-evidence">
+                    {{ roleInitiativeEvidenceLabel() }}
+                  </small>
+                </div>
               } @else {
                 <div class="dashboard-chart-empty">
                   <span aria-hidden="true">◇</span>
@@ -427,6 +453,9 @@ export class ProfileDashboardPageComponent {
   readonly roleProfile = computed(() =>
     buildRoleProfile(this.profile(), this.catalogueStore.snapshot()?.catalogue.practices),
   );
+  readonly roleProfileCoordinates = computed(() =>
+    buildRoleProfileCoordinates(this.profile(), this.catalogueStore.snapshot()?.catalogue.practices),
+  );
   readonly roleProfileAnswerCount = computed(() =>
     this.roleProfile().reduce((sum, entry) => sum + entry.answerCount, 0),
   );
@@ -494,6 +523,31 @@ export class ProfileDashboardPageComponent {
       'dashboard.roleProfile.answers.one',
       'dashboard.roleProfile.answers.other',
     );
+  }
+
+  roleCoordinateLeft(): number {
+    return Math.max(8, Math.min(92, 50 + this.roleProfileCoordinates().roleBalance * 0.42));
+  }
+
+  roleCoordinateTop(): number {
+    const coordinates = this.roleProfileCoordinates();
+    if (coordinates.initiativeEvidenceCount === 0) return 50;
+    return Math.max(8, Math.min(92, 50 - coordinates.initiativeBalance * 0.42));
+  }
+
+  roleInitiativeEvidenceLabel(): string {
+    const count = this.roleProfileCoordinates().initiativeEvidenceCount;
+    if (count === 0) return this.i18n.t('dashboard.roleProfile.initiativeMissing');
+    return this.i18n.plural(
+      count,
+      'dashboard.roleProfile.initiativeEvidence.one',
+      'dashboard.roleProfile.initiativeEvidence.other',
+    );
+  }
+
+  roleCompassAriaLabel(): string {
+    const coordinates = this.roleProfileCoordinates();
+    return `${this.i18n.t('dashboard.roleProfile.balanceTitle')} · ${this.i18n.t('dashboard.roleProfile.receptive')} ↔ ${this.i18n.t('dashboard.roleProfile.active')}: ${coordinates.roleBalance}; ${this.i18n.t('dashboard.roleProfile.initiativePartner')} ↔ ${this.i18n.t('dashboard.roleProfile.initiativeSelf')}: ${coordinates.initiativeBalance}`;
   }
 
   preferenceLabel(preference: Preference): string {
