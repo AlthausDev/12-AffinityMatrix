@@ -7,7 +7,6 @@ import { applyCatalogueClosingPass, CLOSING_PASS_RETIRED_PRACTICE_IDS } from './
 import { applyCatalogueClosingOrder } from './catalogue-closing-order';
 import { applyCatalogueReleaseAudit, applyCatalogueReleaseAuditCategoryCopy } from './catalogue-release-audit';
 import { applyCatalogueReleaseAuditOrder } from './catalogue-release-order';
-import { applyBodyTraitRefinementCompaction, BODY_TRAIT_REFINEMENT_RETIRED_PRACTICE_IDS } from './body-trait-refinements';
 import { applyFinalCategoryCopy } from './category-copy-overrides';
 import { polishCatalogue } from './content-polish';
 import { materializeContextualDescriptions } from './contextual-description';
@@ -33,6 +32,10 @@ import { applyManualRoleFollowup } from './manual-role-followup';
 import { applyMutualRoleNoiseCleanup } from './mutual-role-noise-cleanup';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
 import { applyPatchReleaseCorrections } from './patch-release-corrections';
+import {
+  extractPhysicalPreferencesFromCatalogue,
+  PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS,
+} from './physical-preferences-extraction';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
 import { stripRedundantConsentFromRoleLabels } from './role-label-consent-cleanup';
 import { addExpandedSexualPositions } from './sexual-position-additions';
@@ -49,7 +52,7 @@ const ALL_RETIRED_V3_PRACTICE_IDS = [
   ...FINAL_PASS_RETIRED_PRACTICE_IDS,
   ...CLOSING_PASS_RETIRED_PRACTICE_IDS,
   ...FINAL_NOISE_RETIRED_PRACTICE_IDS,
-  ...BODY_TRAIT_REFINEMENT_RETIRED_PRACTICE_IDS,
+  ...PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS,
 ];
 
 export const RETIRED_V3_PRACTICE_IDS = new Set<string>(
@@ -100,7 +103,7 @@ const REPLACEMENT_CONTENT = addFinalNoiseReplacement(NOISE_CLEANED_CONTENT);
 const NOISE_APPLICABILITY_CONTENT = applyFinalNoiseApplicability(REPLACEMENT_CONTENT);
 const QUESTIONNAIRE_FOLLOWUP_CONTENT = applyFinalQuestionnaireFollowup(NOISE_APPLICABILITY_CONTENT);
 const NATURAL_ROLE_CONTENT = applyMutualRoleNoiseCleanup(QUESTIONNAIRE_FOLLOWUP_CONTENT);
-const BODY_REFINED_CONTENT = applyBodyTraitRefinementCompaction(NATURAL_ROLE_CONTENT);
-const PRESENTATION_CLEANED_CONTENT = applyFinalPresentationCleanup(BODY_REFINED_CONTENT);
+const PHYSICAL_PROFILE_EXTRACTED_CONTENT = extractPhysicalPreferencesFromCatalogue(NATURAL_ROLE_CONTENT);
+const PRESENTATION_CLEANED_CONTENT = applyFinalPresentationCleanup(PHYSICAL_PROFILE_EXTRACTED_CONTENT);
 
 export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(PRESENTATION_CLEANED_CONTENT);
