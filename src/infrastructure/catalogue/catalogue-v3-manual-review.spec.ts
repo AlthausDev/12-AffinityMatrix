@@ -6,6 +6,7 @@ import { CATALOGUE_V3_CONTENT } from './v3/content/final';
 const seed = (id: string) => CATALOGUE_V3_CONTENT
   .flatMap((category) => category.practices)
   .find((practice) => practice.id === id);
+const practice = (id: string) => CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.find((candidate) => candidate.id === id);
 const subcategory = (id: string) => CATALOGUE_V3_SUBCATEGORIES.find((candidate) => candidate.id === id);
 const insight = (id: string) => CATALOGUE_V3_PRACTICE_INSIGHTS.find((candidate) => candidate.practiceId === id);
 
@@ -32,27 +33,36 @@ describe('Catalogue V3 final manual review', () => {
     ]);
   });
 
-  it('expands erotic photography, service, ownership symbolism, fluids and Edge without umbrella duplicates', () => {
+  it('uses distinct exhibitionism, service and cleanup questions instead of release-review duplicates', () => {
     for (const id of [
-      'erotic-selfies', 'partner-erotic-photography', 'erotic-photo-session-together',
-      'watch-private-recording-together', 'watching-undressing',
-      'body-care-service', 'hospitality-service', 'ritual-attendance-service',
+      'erotic-selfies', 'erotic-photo-session-together', 'erotic-media-exchange',
+      'watch-private-recording-together', 'watching-undressing', 'watched-masturbation', 'private-striptease',
+      'body-care-service', 'attentive-service', 'pleasure-focused-service', 'erotic-presentation-service',
       'ownership-token', 'temporary-ownership-marking', 'assigned-submissive-name',
-      'semen-on-other-body', 'own-urine-play', 'own-blood-play', 'own-scat-play',
+      'semen-on-other-body', 'semen-cleanup-manual', 'semen-cleanup-oral', 'semen-cleanup-other',
       'ordeal-scene', 'extreme-helplessness-fantasy',
     ]) expect(seed(id), id).toBeDefined();
 
+    for (const retired of [
+      'partner-erotic-photography', 'hospitality-service', 'ritual-attendance-service', 'creampie-cleanup',
+      'own-urine-play', 'own-blood-play', 'own-scat-play',
+    ]) expect(seed(retired), retired).toBeUndefined();
+
     expect(seed('semen-on-other-body')?.descriptionEs).toContain('distinta de cara, pecho, glúteos o boca');
-    expect(subcategory('fluids-urine-blood-scat')?.practiceIds).toContain('own-urine-play');
+    expect(subcategory('fluids-semen-cleanup')?.practiceIds)
+      .toEqual(['semen-cleanup-manual', 'semen-cleanup-oral', 'semen-cleanup-other']);
     expect(subcategory('edge-ordeal-helplessness')?.practiceIds).toEqual(['ordeal-scene', 'extreme-helplessness-fantasy']);
   });
 
-  it('makes couple-with-third dynamics explicit paired roles instead of ambiguous participation', () => {
+  it('makes hotwife, cuckold and cuckquean roles explicit and readable', () => {
     expect(seed('watching-partner-with-other')?.kind).toBe('paired');
     expect(seed('hotwife-dynamic')?.pairedRoles?.map((role) => role.id)).toEqual(['hotwife-role', 'hotwife-partner-role']);
     expect(seed('cuckold-dynamic')?.pairedRoles?.map((role) => role.id)).toEqual(['cuckold-role', 'cuckold-partner-role']);
     expect(seed('cuckquean-dynamic')?.pairedRoles?.map((role) => role.id)).toEqual(['cuckquean-role', 'cuckquean-partner-role']);
-    expect(seed('hotwife-dynamic')?.descriptionEs).toContain('La humillación no es necesaria');
+    expect(seed('hotwife-dynamic')?.descriptionEs).toContain('foco está en la mujer');
+    expect(seed('hotwife-dynamic')?.descriptionEs).toContain('cuckold');
+    expect(seed('cuckold-dynamic')?.descriptionEs).toContain('foco está en el hombre');
+    expect(seed('cuckold-dynamic')?.descriptionEs).toContain('hotwife');
   });
 
   it('uses human role wording across the reviewed orgasm, restraint, psychological and advanced sections', () => {
@@ -71,14 +81,14 @@ describe('Catalogue V3 final manual review', () => {
       .flatMap((item) => item.practiceIds));
     const generic = new Set(['Give / do', 'Receive', 'Lead / control', 'Follow / receive']);
 
-    for (const practice of CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.filter((item) => reviewedIds.has(item.id))) {
-      for (const role of practice.roles.filter((item) => ['give', 'receive', 'lead', 'follow'].includes(item.id))) {
-        expect(generic.has(role.label), `${practice.id}:${role.id} -> ${role.label}`).toBe(false);
+    for (const current of CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices.filter((item) => reviewedIds.has(item.id))) {
+      for (const role of current.roles.filter((item) => ['give', 'receive', 'lead', 'follow'].includes(item.id))) {
+        expect(generic.has(role.label), `${current.id}:${role.id} -> ${role.label}`).toBe(false);
       }
     }
   });
 
-  it('adds useful hidden semantic discriminators and tags every newly added practice', () => {
+  it('adds useful hidden semantic discriminators and keeps new concepts tagged', () => {
     const tagIds = new Set(CATALOGUE_INSIGHT_TAGS.map((tag) => tag.id));
     for (const id of [
       'anatomy-focus', 'orgasm-focus', 'recording-media', 'voyeuristic-focus', 'exhibitionistic-focus',
@@ -92,15 +102,22 @@ describe('Catalogue V3 final manual review', () => {
     expect(insight('breath-play')?.signals['edge-risk']).toBe(1);
     expect(insight('vagina')?.signals['anatomy-focus']).toBe(1);
     expect(insight('semen-on-other-body')?.signals['fluid-focus']).toBe(1);
+    expect(insight('erotic-media-exchange')?.signals['recording-media']).toBe(1);
+    expect(insight('semen-cleanup-oral')?.signals['fluid-focus']).toBe(1);
   });
 
-  it('sex-scopes partner urine, blood and scat roles while keeping own-fluid interests separate', () => {
-    for (const id of ['urine-play', 'urine-drinking', 'blood-play', 'blood-on-body', 'blood-drinking', 'scat-on-body', 'scat-in-mouth', 'scat-ingestion']) {
+  it('keeps own urine, blood and scat as answer roles inside the relevant practice', () => {
+    const ids = ['urine-play', 'urine-drinking', 'blood-play', 'blood-on-body', 'blood-drinking', 'scat-on-body', 'scat-in-mouth', 'scat-ingestion'];
+    for (const id of ids) {
+      expect(seed(id)?.kind, id).toBe('directed-self');
       expect(seed(id)?.counterpartScoped, id).toBe(true);
+      expect(practice(id)?.roles.map((role) => role.id), id).toEqual(['give', 'receive', 'self']);
     }
-    for (const id of ['own-urine-play', 'own-blood-play', 'own-scat-play']) {
-      expect(seed(id)?.kind, id).toBe('self');
-      expect(seed(id)?.counterpartScoped, id).not.toBe(true);
-    }
+    expect(practice('urine-drinking')?.roles.find((role) => role.id === 'self')?.label).toBe('Drink my own urine');
+  });
+
+  it('uses a cleaner name for female external-genital pain play', () => {
+    expect(seed('pussy-torture')?.es).toBe('Juego intenso de dolor vulvar');
+    expect(seed('pussy-torture')?.descriptionEs).toContain('no se refiere a la vagina interna');
   });
 });
