@@ -16,6 +16,7 @@ import { addFinalRolePractices, REACTIVATED_V3_PRACTICE_IDS } from './final-role
 import { applyConciseCategoryCopy, applyFinalRolePolish, FINAL_ROLE_POLISH_RETIRED_PRACTICE_IDS } from './final-role-polish';
 import { sanitizeFinalCatalogueSeeds } from './final-seed-sanitization';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
+import { normalizeManualDescriptions } from './manual-description-cleanup';
 import { applyManualReleaseReview } from './manual-release-review';
 import { applyManualRoleFollowup } from './manual-role-followup';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
@@ -65,9 +66,10 @@ const ROLE_ADDED_CONTENT = addFinalRolePractices(FINAL_ROLE_CONTENT);
 const POSITION_EXPANDED_CONTENT = addExpandedSexualPositions(ROLE_ADDED_CONTENT);
 const SANITIZED_CONTENT = sanitizeFinalCatalogueSeeds(POSITION_EXPANDED_CONTENT);
 const PATCH_CORRECTED_CONTENT = applyPatchReleaseCorrections(SANITIZED_CONTENT);
-const GROUPED_CONTENT = groupFinalCataloguePractices(PATCH_CORRECTED_CONTENT);
+const MANUALLY_REVIEWED_CONTENT = applyManualReleaseReview(PATCH_CORRECTED_CONTENT);
+const GROUPED_CONTENT = groupFinalCataloguePractices(MANUALLY_REVIEWED_CONTENT);
 const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(GROUPED_CONTENT);
 const CONCISE_CONTENT = applyConciseCategoryCopy(CATEGORY_COPY_CONTENT);
-const MANUALLY_REVIEWED_CONTENT = applyManualReleaseReview(CONCISE_CONTENT);
+const ROLE_REVIEWED_CONTENT = applyManualRoleFollowup(CONCISE_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyManualRoleFollowup(MANUALLY_REVIEWED_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(ROLE_REVIEWED_CONTENT);
