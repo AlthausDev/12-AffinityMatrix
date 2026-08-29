@@ -11,8 +11,8 @@ export const CLOSING_PASS_RETIRED_PRACTICE_IDS = new Set<string>([
 
 const PRACTICE_OVERRIDES: Readonly<Record<string, Partial<CataloguePracticeSeed>>> = {
   voyeurism: {
-    en: 'Open consensual voyeurism',
-    es: 'Voyeurismo consensuado abierto',
+    en: 'Open voyeurism',
+    es: 'Voyeurismo abierto',
     descriptionEn: 'Watching a partner while they know they are being watched at that moment. Unannounced watching covered by a prior agreement is asked separately.',
     descriptionEs: 'Observar a la pareja mientras sabe que está siendo observada en ese momento. La observación sin aviso pero acordada previamente se pregunta aparte.',
   },
