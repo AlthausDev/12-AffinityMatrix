@@ -36,6 +36,21 @@ describe('Catalogue V3 final release audit', () => {
     expect(seed('food-anal-penetration')?.kind).toBe('directed-self');
   });
 
+  it('splits purpose-made toys from accessories, equipment and improvised objects', () => {
+    const toys = CATALOGUE_V3_CONTENT.find((category) => category.id === 'toys');
+    const accessories = CATALOGUE_V3_CONTENT.find((category) => category.id === 'sexual-accessories');
+
+    expect(toys?.es).toBe('Juguetes sexuales');
+    expect(accessories?.es).toBe('Accesorios, objetos y equipamiento');
+    expect(toys?.practices.map((item) => item.id)).toContain('vibrator');
+    expect(toys?.practices.map((item) => item.id)).toContain('strap-on');
+    expect(toys?.practices.map((item) => item.id)).not.toContain('cock-ring');
+    expect(accessories?.practices.map((item) => item.id)).toContain('cock-ring');
+    expect(accessories?.practices.map((item) => item.id)).toContain('sex-machine');
+    expect(subcategory('toys-everyday-objects')?.categoryId).toBe('sexual-accessories');
+    expect(practice('everyday-object-play')?.categoryId).toBe('sexual-accessories');
+  });
+
   it('adds everyday-object play and separates vaginal from anal penetration', () => {
     expect(subcategory('toys-everyday-objects')?.practiceIds).toEqual([
       'everyday-object-play',
@@ -45,6 +60,35 @@ describe('Catalogue V3 final release audit', () => {
     expect(seed('everyday-object-vaginal-penetration')?.anatomySex).toBe('female');
     expect(seed('everyday-object-anal-penetration')?.anatomySex).toBeUndefined();
     expect(practice('everyday-object-play')?.roles.map((role) => role.id)).toEqual(['give', 'receive', 'self']);
+  });
+
+  it('adds varied service roles instead of repeating one generic sexual-service question', () => {
+    const serviceIds = subcategory('power-service')?.practiceIds ?? [];
+    for (const id of [
+      'oral-service',
+      'manual-pleasure-service',
+      'orgasm-service',
+      'intimate-grooming-service',
+      'fetish-scent-service',
+      'toilet-service-fantasy',
+    ]) {
+      expect(serviceIds, id).toContain(id);
+      expect(seed(id)?.kind, id).toBe('directed');
+    }
+    expect(seed('toilet-service-fantasy')?.descriptionEs).toContain('Fluidos');
+  });
+
+  it('expands impossible fantasies with distinct surreal premises', () => {
+    const ids = subcategory('surrealism-impossible-biology-reality')?.practiceIds ?? [];
+    expect(ids).toEqual([
+      'clone-duplication-fantasy',
+      'possession-fantasy',
+      'slime-creature-fantasy',
+      'oviposition-fantasy',
+      'object-transformation-fantasy',
+      'living-symbiote-fantasy',
+    ]);
+    for (const id of ids) expect(seed(id)?.kind, id).toBe('paired');
   });
 
   it('keeps consent and prior-agreement framing out of titles and answer labels', () => {
@@ -70,15 +114,14 @@ describe('Catalogue V3 final release audit', () => {
 
   it('keeps the final additions concise and semantically tagged', () => {
     const newIds = [
-      'vaginal-torture',
-      'urethral-torture',
-      'erotic-feeding',
-      'food-from-body',
-      'food-vaginal-penetration',
-      'food-anal-penetration',
-      'everyday-object-play',
-      'everyday-object-vaginal-penetration',
-      'everyday-object-anal-penetration',
+      'spontaneous-sex', 'planned-sex', 'quiet-sex', 'vocal-expressive-sex', 'immersive-focused-sex', 'energetic-sex',
+      'orgasm-on-command', 'orgasm-permission', 'orgasm-count-control',
+      'group-oral-focus', 'group-worship-focus', 'group-masturbation-circle', 'group-shared-toy-play',
+      'oral-service', 'manual-pleasure-service', 'orgasm-service', 'intimate-grooming-service', 'fetish-scent-service', 'toilet-service-fantasy',
+      'clone-duplication-fantasy', 'possession-fantasy', 'slime-creature-fantasy', 'oviposition-fantasy', 'object-transformation-fantasy', 'living-symbiote-fantasy',
+      'vaginal-torture', 'urethral-torture',
+      'erotic-feeding', 'food-from-body', 'food-vaginal-penetration', 'food-anal-penetration',
+      'everyday-object-play', 'everyday-object-vaginal-penetration', 'everyday-object-anal-penetration',
     ];
     const insightIds = new Set(CATALOGUE_V3_PRACTICE_INSIGHTS.map((item) => item.practiceId));
 
@@ -93,9 +136,12 @@ describe('Catalogue V3 final release audit', () => {
 
   it('makes the expanded categories discoverable from their category copy', () => {
     const toys = CATALOGUE_V3_CONTENT.find((category) => category.id === 'toys');
+    const accessories = CATALOGUE_V3_CONTENT.find((category) => category.id === 'sexual-accessories');
     const fluids = CATALOGUE_V3_CONTENT.find((category) => category.id === 'fluids');
-    expect(toys?.es).toBe('Juguetes, objetos y equipamiento');
-    expect(toys?.descriptionEs).toContain('objetos cotidianos');
+    expect(toys?.es).toBe('Juguetes sexuales');
+    expect(toys?.descriptionEs).toContain('Vibradores');
+    expect(accessories?.es).toBe('Accesorios, objetos y equipamiento');
+    expect(accessories?.descriptionEs).toContain('Masturbadores');
     expect(fluids?.es).toBe('Fluidos, alimentos y sustancias');
     expect(fluids?.descriptionEs).toContain('alimentos');
   });
