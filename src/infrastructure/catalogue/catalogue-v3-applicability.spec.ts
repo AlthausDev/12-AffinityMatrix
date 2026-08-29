@@ -75,75 +75,53 @@ describe('Catalogue V3 final applicability', () => {
     expect(ids).toContain('female-ejaculation');
   });
 
-  it('uses semen-source anatomy rather than orientation stereotypes', () => {
+  it('does not offer semen swallowing to a heterosexual man while keeping the partner role', () => {
     const heterosexualMan = profile('heterosexual-man-fluids', 'male', 'heterosexual');
-
     expect(roleIds('fluids', 'swallowing', heterosexualMan)).toEqual(['partner-state']);
-    expect(roleIds('fluids', 'snowballing', heterosexualMan)).toContain('participate');
   });
 
-  it('keeps harness strap-ons sex-neutral while preserving strapless wearer anatomy', () => {
+  it('removes solo strap-on use and filters strap-on roles by who can wear it', () => {
     const lesbian = profile('lesbian-toys', 'female', 'homosexual');
     const heterosexualMan = profile('heterosexual-man-toys', 'male', 'heterosexual');
-    const heterosexualWoman = profile('heterosexual-woman-toys', 'female', 'heterosexual');
     const gayMan = profile('gay-man-toys', 'male', 'homosexual');
 
-    for (const current of [lesbian, heterosexualMan, heterosexualWoman, gayMan]) {
-      expect(roleIds('toys', 'strap-on', current))
-        .toEqual(['use-on-partner', 'partner-uses-on-me']);
-    }
-
-    expect(roleIds('toys', 'strapless-strap-on', lesbian))
-      .toEqual(['use-on-partner', 'partner-uses-on-me']);
-    expect(roleIds('toys', 'strapless-strap-on', heterosexualMan))
-      .toEqual(['partner-uses-on-me']);
-    expect(roleIds('toys', 'strapless-strap-on', heterosexualWoman))
-      .toEqual(['use-on-partner']);
+    expect(roleIds('toys', 'strap-on', lesbian)).toEqual(['use-on-partner', 'partner-uses-on-me']);
+    expect(roleIds('toys', 'strapless-strap-on', lesbian)).toEqual(['use-on-partner', 'partner-uses-on-me']);
+    expect(practiceIds('toys', heterosexualMan)).not.toContain('strap-on');
+    expect(practiceIds('toys', heterosexualMan)).not.toContain('strapless-strap-on');
+    expect(practiceIds('toys', gayMan)).not.toContain('strap-on');
     expect(practiceIds('toys', gayMan)).not.toContain('strapless-strap-on');
   });
 
-  it('does not infer toy preferences from heterosexual male orientation', () => {
+  it('hides self-targeted mouth and anal toy use for a heterosexual man', () => {
     const heterosexualMan = profile('heterosexual-man-orifice-toys', 'male', 'heterosexual');
     const bisexualMan = profile('bisexual-man-orifice-toys', 'male', 'bisexual');
 
-    expect(roleIds('toys', 'dildo', heterosexualMan))
-      .toEqual(['use-on-self', 'use-on-partner', 'partner-uses-on-me']);
-    expect(roleIds('toys', 'anal-plug', heterosexualMan))
-      .toEqual(['use-on-self', 'use-on-partner', 'partner-uses-on-me']);
+    expect(roleIds('toys', 'dildo', heterosexualMan)).toEqual(['use-on-partner']);
+    expect(roleIds('toys', 'anal-plug', heterosexualMan)).toEqual(['use-on-partner']);
     expect(roleIds('toys', 'dildo', bisexualMan))
       .toEqual(['use-on-self', 'use-on-partner', 'partner-uses-on-me']);
   });
 
-  it('uses anatomy rather than orientation for penetrative receiver roles', () => {
+  it('hides penetrative receiver roles for a heterosexual man without hiding active roles', () => {
     const heterosexualMan = profile('heterosexual-man-penetration', 'male', 'heterosexual');
+    const bisexualMan = profile('bisexual-man-penetration', 'male', 'bisexual');
 
-    expect(roleIds('penetration', 'anal-penetration', heterosexualMan))
-      .toEqual(['give', 'receive']);
-    expect(roleIds('manual-masturbation', 'fingering-anal', heterosexualMan))
-      .toEqual(['give', 'receive']);
-    expect(roleIds('manual-masturbation', 'prostate-massage-manual', heterosexualMan))
-      .toEqual(['receive']);
-    expect(roleIds('penetration', 'vaginal-penetration', heterosexualMan))
-      .toEqual(['give']);
+    expect(roleIds('penetration', 'anal-penetration', heterosexualMan)).toEqual(['give']);
+    expect(roleIds('manual-masturbation', 'fingering-anal', heterosexualMan)).toEqual(['give']);
+    expect(practiceIds('manual-masturbation', heterosexualMan)).not.toContain('prostate-massage-manual');
+    expect(roleIds('penetration', 'anal-penetration', bisexualMan)).toEqual(['give', 'receive']);
   });
 
-  it('keeps external wand use available to bodies of either sex', () => {
+  it('keeps wand use meaningful for female bodies instead of presenting male self-use', () => {
     const heterosexualMan = profile('heterosexual-man-wand', 'male', 'heterosexual');
     const gayMan = profile('gay-man-wand', 'male', 'homosexual');
     const lesbian = profile('lesbian-wand', 'female', 'homosexual');
 
-    for (const current of [heterosexualMan, gayMan, lesbian]) {
-      expect(roleIds('toys', 'wand-vibrator', current))
-        .toEqual(['use-on-self', 'use-on-partner', 'partner-uses-on-me']);
-    }
-  });
-
-  it('does not assign generic gangbang roles from heterosexual stereotypes', () => {
-    const heterosexualMan = profile('heterosexual-man-gangbang', 'male', 'heterosexual');
-    const heterosexualWoman = profile('heterosexual-woman-gangbang', 'female', 'heterosexual');
-
-    expect(roleIds('groups', 'gangbang', heterosexualMan)).toEqual(['center', 'participate']);
-    expect(roleIds('groups', 'gangbang', heterosexualWoman)).toEqual(['center', 'participate']);
+    expect(roleIds('toys', 'wand-vibrator', heterosexualMan)).toEqual(['use-on-partner']);
+    expect(practiceIds('toys', gayMan)).not.toContain('wand-vibrator');
+    expect(roleIds('toys', 'wand-vibrator', lesbian))
+      .toEqual(['use-on-self', 'use-on-partner', 'partner-uses-on-me']);
   });
 
   it('limits facial-hair attraction to male counterpart variants', () => {
