@@ -1,4 +1,5 @@
 import { isCatalogueVersion } from '../../domain/catalogue/catalogue-version';
+import { validatePhysicalPreferences } from '../../domain/profile/physical-preferences';
 import { ProfileDataValidator } from '../../domain/profile/profile-data.validator';
 import { ValidationIssue } from '../../domain/shared/validator';
 import {
@@ -12,6 +13,7 @@ const PORTABLE_PROFILE_KEYS = [
   'profileSchemaVersion',
   'catalogueVersion',
   'metadata',
+  'physicalPreferences',
   'answers',
 ] as const;
 
@@ -24,6 +26,7 @@ export class PortableProfileValidator extends ProfileDataValidator<PortableProfi
     const issues = [
       ...this.validateAllowedKeys(value, PORTABLE_PROFILE_KEYS),
       ...this.validateProfileData(value),
+      ...validatePhysicalPreferences(value['physicalPreferences']),
     ];
 
     if (value['formatVersion'] !== PORTABLE_PROFILE_V6_FORMAT_VERSION) {
