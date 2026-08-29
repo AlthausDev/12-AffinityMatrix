@@ -177,6 +177,10 @@ describe('catalogue v3 snapshot', () => {
       'oral-lying-between-legs-position',
       'oral-side-lying-position',
       'oral-edge-position',
+      'coital-alignment-position',
+      'standing-rear-entry-position',
+      'mating-press-position',
+      'piledriver-position',
     ]);
     expect(snapshotPractice('missionary')?.categoryId).toBe('sexual-positions');
     expect(snapshotPractice('side-by-side-face-to-face')?.categoryId).toBe('sexual-positions');
