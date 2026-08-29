@@ -27,11 +27,11 @@ export function applyFinalNoiseApplicability(
             ...(practice.roleApplicability ?? {}),
             give: {
               ...(practice.roleApplicability?.['give'] ?? {}),
-              partnerSex: ['male'] as const,
+              requiresAnyParticipantSex: ['male'] as const,
             },
             receive: {
               ...(practice.roleApplicability?.['receive'] ?? {}),
-              partnerSex: ['male'] as const,
+              requiresAnyParticipantSex: ['male'] as const,
             },
             ...(SEMEN_SELF_CLEANUP_IDS.has(practice.id)
               ? {
