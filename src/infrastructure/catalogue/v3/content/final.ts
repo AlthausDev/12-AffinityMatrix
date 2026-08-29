@@ -14,6 +14,7 @@ import { applyFinalApplicabilityReview, FINAL_APPLICABILITY_RETIRED_PRACTICE_IDS
 import { applyFinalClarityReview, FINAL_CLARITY_RETIRED_PRACTICE_IDS } from './final-clarity-review';
 import { applyFinalContentReview } from './final-content-review';
 import { applyFinalLastMileReview, FINAL_LAST_MILE_RETIRED_PRACTICE_IDS } from './final-last-mile-review';
+import { applyFinalNoiseCleanup, FINAL_NOISE_RETIRED_PRACTICE_IDS } from './final-noise-cleanup';
 import { groupFinalCataloguePractices } from './final-practice-order';
 import { applyFinalReleaseCopy } from './final-release-copy';
 import { applyFinalReleaseTaxonomy, FINAL_RELEASE_RETIRED_PRACTICE_IDS } from './final-release-taxonomy';
@@ -41,6 +42,7 @@ const ALL_RETIRED_V3_PRACTICE_IDS = [
   ...FINAL_ROLE_POLISH_RETIRED_PRACTICE_IDS,
   ...FINAL_PASS_RETIRED_PRACTICE_IDS,
   ...CLOSING_PASS_RETIRED_PRACTICE_IDS,
+  ...FINAL_NOISE_RETIRED_PRACTICE_IDS,
 ];
 
 export const RETIRED_V3_PRACTICE_IDS = new Set<string>(
@@ -86,5 +88,6 @@ const CONCISE_CONTENT = applyConciseCategoryCopy(CATEGORY_COPY_CONTENT);
 const RELEASE_COPY_AUDITED_CONTENT = applyCatalogueReleaseAuditCategoryCopy(CONCISE_CONTENT);
 const ROLE_REVIEWED_CONTENT = applyManualRoleFollowup(RELEASE_COPY_AUDITED_CONTENT);
 const CONSENT_CLEANED_CONTENT = stripRedundantConsentFromRoleLabels(ROLE_REVIEWED_CONTENT);
+const NOISE_CLEANED_CONTENT = applyFinalNoiseCleanup(CONSENT_CLEANED_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(CONSENT_CLEANED_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(NOISE_CLEANED_CONTENT);
