@@ -1,4 +1,5 @@
 export type { CatalogueSubcategorySeed } from './catalogue-taxonomy-core';
+import { BODY_TRAIT_REFINEMENT_RETIRED_PRACTICE_IDS } from './content/body-trait-refinements';
 import { CATALOGUE_V3_SUBCATEGORIES as CATALOGUE_V3_CORE_SUBCATEGORIES } from './catalogue-taxonomy-core';
 import { applyCatalogueTaxonomyClosingPass } from './catalogue-taxonomy-closing-pass';
 import { applyCatalogueTaxonomyFinalPass } from './catalogue-taxonomy-final-pass';
@@ -19,5 +20,12 @@ const FINAL_PASS_SUBCATEGORIES = applyCatalogueTaxonomyFinalPass(MANUALLY_REVIEW
 const CLOSING_PASS_SUBCATEGORIES = applyCatalogueTaxonomyClosingPass(FINAL_PASS_SUBCATEGORIES);
 const RELEASE_AUDITED_SUBCATEGORIES = applyCatalogueTaxonomyReleaseAudit(CLOSING_PASS_SUBCATEGORIES);
 const NOISE_CLEANED_SUBCATEGORIES = applyCatalogueTaxonomyNoiseCleanup(RELEASE_AUDITED_SUBCATEGORIES);
+const QUESTIONNAIRE_FOLLOWUP_SUBCATEGORIES = applyCatalogueTaxonomyQuestionnaireFollowup(NOISE_CLEANED_SUBCATEGORIES);
 
-export const CATALOGUE_V3_SUBCATEGORIES = applyCatalogueTaxonomyQuestionnaireFollowup(NOISE_CLEANED_SUBCATEGORIES);
+/** Refinement ids remain stable semantic vocabulary but no longer render as first-class questions. */
+export const CATALOGUE_V3_SUBCATEGORIES = QUESTIONNAIRE_FOLLOWUP_SUBCATEGORIES.map((subcategory) => ({
+  ...subcategory,
+  practiceIds: subcategory.practiceIds.filter(
+    (practiceId) => !BODY_TRAIT_REFINEMENT_RETIRED_PRACTICE_IDS.has(practiceId),
+  ),
+}));

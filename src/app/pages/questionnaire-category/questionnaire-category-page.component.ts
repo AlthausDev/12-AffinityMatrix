@@ -426,8 +426,10 @@ export class QuestionnaireCategoryPageComponent {
       return;
     }
 
+    // Manual accordion interaction should stay under the user's finger. Automatic scrolling is
+    // reserved for progression after completing a subcategory, avoiding a delayed mobile jump.
+    this.clearScrollTimer();
     this.openSubcategoryId.set(sectionId);
-    this.scheduleSubcategoryScroll(sectionId);
   }
 
   toggleFiltered(event: Event): void {

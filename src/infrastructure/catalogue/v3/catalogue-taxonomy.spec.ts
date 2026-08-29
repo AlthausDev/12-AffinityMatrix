@@ -46,7 +46,7 @@ describe('catalogue v3 questionnaire taxonomy', () => {
       toys: [4, 18],
       'sexual-accessories': [5, 17],
       'orgasm-control': [4, 14],
-      'body-fetishes': [7, 54],
+      'body-fetishes': [7, 37],
       groups: [5, 21],
       roleplay: [5, 23],
       exhibitionism: [2, 16],

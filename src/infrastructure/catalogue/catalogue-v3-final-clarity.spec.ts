@@ -1,6 +1,7 @@
 import { QuestionnaireService } from '../../application/questionnaire/questionnaire-service';
 import { createProfile } from '../../domain/profile/profile';
 import { CURRENT_CATALOGUE_SNAPSHOT } from './catalogue-v3';
+import { bodyTraitRefinementGroup } from './v3/content/body-trait-refinements';
 import { CATALOGUE_V3_CONTENT, RETIRED_V3_PRACTICE_IDS } from './v3/content/final';
 
 const questionnaire = new QuestionnaireService();
@@ -76,19 +77,33 @@ describe('Catalogue V3 final clarity pass', () => {
     expect(seed('no-orgasm-sex')?.descriptionEs).toContain('no tiene por qué haber una persona controlando');
   });
 
-  it('unifies generic chest focus, keeps size choices expressive and expands piercing locations', () => {
+  it('unifies generic chest focus and turns repetitive size and piercing cards into refinements', () => {
     expect(seed('breasts')).toBeUndefined();
     expect(seed('chest')).toBeUndefined();
     expect(seed('chest-general')?.es).toBe('Pecho');
+    expect(categoryOf('piercings')).toBe('body-fetishes');
+
+    expect(bodyTraitRefinementGroup('chest-general')?.options.map((option) => option.id)).toEqual([
+      'breast-size-small', 'breast-size-average', 'breast-size-large',
+    ]);
+    expect(bodyTraitRefinementGroup('buttocks')?.options.map((option) => option.id)).toEqual([
+      'buttocks-size-small', 'buttocks-size-average', 'buttocks-size-large',
+    ]);
+    expect(bodyTraitRefinementGroup('penis')?.options.map((option) => option.id)).toEqual([
+      'penis-size-small', 'penis-size-average', 'penis-size-large',
+    ]);
+    expect(bodyTraitRefinementGroup('piercings')?.options.map((option) => option.id)).toEqual([
+      'facial-piercings', 'body-piercings', 'nipple-piercings', 'genital-piercings',
+    ]);
 
     for (const id of [
       'breast-size-small', 'breast-size-average', 'breast-size-large',
       'penis-size-small', 'penis-size-average', 'penis-size-large',
       'buttocks-size-small', 'buttocks-size-average', 'buttocks-size-large',
-    ]) expect(seed(id), id).toBeDefined();
-
-    for (const id of ['piercings', 'facial-piercings', 'body-piercings', 'nipple-piercings', 'genital-piercings']) {
-      expect(categoryOf(id), id).toBe('body-fetishes');
+      'facial-piercings', 'body-piercings', 'nipple-piercings', 'genital-piercings',
+    ]) {
+      expect(seed(id), id).toBeUndefined();
+      expect(RETIRED_V3_PRACTICE_IDS.has(id), id).toBe(true);
     }
   });
 

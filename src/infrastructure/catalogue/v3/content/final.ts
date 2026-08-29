@@ -7,6 +7,7 @@ import { applyCatalogueClosingPass, CLOSING_PASS_RETIRED_PRACTICE_IDS } from './
 import { applyCatalogueClosingOrder } from './catalogue-closing-order';
 import { applyCatalogueReleaseAudit, applyCatalogueReleaseAuditCategoryCopy } from './catalogue-release-audit';
 import { applyCatalogueReleaseAuditOrder } from './catalogue-release-order';
+import { applyBodyTraitRefinementCompaction, BODY_TRAIT_REFINEMENT_RETIRED_PRACTICE_IDS } from './body-trait-refinements';
 import { applyFinalCategoryCopy } from './category-copy-overrides';
 import { polishCatalogue } from './content-polish';
 import { materializeContextualDescriptions } from './contextual-description';
@@ -48,6 +49,7 @@ const ALL_RETIRED_V3_PRACTICE_IDS = [
   ...FINAL_PASS_RETIRED_PRACTICE_IDS,
   ...CLOSING_PASS_RETIRED_PRACTICE_IDS,
   ...FINAL_NOISE_RETIRED_PRACTICE_IDS,
+  ...BODY_TRAIT_REFINEMENT_RETIRED_PRACTICE_IDS,
 ];
 
 export const RETIRED_V3_PRACTICE_IDS = new Set<string>(
@@ -98,6 +100,7 @@ const REPLACEMENT_CONTENT = addFinalNoiseReplacement(NOISE_CLEANED_CONTENT);
 const NOISE_APPLICABILITY_CONTENT = applyFinalNoiseApplicability(REPLACEMENT_CONTENT);
 const QUESTIONNAIRE_FOLLOWUP_CONTENT = applyFinalQuestionnaireFollowup(NOISE_APPLICABILITY_CONTENT);
 const NATURAL_ROLE_CONTENT = applyMutualRoleNoiseCleanup(QUESTIONNAIRE_FOLLOWUP_CONTENT);
-const PRESENTATION_CLEANED_CONTENT = applyFinalPresentationCleanup(NATURAL_ROLE_CONTENT);
+const BODY_REFINED_CONTENT = applyBodyTraitRefinementCompaction(NATURAL_ROLE_CONTENT);
+const PRESENTATION_CLEANED_CONTENT = applyFinalPresentationCleanup(BODY_REFINED_CONTENT);
 
 export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(PRESENTATION_CLEANED_CONTENT);

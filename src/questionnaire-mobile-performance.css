@@ -5,7 +5,16 @@
   .questionnaire-overlay {
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
     scroll-behavior: auto;
+    scroll-padding-top: calc(var(--questionnaire-top-space, 4.9rem) + 0.65rem);
+    scroll-padding-bottom: calc(var(--questionnaire-bottom-space, 0rem) + 0.65rem);
+    scrollbar-width: none;
+  }
+
+  .questionnaire-overlay::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 
   .questionnaire-top-dock,
@@ -30,12 +39,42 @@
   .questionnaire-page .subcategory-summary::after {
     transition-duration: 160ms !important;
   }
+
+  /* Previous/Next should read as one control, not as a label with a detached edge icon. */
+  .questionnaire-bottom-dock .sequence-button {
+    padding-inline: 1rem !important;
+    gap: 0.55rem !important;
+  }
+
+  .questionnaire-bottom-dock .sequence-arrow {
+    position: static !important;
+    top: auto !important;
+    width: 0.48rem;
+    height: 0.48rem;
+    flex: 0 0 0.48rem;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    font-size: 0 !important;
+    line-height: 0;
+    opacity: 0.76;
+  }
+
+  .questionnaire-bottom-dock .sequence-arrow-previous {
+    margin-right: 0.05rem;
+    transform: rotate(-135deg) !important;
+  }
+
+  .questionnaire-bottom-dock .sequence-arrow-next {
+    margin-left: 0.05rem;
+    transform: rotate(45deg) !important;
+  }
 }
 
 @media (max-width: 720px) and (pointer: coarse) {
   .questionnaire-page .preference-option:hover,
   .questionnaire-page .button:hover,
-  .questionnaire-page .subcategory-summary:hover {
+  .questionnaire-page .subcategory-summary:hover,
+  .questionnaire-page .trait-refinement-option:hover {
     transform: none !important;
   }
 }
