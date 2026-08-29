@@ -25,6 +25,7 @@ import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
 import { normalizeManualDescriptions } from './manual-description-cleanup';
 import { applyManualReleaseReview } from './manual-release-review';
 import { applyManualRoleFollowup } from './manual-role-followup';
+import { applyMutualRoleNoiseCleanup } from './mutual-role-noise-cleanup';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
 import { applyPatchReleaseCorrections } from './patch-release-corrections';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
@@ -89,5 +90,6 @@ const RELEASE_COPY_AUDITED_CONTENT = applyCatalogueReleaseAuditCategoryCopy(CONC
 const ROLE_REVIEWED_CONTENT = applyManualRoleFollowup(RELEASE_COPY_AUDITED_CONTENT);
 const CONSENT_CLEANED_CONTENT = stripRedundantConsentFromRoleLabels(ROLE_REVIEWED_CONTENT);
 const NOISE_CLEANED_CONTENT = applyFinalNoiseCleanup(CONSENT_CLEANED_CONTENT);
+const NATURAL_ROLE_CONTENT = applyMutualRoleNoiseCleanup(NOISE_CLEANED_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(NOISE_CLEANED_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(NATURAL_ROLE_CONTENT);
