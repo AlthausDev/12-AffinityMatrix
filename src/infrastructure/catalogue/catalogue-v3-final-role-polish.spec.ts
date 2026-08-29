@@ -29,13 +29,17 @@ function snapshotPractice(id: string) {
 }
 
 describe('Catalogue V3 final role polish', () => {
-  it('removes irrelevant semen roles for heterosexual men while keeping useful cleanup semantics', () => {
+  it('removes irrelevant semen roles for heterosexual men while keeping distinct cleanup semantics', () => {
     const man = profile('hetero-man-fluids-final', 'male', 'heterosexual');
     expect(practiceIds('fluids', man)).not.toContain('snowballing');
-    expect(roleIds('fluids', 'creampie-cleanup', man)).toEqual(['give']);
-    expect(snapshotPractice('creampie-cleanup')?.roles.map((role) => role.label)).toEqual([
-      'Clean my partner after a creampie',
-      'Be cleaned after a creampie',
+    expect(snapshotPractice('creampie-cleanup')).toBeUndefined();
+
+    for (const cleanupId of ['semen-cleanup-manual', 'semen-cleanup-oral', 'semen-cleanup-other']) {
+      expect(roleIds('fluids', cleanupId, man), cleanupId).toEqual(['give', 'receive']);
+    }
+    expect(snapshotPractice('semen-cleanup-manual')?.roles.map((role) => role.label)).toEqual([
+      'Manually clean semen from my partner',
+      'Have my partner manually clean semen from me',
     ]);
   });
 
