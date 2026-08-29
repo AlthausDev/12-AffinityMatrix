@@ -1,5 +1,6 @@
 import { CURRENT_CATALOGUE_VERSION, CatalogueVersion } from '../catalogue/catalogue-version';
 import { AnswerKey, cloneAnswers, PracticeAnswer } from './profile-answer';
+import { clonePhysicalPreferences, PhysicalPreferences } from './physical-preferences';
 import { ProfileMetadata } from './profile-metadata';
 import { DEFAULT_PROFILE_SETTINGS, ProfileSettings } from './profile-settings';
 
@@ -15,6 +16,7 @@ export interface Profile {
   readonly catalogueVersion: CatalogueVersion;
   readonly metadata: ProfileMetadata;
   readonly settings: ProfileSettings;
+  readonly physicalPreferences?: PhysicalPreferences;
   readonly answers: Readonly<Record<AnswerKey, PracticeAnswer>>;
   readonly createdAt: string;
   readonly updatedAt: string;
@@ -26,6 +28,7 @@ export interface CreateProfileInput {
   readonly catalogueVersion?: CatalogueVersion;
   readonly metadata?: ProfileMetadata;
   readonly settings?: Partial<ProfileSettings>;
+  readonly physicalPreferences?: PhysicalPreferences;
   readonly answers?: Readonly<Record<AnswerKey, PracticeAnswer>>;
 }
 
@@ -40,6 +43,7 @@ export function createProfile(input: CreateProfileInput): Profile {
       ...DEFAULT_PROFILE_SETTINGS,
       ...input.settings,
     },
+    physicalPreferences: clonePhysicalPreferences(input.physicalPreferences),
     answers: cloneAnswers(input.answers ?? {}),
     createdAt: input.now,
     updatedAt: input.now,
