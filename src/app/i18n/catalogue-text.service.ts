@@ -25,7 +25,7 @@ const V3_PRACTICES = new Map<string, CataloguePracticeSeed>(
 
 const V3_ROLE_LABELS: Readonly<Record<Locale, Readonly<Record<string, string>>>> = {
   es: {
-    participate: 'Participar yo',
+    participate: 'Participar',
     give: 'Hacerlo yo a mi pareja',
     receive: 'Que mi pareja me lo haga a mí',
     self: 'Hacerlo / vivirlo yo',
@@ -44,7 +44,7 @@ const V3_ROLE_LABELS: Readonly<Record<Locale, Readonly<Record<string, string>>>>
     'partner-uses-on-me': 'Que mi pareja lo use conmigo',
   },
   en: {
-    participate: 'I participate',
+    participate: 'Participate',
     give: 'I do it to my partner',
     receive: 'My partner does it to me',
     self: 'I do / experience it myself',

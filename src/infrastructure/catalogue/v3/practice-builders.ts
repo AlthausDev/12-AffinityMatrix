@@ -14,6 +14,7 @@ export function buildPractice(seed: CataloguePracticeSeed, categoryId: string): 
   switch (seed.kind) {
     case 'mutual': return mutual(seed, categoryId);
     case 'directed': return directed(seed, categoryId);
+    case 'directed-self': return directedSelf(seed, categoryId);
     case 'self': return self(seed, categoryId);
     case 'state': return state(seed, categoryId);
     case 'wear': return wear(seed, categoryId);
@@ -52,6 +53,42 @@ function directed(seed: CataloguePracticeSeed, categoryId: string): Practice {
     ...(axes ? { contextAxes: axes } : {}),
   };
   return practice(seed, categoryId, [give, receive], [{ leftRoleId: 'give', rightRoleId: 'receive' }]);
+}
+
+/**
+ * Directed practice that also has a meaningful first-person/self variant.
+ * This is intentionally one practice rather than a parallel "own X" entry so profiles can compare
+ * partner-directed, partner-received and self-directed interest without duplicating taxonomy.
+ */
+function directedSelf(seed: CataloguePracticeSeed, categoryId: string): Practice {
+  const axes = seed.counterpartScoped ? (['counterpartSex'] as const) : undefined;
+  const giveApplicability = mergeRoleApplicability(seed, 'give', anatomyApplicability(seed.actorSex, seed.anatomySex));
+  const receiveApplicability = mergeRoleApplicability(seed, 'receive', anatomyApplicability(seed.anatomySex, seed.actorSex));
+  const selfApplicability = mergeRoleApplicability(
+    seed,
+    'self',
+    seed.anatomySex ? { selfSex: [seed.anatomySex] as readonly Sex[] } : undefined,
+  );
+
+  const give: PracticeRole = {
+    id: 'give', label: roleLabel(seed, 'give', 'Give / do'), perspective: 'active',
+    ...(giveApplicability ? { applicability: giveApplicability } : {}),
+    ...(axes ? { contextAxes: axes } : {}),
+  };
+  const receive: PracticeRole = {
+    id: 'receive', label: roleLabel(seed, 'receive', 'Receive'), perspective: 'receptive',
+    ...(receiveApplicability ? { applicability: receiveApplicability } : {}),
+    ...(axes ? { contextAxes: axes } : {}),
+  };
+  const selfRole: PracticeRole = {
+    id: 'self', label: roleLabel(seed, 'self', 'Do / experience it myself'), perspective: 'neutral',
+    ...(selfApplicability ? { applicability: selfApplicability } : {}),
+  };
+
+  return practice(seed, categoryId, [give, receive, selfRole], [
+    { leftRoleId: 'give', rightRoleId: 'receive' },
+    { leftRoleId: 'self', rightRoleId: 'self' },
+  ]);
 }
 
 function self(seed: CataloguePracticeSeed, categoryId: string): Practice {
