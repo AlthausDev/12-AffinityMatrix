@@ -350,11 +350,10 @@ export class QuestionnaireCategoryPageComponent {
       .map((subcategory) => {
         const practiceIds = new Set(subcategory.practiceIds);
         const practices = category.practices.filter((item) => practiceIds.has(item.practice.id));
-        const total = practices.reduce((sum, item) => sum + item.roles.length, 0);
-        const answered = practices.reduce(
-          (sum, item) => sum + item.roles.filter((role) => role.answer !== undefined).length,
-          0,
-        );
+        const total = practices.length;
+        const answered = practices.filter((item) =>
+          item.roles.some((role) => role.answer !== undefined),
+        ).length;
         return {
           ...subcategory,
           practices,
