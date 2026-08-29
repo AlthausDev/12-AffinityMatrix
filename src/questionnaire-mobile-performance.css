@@ -1,0 +1,51 @@
+/* Mobile-only rendering safeguards for the long questionnaire.
+ * Fixed backdrop blur and stacked soft shadows are expensive while the scroll layer moves,
+ * especially on mid-range Android GPUs. Desktop keeps the richer treatment. */
+@media (max-width: 720px) {
+  .questionnaire-overlay {
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto;
+  }
+
+  .questionnaire-top-dock,
+  .questionnaire-bottom-dock {
+    contain: layout paint style;
+    backface-visibility: hidden;
+  }
+
+  .questionnaire-dock-inner {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .questionnaire-window,
+  .questionnaire-page .question-card,
+  .questionnaire-page .subcategory-section {
+    box-shadow: none !important;
+  }
+
+  .questionnaire-page .subcategory-section,
+  .questionnaire-page .subcategory-reveal,
+  .questionnaire-page .subcategory-summary::after {
+    transition-duration: 160ms !important;
+  }
+}
+
+@media (max-width: 720px) and (pointer: coarse) {
+  .questionnaire-page .preference-option:hover,
+  .questionnaire-page .button:hover,
+  .questionnaire-page .subcategory-summary:hover {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .questionnaire-overlay,
+  .questionnaire-page .subcategory-section,
+  .questionnaire-page .subcategory-reveal,
+  .questionnaire-page .subcategory-summary::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
