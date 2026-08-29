@@ -39,10 +39,12 @@ export interface RoleProfileEntry {
   readonly answerCount: number;
   readonly affinityCount: number;
   readonly favoriteCount: number;
-  /** Weighted affinity across Favorite, Like, Curious and Depends answers. */
+  /** Weighted affinity inside this role family across Favorite, Like, Curious and Depends answers. */
   readonly affinityPercentage: number;
   /** Average share of Favorite answers inside each distinct practice + role combination. */
   readonly favoritePercentage: number;
+  /** Share of all positive/conditional role affinity contributed by this role family. */
+  readonly profileWeightPercentage: number;
 }
 
 export interface RoleProfileCoordinates {
@@ -57,6 +59,14 @@ export interface RoleProfileCoordinates {
 interface RoleAnswerGroup {
   readonly perspective: RolePerspective;
   readonly answers: readonly PracticeAnswer[];
+}
+
+interface RolePerspectiveAggregate {
+  readonly perspective: RolePerspective;
+  readonly groups: readonly RoleAnswerGroup[];
+  readonly affinityValues: readonly number[];
+  readonly affinityMass: number;
+  readonly favoriteShares: readonly number[];
 }
 
 const ROLE_PERSPECTIVES: readonly RolePerspective[] = ['active', 'receptive', 'neutral'];
@@ -117,30 +127,24 @@ export function buildRoleProfile(
   profile: Pick<Profile, 'answers'> | undefined,
   practices: readonly Practice[] | undefined,
 ): readonly RoleProfileEntry[] {
-  const groups = buildRoleAnswerGroups(profile, practices);
+  const aggregates = buildRolePerspectiveAggregates(profile, practices);
+  const totalAffinityMass = aggregates.reduce((sum, entry) => sum + entry.affinityMass, 0);
 
-  return ROLE_PERSPECTIVES.map((perspective) => {
-    const perspectiveGroups = groups.filter((group) => group.perspective === perspective);
-    const affinityValues = perspectiveGroups.map((group) => average(
-      group.answers.map((answer) => preferenceAffinity(answer.preference)),
-    ));
-    const favoriteShares = perspectiveGroups.map((group) => average(
-      group.answers.map((answer) => answer.preference === 'favorite' ? 1 : 0),
-    ));
-
-    return {
-      perspective,
-      answerCount: perspectiveGroups.length,
-      affinityCount: perspectiveGroups.filter((group) =>
-        group.answers.some((answer) => answer.preference === 'favorite' || answer.preference === 'like'),
-      ).length,
-      favoriteCount: perspectiveGroups.filter((group) =>
-        group.answers.some((answer) => answer.preference === 'favorite'),
-      ).length,
-      affinityPercentage: Math.round(average(affinityValues) * 100),
-      favoritePercentage: Math.round(average(favoriteShares) * 100),
-    };
-  });
+  return aggregates.map((aggregate) => ({
+    perspective: aggregate.perspective,
+    answerCount: aggregate.groups.length,
+    affinityCount: aggregate.groups.filter((group) =>
+      group.answers.some((answer) => answer.preference === 'favorite' || answer.preference === 'like'),
+    ).length,
+    favoriteCount: aggregate.groups.filter((group) =>
+      group.answers.some((answer) => answer.preference === 'favorite'),
+    ).length,
+    affinityPercentage: Math.round(average(aggregate.affinityValues) * 100),
+    favoritePercentage: Math.round(average(aggregate.favoriteShares) * 100),
+    profileWeightPercentage: totalAffinityMass <= 0
+      ? 0
+      : Math.round((aggregate.affinityMass / totalAffinityMass) * 100),
+  }));
 }
 
 export function buildRoleProfileCoordinates(
@@ -176,6 +180,31 @@ export function buildRoleProfileCoordinates(
     roleEvidenceCount: roleProfile.reduce((sum, entry) => sum + entry.answerCount, 0),
     initiativeEvidenceCount: initiativeGroups.length,
   };
+}
+
+function buildRolePerspectiveAggregates(
+  profile: Pick<Profile, 'answers'> | undefined,
+  practices: readonly Practice[] | undefined,
+): readonly RolePerspectiveAggregate[] {
+  const groups = buildRoleAnswerGroups(profile, practices);
+
+  return ROLE_PERSPECTIVES.map((perspective) => {
+    const perspectiveGroups = groups.filter((group) => group.perspective === perspective);
+    const affinityValues = perspectiveGroups.map((group) => average(
+      group.answers.map((answer) => preferenceAffinity(answer.preference)),
+    ));
+    const favoriteShares = perspectiveGroups.map((group) => average(
+      group.answers.map((answer) => answer.preference === 'favorite' ? 1 : 0),
+    ));
+
+    return {
+      perspective,
+      groups: perspectiveGroups,
+      affinityValues,
+      affinityMass: affinityValues.reduce((sum, value) => sum + value, 0),
+      favoriteShares,
+    };
+  });
 }
 
 function buildRoleAnswerGroups(
