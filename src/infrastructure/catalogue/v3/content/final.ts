@@ -17,6 +17,7 @@ import { applyFinalLastMileReview, FINAL_LAST_MILE_RETIRED_PRACTICE_IDS } from '
 import { applyFinalNoiseApplicability } from './final-noise-applicability';
 import { applyFinalNoiseCleanup, FINAL_NOISE_RETIRED_PRACTICE_IDS } from './final-noise-cleanup';
 import { addFinalNoiseReplacement } from './final-noise-replacement';
+import { applyFinalPresentationCleanup } from './final-presentation-cleanup';
 import { groupFinalCataloguePractices } from './final-practice-order';
 import { applyFinalQuestionnaireFollowup } from './final-questionnaire-followup';
 import { applyFinalReleaseCopy } from './final-release-copy';
@@ -97,5 +98,6 @@ const REPLACEMENT_CONTENT = addFinalNoiseReplacement(NOISE_CLEANED_CONTENT);
 const NOISE_APPLICABILITY_CONTENT = applyFinalNoiseApplicability(REPLACEMENT_CONTENT);
 const QUESTIONNAIRE_FOLLOWUP_CONTENT = applyFinalQuestionnaireFollowup(NOISE_APPLICABILITY_CONTENT);
 const NATURAL_ROLE_CONTENT = applyMutualRoleNoiseCleanup(QUESTIONNAIRE_FOLLOWUP_CONTENT);
+const PRESENTATION_CLEANED_CONTENT = applyFinalPresentationCleanup(NATURAL_ROLE_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(NATURAL_ROLE_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(PRESENTATION_CLEANED_CONTENT);
