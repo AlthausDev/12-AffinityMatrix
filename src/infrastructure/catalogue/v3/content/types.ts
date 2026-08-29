@@ -5,6 +5,7 @@ import { Sex } from '../../../../domain/profile/profile-metadata';
 export type CataloguePracticeKind =
   | 'mutual'
   | 'directed'
+  | 'directed-self'
   | 'self'
   | 'state'
   | 'wear'
