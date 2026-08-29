@@ -103,7 +103,7 @@ describe('QuestionnaireService', () => {
       createAnswerKey('kissing', 'mutual', { counterpartSex: 'male' }),
       createAnswerKey('kissing', 'mutual', { counterpartSex: 'female' }),
     ]);
-    expect(general?.total).toBe(2);
+    expect(general?.total).toBe(1);
     expect(general?.filtered).toBe(0);
   });
 
@@ -127,9 +127,10 @@ describe('QuestionnaireService', () => {
     expect(roles).toHaveLength(4);
     expect(roles.filter((item) => item.filtered).map((item) => item.counterpartSex)).toEqual(['female', 'female']);
     expect(new Set(roles.map((item) => item.answerKey)).size).toBe(4);
+    expect(restraint?.total).toBe(1);
   });
 
-  it('keeps preferences for men and women independent in progress calculation', () => {
+  it('counts a practice as answered as soon as any of its independent variants is answered', () => {
     const current = profile('female', 'bisexual');
     const maleKey = createAnswerKey('kissing', 'mutual', { counterpartSex: 'male' });
     const answered = {
@@ -146,8 +147,8 @@ describe('QuestionnaireService', () => {
 
     const general = service.getCategory(snapshot, answered, 'general');
     expect(general?.answered).toBe(1);
-    expect(general?.total).toBe(2);
-    expect(general?.completionPercentage).toBe(50);
+    expect(general?.total).toBe(1);
+    expect(general?.completionPercentage).toBe(100);
     expect(general?.practices[0]?.roles.find((item) => item.counterpartSex === 'female')?.answer).toBeUndefined();
   });
 
