@@ -17,6 +17,7 @@ import { applyConciseCategoryCopy, applyFinalRolePolish, FINAL_ROLE_POLISH_RETIR
 import { sanitizeFinalCatalogueSeeds } from './final-seed-sanitization';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
 import { applyManualReleaseReview } from './manual-release-review';
+import { applyManualRoleFollowup } from './manual-role-followup';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
 import { applyPatchReleaseCorrections } from './patch-release-corrections';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
@@ -67,5 +68,6 @@ const PATCH_CORRECTED_CONTENT = applyPatchReleaseCorrections(SANITIZED_CONTENT);
 const GROUPED_CONTENT = groupFinalCataloguePractices(PATCH_CORRECTED_CONTENT);
 const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(GROUPED_CONTENT);
 const CONCISE_CONTENT = applyConciseCategoryCopy(CATEGORY_COPY_CONTENT);
+const MANUALLY_REVIEWED_CONTENT = applyManualReleaseReview(CONCISE_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyManualReleaseReview(CONCISE_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyManualRoleFollowup(MANUALLY_REVIEWED_CONTENT);
