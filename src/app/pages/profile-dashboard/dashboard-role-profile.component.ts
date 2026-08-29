@@ -15,7 +15,10 @@ import {
       <header class="dashboard-chart-heading">
         <div>
           <h3>{{ i18n.t('dashboard.roleProfile.title') }}</h3>
-          <p>{{ i18n.t('dashboard.roleProfile.description') }}</p>
+          <p>{{ text(
+            'Separa afinidad dentro de cada rol y peso de ese rol dentro de tus preferencias positivas.',
+            'Separates affinity within each role from that role’s weight across your positive preferences.'
+          ) }}</p>
         </div>
       </header>
 
@@ -23,11 +26,11 @@ import {
         <div class="dashboard-role-legend">
           <span>
             <span class="dashboard-role-legend-swatch dashboard-role-legend-swatch-affinity" aria-hidden="true"></span>
-            {{ i18n.t('dashboard.roleProfile.affinityWithinRole') }}
+            {{ text('Afinidad dentro del rol', 'Affinity within role') }}
           </span>
           <span>
             <span class="dashboard-role-legend-swatch dashboard-role-legend-swatch-weight" aria-hidden="true"></span>
-            {{ i18n.t('dashboard.roleProfile.profileWeight') }}
+            {{ text('Peso dentro del perfil', 'Weight within profile') }}
           </span>
         </div>
 
@@ -42,7 +45,7 @@ import {
               <div class="dashboard-role-metrics">
                 <div class="dashboard-role-metric">
                   <div class="dashboard-role-metric-label">
-                    <span>{{ i18n.t('dashboard.roleProfile.affinityWithinRole') }}</span>
+                    <span>{{ text('Afinidad', 'Affinity') }}</span>
                     <strong>{{ entry.affinityPercentage }}%</strong>
                   </div>
                   <div
@@ -56,7 +59,7 @@ import {
 
                 <div class="dashboard-role-metric">
                   <div class="dashboard-role-metric-label">
-                    <span>{{ i18n.t('dashboard.roleProfile.profileWeight') }}</span>
+                    <span>{{ text('Peso del perfil', 'Profile weight') }}</span>
                     <strong>{{ entry.profileWeightPercentage }}%</strong>
                   </div>
                   <div
@@ -77,12 +80,15 @@ import {
           }
         </div>
 
-        <section class="dashboard-role-spectra" [attr.aria-label]="i18n.t('dashboard.roleProfile.spectraTitle')">
+        <section class="dashboard-role-spectra" [attr.aria-label]="text('Tendencias de rol', 'Role tendencies')">
           <div class="dashboard-role-spectrum-block">
             <div class="dashboard-role-spectrum-heading">
               <div>
-                <strong>{{ i18n.t('dashboard.roleProfile.roleSpectrumTitle') }}</strong>
-                <small>{{ i18n.t('dashboard.roleProfile.roleSpectrumDescription') }}</small>
+                <strong>{{ text('Tendencia activa / receptiva', 'Active / receptive tendency') }}</strong>
+                <small>{{ text(
+                  'Compara únicamente la afinidad ponderada de roles activos y receptivos; los roles mutuos se muestran arriba como una dimensión propia.',
+                  'Compares weighted active and receptive affinity only; mutual roles remain visible above as their own dimension.'
+                ) }}</small>
               </div>
               <span>{{ roleDirectionEvidenceLabel() }}</span>
             </div>
@@ -107,8 +113,11 @@ import {
           <div class="dashboard-role-spectrum-block dashboard-role-spectrum-initiative">
             <div class="dashboard-role-spectrum-heading">
               <div>
-                <strong>{{ i18n.t('dashboard.roleProfile.initiativeSpectrumTitle') }}</strong>
-                <small>{{ i18n.t('dashboard.roleProfile.initiativeSpectrumDescription') }}</small>
+                <strong>{{ text('Preferencia de iniciativa', 'Initiative preference') }}</strong>
+                <small>{{ text(
+                  'Usa sólo las respuestas donde has indicado explícitamente quién prefieres que tome la iniciativa.',
+                  'Uses only answers where you explicitly stated who you prefer to take the initiative.'
+                ) }}</small>
               </div>
               @if (roleProfileCoordinates().initiativeEvidenceCount > 0) {
                 <span>{{ roleInitiativeEvidenceLabel() }}</span>
@@ -119,7 +128,7 @@ import {
               <div class="dashboard-role-spectrum" role="img" [attr.aria-label]="initiativeSpectrumAriaLabel()">
                 <div class="dashboard-role-spectrum-labels" aria-hidden="true">
                   <span>{{ i18n.t('dashboard.roleProfile.initiativePartner') }}</span>
-                  <span>{{ i18n.t('dashboard.roleProfile.initiativeFlexible') }}</span>
+                  <span>{{ text('Flexible', 'Flexible') }}</span>
                   <span>{{ i18n.t('dashboard.roleProfile.initiativeSelf') }}</span>
                 </div>
                 <div class="dashboard-role-spectrum-rail dashboard-role-spectrum-rail-initiative">
@@ -180,10 +189,10 @@ export class DashboardRoleProfileComponent {
   }
 
   roleDirectionEvidenceLabel(): string {
-    return this.i18n.plural(
-      this.roleProfileCoordinates().roleEvidenceCount,
-      'dashboard.roleProfile.roleEvidence.one',
-      'dashboard.roleProfile.roleEvidence.other',
+    const count = this.roleProfileCoordinates().roleEvidenceCount;
+    return this.text(
+      `${count} ${count === 1 ? 'rol medido' : 'roles medidos'}`,
+      `${count} measured ${count === 1 ? 'role' : 'roles'}`,
     );
   }
 
@@ -198,20 +207,24 @@ export class DashboardRoleProfileComponent {
 
   roleMetricAriaLabel(entry: RoleProfileEntry, metric: 'affinity' | 'weight'): string {
     const label = metric === 'affinity'
-      ? this.i18n.t('dashboard.roleProfile.affinityWithinRole')
-      : this.i18n.t('dashboard.roleProfile.profileWeight');
+      ? this.text('Afinidad dentro del rol', 'Affinity within role')
+      : this.text('Peso dentro del perfil', 'Weight within profile');
     const value = metric === 'affinity' ? entry.affinityPercentage : entry.profileWeightPercentage;
     return `${this.rolePerspectiveLabel(entry.perspective)} · ${label} ${value}%`;
   }
 
   roleSpectrumAriaLabel(): string {
     const coordinates = this.roleProfileCoordinates();
-    return `${this.i18n.t('dashboard.roleProfile.roleSpectrumTitle')} · ${this.i18n.t('dashboard.roleProfile.receptive')} ↔ ${this.i18n.t('dashboard.roleProfile.active')}: ${coordinates.roleBalance}`;
+    return `${this.text('Tendencia activa / receptiva', 'Active / receptive tendency')} · ${this.i18n.t('dashboard.roleProfile.receptive')} ↔ ${this.i18n.t('dashboard.roleProfile.active')}: ${coordinates.roleBalance}`;
   }
 
   initiativeSpectrumAriaLabel(): string {
     const coordinates = this.roleProfileCoordinates();
-    return `${this.i18n.t('dashboard.roleProfile.initiativeSpectrumTitle')} · ${this.i18n.t('dashboard.roleProfile.initiativePartner')} ↔ ${this.i18n.t('dashboard.roleProfile.initiativeSelf')}: ${coordinates.initiativeBalance}`;
+    return `${this.text('Preferencia de iniciativa', 'Initiative preference')} · ${this.i18n.t('dashboard.roleProfile.initiativePartner')} ↔ ${this.i18n.t('dashboard.roleProfile.initiativeSelf')}: ${coordinates.initiativeBalance}`;
+  }
+
+  text(es: string, en: string): string {
+    return this.i18n.locale() === 'es' ? es : en;
   }
 }
 
