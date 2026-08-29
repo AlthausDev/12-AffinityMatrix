@@ -35,12 +35,15 @@ export const TARGET_SITE_VALUES = [
 export type TargetSite = (typeof TARGET_SITE_VALUES)[number];
 
 export const DEPENDS_ON_MAX_LENGTH = 500;
+export const MAX_ANSWER_REFINEMENTS = 32;
 
 export interface AnswerDetails {
   readonly context?: ExperienceContext;
   readonly desiredFrequency?: DesiredFrequency;
   readonly initiative?: InitiativePreference;
   readonly dependsOn?: string;
+  /** Stable ids for optional catalogue-specific nuances such as preferred hair length. */
+  readonly refinements?: readonly string[];
 }
 
 /** Relational and semantic dimensions that qualify an answer without changing its role. */
@@ -83,7 +86,14 @@ export function clonePracticeAnswer(answer: PracticeAnswer): PracticeAnswer {
   return {
     ...answer,
     ...(answer.scope ? { scope: { ...answer.scope } } : {}),
-    ...(answer.details ? { details: { ...answer.details } } : {}),
+    ...(answer.details
+      ? {
+          details: {
+            ...answer.details,
+            ...(answer.details.refinements ? { refinements: [...answer.details.refinements] } : {}),
+          },
+        }
+      : {}),
   };
 }
 
