@@ -4,6 +4,8 @@ import { ProfileExportPageComponent } from './pages/profile-export/profile-expor
 import { ProfileImportPageComponent } from './pages/profile-import/profile-import-page.component';
 import { PRODUCT_NAME } from './shared/product-brand';
 
+const brandedTitle = (page: string): string => `${PRODUCT_NAME} · ${page}`;
+
 export const routes: Routes = [
   {
     path: '',
@@ -15,43 +17,43 @@ export const routes: Routes = [
   {
     path: 'profiles/new',
     component: ProfileEditorPageComponent,
-    title: 'Create profile',
+    title: brandedTitle('Create profile'),
   },
   {
     path: 'profiles/import',
     component: ProfileImportPageComponent,
-    title: 'Import profile',
+    title: brandedTitle('Import profile'),
   },
   {
     path: 'profiles/:id/edit',
     component: ProfileEditorPageComponent,
-    title: 'Edit profile',
+    title: brandedTitle('Edit profile'),
   },
   {
     path: 'profiles/:id/settings',
     loadComponent: () =>
       import('./pages/settings/settings-page.component')
         .then((module) => module.SettingsPageComponent),
-    title: 'Settings',
+    title: brandedTitle('Settings'),
   },
   {
     path: 'profiles/:id/compare',
     loadComponent: () =>
       import('./pages/profile-comparison/profile-comparison-page.component')
         .then((module) => module.ProfileComparisonPageComponent),
-    title: 'Compare profiles',
+    title: brandedTitle('Compare profiles'),
   },
   {
     path: 'profiles/:id/export',
     component: ProfileExportPageComponent,
-    title: 'Export profile',
+    title: brandedTitle('Export profile'),
   },
   {
     path: 'profiles/:id',
     loadComponent: () =>
       import('./pages/profile-dashboard/profile-dashboard-page.component')
         .then((module) => module.ProfileDashboardPageComponent),
-    title: 'Profile',
+    title: brandedTitle('Profile'),
     children: [
       {
         path: 'questionnaire',
@@ -64,14 +66,14 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./pages/questionnaire-categories/questionnaire-categories-page.component')
                 .then((module) => module.QuestionnaireCategoriesPageComponent),
-            title: 'Questionnaire categories',
+            title: brandedTitle('Questionnaire categories'),
           },
           {
             path: ':category',
             loadComponent: () =>
               import('./pages/questionnaire-category/questionnaire-category-page.component')
                 .then((module) => module.QuestionnaireCategoryPageComponent),
-            title: 'Questionnaire',
+            title: brandedTitle('Questionnaire'),
           },
         ],
       },

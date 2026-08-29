@@ -48,6 +48,10 @@ const SEXUAL_POSITIONS_RELEASE_ORDER = [
   'oral-lying-between-legs-position',
   'oral-side-lying-position',
   'oral-edge-position',
+  'coital-alignment-position',
+  'standing-rear-entry-position',
+  'mating-press-position',
+  'piledriver-position',
 ];
 
 const TOYS_RELEASE_AUDIT_ORDER = without(
@@ -60,6 +64,7 @@ const SEXUAL_ACCESSORIES_RELEASE_AUDIT_ORDER = [
   'everyday-object-play',
   'everyday-object-vaginal-penetration',
   'everyday-object-anal-penetration',
+  'chastity-device',
 ];
 
 const ORGASM_RELEASE_ORDER = [

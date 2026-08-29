@@ -2,7 +2,7 @@ import { CatalogueCategorySeed, CatalogueRoleLabelSeed } from './types';
 
 const LABELS: Readonly<Record<string, CatalogueRoleLabelSeed>> = {
   'affection-intimacy': { en: 'Share this with my partner', es: 'Compartirlo con mi pareja' },
-  'sexual-style': { en: 'Prefer this style', es: 'Preferir este estilo' },
+  'sexual-style': { en: 'Preference for this style', es: 'Preferencia por este estilo' },
   'manual-masturbation': { en: 'Do this together', es: 'Hacerlo juntos' },
   oral: { en: 'Do this together', es: 'Hacerlo juntos' },
   penetration: { en: 'Do this together', es: 'Hacerlo juntos' },

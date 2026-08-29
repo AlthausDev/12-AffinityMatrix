@@ -138,6 +138,10 @@ export class QuestionnaireService {
 
     for (const practice of snapshot.catalogue.practices) {
       if (practice.categoryId !== category.id) continue;
+
+      let hasIncludedVariant = false;
+      let hasAnsweredVariant = false;
+
       for (const role of practice.roles) {
         for (const candidateScope of this.scopePolicy.getScopes(role)) {
           const scope = this.nonEmptyScope(candidateScope);
@@ -146,10 +150,17 @@ export class QuestionnaireService {
           const visible = this.visibilityPolicy.isRoleVisible(role, context, scope);
           if (!visible) filtered += 1;
           if (!visible && !includeFiltered) continue;
-          total += 1;
-          if (profile.answers[createAnswerKey(practice.id, role.id, scope)]) answered += 1;
+
+          hasIncludedVariant = true;
+          if (profile.answers[createAnswerKey(practice.id, role.id, scope)]) {
+            hasAnsweredVariant = true;
+          }
         }
       }
+
+      if (!hasIncludedVariant) continue;
+      total += 1;
+      if (hasAnsweredVariant) answered += 1;
     }
 
     return {
