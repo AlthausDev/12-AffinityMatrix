@@ -33,8 +33,14 @@ describe('Catalogue V3 final role polish', () => {
     const man = profile('hetero-man-fluids-final', 'male', 'heterosexual');
     expect(practiceIds('fluids', man)).not.toContain('snowballing');
     expect(snapshotPractice('creampie-cleanup')).toBeUndefined();
+    expect(snapshotPractice('semen-cleanup-oral')).toBeUndefined();
 
-    for (const cleanupId of ['semen-cleanup-manual', 'semen-cleanup-oral', 'semen-cleanup-other']) {
+    for (const cleanupId of [
+      'semen-cleanup-manual',
+      'semen-cleanup-oral-external',
+      'semen-cleanup-oral-creampie',
+      'semen-cleanup-other',
+    ]) {
       expect(roleIds('fluids', cleanupId, man), cleanupId).toEqual(['give', 'receive']);
     }
     expect(snapshotPractice('semen-cleanup-manual')?.roles.map((role) => role.label)).toEqual([

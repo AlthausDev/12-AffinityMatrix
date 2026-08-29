@@ -10,7 +10,7 @@ import {
   computed,
   ViewChild,
 } from '@angular/core';
-import { splitCatalogueGlossaryText } from '../i18n/catalogue-glossary';
+import { splitFinalCatalogueGlossaryText } from '../i18n/catalogue-glossary-final';
 import { TranslationService } from '../i18n/translation.service';
 
 interface GlossaryPopupPlacement {
@@ -23,17 +23,17 @@ interface GlossaryPopupPlacement {
   selector: 'app-catalogue-glossary-text',
   template: `
     @for (segment of segments(); track $index) {
-      @if (segment.termId; as termId) {
+      @if (segment.termId && shouldLinkTerm(segment.text); as linked) {
         <button
           type="button"
           class="glossary-term"
-          [attr.aria-expanded]="isVisible(termId)"
-          (mouseenter)="showHover(termId, segment.definition ?? '', $event)"
-          (mouseleave)="clearHover(termId)"
-          (focus)="showHover(termId, segment.definition ?? '', $event)"
-          (blur)="clearHover(termId)"
-          (click)="togglePinned(termId, segment.definition ?? '', $event)"
-          (pointerdown)="startLongPress(termId, segment.definition ?? '', $event)"
+          [attr.aria-expanded]="isVisible(segment.termId!)"
+          (mouseenter)="showHover(segment.termId!, segment.definition ?? '', $event)"
+          (mouseleave)="clearHover(segment.termId!)"
+          (focus)="showHover(segment.termId!, segment.definition ?? '', $event)"
+          (blur)="clearHover(segment.termId!)"
+          (click)="togglePinned(segment.termId!, segment.definition ?? '', $event)"
+          (pointerdown)="startLongPress(segment.termId!, segment.definition ?? '', $event)"
           (pointerup)="cancelLongPress()"
           (pointercancel)="cancelLongPress()"
           (pointerleave)="cancelLongPress()"
@@ -118,6 +118,7 @@ interface GlossaryPopupPlacement {
 export class CatalogueGlossaryTextComponent {
   private readonly i18n = inject(TranslationService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly host = inject(ElementRef<HTMLElement>);
   private longPressTimer: ReturnType<typeof setTimeout> | undefined;
   private longPressTriggered = false;
 
@@ -129,13 +130,26 @@ export class CatalogueGlossaryTextComponent {
   readonly activeDefinition = signal('');
   readonly fallbackOpen = signal(false);
   readonly placement = signal<GlossaryPopupPlacement>({ left: 0, top: 0, above: true });
-  readonly segments = computed(() => splitCatalogueGlossaryText(this.text(), this.i18n.locale()));
+  readonly segments = computed(() => splitFinalCatalogueGlossaryText(this.text(), this.i18n.locale()));
 
   constructor() {
     this.destroyRef.onDestroy(() => {
       this.cancelLongPress();
       this.hidePopup();
     });
+  }
+
+  /**
+   * If a specialised term is already explained from the question title, do not underline the
+   * same literal term again in that question's description. The description remains plain text.
+   */
+  shouldLinkTerm(termText: string): boolean {
+    const host = this.host.nativeElement;
+    if (!host.closest('p')) return true;
+    const card = host.closest('.question-card');
+    const heading = card?.querySelector('h2');
+    if (!heading?.textContent) return true;
+    return !heading.textContent.toLocaleLowerCase().includes(termText.toLocaleLowerCase());
   }
 
   isVisible(termId: string): boolean {
@@ -205,7 +219,6 @@ export class CatalogueGlossaryTextComponent {
     this.activeDefinition.set(definition);
     this.placement.set(positionPopup(anchor));
 
-    // Popover uses the browser top layer, so accordion/card overflow cannot clip the definition.
     const popover = popup as HTMLElement & { showPopover?: () => void; hidePopover?: () => void };
     if (popover.showPopover) {
       closeOtherGlossaryPopovers(popup);
