@@ -1,5 +1,12 @@
 import { CatalogueCategorySeed } from './types';
 
+const SEMEN_CLEANUP_IDS = new Set([
+  'semen-cleanup-manual',
+  'semen-cleanup-oral-external',
+  'semen-cleanup-oral-creampie',
+  'semen-cleanup-other',
+]);
+
 const SEMEN_SELF_CLEANUP_IDS = new Set([
   'semen-cleanup-manual',
   'semen-cleanup-oral-external',
@@ -13,15 +20,27 @@ export function applyFinalNoiseApplicability(
   return content.map((category) => ({
     ...category,
     practices: category.practices.map((practice) => {
-      if (SEMEN_SELF_CLEANUP_IDS.has(practice.id)) {
+      if (SEMEN_CLEANUP_IDS.has(practice.id)) {
         return {
           ...practice,
           roleApplicability: {
             ...(practice.roleApplicability ?? {}),
-            self: {
-              ...(practice.roleApplicability?.['self'] ?? {}),
+            give: {
+              ...(practice.roleApplicability?.['give'] ?? {}),
               partnerSex: ['male'] as const,
             },
+            receive: {
+              ...(practice.roleApplicability?.['receive'] ?? {}),
+              partnerSex: ['male'] as const,
+            },
+            ...(SEMEN_SELF_CLEANUP_IDS.has(practice.id)
+              ? {
+                  self: {
+                    ...(practice.roleApplicability?.['self'] ?? {}),
+                    partnerSex: ['male'] as const,
+                  },
+                }
+              : {}),
           },
         };
       }
