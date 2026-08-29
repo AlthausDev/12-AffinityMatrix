@@ -153,6 +153,7 @@ import {
       }
     </article>
   `,
+  styles: `:host { display: block; min-width: 0; }`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardRoleProfileComponent {
