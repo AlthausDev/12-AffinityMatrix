@@ -1,8 +1,9 @@
 import { CatalogueCategorySeed, CatalogueRoleLabelsSeed } from './types';
 
 /**
- * Consent is a catalogue-wide premise shown before the questions. Answer labels should describe
- * the role itself; practice-specific agreement details remain in descriptions where they matter.
+ * Consent is a catalogue-wide premise shown before the questions. Titles and answer labels should
+ * describe the practice or role itself; practice-specific agreement details remain in descriptions
+ * where they actually change the meaning.
  */
 export function stripRedundantConsentFromRoleLabels(
   content: readonly CatalogueCategorySeed[],
@@ -36,9 +37,10 @@ export function stripRedundantConsentFromRoleLabels(
         ] as const
         : undefined;
 
-      if (!roleLabels && !pairedRoles) return practice;
       return {
         ...practice,
+        en: clean(practice.en),
+        es: clean(practice.es),
         ...(roleLabels ? { roleLabels } : {}),
         ...(pairedRoles ? { pairedRoles } : {}),
       };
@@ -48,6 +50,7 @@ export function stripRedundantConsentFromRoleLabels(
 
 function clean(value: string): string {
   return value
+    .replace(/\s*\(\s*(?:pre[- ]?agreed|preacordad[oa]s?|consensual|consensuad[oa]s?)\s*\)/gi, '')
     .replace(/\bconsensually\b\s*/gi, '')
     .replace(/\bconsensual\b\s*/gi, '')
     .replace(/\bde forma consensuada\b\s*/gi, '')
@@ -56,6 +59,7 @@ function clean(value: string): string {
     .replace(/\bconsentid[oa]s?\b\s*/gi, '')
     .replace(/\bpre[- ]?agreed\b\s*/gi, '')
     .replace(/\bpreacordad[oa]s?\b\s*/gi, '')
+    .replace(/\(\s*\)/g, '')
     .replace(/\s+([,.;:])/g, '$1')
     .replace(/\s{2,}/g, ' ')
     .trim();
