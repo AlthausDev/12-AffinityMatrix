@@ -39,6 +39,11 @@ import {
           </p>
         </aside>
 
+        <aside class="dashboard-role-summary">
+          <span>{{ text('Lectura rápida', 'Quick read') }}</span>
+          <strong>{{ roleProfileDiagnosis() }}</strong>
+        </aside>
+
         <div class="dashboard-role-profile">
           @for (entry of roleProfile(); track entry.perspective) {
             <div class="dashboard-role-row" [class.dashboard-role-row-empty]="entry.answerCount === 0">
@@ -211,6 +216,63 @@ export class DashboardRoleProfileComponent {
     return this.text('muy alta', 'very high');
   }
 
+  roleProfileDiagnosis(): string {
+    const entries = this.roleProfile();
+    const active = entries.find((entry) => entry.perspective === 'active')?.profileWeightPercentage ?? 0;
+    const receptive = entries.find((entry) => entry.perspective === 'receptive')?.profileWeightPercentage ?? 0;
+    const mutual = entries.find((entry) => entry.perspective === 'neutral')?.profileWeightPercentage ?? 0;
+    const weights = [
+      { perspective: 'active' as const, value: active },
+      { perspective: 'receptive' as const, value: receptive },
+      { perspective: 'neutral' as const, value: mutual },
+    ].sort((a, b) => b.value - a.value);
+    const dominant = weights[0];
+    const second = weights[1];
+    const spread = (dominant?.value ?? 0) - (weights.at(-1)?.value ?? 0);
+    const lead = (dominant?.value ?? 0) - (second?.value ?? 0);
+    const versatile = Math.min(active, receptive, mutual) >= 18 && spread <= 30;
+    const balance = this.roleProfileCoordinates().roleBalance;
+    const direction = this.directionalSuffix(balance);
+
+    if (versatile) {
+      const dominantLabel = dominant && lead >= 8 ? this.roleProfileFamilyPhrase(dominant.perspective) : '';
+      if (dominantLabel && direction) {
+        return this.text(
+          `Perfil bastante versátil, con mayor peso ${dominantLabel} y ${direction}.`,
+          `Quite a versatile profile, with more weight ${dominantLabel} and ${direction}.`,
+        );
+      }
+      if (dominantLabel) {
+        return this.text(
+          `Perfil bastante versátil, con mayor peso ${dominantLabel}.`,
+          `Quite a versatile profile, with more weight ${dominantLabel}.`,
+        );
+      }
+      return this.text(
+        'Perfil de roles muy equilibrado, sin una forma de participación claramente dominante.',
+        'Very balanced role profile, with no clearly dominant way of participating.',
+      );
+    }
+
+    if (!dominant || lead < 8) {
+      return direction
+        ? this.text(`Perfil mixto, con ${direction}.`, `Mixed profile, with ${direction}.`)
+        : this.text('Perfil mixto y bastante equilibrado.', 'Mixed and fairly balanced profile.');
+    }
+
+    const dominantLabel = this.roleProfileFamilyPhrase(dominant.perspective);
+    if (dominant.perspective === 'neutral') {
+      return direction
+        ? this.text(`Predominio ${dominantLabel}, con ${direction}.`, `Predominantly ${dominantLabel}, with ${direction}.`)
+        : this.text(`Predominio ${dominantLabel}.`, `Predominantly ${dominantLabel}.`);
+    }
+
+    const marked = lead >= 20 || dominant.value >= 50;
+    const baseEs = marked ? `Perfil marcadamente ${dominantLabel}` : `Predominio ${dominantLabel}`;
+    const baseEn = marked ? `Markedly ${dominantLabel} profile` : `Predominantly ${dominantLabel}`;
+    return this.text(`${baseEs}.`, `${baseEn}.`);
+  }
+
   roleCoordinateLeft(): number {
     return coordinateLeft(this.roleProfileCoordinates().roleBalance);
   }
@@ -269,6 +331,22 @@ export class DashboardRoleProfileComponent {
 
   text(es: string, en: string): string {
     return this.i18n.locale() === 'es' ? es : en;
+  }
+
+  private roleProfileFamilyPhrase(perspective: RolePerspective): string {
+    if (perspective === 'active') return this.text('de lo activo', 'on active roles');
+    if (perspective === 'receptive') return this.text('de lo receptivo', 'on receptive roles');
+    return this.text('de lo mutuo/recíproco', 'on mutual/reciprocal roles');
+  }
+
+  private directionalSuffix(value: number): string {
+    const magnitude = Math.abs(value);
+    if (magnitude < 10) return '';
+    const target = value < 0
+      ? this.text('receptiva', 'receptive')
+      : this.text('activa', 'active');
+    if (magnitude < 30) return this.text(`una ligera inclinación ${target}`, `a slight ${target} lean`);
+    return this.text(`una inclinación ${target}`, `a ${target} lean`);
   }
 
   private balanceDiagnosis(value: number, low: string, high: string): string {

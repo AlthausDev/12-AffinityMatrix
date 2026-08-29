@@ -62,7 +62,7 @@ import {
                     <small>{{ themeDescription(entry) }}</small>
                   </div>
                   @if (entry.evidenceCount > 0) {
-                    <span>{{ entry.score }} · {{ dimensionAffinityLabel(entry.score) }}</span>
+                    <span>{{ entry.score }}% · {{ dimensionAffinityLabel(entry.score) }}</span>
                   } @else {
                     <span class="semantic-no-score">{{ text('Sin datos', 'No data') }}</span>
                   }
@@ -430,11 +430,11 @@ export class DashboardSemanticMapComponent {
   }
 
   dimensionAffinityLabel(score: number): string {
-    if (score < 20) return this.text('muy baja', 'very low');
-    if (score < 40) return this.text('baja', 'low');
-    if (score < 60) return this.text('media', 'medium');
-    if (score < 80) return this.text('alta', 'high');
-    return this.text('muy alta', 'very high');
+    if (score < 20) return this.text('Afinidad muy baja', 'Very low affinity');
+    if (score < 40) return this.text('Afinidad baja', 'Low affinity');
+    if (score < 60) return this.text('Afinidad moderada', 'Moderate affinity');
+    if (score < 80) return this.text('Afinidad alta', 'High affinity');
+    return this.text('Afinidad muy alta', 'Very high affinity');
   }
 
   affinityDiagnosis(score: number): string {
