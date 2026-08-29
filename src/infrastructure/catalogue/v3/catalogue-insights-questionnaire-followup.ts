@@ -23,7 +23,7 @@ const ADDITIONS: readonly PracticeInsightSignals[] = [
   },
   {
     practiceId: QUESTIONNAIRE_FOLLOWUP_CHASTITY_ID,
-    signals: { 'power-exchange': 1, structure: 0.75, 'physical-restraint': 0.5, anticipation: 0.75 },
+    signals: { 'power-exchange': 1, structure: 0.75, 'physical-restraint': 0.5 },
   },
 ] as const;
 
