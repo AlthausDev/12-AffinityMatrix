@@ -25,8 +25,8 @@ const REPLACED_BASE_IDS = new Set(['hotwife', 'cuckold', 'voyeurism', 'glory-hol
 const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
   term(
     'groups-non-monogamy', 'cuckold', 'Cuckold', 'Cuckold', ['cuckold'],
-    'A consensual framing where a man’s role as the partner of someone having sex with other people is itself part of the erotic interest. Jealousy, exclusion, submission or humiliation may appear, but are not required.',
-    'Marco consensuado donde el papel de un hombre como pareja de alguien que tiene sexo con terceros forma parte del propio interés erótico. Puede incluir celos, exclusión, sumisión o humillación, pero no es obligatorio.',
+    'A framing where a man’s role as the partner of someone having sex with other people is itself part of the erotic interest. Jealousy, exclusion, submission or humiliation may appear, but are not required.',
+    'Marco donde el papel de un hombre como pareja de alguien que tiene sexo con terceros forma parte del propio interés erótico. Puede incluir celos, exclusión, sumisión o humillación, pero no es obligatorio.',
   ),
   term(
     'groups-non-monogamy', 'compersion', 'Erotic compersion', 'Compersión erótica', ['compersion', 'compersión'],
@@ -35,8 +35,8 @@ const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
   ),
   term(
     'visibility-media', 'voyeurism', 'Voyeurism', 'Voyeurismo', ['voyeurism', 'voyeurismo'],
-    'Erotic interest in watching another person. In DesireSync the open-voyeurism entry means the observed partner knows they are being watched at that moment; pre-agreed unannounced watching is a separate entry.',
-    'Interés erótico en observar a otra persona. En DesireSync la entrada de voyeurismo abierto implica que la pareja sabe que está siendo observada en ese momento; la observación sin aviso preacordada se pregunta aparte.',
+    'Erotic interest in watching another person. In DesireSync the open-voyeurism entry means the observed partner knows they are being watched at that moment; observation without notice is a separate entry whose prior agreement is explained in its description.',
+    'Interés erótico en observar a otra persona. En DesireSync el voyeurismo abierto implica que la pareja sabe que está siendo observada en ese momento; la observación sin aviso es otra entrada cuyo acuerdo previo se explica en su descripción.',
   ),
 
   term(
@@ -45,12 +45,12 @@ const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
     'Conducto que lleva la orina desde la vejiga hasta el exterior del cuerpo. Los intereses centrados en la uretra son anatómicamente distintos del juego vaginal o genital externo general.',
   ),
   term(
-    'edge', 'vulvar-torture', 'Vulvar / pussy torture', 'Tortura vulvar / pussy torture', ['vulvar torture', 'vulva torture', 'pussy torture', 'tortura vulvar'],
+    'edge', 'vulvar-torture', 'Pussy torture', 'Pussy torture', ['pussy torture', 'vulvar torture', 'vulva torture', 'tortura vulvar'],
     'High-intensity pain-focused play centred on the vulva or external female genitals. It refers to the external anatomy rather than the internal vaginal canal.',
     'Juego de dolor de alta intensidad centrado en la vulva o genitales externos femeninos. Se refiere a la anatomía externa, no al canal vaginal interno.',
   ),
   term(
-    'edge', 'vaginal-torture', 'Vaginal torture', 'Tortura vaginal', ['vaginal torture', 'tortura vaginal'],
+    'edge', 'vaginal-torture', 'Vaginal torture', 'Vaginal torture', ['vaginal torture', 'tortura vaginal'],
     'High-intensity pain-focused play where the internal vaginal canal is the specific focus, distinct from external vulvar pain play.',
     'Juego de dolor de alta intensidad donde el canal vaginal interno es el foco específico, distinto del juego de dolor sobre la vulva externa.',
   ),
@@ -116,6 +116,17 @@ const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
     'places-settings', 'glory-hole', 'Glory hole', 'Glory hole', ['glory hole', 'glory-hole'],
     'A sexual setting separated by a wall or partition with an opening through which sexual contact occurs, reducing visual contact between participants.',
     'Entorno sexual separado por una pared o mampara con una abertura a través de la cual se produce el contacto sexual, reduciendo el contacto visual entre participantes.',
+  ),
+
+  term(
+    'toys-penetration', 'wand-vibrator', 'Wand vibrator', 'Vibrador wand', ['wand vibrator', 'vibrador wand', 'wand'],
+    'A usually larger handheld vibrator with a broad rounded head, primarily associated with strong external vibration rather than a penetrative shape.',
+    'Vibrador de mano normalmente grande, con cabeza ancha y redondeada, asociado sobre todo a vibración externa intensa y no a una forma pensada para penetración.',
+  ),
+  term(
+    'toys-penetration', 'rabbit-vibrator', 'Rabbit vibrator', 'Vibrador rabbit', ['rabbit vibrator', 'vibrador rabbit', 'rabbit'],
+    'A penetrative vibrator with a second external arm, commonly designed to stimulate the clitoral area at the same time.',
+    'Vibrador de penetración con un segundo brazo externo, normalmente diseñado para estimular a la vez la zona del clítoris.',
   ),
 ] as const;
 

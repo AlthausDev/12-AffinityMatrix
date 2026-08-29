@@ -3,10 +3,10 @@ import { CATALOGUE_V3_CONTENT } from './final';
 import { EXPANDED_SEXUAL_POSITIONS } from './sexual-position-additions';
 
 describe('expanded sexual positions', () => {
-  it('adds eight distinct positions to the final sexual-position category', () => {
+  it('keeps the eight expanded positions inside the final 24-position category', () => {
     const category = CATALOGUE_V3_CONTENT.find((entry) => entry.id === 'sexual-positions');
     expect(category).toBeDefined();
-    expect(category!.practices).toHaveLength(20);
+    expect(category!.practices).toHaveLength(24);
 
     const ids = category!.practices.map((practice) => practice.id);
     for (const addition of EXPANDED_SEXUAL_POSITIONS) {

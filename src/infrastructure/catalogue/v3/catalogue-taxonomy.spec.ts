@@ -55,7 +55,7 @@ describe('catalogue v3 questionnaire taxonomy', () => {
       restraint: [6, 36],
       psychological: [4, 22],
       sensation: [4, 29],
-      fluids: [7, 37],
+      fluids: [7, 38],
       'taboo-fantasies': [2, 12],
       surrealism: [3, 16],
       edge: [5, 26],

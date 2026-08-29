@@ -46,6 +46,7 @@ describe('Catalogue V3 final role polish', () => {
     expect(snapshotPractice('semen-cleanup-manual')?.roles.map((role) => role.label)).toEqual([
       'Manually clean semen from my partner',
       'Have my partner manually clean semen from me',
+      'Manually clean semen from my own body',
     ]);
   });
 
