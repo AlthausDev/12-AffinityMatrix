@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { QuestionnaireRoleComponent } from './questionnaire-role.component';
 
 const role = { id: 'receive', label: 'Receive', perspective: 'receptive' as const };
-const interestRole = { id: 'interest', label: 'Interested / attracted', perspective: 'neutral' as const };
 
 describe('QuestionnaireRoleComponent', () => {
   it('preserves relational scope when selecting a preference', async () => {
@@ -73,7 +72,7 @@ describe('QuestionnaireRoleComponent', () => {
     fixture.componentRef.setInput('role', role);
     fixture.componentRef.setInput('answer', {
       practiceId: 'example', roleId: 'receive', preference: 'depends',
-      details: { dependsOn: 'Only sometimes', desiredFrequency: 'occasionally', refinements: ['example-detail'] },
+      details: { dependsOn: 'Only sometimes', desiredFrequency: 'occasionally' },
     });
 
     let emitted: unknown;
@@ -90,7 +89,7 @@ describe('QuestionnaireRoleComponent', () => {
     fixture.componentRef.setInput('role', role);
     fixture.componentRef.setInput('answer', {
       practiceId: 'example', roleId: 'receive', preference: 'depends',
-      details: { dependsOn: 'Only sometimes', desiredFrequency: 'occasionally', refinements: ['example-detail'] },
+      details: { dependsOn: 'Only sometimes', desiredFrequency: 'occasionally' },
     });
 
     let emitted: any;
@@ -99,25 +98,5 @@ describe('QuestionnaireRoleComponent', () => {
 
     expect(emitted.details.dependsOn).toBeUndefined();
     expect(emitted.details.desiredFrequency).toBe('occasionally');
-    expect(emitted.details.refinements).toEqual(['example-detail']);
-  });
-
-  it('stores body-trait refinements as optional details in catalogue order', async () => {
-    await TestBed.configureTestingModule({ imports: [QuestionnaireRoleComponent] }).compileComponents();
-    const fixture = TestBed.createComponent(QuestionnaireRoleComponent);
-    fixture.componentRef.setInput('practiceId', 'hair');
-    fixture.componentRef.setInput('role', interestRole);
-    fixture.componentRef.setInput('scope', { counterpartSex: 'female' });
-    fixture.componentRef.setInput('answer', {
-      practiceId: 'hair', roleId: 'interest', scope: { counterpartSex: 'female' }, preference: 'like',
-      details: { refinements: ['hair-length-long'] },
-    });
-
-    let emitted: any;
-    fixture.componentInstance.answerChange.subscribe((answer) => { emitted = answer; });
-    fixture.componentInstance.toggleRefinement('hair-length-short');
-
-    expect(emitted.details.refinements).toEqual(['hair-length-short', 'hair-length-long']);
-    expect(emitted.scope).toEqual({ counterpartSex: 'female' });
   });
 });
