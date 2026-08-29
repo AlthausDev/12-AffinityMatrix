@@ -134,7 +134,7 @@ const CATEGORY_COPY: Readonly<Record<string, Partial<CatalogueCategorySeed>>> = 
     en: 'Fluids, food & substances',
     es: 'Fluidos, alimentos y sustancias',
     descriptionEn: 'Saliva, sexual fluids, food, oils and other substances used as part of erotic play.',
-    descriptionEs: 'Saliva, fluidos sexuales, alimentos, aceites y otras sustancias utilizadas como parte del juego erótico.',
+    descriptionEs: 'Saliva, fluidos sexuales, alimentos, aceites y otras sustancias dentro del juego erótico.',
   },
 };
 
