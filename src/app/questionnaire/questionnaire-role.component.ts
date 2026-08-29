@@ -16,7 +16,6 @@ import { CatalogueTextService } from '../i18n/catalogue-text.service';
 import { TranslationService } from '../i18n/translation.service';
 import { PREFERENCE_PRESENTATION } from '../shared/comparison-presentation';
 import { QuestionnaireCounterpartContextService } from './questionnaire-counterpart-context.service';
-import { QuestionnaireRolePromptService } from './questionnaire-role-prompt.service';
 
 const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
   value,
@@ -30,9 +29,14 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
       <div class="role-heading">
         <div>
           @if (headingLevel() === 4) {
-            <h4>{{ questionPrompt() }}</h4>
+            <h4>{{ roleLabel() }}</h4>
           } @else {
-            <h3>{{ questionPrompt() }}</h3>
+            <h3>{{ roleLabel() }}</h3>
+          }
+          @if (showCounterpartSex()) {
+            @if (counterpartSex(); as sex) {
+              <p class="scope-note">{{ i18n.t('questionnaireRole.counterpart', { sex: sexLabel(sex) }) }}</p>
+            }
           }
           @if (targetSite(); as site) {
             <p class="scope-note">{{ i18n.t('questionnaireRole.targetSite', { site: targetSiteLabel(site) }) }}</p>
@@ -199,7 +203,6 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
 export class QuestionnaireRoleComponent implements OnInit, OnDestroy {
   readonly i18n = inject(TranslationService);
   private readonly catalogueText = inject(CatalogueTextService);
-  private readonly prompts = inject(QuestionnaireRolePromptService);
   private readonly counterpartContext = inject(QuestionnaireCounterpartContextService);
   private unregisterCounterpart?: () => void;
 
@@ -215,14 +218,16 @@ export class QuestionnaireRoleComponent implements OnInit, OnDestroy {
   readonly counterpartSex = computed(() => this.scope()?.counterpartSex);
   readonly targetSite = computed(() => this.scope()?.targetSite);
   readonly roleLabel = computed(() => this.catalogueText.roleLabel(this.practiceId(), this.role()));
-  readonly questionPrompt = computed(() => this.prompts.prompt(
-    this.role(),
-    this.scope(),
-    this.roleLabel(),
-    this.counterpartContext.hasMultipleSexVariants(this.practiceId(), this.role().id),
-  ));
+  readonly showCounterpartSex = computed(() =>
+    !!this.counterpartSex()
+      && this.counterpartContext.hasMultipleSexVariants(this.practiceId(), this.role().id),
+  );
   readonly ariaLabel = computed(() => {
-    const parts = [this.questionPrompt()];
+    const parts = [this.roleLabel()];
+    const sex = this.counterpartSex();
+    if (sex && this.showCounterpartSex()) {
+      parts.push(this.i18n.t('questionnaireRole.counterpart', { sex: this.sexLabel(sex) }));
+    }
     const site = this.targetSite();
     if (site) parts.push(this.i18n.t('questionnaireRole.targetSite', { site: this.targetSiteLabel(site) }));
     return parts.join('. ');
