@@ -65,7 +65,7 @@ describe('Catalogue V3 final manual review', () => {
     expect(seed('erotic-compersion')?.pairedRoles?.map((role) => role.id))
       .toEqual(['experience-compersion', 'be-compersion-focus']);
     expect(seed('erotic-compersion')?.descriptionEs).toContain('disfrute');
-    expect(seed('erotic-compersion')?.descriptionEs).not.toContain('humillación ni en observar');
+    expect(seed('erotic-compersion')?.descriptionEs).toContain('no en la humillación ni en observar');
     expect(seed('cuckold-dynamic')?.pairedRoles?.map((role) => role.id)).toEqual(['cuckold-role', 'cuckold-partner-role']);
     expect(seed('cuckquean-dynamic')?.pairedRoles?.map((role) => role.id)).toEqual(['cuckquean-role', 'cuckquean-partner-role']);
   });
