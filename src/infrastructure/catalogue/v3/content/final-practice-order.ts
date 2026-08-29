@@ -192,6 +192,38 @@ const POWER_FINAL_ORDER = insertAfter(POWER_WITH_SERVICE, 'leash-control', [
   'assigned-submissive-name',
 ]);
 
+const SENSATION_FINAL_ORDER = [
+  'feather-sensation',
+  'tickling',
+  'sensory-deprivation',
+  'sensory-overload',
+  'ice-play',
+  'temperature-contrast',
+  'warm-wax',
+  'electrostimulation-mild',
+  'rough-grabbing',
+  'scratching',
+  'biting',
+  'pinching',
+  'hair-pulling',
+  'pressure-points',
+  'nipple-pinching',
+  'clothespins',
+  'nipple-clamp-sensation',
+  'breast-slapping',
+  'genital-slapping',
+  'spanking',
+  'wooden-spoon-impact',
+  'slapping-body',
+  'paddling',
+  'flogging',
+  'cropping',
+  'belting',
+  'face-slapping',
+  'whipping',
+  'caning',
+] as const;
+
 const RESTRAINT_FINAL_ORDER = insertBefore(base('restraint'), 'gag', ['hand-over-mouth']);
 const FLUIDS_WITH_SQUIRTING = insertAfter(base('fluids'), 'female-ejaculation', ['squirting-on-partner']);
 const FLUIDS_WITH_EXTERNAL_OTHER = insertAfter(FLUIDS_WITH_SQUIRTING, 'semen-on-buttocks', ['semen-on-other-body']);
@@ -217,6 +249,7 @@ export const FINAL_CATALOGUE_PRACTICE_GROUP_ORDER: Readonly<Record<string, reado
   exhibitionism: EXHIBITIONISM_FINAL_ORDER,
   power: POWER_FINAL_ORDER,
   restraint: RESTRAINT_FINAL_ORDER,
+  sensation: SENSATION_FINAL_ORDER,
   fluids: FLUIDS_FINAL_ORDER,
   'taboo-fantasies': TABOO_FINAL_ORDER,
   surrealism: SURREALISM_FINAL_ORDER,
