@@ -46,12 +46,6 @@ const BODY_SUBCATEGORY_COPY: Readonly<Record<string, Readonly<{
     descriptionEn: 'Erotic focus on hands, abdomen, buttocks, legs, thighs, feet and related body details.',
     descriptionEs: 'Foco erótico en manos, abdomen, glúteos, piernas, muslos, pies y detalles corporales relacionados.',
   },
-  'body-genitals-pubic': {
-    en: 'Genitals & pubic hair',
-    es: 'Genitales y vello púbico',
-    descriptionEn: 'Erotic focus on genital anatomy or pubic hair beyond general attraction to a partner.',
-    descriptionEs: 'Foco erótico en la anatomía genital o el vello púbico más allá de la atracción general por la pareja.',
-  },
 };
 
 /** Appearance ratings live on the profile; only erotic/sensory body focuses remain here. */
