@@ -3,6 +3,8 @@ import {
   RETIRED_V3_PRACTICE_IDS as CURATED_RETIRED_V3_PRACTICE_IDS,
 } from './curated';
 import { applyCatalogueFinalPass, FINAL_PASS_RETIRED_PRACTICE_IDS } from './catalogue-final-pass';
+import { applyCatalogueClosingPass, CLOSING_PASS_RETIRED_PRACTICE_IDS } from './catalogue-closing-pass';
+import { applyCatalogueClosingOrder } from './catalogue-closing-order';
 import { applyFinalCategoryCopy } from './category-copy-overrides';
 import { polishCatalogue } from './content-polish';
 import { materializeContextualDescriptions } from './contextual-description';
@@ -35,6 +37,7 @@ const ALL_RETIRED_V3_PRACTICE_IDS = [
   ...FINAL_APPLICABILITY_RETIRED_PRACTICE_IDS,
   ...FINAL_ROLE_POLISH_RETIRED_PRACTICE_IDS,
   ...FINAL_PASS_RETIRED_PRACTICE_IDS,
+  ...CLOSING_PASS_RETIRED_PRACTICE_IDS,
 ];
 
 export const RETIRED_V3_PRACTICE_IDS = new Set<string>(
@@ -70,8 +73,10 @@ const SANITIZED_CONTENT = sanitizeFinalCatalogueSeeds(POSITION_EXPANDED_CONTENT)
 const PATCH_CORRECTED_CONTENT = applyPatchReleaseCorrections(SANITIZED_CONTENT);
 const MANUALLY_REVIEWED_CONTENT = applyManualReleaseReview(PATCH_CORRECTED_CONTENT);
 const FINAL_PASS_CONTENT = applyCatalogueFinalPass(MANUALLY_REVIEWED_CONTENT);
-const GROUPED_CONTENT = groupFinalCataloguePractices(FINAL_PASS_CONTENT);
-const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(GROUPED_CONTENT);
+const CLOSING_PASS_CONTENT = applyCatalogueClosingPass(FINAL_PASS_CONTENT);
+const GROUPED_CONTENT = groupFinalCataloguePractices(CLOSING_PASS_CONTENT);
+const CLOSING_ORDERED_CONTENT = applyCatalogueClosingOrder(GROUPED_CONTENT);
+const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(CLOSING_ORDERED_CONTENT);
 const CONCISE_CONTENT = applyConciseCategoryCopy(CATEGORY_COPY_CONTENT);
 const ROLE_REVIEWED_CONTENT = applyManualRoleFollowup(CONCISE_CONTENT);
 
