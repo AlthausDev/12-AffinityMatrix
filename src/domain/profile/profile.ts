@@ -33,6 +33,7 @@ export interface CreateProfileInput {
 }
 
 export function createProfile(input: CreateProfileInput): Profile {
+  const physicalPreferences = clonePhysicalPreferences(input.physicalPreferences);
   return {
     schemaVersion: PROFILE_SCHEMA_VERSION,
     id: input.id,
@@ -43,7 +44,7 @@ export function createProfile(input: CreateProfileInput): Profile {
       ...DEFAULT_PROFILE_SETTINGS,
       ...input.settings,
     },
-    physicalPreferences: clonePhysicalPreferences(input.physicalPreferences),
+    ...(Object.keys(physicalPreferences).length > 0 ? { physicalPreferences } : {}),
     answers: cloneAnswers(input.answers ?? {}),
     createdAt: input.now,
     updatedAt: input.now,
