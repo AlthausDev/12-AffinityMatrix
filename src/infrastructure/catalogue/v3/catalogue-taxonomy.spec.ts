@@ -44,7 +44,7 @@ describe('catalogue v3 questionnaire taxonomy', () => {
     const expected: Readonly<Record<string, readonly [number, number]>> = {
       'sexual-style': [3, 16],
       toys: [4, 18],
-      'sexual-accessories': [4, 16],
+      'sexual-accessories': [5, 17],
       'orgasm-control': [4, 14],
       'body-fetishes': [7, 54],
       groups: [5, 21],
