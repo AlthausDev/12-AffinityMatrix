@@ -8,14 +8,15 @@ import { PROFILE_STORAGE_CONTEXT } from '../../core/profile-repository.token';
 import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
 import { UiPreferencesService } from '../../core/ui-preferences.service';
+import { CatalogueTaxonomyService } from '../../i18n/catalogue-taxonomy.service';
 import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { PointerGlowDirective } from '../../shared/pointer-glow.directive';
 import {
-  buildPracticeProgress,
   buildPreferenceDistribution,
   buildRoleProfile,
+  buildSubcategoryProgress,
 } from './profile-dashboard-insights';
 
 @Component({
@@ -144,6 +145,22 @@ import {
                 <span class="eyebrow">{{ i18n.t('dashboard.profileData.eyebrow') }}</span>
                 <strong>{{ i18n.t('dashboard.profileData.title') }}</strong>
                 <small>{{ i18n.t('dashboard.profileData.description') }}</small>
+              </span>
+              <span class="dashboard-action-arrow" aria-hidden="true">→</span>
+            </a>
+
+            <a
+              class="dashboard-action"
+              appPointerGlow
+              [routerLink]="['/profiles', currentProfile.id, 'glossary']"
+            >
+              <span class="dashboard-action-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 4.5h5.5A2.5 2.5 0 0 1 13 7v12a3 3 0 0 0-3-3H5V4.5Z"/><path d="M19 4.5h-3.5A2.5 2.5 0 0 0 13 7v12a3 3 0 0 1 3-3h3V4.5Z"/></svg>
+              </span>
+              <span class="dashboard-action-copy">
+                <span class="eyebrow">{{ i18n.t('dashboard.glossary.eyebrow') }}</span>
+                <strong>{{ i18n.t('dashboard.glossary.title') }}</strong>
+                <small>{{ i18n.t('dashboard.glossary.description') }}</small>
               </span>
               <span class="dashboard-action-arrow" aria-hidden="true">→</span>
             </a>
@@ -318,14 +335,18 @@ import {
                         class="dashboard-subcategory-list"
                         [id]="'dashboard-category-detail-' + summary.category.id"
                       >
-                        @for (detail of categoryPracticeProgress(summary.category.id); track detail.practice.id) {
-                          <div class="dashboard-subcategory-row">
+                        @for (detail of categorySubcategoryProgress(summary.category.id); track detail.id) {
+                          <a
+                            class="dashboard-subcategory-row"
+                            [routerLink]="['/profiles', currentProfile.id, 'questionnaire', summary.category.id]"
+                            [queryParams]="{ subcategory: detail.id }"
+                          >
                             <div class="dashboard-subcategory-copy">
-                              <strong [title]="catalogueText.practiceLabel(detail.practice)">{{ catalogueText.practiceLabel(detail.practice) }}</strong>
+                              <strong [title]="detail.description">{{ detail.label }}</strong>
                               <span>{{ i18n.t('dashboard.status.categoryValue', { answered: detail.answered, total: detail.total, percentage: detail.completionPercentage }) }}</span>
                             </div>
                             <app-completion-progress [value]="detail.completionPercentage" />
-                          </div>
+                          </a>
                         }
                       </div>
                     }
@@ -365,6 +386,7 @@ export class ProfileDashboardPageComponent {
   readonly catalogueText = inject(CatalogueTextService);
   readonly storageContext = inject(PROFILE_STORAGE_CONTEXT);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
+  private readonly taxonomy = inject(CatalogueTaxonomyService);
   private readonly preferences = inject(UiPreferencesService);
   private readonly route = inject(ActivatedRoute);
   private readonly profileId = this.route.snapshot.paramMap.get('id') ?? '';
@@ -439,13 +461,15 @@ export class ProfileDashboardPageComponent {
     });
   }
 
-  categoryPracticeProgress(categoryId: string) {
+  categorySubcategoryProgress(categoryId: string) {
     const profile = this.profile();
     const snapshot = this.catalogueStore.snapshot();
     if (!profile || !snapshot) return [];
 
-    return buildPracticeProgress(
-      this.questionnaireService.getCategory(snapshot, profile, categoryId, false)?.practices,
+    const category = this.questionnaireService.getCategory(snapshot, profile, categoryId, false);
+    return buildSubcategoryProgress(
+      this.taxonomy.subcategoriesFor(categoryId),
+      category?.practices,
     );
   }
 
