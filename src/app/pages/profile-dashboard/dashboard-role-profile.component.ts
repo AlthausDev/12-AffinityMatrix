@@ -16,37 +16,45 @@ import {
         <div>
           <h3>{{ i18n.t('dashboard.roleProfile.title') }}</h3>
           <p>{{ text(
-            'Separa afinidad dentro de cada rol y peso de ese rol dentro de tus preferencias positivas.',
-            'Separates affinity within each role from that role’s weight across your positive preferences.'
+            'Resume cómo encajan tus respuestas en tres formas de participar: realizar la acción, recibirla o compartirla.',
+            'Summarizes how your answers fit three ways of taking part: performing the action, receiving it, or sharing it.'
           ) }}</p>
         </div>
       </header>
 
       @if (roleProfileAnswerCount() > 0) {
-        <div class="dashboard-role-legend">
-          <span>
-            <span class="dashboard-role-legend-swatch dashboard-role-legend-swatch-affinity" aria-hidden="true"></span>
-            {{ text('Afinidad dentro del rol', 'Affinity within role') }}
-          </span>
-          <span>
-            <span class="dashboard-role-legend-swatch dashboard-role-legend-swatch-weight" aria-hidden="true"></span>
-            {{ text('Peso dentro del perfil', 'Weight within profile') }}
-          </span>
-        </div>
+        <aside class="dashboard-role-reading-note">
+          <strong>{{ text('Cómo leer los porcentajes', 'How to read the percentages') }}</strong>
+          <p>
+            <b>{{ text('Afinidad media', 'Average affinity') }}:</b>
+            {{ text(
+              'cuánto te atraen los roles de ese tipo que ya has respondido. No mide progreso.',
+              'how much the answered roles in that family appeal to you. It is not completion.'
+            ) }}
+            <b>{{ text('Presencia en tu perfil', 'Presence in your profile') }}:</b>
+            {{ text(
+              'qué parte de toda tu afinidad de roles cae en esa familia; Activo + Receptivo + Mutuo suman 100%.',
+              'what share of your total role affinity belongs to that family; Active + Receptive + Mutual add up to 100%.'
+            ) }}
+          </p>
+        </aside>
 
         <div class="dashboard-role-profile">
           @for (entry of roleProfile(); track entry.perspective) {
             <div class="dashboard-role-row" [class.dashboard-role-row-empty]="entry.answerCount === 0">
               <div class="dashboard-role-row-heading">
-                <strong>{{ rolePerspectiveLabel(entry.perspective) }}</strong>
-                <span>{{ roleProfileAnswerLabel(entry.answerCount) }}</span>
+                <div>
+                  <strong>{{ rolePerspectiveLabel(entry.perspective) }}</strong>
+                  <small>{{ rolePerspectiveDescription(entry.perspective) }}</small>
+                </div>
+                <span>{{ roleEvidenceLabel(entry.answerCount) }}</span>
               </div>
 
               <div class="dashboard-role-metrics">
                 <div class="dashboard-role-metric">
                   <div class="dashboard-role-metric-label">
-                    <span>{{ text('Afinidad', 'Affinity') }}</span>
-                    <strong>{{ entry.affinityPercentage }}%</strong>
+                    <span>{{ text('Afinidad media', 'Average affinity') }}</span>
+                    <strong>{{ entry.affinityPercentage }}% · {{ affinityDescriptor(entry.affinityPercentage) }}</strong>
                   </div>
                   <div
                     class="dashboard-role-track"
@@ -59,7 +67,7 @@ import {
 
                 <div class="dashboard-role-metric">
                   <div class="dashboard-role-metric-label">
-                    <span>{{ text('Peso del perfil', 'Profile weight') }}</span>
+                    <span>{{ text('Presencia en tu perfil', 'Presence in your profile') }}</span>
                     <strong>{{ entry.profileWeightPercentage }}%</strong>
                   </div>
                   <div
@@ -73,7 +81,7 @@ import {
               </div>
 
               <div class="dashboard-role-row-meta">
-                <span>{{ i18n.t('dashboard.roleProfile.favorites') }}</span>
+                <span>{{ text('Favoritos dentro de este rol', 'Favorites within this role') }}</span>
                 <strong>{{ entry.favoritePercentage }}%</strong>
               </div>
             </div>
@@ -84,10 +92,10 @@ import {
           <div class="dashboard-role-spectrum-block">
             <div class="dashboard-role-spectrum-heading">
               <div>
-                <strong>{{ text('Tendencia activa / receptiva', 'Active / receptive tendency') }}</strong>
+                <strong>{{ text('Activo ↔ Receptivo', 'Active ↔ Receptive') }}</strong>
                 <small>{{ text(
-                  'Compara únicamente la afinidad ponderada de roles activos y receptivos; los roles mutuos se muestran arriba como una dimensión propia.',
-                  'Compares weighted active and receptive affinity only; mutual roles remain visible above as their own dimension.'
+                  'Compara la afinidad media de las dos familias direccionales. Mutuo se mantiene aparte porque no es el punto medio entre ambas.',
+                  'Compares average affinity for the two directional families. Mutual stays separate because it is not the midpoint between them.'
                 ) }}</small>
               </div>
               <span>{{ roleDirectionEvidenceLabel() }}</span>
@@ -107,6 +115,7 @@ import {
                   aria-hidden="true"
                 ></span>
               </div>
+              <strong class="dashboard-role-spectrum-diagnosis">{{ roleTrendDiagnosis() }}</strong>
             </div>
           </div>
 
@@ -115,8 +124,8 @@ import {
               <div>
                 <strong>{{ text('Preferencia de iniciativa', 'Initiative preference') }}</strong>
                 <small>{{ text(
-                  'Usa sólo las respuestas donde has indicado explícitamente quién prefieres que tome la iniciativa.',
-                  'Uses only answers where you explicitly stated who you prefer to take the initiative.'
+                  'Sólo utiliza respuestas en las que has indicado explícitamente quién prefieres que dé el primer paso.',
+                  'Uses only answers where you explicitly stated who you prefer to make the first move.'
                 ) }}</small>
               </div>
               @if (roleProfileCoordinates().initiativeEvidenceCount > 0) {
@@ -139,9 +148,13 @@ import {
                     aria-hidden="true"
                   ></span>
                 </div>
+                <strong class="dashboard-role-spectrum-diagnosis">{{ initiativeTrendDiagnosis() }}</strong>
               </div>
             } @else {
-              <p class="dashboard-role-initiative-empty">{{ i18n.t('dashboard.roleProfile.initiativeMissing') }}</p>
+              <p class="dashboard-role-initiative-empty">{{ text(
+                'Aún no hay respuestas con preferencia de iniciativa. No mostramos una posición hasta tener datos reales.',
+                'There are no answers with an initiative preference yet. No position is shown until there is real evidence.'
+              ) }}</p>
             }
           </div>
         </section>
@@ -173,12 +186,29 @@ export class DashboardRoleProfileComponent {
     return this.i18n.t('dashboard.roleProfile.neutral');
   }
 
-  roleProfileAnswerLabel(count: number): string {
-    return this.i18n.plural(
-      count,
-      'dashboard.roleProfile.answers.one',
-      'dashboard.roleProfile.answers.other',
+  rolePerspectiveDescription(perspective: RolePerspective): string {
+    if (perspective === 'active') {
+      return this.text('Tú realizas, das o diriges la acción.', 'You perform, give, or direct the action.');
+    }
+    if (perspective === 'receptive') {
+      return this.text('Tú recibes o eres el destinatario de la acción.', 'You receive or are the target of the action.');
+    }
+    return this.text('La práctica es compartida, recíproca o sin una dirección de rol.', 'The practice is shared, reciprocal, or has no directional role.');
+  }
+
+  roleEvidenceLabel(count: number): string {
+    return this.text(
+      `${count} ${count === 1 ? 'rol medido' : 'roles medidos'}`,
+      `${count} measured ${count === 1 ? 'role' : 'roles'}`,
     );
+  }
+
+  affinityDescriptor(score: number): string {
+    if (score < 20) return this.text('muy baja', 'very low');
+    if (score < 40) return this.text('baja', 'low');
+    if (score < 60) return this.text('media', 'medium');
+    if (score < 80) return this.text('alta', 'high');
+    return this.text('muy alta', 'very high');
   }
 
   roleCoordinateLeft(): number {
@@ -191,10 +221,7 @@ export class DashboardRoleProfileComponent {
 
   roleDirectionEvidenceLabel(): string {
     const count = this.roleProfileCoordinates().roleEvidenceCount;
-    return this.text(
-      `${count} ${count === 1 ? 'rol medido' : 'roles medidos'}`,
-      `${count} measured ${count === 1 ? 'role' : 'roles'}`,
-    );
+    return this.roleEvidenceLabel(count);
   }
 
   roleInitiativeEvidenceLabel(): string {
@@ -206,10 +233,26 @@ export class DashboardRoleProfileComponent {
     );
   }
 
+  roleTrendDiagnosis(): string {
+    return this.balanceDiagnosis(
+      this.roleProfileCoordinates().roleBalance,
+      this.i18n.t('dashboard.roleProfile.receptive'),
+      this.i18n.t('dashboard.roleProfile.active'),
+    );
+  }
+
+  initiativeTrendDiagnosis(): string {
+    return this.balanceDiagnosis(
+      this.roleProfileCoordinates().initiativeBalance,
+      this.i18n.t('dashboard.roleProfile.initiativePartner'),
+      this.i18n.t('dashboard.roleProfile.initiativeSelf'),
+    );
+  }
+
   roleMetricAriaLabel(entry: RoleProfileEntry, metric: 'affinity' | 'weight'): string {
     const label = metric === 'affinity'
-      ? this.text('Afinidad dentro del rol', 'Affinity within role')
-      : this.text('Peso dentro del perfil', 'Weight within profile');
+      ? this.text('Afinidad media', 'Average affinity')
+      : this.text('Presencia en tu perfil', 'Presence in your profile');
     const value = metric === 'affinity' ? entry.affinityPercentage : entry.profileWeightPercentage;
     return `${this.rolePerspectiveLabel(entry.perspective)} · ${label} ${value}%`;
   }
@@ -226,6 +269,15 @@ export class DashboardRoleProfileComponent {
 
   text(es: string, en: string): string {
     return this.i18n.locale() === 'es' ? es : en;
+  }
+
+  private balanceDiagnosis(value: number, low: string, high: string): string {
+    const magnitude = Math.abs(value);
+    if (magnitude < 10) return this.text('Muy equilibrado', 'Very balanced');
+    const target = value < 0 ? low : high;
+    if (magnitude < 25) return this.text(`Ligera tendencia hacia ${target}`, `Slight tendency toward ${target}`);
+    if (magnitude < 50) return this.text(`Tendencia hacia ${target}`, `Tendency toward ${target}`);
+    return this.text(`Tendencia clara hacia ${target}`, `Clear tendency toward ${target}`);
   }
 }
 
