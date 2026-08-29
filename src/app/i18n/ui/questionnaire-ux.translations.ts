@@ -1,6 +1,7 @@
 export const ES_QUESTIONNAIRE_UX_TRANSLATIONS = {
   'a11y.skipToMain': 'Saltar al contenido principal',
   'questionnaire.windowAria': 'Cuestionario',
+  'questionnaire.subcategoriesAria': 'Subcategorías del cuestionario',
   'questionnaire.pending.complete': 'No quedan preguntas visibles pendientes',
   'questionnaire.pending.one': 'Queda {count} pregunta visible pendiente',
   'questionnaire.pending.other': 'Quedan {count} preguntas visibles pendientes',
@@ -59,6 +60,7 @@ export type QuestionnaireUxTranslationKey = keyof typeof ES_QUESTIONNAIRE_UX_TRA
 export const EN_QUESTIONNAIRE_UX_TRANSLATIONS = {
   'a11y.skipToMain': 'Skip to main content',
   'questionnaire.windowAria': 'Questionnaire',
+  'questionnaire.subcategoriesAria': 'Questionnaire subcategories',
   'questionnaire.pending.complete': 'No visible questions remain unanswered',
   'questionnaire.pending.one': '{count} visible question remains unanswered',
   'questionnaire.pending.other': '{count} visible questions remain unanswered',
