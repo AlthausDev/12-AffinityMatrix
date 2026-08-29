@@ -14,38 +14,21 @@ export class QuestionnaireRolePromptService {
 
     const person = this.person(sex);
     const locale = this.i18n.locale();
+    const partnerScopedRole = [
+      'give', 'receive', 'partner-state', 'partner-wears', 'use-on-partner', 'partner-uses-on-me',
+    ].includes(role.id);
 
     if (locale === 'es') {
-      switch (role.id) {
-        case 'participate': return `Con ${person}`;
-        case 'give': return `Hacérselo a ${person}`;
-        case 'receive': return `Que ${person} me lo haga`;
-        case 'partner-state': return `En ${person}`;
-        case 'partner-wears': return `Que lo lleve ${person}`;
-        case 'watch': return `Ver a ${person}`;
-        case 'be-watched': return `Que me vea ${person}`;
-        case 'interest': return `En ${person}`;
-        case 'use-on-partner': return `Usarlo con ${person}`;
-        case 'partner-uses-on-me': return `Que ${person} lo use conmigo`;
-        case 'use-together': return `Usarlo juntos con ${person}`;
-        default: return `${fallbackRoleLabel} · ${person}`;
-      }
+      if (role.id === 'interest') return `${fallbackRoleLabel} · en ${person}`;
+      if (role.id === 'participate' || role.id === 'use-together') return `${fallbackRoleLabel} · con ${person}`;
+      if (partnerScopedRole) return `${fallbackRoleLabel} · pareja: ${person}`;
+      return `${fallbackRoleLabel} · con ${person}`;
     }
 
-    switch (role.id) {
-      case 'participate': return `With ${person}`;
-      case 'give': return `Do it to ${person}`;
-      case 'receive': return `Have ${person} do it to me`;
-      case 'partner-state': return `For ${person}`;
-      case 'partner-wears': return `Have ${person} wear it`;
-      case 'watch': return `Watch ${person}`;
-      case 'be-watched': return `Be watched by ${person}`;
-      case 'interest': return `In ${person}`;
-      case 'use-on-partner': return `Use it with ${person}`;
-      case 'partner-uses-on-me': return `Have ${person} use it on me`;
-      case 'use-together': return `Use it together with ${person}`;
-      default: return `${fallbackRoleLabel} · ${person}`;
-    }
+    if (role.id === 'interest') return `${fallbackRoleLabel} · in ${person}`;
+    if (role.id === 'participate' || role.id === 'use-together') return `${fallbackRoleLabel} · with ${person}`;
+    if (partnerScopedRole) return `${fallbackRoleLabel} · partner: ${person}`;
+    return `${fallbackRoleLabel} · with ${person}`;
   }
 
   private person(sex: Sex): string {
