@@ -8,6 +8,7 @@ import { describeCataloguePractice } from './v3/content/practice-description';
 
 const questionnaire = new QuestionnaireService();
 const CATEGORY_IDS = [
+  'body-fetishes',
   'affection-intimacy',
   'sexual-style',
   'clothing-appearance',
@@ -18,7 +19,6 @@ const CATEGORY_IDS = [
   'toys',
   'sexual-accessories',
   'orgasm-control',
-  'body-fetishes',
   'groups',
   'roleplay',
   'exhibitionism',
@@ -173,6 +173,10 @@ describe('catalogue v3 snapshot', () => {
       'bridge-position',
       'sixty-nine',
       'face-sitting',
+      'oral-kneeling-standing-position',
+      'oral-lying-between-legs-position',
+      'oral-side-lying-position',
+      'oral-edge-position',
     ]);
     expect(snapshotPractice('missionary')?.categoryId).toBe('sexual-positions');
     expect(snapshotPractice('side-by-side-face-to-face')?.categoryId).toBe('sexual-positions');
