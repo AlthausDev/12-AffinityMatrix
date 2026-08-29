@@ -13,6 +13,7 @@ import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { PointerGlowDirective } from '../../shared/pointer-glow.directive';
+import { DashboardRoleProfileComponent } from './dashboard-role-profile.component';
 import { DashboardSemanticMapComponent } from './dashboard-semantic-map.component';
 import {
   buildPreferenceDistribution,
@@ -28,6 +29,7 @@ import {
     RouterOutlet,
     CompletionProgressComponent,
     PointerGlowDirective,
+    DashboardRoleProfileComponent,
     DashboardSemanticMapComponent,
   ],
   template: `
@@ -236,98 +238,10 @@ import {
               }
             </article>
 
-            <article class="dashboard-chart-card dashboard-role-card">
-              <header class="dashboard-chart-heading">
-                <div>
-                  <h3>{{ i18n.t('dashboard.roleProfile.title') }}</h3>
-                  <p>{{ i18n.t('dashboard.roleProfile.description') }}</p>
-                </div>
-              </header>
-
-              @if (roleProfileAnswerCount() > 0) {
-                <div class="dashboard-role-legend">
-                  <span>
-                    <span class="dashboard-role-legend-swatch dashboard-role-legend-swatch-affinity" aria-hidden="true"></span>
-                    {{ i18n.t('dashboard.roleProfile.affinity') }} · {{ i18n.t('dashboard.roleProfile.affinityHint') }}
-                  </span>
-                  <span>
-                    <span class="dashboard-role-legend-swatch dashboard-role-legend-swatch-favorite" aria-hidden="true"></span>
-                    {{ i18n.t('dashboard.roleProfile.favorites') }}
-                  </span>
-                </div>
-
-                <div class="dashboard-role-profile">
-                  @for (entry of roleProfile(); track entry.perspective) {
-                    <div class="dashboard-role-row" [class.dashboard-role-row-empty]="entry.answerCount === 0">
-                      <div class="dashboard-role-row-heading">
-                        <strong>{{ rolePerspectiveLabel(entry.perspective) }}</strong>
-                        <span>{{ roleProfileAnswerLabel(entry.answerCount) }}</span>
-                      </div>
-
-                      <div class="dashboard-role-metrics">
-                        <div class="dashboard-role-metric">
-                          <div class="dashboard-role-metric-label">
-                            <span>{{ i18n.t('dashboard.roleProfile.affinity') }}</span>
-                            <strong>{{ entry.affinityPercentage }}%</strong>
-                          </div>
-                          <div
-                            class="dashboard-role-track"
-                            role="img"
-                            [attr.aria-label]="rolePerspectiveLabel(entry.perspective) + ' · ' + i18n.t('dashboard.roleProfile.affinity') + ' ' + entry.affinityPercentage + '%'"
-                          >
-                            <span class="dashboard-role-fill dashboard-role-fill-affinity" [style.width.%]="entry.affinityPercentage"></span>
-                          </div>
-                        </div>
-
-                        <div class="dashboard-role-metric">
-                          <div class="dashboard-role-metric-label">
-                            <span>{{ i18n.t('dashboard.roleProfile.favorites') }}</span>
-                            <strong>{{ entry.favoritePercentage }}%</strong>
-                          </div>
-                          <div
-                            class="dashboard-role-track"
-                            role="img"
-                            [attr.aria-label]="rolePerspectiveLabel(entry.perspective) + ' · ' + i18n.t('dashboard.roleProfile.favorites') + ' ' + entry.favoritePercentage + '%'"
-                          >
-                            <span class="dashboard-role-fill dashboard-role-fill-favorite" [style.width.%]="entry.favoritePercentage"></span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                </div>
-
-                <div class="dashboard-role-compass">
-                  <div class="dashboard-role-compass-heading">
-                    <strong>{{ i18n.t('dashboard.roleProfile.balanceTitle') }}</strong>
-                    <small>{{ i18n.t('dashboard.roleProfile.balanceDescription') }}</small>
-                  </div>
-                  <div class="dashboard-role-plane" role="img" [attr.aria-label]="roleCompassAriaLabel()">
-                    <span class="dashboard-role-axis dashboard-role-axis-x" aria-hidden="true"></span>
-                    <span class="dashboard-role-axis dashboard-role-axis-y" aria-hidden="true"></span>
-                    <span class="dashboard-role-axis-label dashboard-role-axis-left">{{ i18n.t('dashboard.roleProfile.receptive') }}</span>
-                    <span class="dashboard-role-axis-label dashboard-role-axis-right">{{ i18n.t('dashboard.roleProfile.active') }}</span>
-                    <span class="dashboard-role-axis-label dashboard-role-axis-top">{{ i18n.t('dashboard.roleProfile.initiativeSelf') }}</span>
-                    <span class="dashboard-role-axis-label dashboard-role-axis-bottom">{{ i18n.t('dashboard.roleProfile.initiativePartner') }}</span>
-                    <span class="dashboard-role-axis-center" aria-hidden="true">{{ i18n.t('dashboard.roleProfile.balanceCenter') }}</span>
-                    <span
-                      class="dashboard-role-coordinate-marker"
-                      [style.left.%]="roleCoordinateLeft()"
-                      [style.top.%]="roleCoordinateTop()"
-                      aria-hidden="true"
-                    ></span>
-                  </div>
-                  <small class="dashboard-role-compass-evidence">
-                    {{ roleInitiativeEvidenceLabel() }}
-                  </small>
-                </div>
-              } @else {
-                <div class="dashboard-chart-empty">
-                  <span aria-hidden="true">◇</span>
-                  <p>{{ i18n.t('dashboard.roleProfile.empty') }}</p>
-                </div>
-              }
-            </article>
+            <app-dashboard-role-profile
+              [profile]="profile()"
+              [practices]="catalogueStore.snapshot()?.catalogue.practices"
+            />
           </div>
 
           <app-dashboard-semantic-map [profile]="profile()" />
