@@ -18,6 +18,28 @@ describe('questionnaire subcategory progression', () => {
     expect(isSubcategoryComplete(sections[1])).toBe(false);
   });
 
+  it('does not auto-complete a subcategory while a visible role option is unanswered', () => {
+    expect(isSubcategoryComplete({
+      id: 'roles',
+      answered: 2,
+      total: 2,
+      practices: [
+        { roles: [{ answer: { preference: 'like' } }, { answer: { preference: 'curious' } }] },
+        { roles: [{ answer: { preference: 'like' } }, {}] },
+      ],
+    })).toBe(false);
+
+    expect(isSubcategoryComplete({
+      id: 'roles',
+      answered: 2,
+      total: 2,
+      practices: [
+        { roles: [{ answer: { preference: 'like' } }, { answer: { preference: 'curious' } }] },
+        { roles: [{ answer: { preference: 'like' } }, { answer: { preference: 'depends' } }] },
+      ],
+    })).toBe(true);
+  });
+
   it('opens the first pending subcategory when entering a category', () => {
     expect(firstPendingSubcategoryId(sections)).toBe('second');
   });
