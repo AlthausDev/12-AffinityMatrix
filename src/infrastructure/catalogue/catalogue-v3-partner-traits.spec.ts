@@ -1,17 +1,20 @@
-import { CURRENT_CATALOGUE_SNAPSHOT } from './catalogue-v3';
-import { CATALOGUE_V3_CONTENT } from './v3/content/final';
+import { CATALOGUE_V3_CONTENT, RETIRED_V3_PRACTICE_IDS } from './v3/content/final';
+import { bodyTraitRefinementGroup } from './v3/content/body-trait-refinements';
 
 describe('Catalogue V3 partner physical traits', () => {
   const category = () => CATALOGUE_V3_CONTENT.find((candidate) => candidate.id === 'body-fetishes');
   const seed = (id: string) => category()?.practices.find((practice) => practice.id === id);
-  const practice = (id: string) => CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices
-    .find((candidate) => candidate.id === id);
 
-  it('covers size, hair, stature and build preferences without fixed measurement cutoffs', () => {
+  it('keeps broad physical-trait preferences while compacting repetitive variants', () => {
     expect(category()?.es).toBe('Cuerpo, rasgos físicos y fetiches');
     expect(category()?.en).toBe('Body, physical traits & fetishes');
 
-    expect(category()?.practices.map((item) => item.id)).toEqual(expect.arrayContaining([
+    for (const parent of ['hair', 'chest-general', 'buttocks', 'penis', 'piercings']) {
+      expect(seed(parent), parent).toBeDefined();
+      expect(bodyTraitRefinementGroup(parent), parent).toBeDefined();
+    }
+
+    const compacted = [
       'penis-size-small',
       'penis-size-average',
       'penis-size-large',
@@ -25,39 +28,39 @@ describe('Catalogue V3 partner physical traits', () => {
       'hair-length-medium',
       'hair-length-long',
       'shaved-bald-head',
-      'facial-hair',
-      'stature-short',
-      'stature-average',
-      'stature-tall',
-      'slim-build',
-      'curvy-build',
-      'stocky-build',
-    ]));
+      'facial-piercings',
+      'body-piercings',
+      'nipple-piercings',
+      'genital-piercings',
+    ];
 
-    expect(seed('penis-size-small')?.descriptionEs).toContain('preferencia subjetiva');
-    expect(seed('breast-size-large')?.descriptionEn).toContain('subjective preference');
-    expect(seed('buttocks-size-small')?.descriptionEs).toContain('preferencia subjetiva');
-    expect(seed('hair-length-long')?.descriptionEs).toContain('no fija una longitud exacta');
-    expect(seed('stature-tall')?.descriptionEn).toContain('without setting a fixed height cutoff');
+    for (const id of compacted) {
+      expect(seed(id), id).toBeUndefined();
+      expect(RETIRED_V3_PRACTICE_IDS.has(id), id).toBe(true);
+    }
+
+    // Stature and build remain first-class questions until they have a semantically clean parent.
+    expect(seed('stature-short')).toBeDefined();
+    expect(seed('stature-average')).toBeDefined();
+    expect(seed('stature-tall')).toBeDefined();
+    expect(seed('slim-build')).toBeDefined();
+    expect(seed('curvy-build')).toBeDefined();
+    expect(seed('stocky-build')).toBeDefined();
   });
 
-  it('applies sex-specific anatomy only where the physical trait requires it', () => {
-    expect(seed('penis-size-large')?.anatomySex).toBe('male');
-    expect(seed('breast-size-large')?.anatomySex).toBe('female');
-    expect(seed('buttocks-size-large')?.anatomySex).toBeUndefined();
-    expect(seed('hair-length-long')?.anatomySex).toBeUndefined();
-    expect(seed('stature-tall')?.anatomySex).toBeUndefined();
+  it('preserves sex-specific meaning on refinement options', () => {
+    const breastOptions = bodyTraitRefinementGroup('chest-general')?.options ?? [];
+    const penisOptions = bodyTraitRefinementGroup('penis')?.options ?? [];
+    const hairOptions = bodyTraitRefinementGroup('hair')?.options ?? [];
 
-    const penisRole = practice('penis-size-large')?.roles[0];
-    const breastRole = practice('breast-size-large')?.roles[0];
-    const buttocksRole = practice('buttocks-size-large')?.roles[0];
-    const hairRole = practice('hair-length-long')?.roles[0];
-
-    expect(penisRole?.id).toBe('interest');
-    expect(penisRole?.contextAxes).toEqual(['counterpartSex']);
-    expect(penisRole?.applicability?.partnerSex).toEqual(['male']);
-    expect(breastRole?.applicability?.partnerSex).toEqual(['female']);
-    expect(buttocksRole?.applicability).toBeUndefined();
-    expect(hairRole?.applicability).toBeUndefined();
+    expect(breastOptions.map((option) => option.id)).toEqual([
+      'breast-size-small', 'breast-size-average', 'breast-size-large',
+    ]);
+    expect(breastOptions.every((option) => option.partnerSex === 'female')).toBe(true);
+    expect(penisOptions.map((option) => option.id)).toEqual([
+      'penis-size-small', 'penis-size-average', 'penis-size-large',
+    ]);
+    expect(penisOptions.every((option) => option.partnerSex === 'male')).toBe(true);
+    expect(hairOptions.every((option) => option.partnerSex === undefined)).toBe(true);
   });
 });
