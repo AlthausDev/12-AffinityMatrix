@@ -43,15 +43,16 @@ export interface RoleProfileEntry {
   readonly affinityPercentage: number;
   /** Average share of Favorite answers inside each distinct practice + role combination. */
   readonly favoritePercentage: number;
-  /** Share of all positive/conditional role affinity contributed by this role family. */
+  /** Share of all positive/conditional role affinity contributed by this role family. The three families sum to 100. */
   readonly profileWeightPercentage: number;
 }
 
 export interface RoleProfileCoordinates {
-  /** -100 receptive, +100 active. Neutral/mutual answers do not create a direction. */
+  /** -100 receptive, +100 active. Neutral/mutual answers remain a separate family. */
   readonly roleBalance: number;
   /** -100 partner-led, +100 self-led, based on explicit initiative details only. */
   readonly initiativeBalance: number;
+  /** Distinct active + receptive practice/role combinations used by the directional spectrum. */
   readonly roleEvidenceCount: number;
   readonly initiativeEvidenceCount: number;
 }
@@ -129,8 +130,12 @@ export function buildRoleProfile(
 ): readonly RoleProfileEntry[] {
   const aggregates = buildRolePerspectiveAggregates(profile, practices);
   const totalAffinityMass = aggregates.reduce((sum, entry) => sum + entry.affinityMass, 0);
+  const profileWeights = distributePercentages(
+    aggregates.map((aggregate) => aggregate.affinityMass),
+    totalAffinityMass,
+  );
 
-  return aggregates.map((aggregate) => ({
+  return aggregates.map((aggregate, index) => ({
     perspective: aggregate.perspective,
     answerCount: aggregate.groups.length,
     affinityCount: aggregate.groups.filter((group) =>
@@ -141,9 +146,7 @@ export function buildRoleProfile(
     ).length,
     affinityPercentage: Math.round(average(aggregate.affinityValues) * 100),
     favoritePercentage: Math.round(average(aggregate.favoriteShares) * 100),
-    profileWeightPercentage: totalAffinityMass <= 0
-      ? 0
-      : Math.round((aggregate.affinityMass / totalAffinityMass) * 100),
+    profileWeightPercentage: profileWeights[index] ?? 0,
   }));
 }
 
@@ -177,7 +180,7 @@ export function buildRoleProfileCoordinates(
   return {
     roleBalance: clampBalance(roleBalance),
     initiativeBalance: clampBalance(Math.round(average(initiativeGroups) * 100)),
-    roleEvidenceCount: roleProfile.reduce((sum, entry) => sum + entry.answerCount, 0),
+    roleEvidenceCount: (active?.answerCount ?? 0) + (receptive?.answerCount ?? 0),
     initiativeEvidenceCount: initiativeGroups.length,
   };
 }
@@ -231,6 +234,25 @@ function buildRoleAnswerGroups(
     const perspective = perspectiveByRole.get(key);
     return perspective ? [{ perspective, answers }] : [];
   });
+}
+
+function distributePercentages(values: readonly number[], total: number): readonly number[] {
+  if (total <= 0) return values.map(() => 0);
+
+  const exact = values.map((value) => (value / total) * 100);
+  const roundedDown = exact.map((value) => Math.floor(value));
+  let remaining = 100 - roundedDown.reduce((sum, value) => sum + value, 0);
+  const order = exact
+    .map((value, index) => ({ index, remainder: value - Math.floor(value) }))
+    .sort((left, right) => right.remainder - left.remainder || left.index - right.index);
+
+  const result = [...roundedDown];
+  for (const item of order) {
+    if (remaining <= 0) break;
+    result[item.index] = (result[item.index] ?? 0) + 1;
+    remaining -= 1;
+  }
+  return result;
 }
 
 function roleLookupKey(practiceId: string, roleId: string): string {
