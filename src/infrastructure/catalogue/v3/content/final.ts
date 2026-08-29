@@ -2,6 +2,11 @@ import {
   CATALOGUE_V3_CONTENT as CURATED_CONTENT,
   RETIRED_V3_PRACTICE_IDS as CURATED_RETIRED_V3_PRACTICE_IDS,
 } from './curated';
+import { applyCatalogueFinalPass, FINAL_PASS_RETIRED_PRACTICE_IDS } from './catalogue-final-pass';
+import { applyCatalogueClosingPass, CLOSING_PASS_RETIRED_PRACTICE_IDS } from './catalogue-closing-pass';
+import { applyCatalogueClosingOrder } from './catalogue-closing-order';
+import { applyCatalogueReleaseAudit, applyCatalogueReleaseAuditCategoryCopy } from './catalogue-release-audit';
+import { applyCatalogueReleaseAuditOrder } from './catalogue-release-order';
 import { applyFinalCategoryCopy } from './category-copy-overrides';
 import { polishCatalogue } from './content-polish';
 import { materializeContextualDescriptions } from './contextual-description';
@@ -9,16 +14,31 @@ import { applyFinalApplicabilityReview, FINAL_APPLICABILITY_RETIRED_PRACTICE_IDS
 import { applyFinalClarityReview, FINAL_CLARITY_RETIRED_PRACTICE_IDS } from './final-clarity-review';
 import { applyFinalContentReview } from './final-content-review';
 import { applyFinalLastMileReview, FINAL_LAST_MILE_RETIRED_PRACTICE_IDS } from './final-last-mile-review';
+import { applyFinalNoiseApplicability } from './final-noise-applicability';
+import { applyFinalNoiseCleanup, FINAL_NOISE_RETIRED_PRACTICE_IDS } from './final-noise-cleanup';
+import { addFinalNoiseReplacement } from './final-noise-replacement';
+import { applyFinalPresentationCleanup } from './final-presentation-cleanup';
 import { groupFinalCataloguePractices } from './final-practice-order';
+import { applyFinalQuestionnaireFollowup } from './final-questionnaire-followup';
 import { applyFinalReleaseCopy } from './final-release-copy';
 import { applyFinalReleaseTaxonomy, FINAL_RELEASE_RETIRED_PRACTICE_IDS } from './final-release-taxonomy';
 import { addFinalRolePractices, REACTIVATED_V3_PRACTICE_IDS } from './final-role-additions';
 import { applyConciseCategoryCopy, applyFinalRolePolish, FINAL_ROLE_POLISH_RETIRED_PRACTICE_IDS } from './final-role-polish';
 import { sanitizeFinalCatalogueSeeds } from './final-seed-sanitization';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
+import { normalizeManualDescriptions } from './manual-description-cleanup';
+import { applyManualReleaseReview } from './manual-release-review';
+import { applyManualRoleFollowup } from './manual-role-followup';
+import { applyMutualRoleNoiseCleanup } from './mutual-role-noise-cleanup';
 import { PAIRED_PRACTICE_OVERRIDES } from './paired-role-overrides';
 import { applyPatchReleaseCorrections } from './patch-release-corrections';
+import {
+  extractPhysicalPreferencesFromCatalogue,
+  PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS,
+} from './physical-preferences-extraction';
 import { applyRoleWordingOverrides } from './role-wording-overrides';
+import { stripRedundantConsentFromRoleLabels } from './role-label-consent-cleanup';
+import { addExpandedSexualPositions } from './sexual-position-additions';
 import { CatalogueCategorySeed } from './types';
 
 const ALL_RETIRED_V3_PRACTICE_IDS = [
@@ -29,6 +49,10 @@ const ALL_RETIRED_V3_PRACTICE_IDS = [
   ...FINAL_RELEASE_RETIRED_PRACTICE_IDS,
   ...FINAL_APPLICABILITY_RETIRED_PRACTICE_IDS,
   ...FINAL_ROLE_POLISH_RETIRED_PRACTICE_IDS,
+  ...FINAL_PASS_RETIRED_PRACTICE_IDS,
+  ...CLOSING_PASS_RETIRED_PRACTICE_IDS,
+  ...FINAL_NOISE_RETIRED_PRACTICE_IDS,
+  ...PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS,
 ];
 
 export const RETIRED_V3_PRACTICE_IDS = new Set<string>(
@@ -59,9 +83,27 @@ const RELEASE_COPY_CONTENT = applyFinalReleaseCopy(RELEASE_TAXONOMY_CONTENT);
 const APPLICABILITY_REVIEWED_CONTENT = applyFinalApplicabilityReview(RELEASE_COPY_CONTENT);
 const FINAL_ROLE_CONTENT = applyFinalRolePolish(APPLICABILITY_REVIEWED_CONTENT);
 const ROLE_ADDED_CONTENT = addFinalRolePractices(FINAL_ROLE_CONTENT);
-const SANITIZED_CONTENT = sanitizeFinalCatalogueSeeds(ROLE_ADDED_CONTENT);
+const POSITION_EXPANDED_CONTENT = addExpandedSexualPositions(ROLE_ADDED_CONTENT);
+const SANITIZED_CONTENT = sanitizeFinalCatalogueSeeds(POSITION_EXPANDED_CONTENT);
 const PATCH_CORRECTED_CONTENT = applyPatchReleaseCorrections(SANITIZED_CONTENT);
-const GROUPED_CONTENT = groupFinalCataloguePractices(PATCH_CORRECTED_CONTENT);
-const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(GROUPED_CONTENT);
+const MANUALLY_REVIEWED_CONTENT = applyManualReleaseReview(PATCH_CORRECTED_CONTENT);
+const FINAL_PASS_CONTENT = applyCatalogueFinalPass(MANUALLY_REVIEWED_CONTENT);
+const CLOSING_PASS_CONTENT = applyCatalogueClosingPass(FINAL_PASS_CONTENT);
+const RELEASE_AUDITED_CONTENT = applyCatalogueReleaseAudit(CLOSING_PASS_CONTENT);
+const GROUPED_CONTENT = groupFinalCataloguePractices(RELEASE_AUDITED_CONTENT);
+const CLOSING_ORDERED_CONTENT = applyCatalogueClosingOrder(GROUPED_CONTENT);
+const RELEASE_ORDERED_CONTENT = applyCatalogueReleaseAuditOrder(CLOSING_ORDERED_CONTENT);
+const CATEGORY_COPY_CONTENT = applyFinalCategoryCopy(RELEASE_ORDERED_CONTENT);
+const CONCISE_CONTENT = applyConciseCategoryCopy(CATEGORY_COPY_CONTENT);
+const RELEASE_COPY_AUDITED_CONTENT = applyCatalogueReleaseAuditCategoryCopy(CONCISE_CONTENT);
+const ROLE_REVIEWED_CONTENT = applyManualRoleFollowup(RELEASE_COPY_AUDITED_CONTENT);
+const CONSENT_CLEANED_CONTENT = stripRedundantConsentFromRoleLabels(ROLE_REVIEWED_CONTENT);
+const NOISE_CLEANED_CONTENT = applyFinalNoiseCleanup(CONSENT_CLEANED_CONTENT);
+const REPLACEMENT_CONTENT = addFinalNoiseReplacement(NOISE_CLEANED_CONTENT);
+const NOISE_APPLICABILITY_CONTENT = applyFinalNoiseApplicability(REPLACEMENT_CONTENT);
+const QUESTIONNAIRE_FOLLOWUP_CONTENT = applyFinalQuestionnaireFollowup(NOISE_APPLICABILITY_CONTENT);
+const NATURAL_ROLE_CONTENT = applyMutualRoleNoiseCleanup(QUESTIONNAIRE_FOLLOWUP_CONTENT);
+const PHYSICAL_PROFILE_EXTRACTED_CONTENT = extractPhysicalPreferencesFromCatalogue(NATURAL_ROLE_CONTENT);
+const PRESENTATION_CLEANED_CONTENT = applyFinalPresentationCleanup(PHYSICAL_PROFILE_EXTRACTED_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyConciseCategoryCopy(CATEGORY_COPY_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(PRESENTATION_CLEANED_CONTENT);

@@ -9,12 +9,14 @@ describe('UiPreferencesService', () => {
   beforeEach(() => {
     localStorage.removeItem(UI_PREFERENCES_STORAGE_KEY);
     document.documentElement.removeAttribute('data-font-scale');
+    document.documentElement.removeAttribute('data-visual-effects');
     TestBed.resetTestingModule();
   });
 
   afterEach(() => {
     localStorage.removeItem(UI_PREFERENCES_STORAGE_KEY);
     document.documentElement.removeAttribute('data-font-scale');
+    document.documentElement.removeAttribute('data-visual-effects');
   });
 
   it('uses safe defaults when no preference has been stored', () => {
@@ -30,7 +32,10 @@ describe('UiPreferencesService', () => {
     expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toEqual({
       confirmQuestionnaireExit: false,
       fontScale: 'normal',
+      reduceVisualEffects: false,
       hiddenCategoriesByProfile: {},
+      profileOrder: [],
+      profileSortMode: 'manual',
     });
   });
 
@@ -46,7 +51,24 @@ describe('UiPreferencesService', () => {
     expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toEqual({
       confirmQuestionnaireExit: true,
       fontScale: 'large',
+      reduceVisualEffects: false,
       hiddenCategoriesByProfile: {},
+      profileOrder: [],
+      profileSortMode: 'manual',
+    });
+  });
+
+  it('applies and persists reduced visual effects globally', () => {
+    const service = TestBed.inject(UiPreferencesService);
+    service.initialize();
+    expect(document.documentElement.dataset['visualEffects']).toBe('full');
+
+    service.setReduceVisualEffects(true);
+
+    expect(service.reduceVisualEffects()).toBe(true);
+    expect(document.documentElement.dataset['visualEffects']).toBe('reduced');
+    expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({
+      reduceVisualEffects: true,
     });
   });
 
@@ -69,14 +91,60 @@ describe('UiPreferencesService', () => {
     expect(service.hiddenCategoryIds('profile-b')).toEqual(['roleplay']);
   });
 
-  it('restores a stored font scale and sanitized hidden categories when the application initializes', () => {
+  it('cleans profile-scoped UI preferences when a profile is deleted', () => {
+    const service = TestBed.inject(UiPreferencesService);
+    service.setProfileOrder(['profile-a', 'profile-b']);
+    service.setCategoryHidden('profile-a', 'edge', true);
+    service.setCategoryHidden('profile-b', 'roleplay', true);
+
+    service.removeProfile('profile-a');
+
+    expect(service.profileOrder()).toEqual(['profile-b']);
+    expect(service.hiddenCategoryIds('profile-a')).toEqual([]);
+    expect(service.hiddenCategoryIds('profile-b')).toEqual(['roleplay']);
+  });
+
+  it('persists a sanitized local profile order', () => {
+    const service = TestBed.inject(UiPreferencesService);
+
+    service.setProfileOrder(['profile-b', 'profile-a', 'profile-b', '']);
+
+    expect(service.profileOrder()).toEqual(['profile-b', 'profile-a']);
+    expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toEqual({
+      confirmQuestionnaireExit: true,
+      fontScale: 'normal',
+      reduceVisualEffects: false,
+      hiddenCategoriesByProfile: {},
+      profileOrder: ['profile-b', 'profile-a'],
+      profileSortMode: 'manual',
+    });
+  });
+
+  it('persists the selected profile sort mode without changing the manual order', () => {
+    const service = TestBed.inject(UiPreferencesService);
+    service.setProfileOrder(['profile-b', 'profile-a']);
+
+    service.setProfileSortMode('completion');
+
+    expect(service.profileSortMode()).toBe('completion');
+    expect(service.profileOrder()).toEqual(['profile-b', 'profile-a']);
+    expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({
+      profileOrder: ['profile-b', 'profile-a'],
+      profileSortMode: 'completion',
+    });
+  });
+
+  it('restores stored preferences and sanitizes local collections when the application initializes', () => {
     localStorage.setItem(UI_PREFERENCES_STORAGE_KEY, JSON.stringify({
       confirmQuestionnaireExit: true,
       fontScale: 'extra-large',
+      reduceVisualEffects: true,
       hiddenCategoriesByProfile: {
         'profile-a': ['edge', 'edge', '', 4, 'fluids'],
         'profile-b': 'not-an-array',
       },
+      profileOrder: ['profile-c', 'profile-a', 'profile-c', 7, ''],
+      profileSortMode: 'alias',
     }));
 
     const service = TestBed.inject(UiPreferencesService);
@@ -84,15 +152,22 @@ describe('UiPreferencesService', () => {
 
     expect(service.fontScale()).toBe('extra-large');
     expect(document.documentElement.dataset['fontScale']).toBe('extra-large');
+    expect(service.reduceVisualEffects()).toBe(true);
+    expect(document.documentElement.dataset['visualEffects']).toBe('reduced');
     expect(service.hiddenCategoryIds('profile-a')).toEqual(['edge', 'fluids']);
     expect(service.hiddenCategoryIds('profile-b')).toEqual([]);
+    expect(service.profileOrder()).toEqual(['profile-c', 'profile-a']);
+    expect(service.profileSortMode()).toBe('alias');
   });
 
   it('ignores malformed or unsupported stored preference shapes', () => {
     localStorage.setItem(UI_PREFERENCES_STORAGE_KEY, JSON.stringify({
       confirmQuestionnaireExit: 'no',
       fontScale: 'huge',
+      reduceVisualEffects: 'sometimes',
       hiddenCategoriesByProfile: null,
+      profileOrder: 'not-an-array',
+      profileSortMode: 'random',
     }));
 
     const service = TestBed.inject(UiPreferencesService);

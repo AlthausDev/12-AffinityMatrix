@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, OnInit, output } from '@angular/core';
 import { PracticeRole } from '../../domain/catalogue/practice';
 import {
   AnswerDetails,
@@ -15,6 +15,7 @@ import { DETAIL_CAPABLE_PREFERENCES, PREFERENCE_VALUES, Preference } from '../..
 import { CatalogueTextService } from '../i18n/catalogue-text.service';
 import { TranslationService } from '../i18n/translation.service';
 import { PREFERENCE_PRESENTATION } from '../shared/comparison-presentation';
+import { QuestionnaireCounterpartContextService } from './questionnaire-counterpart-context.service';
 
 const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
   value,
@@ -27,9 +28,15 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
     <section class="role-block" [class.filtered-role]="filtered()">
       <div class="role-heading">
         <div>
-          <h3>{{ roleLabel() }}</h3>
-          @if (counterpartSex(); as sex) {
-            <p class="scope-note">{{ i18n.t('questionnaireRole.counterpart', { sex: sexLabel(sex) }) }}</p>
+          @if (headingLevel() === 4) {
+            <h4>{{ roleLabel() }}</h4>
+          } @else {
+            <h3>{{ roleLabel() }}</h3>
+          }
+          @if (showCounterpartSex()) {
+            @if (counterpartSex(); as sex) {
+              <p class="scope-note">{{ i18n.t('questionnaireRole.counterpart', { sex: sexLabel(sex) }) }}</p>
+            }
           }
           @if (targetSite(); as site) {
             <p class="scope-note">{{ i18n.t('questionnaireRole.targetSite', { site: targetSiteLabel(site) }) }}</p>
@@ -63,54 +70,56 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
 
       @if (answer(); as currentAnswer) {
         @if (supportsDetails(currentAnswer.preference)) {
-          <details class="answer-details">
-            <summary>{{ i18n.t('questionnaireRole.optionalDetails') }}</summary>
-            <div class="detail-grid">
-              <label class="detail-field">
-                <span>{{ i18n.t('questionnaireRole.context') }}</span>
-                <select [value]="currentAnswer.details?.context ?? ''" (change)="updateContext($event)">
-                  <option value="">{{ i18n.t('common.notSpecified') }}</option>
-                  <option value="fantasy-only">{{ i18n.t('questionnaireRole.context.fantasyOnly') }}</option>
-                  <option value="want-to-try">{{ i18n.t('questionnaireRole.context.wantToTry') }}</option>
-                  <option value="current">{{ i18n.t('questionnaireRole.context.current') }}</option>
-                </select>
-              </label>
-
-              <label class="detail-field">
-                <span>{{ i18n.t('questionnaireRole.frequency') }}</span>
-                <select [value]="currentAnswer.details?.desiredFrequency ?? ''" (change)="updateFrequency($event)">
-                  <option value="">{{ i18n.t('common.notSpecified') }}</option>
-                  <option value="rarely">{{ i18n.t('questionnaireRole.frequency.rarely') }}</option>
-                  <option value="occasionally">{{ i18n.t('questionnaireRole.frequency.occasionally') }}</option>
-                  <option value="regularly">{{ i18n.t('questionnaireRole.frequency.regularly') }}</option>
-                  <option value="frequently">{{ i18n.t('questionnaireRole.frequency.frequently') }}</option>
-                </select>
-              </label>
-
-              <label class="detail-field">
-                <span>{{ i18n.t('questionnaireRole.initiative') }}</span>
-                <select [value]="currentAnswer.details?.initiative ?? ''" (change)="updateInitiative($event)">
-                  <option value="">{{ i18n.t('common.notSpecified') }}</option>
-                  <option value="prefer-partner">{{ i18n.t('questionnaireRole.initiative.preferPartner') }}</option>
-                  <option value="either">{{ i18n.t('questionnaireRole.initiative.either') }}</option>
-                  <option value="prefer-initiate">{{ i18n.t('questionnaireRole.initiative.preferInitiate') }}</option>
-                </select>
-              </label>
-
-              @if (currentAnswer.preference === 'depends') {
-                <label class="detail-field full-width">
-                  <span>{{ i18n.t('questionnaireRole.dependsOn') }}</span>
-                  <textarea
-                    rows="3"
-                    [maxLength]="dependsOnMaxLength"
-                    [value]="currentAnswer.details?.dependsOn ?? ''"
-                    [placeholder]="i18n.t('questionnaireRole.dependsPlaceholder')"
-                    (change)="updateDependsOn($event)"
-                  ></textarea>
+          <div class="role-details">
+            <details class="answer-details">
+              <summary>{{ i18n.t('questionnaireRole.optionalDetails') }}</summary>
+              <div class="detail-grid">
+                <label class="detail-field">
+                  <span>{{ i18n.t('questionnaireRole.context') }}</span>
+                  <select [value]="currentAnswer.details?.context ?? ''" (change)="updateContext($event)">
+                    <option value="">{{ i18n.t('common.notSpecified') }}</option>
+                    <option value="fantasy-only">{{ i18n.t('questionnaireRole.context.fantasyOnly') }}</option>
+                    <option value="want-to-try">{{ i18n.t('questionnaireRole.context.wantToTry') }}</option>
+                    <option value="current">{{ i18n.t('questionnaireRole.context.current') }}</option>
+                  </select>
                 </label>
-              }
-            </div>
-          </details>
+
+                <label class="detail-field">
+                  <span>{{ i18n.t('questionnaireRole.frequency') }}</span>
+                  <select [value]="currentAnswer.details?.desiredFrequency ?? ''" (change)="updateFrequency($event)">
+                    <option value="">{{ i18n.t('common.notSpecified') }}</option>
+                    <option value="rarely">{{ i18n.t('questionnaireRole.frequency.rarely') }}</option>
+                    <option value="occasionally">{{ i18n.t('questionnaireRole.frequency.occasionally') }}</option>
+                    <option value="regularly">{{ i18n.t('questionnaireRole.frequency.regularly') }}</option>
+                    <option value="frequently">{{ i18n.t('questionnaireRole.frequency.frequently') }}</option>
+                  </select>
+                </label>
+
+                <label class="detail-field">
+                  <span>{{ i18n.t('questionnaireRole.initiative') }}</span>
+                  <select [value]="currentAnswer.details?.initiative ?? ''" (change)="updateInitiative($event)">
+                    <option value="">{{ i18n.t('common.notSpecified') }}</option>
+                    <option value="prefer-partner">{{ i18n.t('questionnaireRole.initiative.preferPartner') }}</option>
+                    <option value="either">{{ i18n.t('questionnaireRole.initiative.either') }}</option>
+                    <option value="prefer-initiate">{{ i18n.t('questionnaireRole.initiative.preferInitiate') }}</option>
+                  </select>
+                </label>
+
+                @if (currentAnswer.preference === 'depends') {
+                  <label class="detail-field full-width">
+                    <span>{{ i18n.t('questionnaireRole.dependsOn') }}</span>
+                    <textarea
+                      rows="3"
+                      [maxLength]="dependsOnMaxLength"
+                      [value]="currentAnswer.details?.dependsOn ?? ''"
+                      [placeholder]="i18n.t('questionnaireRole.dependsPlaceholder')"
+                      (change)="updateDependsOn($event)"
+                    ></textarea>
+                  </label>
+                }
+              </div>
+            </details>
+          </div>
         }
       }
     </section>
@@ -122,14 +131,14 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
       grid-template-areas: "heading scale" "details details";
       align-items: center;
       gap: 0.55rem 1rem;
-      padding: 0.7rem 0;
-      border-top: 1px solid var(--border-subtle);
+      padding: 0.85rem 0;
+      border-top: 1px solid color-mix(in srgb, var(--border-subtle) 72%, transparent);
     }
     .role-block:first-child { border-top: 0; padding-top: 0; }
     .filtered-role { opacity: 0.82; }
     .role-heading { grid-area: heading; display: flex; align-items: flex-start; justify-content: space-between; gap: 0.6rem; }
-    .role-heading h3 { margin: 0; font-size: 0.95rem; }
-    .scope-note, .filtered-note { margin: 0.18rem 0 0; color: var(--text-secondary); font-size: 0.72rem; }
+    .role-heading :is(h3, h4) { margin: 0; font-size: 1rem; line-height: 1.25; letter-spacing: -0.01em; }
+    .scope-note, .filtered-note { margin: 0.2rem 0 0; color: var(--text-secondary); font-size: 0.72rem; }
     .scope-note { font-weight: 700; }
     .text-button { padding: 0; border: 0; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 0.72rem; text-decoration: underline; }
     .preference-scale { grid-area: scale; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.35rem; }
@@ -137,7 +146,7 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
       --preference-accent: var(--border-strong);
       display: flex; min-height: 2.55rem; align-items: center; justify-content: center; gap: 0.28rem;
       padding: 0.35rem; border: 1px solid color-mix(in srgb, var(--border-strong) 74%, white);
-      border-radius: 0.45rem; background: color-mix(in srgb, var(--surface-elevated) 86%, #f3f5ff 6%);
+      border-radius: 0.52rem; background: color-mix(in srgb, var(--surface-elevated) 86%, #f3f5ff 6%);
       color: #fafbff; cursor: pointer; font-size: 0.7rem; line-height: 1.15;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
       transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease, transform 140ms ease;
@@ -165,49 +174,78 @@ const PREFERENCE_OPTIONS = PREFERENCE_VALUES.map((value) => ({
       box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--preference-accent) 72%, white), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 1.15rem color-mix(in srgb, var(--preference-accent) 40%, transparent);
     }
     .preference-option.selected span:first-child { color: color-mix(in srgb, var(--preference-accent) 84%, white); text-shadow: 0 0 0.65rem color-mix(in srgb, var(--preference-accent) 46%, transparent); }
-    .answer-details { grid-area: details; margin-top: 0.2rem; }
+    .role-details { grid-area: details; display: grid; gap: 0.55rem; margin-top: 0.2rem; }
+    .answer-details { margin-top: 0; }
     .answer-details summary { color: var(--text-secondary); cursor: pointer; font-size: 0.82rem; }
     .detail-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; margin-top: 0.75rem; }
     .detail-field { display: grid; gap: 0.35rem; color: var(--text-secondary); font-size: 0.82rem; }
     .detail-field select, .detail-field textarea { width: 100%; padding: 0.55rem 0.65rem; border: 1px solid var(--border-strong); border-radius: 0.45rem; background: var(--surface-elevated); color: var(--text-primary); }
     .full-width { grid-column: 1 / -1; }
+    @media (prefers-reduced-motion: reduce) {
+      .preference-option, .preference-option span:first-child { transition: none; }
+      .preference-option:hover { transform: none; }
+    }
     @media (max-width: 920px) {
-      .role-block { grid-template-columns: 1fr; grid-template-areas: "heading" "scale" "details"; }
+      .role-block { grid-template-columns: 1fr; grid-template-areas: "heading" "scale" "details"; gap: 0.6rem; }
     }
     @media (max-width: 760px) {
-      .preference-scale { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .preference-option { min-height: 2.85rem; }
+      .role-block { padding: 0.9rem 0; }
+      .role-heading :is(h3, h4) { font-size: 1.02rem; }
+      .preference-scale { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.42rem; }
+      .preference-option { min-height: 3rem; padding: 0.42rem 0.28rem; flex-direction: column; gap: 0.18rem; font-size: 0.67rem; }
+      .preference-option span:first-child { font-size: 1rem; }
       .detail-grid { grid-template-columns: 1fr; }
       .full-width { grid-column: auto; }
+    }
+    @media (max-width: 360px) {
+      .preference-option { font-size: 0.62rem; }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class QuestionnaireRoleComponent {
+export class QuestionnaireRoleComponent implements OnInit, OnDestroy {
   readonly i18n = inject(TranslationService);
   private readonly catalogueText = inject(CatalogueTextService);
+  private readonly counterpartContext = inject(QuestionnaireCounterpartContextService);
+  private unregisterCounterpart?: () => void;
 
   readonly practiceId = input.required<string>();
   readonly role = input.required<PracticeRole>();
   readonly scope = input<AnswerScope | undefined>();
   readonly answer = input<PracticeAnswer | undefined>();
   readonly filtered = input(false);
+  readonly headingLevel = input<3 | 4>(3);
   readonly answerChange = output<PracticeAnswer>();
   readonly answerRemove = output<{ readonly practiceId: string; readonly roleId: string; readonly scope?: AnswerScope }>();
 
   readonly counterpartSex = computed(() => this.scope()?.counterpartSex);
   readonly targetSite = computed(() => this.scope()?.targetSite);
   readonly roleLabel = computed(() => this.catalogueText.roleLabel(this.practiceId(), this.role()));
+  readonly showCounterpartSex = computed(() =>
+    !!this.counterpartSex()
+      && this.counterpartContext.hasMultipleSexVariants(this.practiceId(), this.role().id),
+  );
   readonly ariaLabel = computed(() => {
     const parts = [this.roleLabel()];
     const sex = this.counterpartSex();
+    if (sex && this.showCounterpartSex()) {
+      parts.push(this.i18n.t('questionnaireRole.counterpart', { sex: this.sexLabel(sex) }));
+    }
     const site = this.targetSite();
-    if (sex) parts.push(this.i18n.t('questionnaireRole.counterpart', { sex: this.sexLabel(sex) }));
     if (site) parts.push(this.i18n.t('questionnaireRole.targetSite', { site: this.targetSiteLabel(site) }));
     return parts.join('. ');
   });
   readonly preferenceOptions = PREFERENCE_OPTIONS;
   readonly dependsOnMaxLength = DEPENDS_ON_MAX_LENGTH;
+
+  ngOnInit(): void {
+    const sex = this.scope()?.counterpartSex;
+    if (sex) this.unregisterCounterpart = this.counterpartContext.register(this.practiceId(), this.role().id, sex);
+  }
+
+  ngOnDestroy(): void {
+    this.unregisterCounterpart?.();
+  }
 
   sexLabel(sex: Sex): string {
     return this.i18n.t(sex === 'male' ? 'questionnaireRole.sex.male' : 'questionnaireRole.sex.female');

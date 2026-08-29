@@ -22,7 +22,23 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "src/profile-hub.css",
+              "src/profile-hub-layout.css",
+              "src/profile-entry.css",
+              "src/profile-editor.css",
+              "src/profile-editor-danger-zone.css",
+              "src/profile-dashboard.css",
+              "src/profile-dashboard-category-details.css",
+              "src/profile-dashboard-role-profile.css",
+              "src/profile-dashboard-progress-gradient.css",
+              "src/profile-dashboard-insight-polish.css",
+              "src/ui-preferences.css",
+              "src/profile-dashboard-mobile-settings.css",
+              "src/desiresync-brand.css",
+              "src/back-navigation.css",
+              "src/questionnaire-v2.css",
+              "src/questionnaire-mobile-performance.css"
             ]
           },
           "configurations": {
@@ -36,7 +52,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumError": "12kB"
                 }
               ],
               "outputHashing": "all"

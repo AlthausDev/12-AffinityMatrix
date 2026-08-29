@@ -19,6 +19,8 @@ function describeObviousPracticeEs(seed: CataloguePracticeSeed): string {
   switch (seed.kind) {
     case 'directed':
       return `Preferencia por «${label}», diferenciando hacerlo a la pareja de recibirlo de ella.`;
+    case 'directed-self':
+      return `Preferencia por «${label}», diferenciando hacerlo con la pareja, recibirlo de ella y la variante con el propio cuerpo o material.`;
     case 'mutual':
       return `Interés por «${label}» como actividad compartida entre las personas participantes.`;
     case 'self':
@@ -49,6 +51,8 @@ function describeObviousPracticeEn(seed: CataloguePracticeSeed): string {
   switch (seed.kind) {
     case 'directed':
       return `Interest in “${label}”, rating doing it to a partner separately from receiving it.`;
+    case 'directed-self':
+      return `Interest in “${label}”, separating partner-directed, partner-received and self-directed variants.`;
     case 'mutual':
       return `Interest in “${label}” as a shared activity between the people involved.`;
     case 'self':

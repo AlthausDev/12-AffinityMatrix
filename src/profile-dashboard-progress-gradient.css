@@ -1,0 +1,10 @@
+.profile-dashboard .completion-ring:not(.completion-ring-muted) {
+  /* The completion percentage already lives in --completion. Interpolating in OKLCH
+     keeps the ring moving smoothly from red through warm hues into green instead of
+     holding one discrete status colour for a large percentage range. */
+  --ring-color: color-mix(
+    in oklch,
+    var(--completion-danger) calc(100% - var(--completion)),
+    var(--completion-complete) var(--completion)
+  );
+}

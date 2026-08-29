@@ -1,0 +1,280 @@
+.profile-entry-page {
+  width: min(100% - 2rem, 50rem);
+  padding-top: clamp(3.5rem, 7vw, 5rem);
+}
+
+.profile-entry-page .profile-entry-back {
+  display: inline-flex;
+  min-height: 2.15rem;
+  align-items: center;
+  gap: 0.42rem;
+  margin-bottom: 1.15rem;
+  padding: 0.34rem 0.62rem;
+  border: 1px solid color-mix(in srgb, var(--neon-cyan) 20%, var(--border-subtle));
+  border-radius: 999px;
+  background: rgba(9, 22, 49, 0.48);
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 720;
+  text-decoration: none;
+  backdrop-filter: blur(10px) saturate(120%);
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+.profile-entry-page .profile-entry-back:hover {
+  border-color: color-mix(in srgb, var(--neon-violet) 48%, var(--neon-cyan));
+  background: rgba(24, 36, 73, 0.64);
+  color: var(--text-primary);
+  box-shadow: 0 0 0.9rem rgba(54, 186, 255, 0.08);
+}
+
+.profile-entry-page .profile-entry-header {
+  display: grid;
+  justify-items: center;
+  margin-bottom: 1.45rem;
+  text-align: center;
+}
+.profile-entry-page .profile-entry-brand-slot {
+  display: grid;
+  min-height: 4.1rem;
+  place-items: center;
+  margin-bottom: 0.65rem;
+}
+.profile-entry-page .profile-entry-brand-slot app-brand-mark {
+  --brand-mark-size: 4.1rem;
+}
+.profile-entry-page .profile-entry-header .eyebrow {
+  margin-bottom: 0.42rem;
+  color: color-mix(in srgb, var(--neon-cyan) 58%, var(--text-secondary));
+}
+.profile-entry-page .profile-entry-header h1 {
+  margin-bottom: 0.6rem;
+  font-size: clamp(2rem, 6vw, 3rem);
+  letter-spacing: -0.04em;
+}
+.profile-entry-page .profile-entry-header .muted {
+  max-width: 38rem;
+  margin: 0;
+  color: color-mix(in srgb, var(--text-primary) 72%, var(--text-secondary));
+  line-height: 1.58;
+}
+
+.profile-entry-page .profile-entry-panel {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.15rem, 3.5vw, 1.7rem);
+  border: 1px solid transparent;
+  border-radius: 1rem;
+  background:
+    linear-gradient(145deg, rgba(14, 31, 68, 0.78), rgba(34, 21, 68, 0.82)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(54, 186, 255, 0.62),
+      rgba(65, 108, 255, 0.52) 34%,
+      rgba(140, 92, 255, 0.62) 68%,
+      rgba(230, 80, 197, 0.48)
+    ) border-box;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    0 0 1.1rem rgba(54, 186, 255, 0.06),
+    0 1.1rem 2.8rem rgba(2, 5, 20, 0.24);
+  backdrop-filter: blur(17px) saturate(126%);
+}
+.profile-entry-page .profile-entry-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(54, 186, 255, 0.13), transparent 32%),
+    radial-gradient(circle at 92% 100%, rgba(230, 80, 197, 0.09), transparent 34%);
+  pointer-events: none;
+}
+.profile-entry-page .profile-entry-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.profile-entry-page .form-grid {
+  gap: 1.05rem;
+}
+.profile-entry-page .field {
+  gap: 0.48rem;
+  color: #eaf2ff;
+  font-size: 0.82rem;
+}
+.profile-entry-page .field > span:first-child {
+  font-weight: 760;
+}
+.profile-entry-page .field input,
+.profile-entry-page .field select,
+.profile-entry-page .profile-entry-code-box {
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--neon-cyan) 18%, var(--border-strong));
+  border-radius: 0.65rem;
+  background: rgba(4, 12, 33, 0.58);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  color: var(--text-primary);
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+}
+.profile-entry-page .field input,
+.profile-entry-page .field select {
+  min-height: 2.85rem;
+  padding: 0.65rem 0.78rem;
+}
+.profile-entry-page .field input:hover,
+.profile-entry-page .field select:hover,
+.profile-entry-page .profile-entry-code-box:hover {
+  border-color: color-mix(in srgb, var(--neon-violet) 38%, var(--border-strong));
+  background: rgba(7, 17, 42, 0.66);
+}
+.profile-entry-page .field input:focus,
+.profile-entry-page .field select:focus,
+.profile-entry-page .profile-entry-code-box:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--neon-cyan) 72%, var(--neon-violet));
+  background: rgba(7, 18, 45, 0.76);
+  box-shadow:
+    0 0 0 2px rgba(54, 186, 255, 0.1),
+    0 0 1rem rgba(54, 186, 255, 0.1);
+}
+.profile-entry-page .field input::placeholder,
+.profile-entry-page .profile-entry-code-box::placeholder {
+  color: color-mix(in srgb, var(--text-secondary) 62%, transparent);
+}
+.profile-entry-page .field select option {
+  background: #0b1230;
+  color: var(--text-primary);
+}
+
+.profile-entry-page .check-field {
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--neon-violet) 22%, var(--border-subtle));
+  border-radius: 0.72rem;
+  background: linear-gradient(110deg, rgba(13, 34, 68, 0.44), rgba(46, 24, 72, 0.4));
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+}
+.profile-entry-page .check-field:hover {
+  border-color: color-mix(in srgb, var(--neon-violet) 44%, var(--neon-cyan));
+  background: linear-gradient(110deg, rgba(18, 46, 84, 0.52), rgba(56, 28, 84, 0.46));
+  box-shadow: 0 0 1rem rgba(140, 92, 255, 0.06);
+}
+.profile-entry-page .check-field input {
+  accent-color: var(--neon-violet);
+}
+.profile-entry-page .check-field strong {
+  color: var(--text-primary);
+}
+.profile-entry-page .check-field small,
+.profile-entry-page .form-note {
+  color: var(--text-secondary);
+}
+.profile-entry-page .form-note {
+  padding: 0 0.15rem;
+  font-size: 0.76rem;
+}
+
+.profile-entry-page .form-actions {
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 0.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(105, 130, 183, 0.18);
+}
+.profile-entry-page .button {
+  min-height: 2.55rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--neon-cyan) 48%, var(--neon-violet));
+  border-radius: 0.62rem;
+  background: linear-gradient(135deg, rgba(32, 112, 181, 0.86), rgba(106, 55, 177, 0.88));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), 0 0.55rem 1.2rem rgba(3, 7, 24, 0.2);
+  color: #f7fbff;
+  font-size: 0.8rem;
+  font-weight: 780;
+}
+.profile-entry-page .button:hover {
+  border-color: color-mix(in srgb, var(--neon-magenta) 46%, var(--neon-cyan));
+  background: linear-gradient(135deg, rgba(37, 129, 205, 0.92), rgba(126, 61, 198, 0.92));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 0 0.9rem rgba(54, 186, 255, 0.12),
+    0 0 1.3rem rgba(140, 92, 255, 0.1),
+    0 0.65rem 1.3rem rgba(3, 7, 24, 0.22);
+}
+.profile-entry-page .button.secondary {
+  border-color: color-mix(in srgb, var(--neon-violet) 22%, var(--border-strong));
+  background: rgba(17, 27, 58, 0.6);
+  color: var(--text-secondary);
+}
+.profile-entry-page .button.secondary:hover {
+  border-color: color-mix(in srgb, var(--neon-violet) 48%, var(--neon-cyan));
+  background: rgba(30, 35, 75, 0.74);
+  color: var(--text-primary);
+}
+
+.profile-entry-page .profile-entry-code-box {
+  min-height: 11rem;
+  resize: vertical;
+  padding: 0.78rem;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+.profile-entry-page .profile-entry-preview {
+  margin-top: 1rem;
+}
+.profile-entry-page .profile-entry-preview h2 {
+  margin-bottom: 0.3rem;
+  font-size: 1.35rem;
+}
+.profile-entry-page .profile-entry-preview .status-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+.profile-entry-page .profile-entry-preview .status-list div {
+  min-width: 0;
+  padding: 0.72rem 0.78rem;
+  border: 1px solid rgba(100, 130, 187, 0.2);
+  border-radius: 0.62rem;
+  background: rgba(7, 18, 43, 0.38);
+}
+.profile-entry-page .profile-entry-preview .status-list dt {
+  color: var(--text-secondary);
+  font-size: 0.67rem;
+  text-transform: uppercase;
+  letter-spacing: 0.045em;
+}
+.profile-entry-page .profile-entry-preview .status-list dd {
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+}
+.profile-entry-page .profile-entry-alert {
+  margin: 0;
+  border-color: color-mix(in srgb, var(--preference-boundary) 44%, var(--border-strong));
+  background: rgba(76, 19, 43, 0.42);
+  color: #ffd9e3;
+}
+
+@media (max-width: 620px) {
+  .profile-entry-page {
+    width: min(100% - 1.2rem, 50rem);
+    padding-top: 5.2rem;
+  }
+  .profile-entry-page .profile-entry-header h1 { font-size: clamp(1.9rem, 10vw, 2.5rem); }
+  .profile-entry-page .profile-entry-panel { padding: 1rem; border-radius: 0.82rem; }
+  .profile-entry-page .profile-entry-preview .status-list { grid-template-columns: 1fr; }
+  .profile-entry-page .form-actions { align-items: stretch; flex-direction: column-reverse; }
+  .profile-entry-page .form-actions .button { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-entry-page .profile-entry-back,
+  .profile-entry-page .field input,
+  .profile-entry-page .field select,
+  .profile-entry-page .profile-entry-code-box,
+  .profile-entry-page .check-field,
+  .profile-entry-page .button { transition: none; }
+}

@@ -6,16 +6,25 @@ export const UI_PREFERENCES_STORAGE_KEY = 'preference-profile.ui-preferences.v1'
 export const FONT_SCALE_VALUES = ['normal', 'large', 'extra-large'] as const;
 export type FontScale = (typeof FONT_SCALE_VALUES)[number];
 
+export const PROFILE_SORT_MODES = ['manual', 'recent', 'completion', 'alias'] as const;
+export type ProfileSortMode = (typeof PROFILE_SORT_MODES)[number];
+
 export interface UiPreferences {
   readonly confirmQuestionnaireExit: boolean;
   readonly fontScale: FontScale;
+  readonly reduceVisualEffects: boolean;
   readonly hiddenCategoriesByProfile: Readonly<Record<string, readonly string[]>>;
+  readonly profileOrder: readonly string[];
+  readonly profileSortMode: ProfileSortMode;
 }
 
 export const DEFAULT_UI_PREFERENCES: UiPreferences = {
   confirmQuestionnaireExit: true,
   fontScale: 'normal',
+  reduceVisualEffects: false,
   hiddenCategoriesByProfile: {},
+  profileOrder: [],
+  profileSortMode: 'manual',
 };
 
 @Injectable({ providedIn: 'root' })
@@ -27,6 +36,7 @@ export class UiPreferencesService {
 
   initialize(): void {
     this.applyFontScale(this.state().fontScale);
+    this.applyVisualEffects(this.state().reduceVisualEffects);
   }
 
   confirmQuestionnaireExit(): boolean {
@@ -37,8 +47,20 @@ export class UiPreferencesService {
     return this.state().fontScale;
   }
 
+  reduceVisualEffects(): boolean {
+    return this.state().reduceVisualEffects;
+  }
+
   hiddenCategoryIds(profileId: string): readonly string[] {
     return this.state().hiddenCategoriesByProfile[profileId] ?? [];
+  }
+
+  profileOrder(): readonly string[] {
+    return this.state().profileOrder;
+  }
+
+  profileSortMode(): ProfileSortMode {
+    return this.state().profileSortMode;
   }
 
   isCategoryHidden(profileId: string, categoryId: string): boolean {
@@ -52,6 +74,35 @@ export class UiPreferencesService {
   setFontScale(value: FontScale): void {
     this.update({ fontScale: value });
     this.applyFontScale(value);
+  }
+
+  setReduceVisualEffects(value: boolean): void {
+    this.update({ reduceVisualEffects: value });
+    this.applyVisualEffects(value);
+  }
+
+  setProfileOrder(profileIds: readonly string[]): void {
+    const profileOrder = [...new Set(profileIds.filter((profileId) => profileId.length > 0))];
+    this.update({ profileOrder });
+  }
+
+  setProfileSortMode(value: ProfileSortMode): void {
+    this.update({ profileSortMode: value });
+  }
+
+  removeProfile(profileId: string): void {
+    if (!profileId) return;
+    const current = this.state();
+    const profileOrder = current.profileOrder.filter((id) => id !== profileId);
+    const hiddenCategoriesByProfile = { ...current.hiddenCategoriesByProfile };
+    delete hiddenCategoriesByProfile[profileId];
+
+    if (
+      profileOrder.length === current.profileOrder.length &&
+      !(profileId in current.hiddenCategoriesByProfile)
+    ) return;
+
+    this.update({ profileOrder, hiddenCategoriesByProfile });
   }
 
   setCategoryHidden(profileId: string, categoryId: string, hidden: boolean): void {
@@ -95,7 +146,15 @@ export class UiPreferencesService {
         fontScale: this.isFontScale(parsed['fontScale'])
           ? parsed['fontScale']
           : DEFAULT_UI_PREFERENCES.fontScale,
+        reduceVisualEffects:
+          typeof parsed['reduceVisualEffects'] === 'boolean'
+            ? parsed['reduceVisualEffects']
+            : DEFAULT_UI_PREFERENCES.reduceVisualEffects,
         hiddenCategoriesByProfile: this.readHiddenCategories(parsed['hiddenCategoriesByProfile']),
+        profileOrder: this.readProfileOrder(parsed['profileOrder']),
+        profileSortMode: this.isProfileSortMode(parsed['profileSortMode'])
+          ? parsed['profileSortMode']
+          : DEFAULT_UI_PREFERENCES.profileSortMode,
       };
     } catch {
       return DEFAULT_UI_PREFERENCES;
@@ -115,6 +174,13 @@ export class UiPreferencesService {
     return result;
   }
 
+  private readProfileOrder(value: unknown): readonly string[] {
+    if (!Array.isArray(value)) return [];
+    return [...new Set(value.filter(
+      (profileId): profileId is string => typeof profileId === 'string' && profileId.length > 0,
+    ))];
+  }
+
   private persist(value: UiPreferences): void {
     try {
       this.document.defaultView?.localStorage.setItem(UI_PREFERENCES_STORAGE_KEY, JSON.stringify(value));
@@ -127,8 +193,16 @@ export class UiPreferencesService {
     this.document.documentElement.dataset['fontScale'] = value;
   }
 
+  private applyVisualEffects(value: boolean): void {
+    this.document.documentElement.dataset['visualEffects'] = value ? 'reduced' : 'full';
+  }
+
   private isFontScale(value: unknown): value is FontScale {
     return typeof value === 'string' && FONT_SCALE_VALUES.includes(value as FontScale);
+  }
+
+  private isProfileSortMode(value: unknown): value is ProfileSortMode {
+    return typeof value === 'string' && PROFILE_SORT_MODES.includes(value as ProfileSortMode);
   }
 
   private isRecord(value: unknown): value is Record<string, unknown> {

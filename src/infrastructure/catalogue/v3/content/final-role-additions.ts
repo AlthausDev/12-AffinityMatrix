@@ -3,6 +3,7 @@ import { CatalogueCategorySeed, CataloguePracticeSeed } from './types';
 /** Practice ids intentionally restored after an earlier pre-release semantic retirement. */
 export const REACTIVATED_V3_PRACTICE_IDS = new Set<string>([
   'squirting-on-partner',
+  'orgasm-on-command',
 ]);
 
 const SQUIRTING_ON_PARTNER: CataloguePracticeSeed = {

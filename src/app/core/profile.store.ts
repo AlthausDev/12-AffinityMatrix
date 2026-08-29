@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { PortableProfile } from '../../application/profile/portable-profile';
 import { AnswerScope, PracticeAnswer } from '../../domain/profile/profile-answer';
+import { PhysicalPreferences } from '../../domain/profile/physical-preferences';
 import { Profile, ProfileId } from '../../domain/profile/profile';
 import { ProfileMetadata } from '../../domain/profile/profile-metadata';
 import { DEFAULT_PROFILE_SETTINGS, ProfileSettings } from '../../domain/profile/profile-settings';
@@ -35,8 +36,13 @@ export class ProfileStore {
   create(
     metadata: ProfileMetadata,
     settings: Partial<ProfileSettings> = DEFAULT_PROFILE_SETTINGS,
+    physicalPreferences: PhysicalPreferences = {},
   ): Promise<Profile | undefined> {
-    return this.enqueueProfileMutation(() => this.service.create(metadata, settings));
+    return this.enqueueProfileMutation(() => this.service.create(metadata, settings, physicalPreferences));
+  }
+
+  duplicate(id: ProfileId, metadata?: ProfileMetadata): Promise<Profile | undefined> {
+    return this.enqueueProfileMutation(() => this.service.duplicate(id, metadata));
   }
 
   importPortable(portable: PortableProfile): Promise<Profile | undefined> {
@@ -47,8 +53,9 @@ export class ProfileStore {
     id: ProfileId,
     metadata: ProfileMetadata,
     settings: ProfileSettings,
+    physicalPreferences?: PhysicalPreferences,
   ): Promise<Profile | undefined> {
-    return this.enqueueProfileMutation(() => this.service.updateProfile(id, metadata, settings));
+    return this.enqueueProfileMutation(() => this.service.updateProfile(id, metadata, settings, physicalPreferences));
   }
 
   upsertAnswer(

@@ -1,16 +1,14 @@
-# 12-AffinityMatrix
+# DesireSync
 
-> Working title. The project name may change as the product evolves.
+A local-first web application for exploring intimate preferences, creating structured profiles, and comparing two profiles privately and clearly.
 
-A local-first web application for creating structured preference profiles, moving them between devices, and comparing two profiles in a clear and privacy-conscious way.
+## Product direction
 
-## Status
+DesireSync is deliberately a focused tool rather than a social network. Profiles are created and stored locally, can be exported or imported through a portable versioned representation, and can be compared using catalogue-defined compatibility rules.
 
-**MVP — early development**
+The product may gain additional convenience features over time, including richer local persistence or optional synchronization, but public discovery, feeds, chat, dating-style matching, and social-network features are outside the current direction.
 
-The first milestone focuses on validating the core workflow before investing in advanced presentation or visual analytics.
-
-## MVP goals
+## Current capabilities
 
 - Create and edit local profiles.
 - Navigate the questionnaire by category instead of using a single long page.
@@ -20,11 +18,11 @@ The first milestone focuses on validating the core workflow before investing in 
 - Export and import profiles through a portable, versioned representation.
 - Compare two profiles by matching explicitly compatible roles and responses.
 - Show category-level affinity based on comparable answered pairs.
-- Ship the interface and catalogue in Spanish and English.
+- Ship the interface and catalogue in Spanish and English, with localization structured to support additional languages.
 
 ## Privacy model
 
-The MVP has no backend, account system, remote profile database, analytics, or tracking requirement. Profiles stay in browser storage unless the user explicitly exports them.
+DesireSync currently has no backend, account system, remote profile database, analytics, or tracking requirement. Profiles stay in browser storage unless the user explicitly exports them.
 
 Local storage is **not encryption**. A person with access to the same browser profile may be able to inspect locally stored data, and exported profile codes must be treated as private data. Portable codes use encoding, versioning, and an integrity checksum; those mechanisms do not provide secrecy.
 
@@ -39,13 +37,11 @@ The project keeps domain rules independent from Angular and browser APIs. The cu
 - Inherited validators for shared profile invariants.
 - Versioned migrations for local persistence and portable profile formats.
 - Angular stores as UI state adapters rather than domain services.
-- Typed presentation resources for Spanish/English localization, with catalogue translations derived from stable ids.
+- Typed presentation resources for localization, with catalogue translations derived from stable ids.
 
 The detailed dependency rules, aggregate boundaries, versioning rules, localization rules, and extension points are documented in [docs/architecture.md](docs/architecture.md).
 
-The model is intended to remain extensible for richer questionnaires, comparison rules, visual summaries, additional languages, and additional local transports. Chat, public discovery, feeds, and social-network features are intentionally outside the product direction.
-
-## Planned stack
+## Stack
 
 - Angular 22
 - TypeScript 6
@@ -53,11 +49,11 @@ The model is intended to remain extensible for richer questionnaires, comparison
 - Angular Router
 - CSS
 - Vitest
-- Browser local storage for the initial persistence layer
+- Browser local storage for the current persistence layer
 
 ## Development approach
 
-The project is developed incrementally: validate domain and questionnaire behavior first, then persistence/portability, comparison, localization/UX/accessibility, and finally richer visual summaries.
+The project is developed incrementally, keeping catalogue semantics, profile portability, comparison behavior, backwards compatibility, localization, and UI presentation independently maintainable.
 
 ## License
 

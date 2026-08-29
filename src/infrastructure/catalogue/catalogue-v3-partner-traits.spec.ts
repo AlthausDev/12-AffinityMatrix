@@ -1,63 +1,39 @@
-import { CURRENT_CATALOGUE_SNAPSHOT } from './catalogue-v3';
-import { CATALOGUE_V3_CONTENT } from './v3/content/final';
+import { CATALOGUE_V3_CONTENT, RETIRED_V3_PRACTICE_IDS } from './v3/content/final';
+import { PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS } from './v3/content/physical-preferences-extraction';
 
-describe('Catalogue V3 partner physical traits', () => {
+describe('Catalogue V3 body fetishes after physical preference extraction', () => {
   const category = () => CATALOGUE_V3_CONTENT.find((candidate) => candidate.id === 'body-fetishes');
   const seed = (id: string) => category()?.practices.find((practice) => practice.id === id);
-  const practice = (id: string) => CURRENT_CATALOGUE_SNAPSHOT.catalogue.practices
-    .find((candidate) => candidate.id === id);
 
-  it('covers size, hair, stature and build preferences without fixed measurement cutoffs', () => {
-    expect(category()?.es).toBe('Cuerpo, rasgos físicos y fetiches');
-    expect(category()?.en).toBe('Body, physical traits & fetishes');
+  it('keeps erotic body focuses while moving neutral appearance dimensions to the profile', () => {
+    expect(category()?.es).toBe('Fetiches corporales y sensoriales');
+    expect(category()?.en).toBe('Body fetishes & sensory attraction');
 
-    expect(category()?.practices.map((item) => item.id)).toEqual(expect.arrayContaining([
-      'penis-size-small',
-      'penis-size-average',
-      'penis-size-large',
-      'breast-size-small',
-      'breast-size-average',
-      'breast-size-large',
-      'buttocks-size-small',
-      'buttocks-size-average',
-      'buttocks-size-large',
-      'hair-length-short',
-      'hair-length-medium',
-      'hair-length-long',
-      'shaved-bald-head',
-      'facial-hair',
-      'stature-short',
-      'stature-average',
-      'stature-tall',
-      'slim-build',
-      'curvy-build',
-      'stocky-build',
-    ]));
+    for (const fetishFocus of [
+      'lips', 'tongue', 'hair', 'neck', 'chest-general', 'nipples', 'buttocks',
+      'feet', 'penis', 'vulva', 'pubic-hair', 'body-hair', 'body-scent', 'sweat',
+      'underwear', 'worn-underwear',
+    ]) {
+      expect(seed(fetishFocus), fetishFocus).toBeDefined();
+    }
 
-    expect(seed('penis-size-small')?.descriptionEs).toContain('preferencia subjetiva');
-    expect(seed('breast-size-large')?.descriptionEn).toContain('subjective preference');
-    expect(seed('buttocks-size-small')?.descriptionEs).toContain('preferencia subjetiva');
-    expect(seed('hair-length-long')?.descriptionEs).toContain('no fija una longitud exacta');
-    expect(seed('stature-tall')?.descriptionEn).toContain('without setting a fixed height cutoff');
+    for (const id of PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS) {
+      expect(seed(id), id).toBeUndefined();
+      expect(RETIRED_V3_PRACTICE_IDS.has(id), id).toBe(true);
+    }
   });
 
-  it('applies sex-specific anatomy only where the physical trait requires it', () => {
-    expect(seed('penis-size-large')?.anatomySex).toBe('male');
-    expect(seed('breast-size-large')?.anatomySex).toBe('female');
-    expect(seed('buttocks-size-large')?.anatomySex).toBeUndefined();
-    expect(seed('hair-length-long')?.anatomySex).toBeUndefined();
-    expect(seed('stature-tall')?.anatomySex).toBeUndefined();
-
-    const penisRole = practice('penis-size-large')?.roles[0];
-    const breastRole = practice('breast-size-large')?.roles[0];
-    const buttocksRole = practice('buttocks-size-large')?.roles[0];
-    const hairRole = practice('hair-length-long')?.roles[0];
-
-    expect(penisRole?.id).toBe('interest');
-    expect(penisRole?.contextAxes).toEqual(['counterpartSex']);
-    expect(penisRole?.applicability?.partnerSex).toEqual(['male']);
-    expect(breastRole?.applicability?.partnerSex).toEqual(['female']);
-    expect(buttocksRole?.applicability).toBeUndefined();
-    expect(hairRole?.applicability).toBeUndefined();
+  it('extracts proportions, overall appearance and aesthetic styling instead of sexualizing them as practices', () => {
+    for (const id of [
+      'hair-length-short', 'hair-length-medium', 'hair-length-long', 'shaved-bald-head',
+      'facial-hair', 'stature-short', 'stature-average', 'stature-tall',
+      'slim-build', 'curvy-build', 'stocky-build', 'muscles',
+      'breast-size-small', 'breast-size-average', 'breast-size-large',
+      'buttocks-size-small', 'buttocks-size-average', 'buttocks-size-large',
+      'penis-size-small', 'penis-size-average', 'penis-size-large',
+      'tattoos', 'piercings', 'facial-piercings', 'body-piercings', 'nipple-piercings', 'genital-piercings',
+    ]) {
+      expect(PROFILE_PHYSICAL_PREFERENCE_PRACTICE_IDS.has(id), id).toBe(true);
+    }
   });
 });

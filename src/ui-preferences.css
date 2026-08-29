@@ -1,0 +1,44 @@
+html[data-visual-effects='reduced'] *,
+html[data-visual-effects='reduced'] *::before,
+html[data-visual-effects='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+}
+
+html[data-visual-effects='reduced'] .dashboard-hero,
+html[data-visual-effects='reduced'] .dashboard-settings-link,
+html[data-visual-effects='reduced'] .dashboard-chart-card,
+html[data-visual-effects='reduced'] .language-trigger,
+html[data-visual-effects='reduced'] .language-menu-surface,
+html[data-visual-effects='reduced'] .profile-entry-panel,
+html[data-visual-effects='reduced'] .profile-editor-management-card,
+html[data-visual-effects='reduced'] .panel,
+html[data-visual-effects='reduced'] .action-card,
+html[data-visual-effects='reduced'] .profile-row {
+  backdrop-filter: none !important;
+}
+
+html[data-visual-effects='reduced'] .dashboard-hero::before,
+html[data-visual-effects='reduced'] .dashboard-action::before {
+  opacity: 0 !important;
+}
+
+html[data-visual-effects='reduced'] .dashboard-action:hover,
+html[data-visual-effects='reduced'] .dashboard-back-link:hover,
+html[data-visual-effects='reduced'] .dashboard-settings-link:hover,
+html[data-visual-effects='reduced'] .button:hover {
+  transform: none !important;
+}
+
+@media (max-width: 520px) {
+  .profile-dashboard .dashboard-topbar {
+    justify-content: flex-start;
+    padding-right: 8.55rem;
+  }
+
+  .profile-dashboard .dashboard-settings-link {
+    margin-left: auto;
+  }
+}

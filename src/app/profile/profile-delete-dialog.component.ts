@@ -1,35 +1,39 @@
 import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
 import { ProfileStore } from '../core/profile.store';
+import { UiPreferencesService } from '../core/ui-preferences.service';
 import { TranslationService } from '../i18n/translation.service';
+import { ModalFocusTrapDirective } from '../shared/modal-focus-trap.directive';
 
 @Component({
   selector: 'app-profile-delete-dialog',
+  imports: [ModalFocusTrapDirective],
   template: `
-    <div class="delete-backdrop">
+    <div class="delete-backdrop" (keydown.escape)="cancel()">
       <section
+        appModalFocusTrap
         class="delete-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-delete-title"
-        aria-describedby="profile-delete-description"
+        aria-describedby="profile-delete-description profile-delete-warning"
       >
         <p class="eyebrow">{{ i18n.t('settings.danger.eyebrow') }}</p>
         <h2 id="profile-delete-title">{{ i18n.t('profileDeletion.title') }}</h2>
         <p id="profile-delete-description" class="muted">
           {{ i18n.t('profileDeletion.description', { alias: displayAlias() }) }}
         </p>
-        <p class="delete-warning">{{ i18n.t('profileDeletion.warning') }}</p>
+        <p id="profile-delete-warning" class="delete-warning">{{ i18n.t('profileDeletion.warning') }}</p>
 
         @if (failed()) {
           <p class="alert delete-error" role="alert">{{ i18n.t('profileDeletion.failed') }}</p>
         }
 
-        <div class="form-actions">
-          <button class="button secondary" type="button" [disabled]="deleting()" (click)="cancel()">
-            {{ i18n.t('common.cancel') }}
-          </button>
+        <div class="delete-actions">
           <button class="button danger" type="button" [disabled]="deleting()" (click)="confirmDeletion()">
             {{ i18n.t(deleting() ? 'profileDeletion.deleting' : 'profileDeletion.confirm') }}
+          </button>
+          <button class="button secondary" type="button" autofocus [disabled]="deleting()" (click)="cancel()">
+            {{ i18n.t('common.cancel') }}
           </button>
         </div>
       </section>
@@ -65,6 +69,12 @@ import { TranslationService } from '../i18n/translation.service';
       color: #ffe6e9;
     }
     .delete-error { margin-bottom: 1rem; }
+    .delete-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+    .delete-actions .button { width: 100%; }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -76,6 +86,7 @@ export class ProfileDeleteDialogComponent {
 
   readonly i18n = inject(TranslationService);
   private readonly profileStore = inject(ProfileStore);
+  private readonly preferences = inject(UiPreferencesService);
 
   readonly deleting = signal(false);
   readonly failed = signal(false);
@@ -94,10 +105,12 @@ export class ProfileDeleteDialogComponent {
 
     this.failed.set(false);
     this.deleting.set(true);
-    const deleted = await this.profileStore.delete(this.profileId());
+    const profileId = this.profileId();
+    const deleted = await this.profileStore.delete(profileId);
     this.deleting.set(false);
 
     if (deleted) {
+      this.preferences.removeProfile(profileId);
       this.deleted.emit();
       return;
     }

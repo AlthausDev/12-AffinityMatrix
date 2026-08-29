@@ -1,0 +1,478 @@
+.profile-hub .profiles-section,
+.profile-hub .hub-footer,
+.profile-hub .profile-storage-alert,
+.profile-hub .profile-storage-notice {
+  width: min(100%, 54rem);
+  margin-inline: auto;
+}
+
+.profile-hub::before {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  background:
+    radial-gradient(circle at 100% 100%, rgba(255, 61, 88, 0.14) 0%, rgba(210, 45, 104, 0.075) 22%, transparent 46%),
+    radial-gradient(ellipse at 84% 18%, rgba(137, 72, 235, 0.23) 0%, rgba(91, 47, 178, 0.11) 35%, transparent 58%),
+    radial-gradient(ellipse at 70% 76%, rgba(210, 64, 184, 0.19) 0%, rgba(126, 50, 163, 0.09) 36%, transparent 61%),
+    radial-gradient(ellipse at 34% 57%, rgba(104, 73, 218, 0.12) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.profile-hub .profile-storage-alert,
+.profile-hub .profile-storage-notice {
+  margin-top: -1.15rem;
+  margin-bottom: 1.25rem;
+}
+
+.profile-hub .profile-storage-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--neon-violet) 26%, var(--border-subtle));
+  border-radius: 0.72rem;
+  background: rgba(25, 22, 57, 0.54);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  backdrop-filter: blur(10px);
+}
+
+.profile-hub .profile-storage-notice > span {
+  flex: 0 0 auto;
+  color: color-mix(in srgb, var(--neon-magenta) 58%, var(--neon-cyan));
+}
+
+.profile-hub .profiles-toolbar {
+  position: relative;
+}
+
+.profile-hub .profiles-title-row {
+  flex-wrap: wrap;
+}
+
+.profile-hub .profile-toolbar-actions {
+  padding-top: 2.35rem;
+}
+
+.profile-hub .profile-order-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  min-height: 1.9rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.34rem;
+  padding: 0.2rem 0.62rem;
+  border: 1px solid color-mix(in srgb, var(--neon-violet) 38%, var(--border-subtle));
+  border-radius: 999px;
+  background: rgba(16, 28, 59, 0.54);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 180ms ease, transform 160ms ease;
+}
+
+.profile-hub .profile-order-button:hover,
+.profile-hub .profile-order-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--neon-cyan) 55%, var(--neon-violet));
+  color: var(--text-primary);
+  box-shadow: 0 0 0 2px rgba(54, 186, 255, 0.08), 0 0 0.72rem rgba(108, 112, 255, 0.18);
+  outline: none;
+}
+
+.profile-hub .profile-order-button[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--neon-magenta) 50%, var(--neon-cyan));
+  background: linear-gradient(135deg, rgba(39, 73, 128, 0.74), rgba(74, 34, 112, 0.8));
+  color: var(--text-primary);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 0.8rem rgba(140, 92, 255, 0.2);
+}
+
+.profile-hub .profile-order-tools {
+  display: grid;
+  gap: 0.5rem;
+  margin: -0.25rem 0 0.85rem;
+  padding: 0.62rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--neon-violet) 24%, var(--border-subtle));
+  border-radius: 0.72rem;
+  background: linear-gradient(135deg, rgba(14, 29, 62, 0.42), rgba(42, 20, 70, 0.4));
+  backdrop-filter: blur(10px);
+}
+
+.profile-hub .profile-sort-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+.profile-hub .profile-sort-option {
+  min-height: 1.85rem;
+  padding: 0.23rem 0.58rem;
+  border: 1px solid color-mix(in srgb, var(--neon-violet) 24%, var(--border-subtle));
+  border-radius: 999px;
+  background: rgba(12, 24, 52, 0.5);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, color 150ms ease, box-shadow 170ms ease;
+}
+
+.profile-hub .profile-sort-option:hover,
+.profile-hub .profile-sort-option:focus-visible {
+  border-color: color-mix(in srgb, var(--neon-cyan) 44%, var(--neon-violet));
+  color: var(--text-primary);
+  outline: none;
+}
+
+.profile-hub .profile-sort-option[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--neon-magenta) 50%, var(--neon-cyan));
+  background: linear-gradient(135deg, rgba(36, 73, 128, 0.7), rgba(77, 32, 111, 0.72));
+  color: var(--text-primary);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 0.65rem rgba(140, 92, 255, 0.15);
+}
+
+.profile-hub .profile-reorder-hint {
+  margin: 0;
+  color: color-mix(in srgb, var(--text-secondary) 88%, var(--neon-violet));
+  font-size: 0.7rem;
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.profile-hub .profile-card-grid {
+  grid-template-columns: 1fr;
+  gap: 0.7rem;
+}
+
+.profile-hub .profile-card {
+  cursor: default;
+  touch-action: pan-y;
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 250ms ease,
+    filter 280ms ease,
+    box-shadow 320ms ease;
+}
+
+.profile-hub .profile-card-main {
+  min-height: 8rem;
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 0.72fr);
+  grid-template-areas:
+    "header facts"
+    "progress progress";
+  align-items: end;
+  column-gap: 1.6rem;
+  row-gap: 0.72rem;
+  padding: 0.9rem 1rem 0.85rem;
+  cursor: pointer;
+  -webkit-user-drag: none;
+}
+
+.profile-hub .profile-card-main:focus-visible {
+  border-radius: inherit;
+  outline: 2px solid color-mix(in srgb, var(--neon-cyan) 60%, var(--neon-violet));
+  outline-offset: -3px;
+}
+
+.profile-hub .profile-manual-reorder-mode .profile-card {
+  cursor: grab;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+.profile-hub .profile-manual-reorder-mode .profile-card-main {
+  cursor: grab;
+  user-select: none;
+}
+
+.profile-hub .profile-reorder-mode:not(.profile-manual-reorder-mode) .profile-card-main {
+  cursor: default;
+}
+
+.profile-hub .profile-reorder-mode .profile-card-arrow {
+  opacity: 0;
+}
+
+.profile-hub .profile-card-grid:has(.profile-card-dragging) .profile-card:not(.profile-card-dragging) {
+  opacity: 0.68;
+  transform: scale(0.997);
+  filter: saturate(0.82) brightness(0.9);
+}
+
+.profile-hub .profile-card-grid:has(.profile-card-dragging) .profile-card.profile-card-drop-before,
+.profile-hub .profile-card-grid:has(.profile-card-dragging) .profile-card.profile-card-drop-after {
+  z-index: 10;
+  opacity: 0.82;
+  transform: translateY(-1px) scale(0.999);
+  filter: saturate(0.92) brightness(0.96);
+  box-shadow:
+    0 0 0.38rem rgba(54, 186, 255, 0.18),
+    0 0 0.8rem rgba(140, 92, 255, 0.18);
+}
+
+.profile-hub .profile-card-dragging {
+  z-index: 12;
+  opacity: 1;
+  transform: translateY(-1px) scale(1.008);
+  filter: saturate(1.05) brightness(1.025);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0.12rem rgba(54, 186, 255, 0.66),
+    0 0 0.68rem rgba(140, 92, 255, 0.28),
+    0 0 1.35rem rgba(230, 80, 197, 0.12),
+    0 0.72rem 1.55rem rgba(2, 5, 20, 0.24);
+  animation: profile-card-drag-pulse 1800ms cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+.profile-hub .profile-card-dragging::before {
+  opacity: 0.86;
+}
+
+.profile-hub .profile-card-dragging,
+.profile-hub .profile-card-dragging .profile-card-main {
+  cursor: grabbing;
+}
+
+.profile-hub .profile-card-drop-before::after,
+.profile-hub .profile-card-drop-after + .profile-card::after,
+.profile-hub .profile-card-drop-after:last-child::after {
+  content: '';
+  position: absolute;
+  z-index: 16;
+  right: 1rem;
+  left: 1rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(54, 186, 255, 0.9) 18%,
+    rgba(140, 92, 255, 1) 50%,
+    rgba(230, 80, 197, 0.9) 82%,
+    transparent
+  );
+  box-shadow:
+    0 0 0.34rem rgba(54, 186, 255, 0.34),
+    0 0 0.78rem rgba(140, 92, 255, 0.44),
+    0 0 1.1rem rgba(230, 80, 197, 0.2);
+  pointer-events: none;
+  animation: profile-card-drop-guide 1200ms ease-in-out infinite alternate;
+}
+
+.profile-hub .profile-card-drop-before::after,
+.profile-hub .profile-card-drop-after + .profile-card::after {
+  top: calc(-0.35rem - 1px);
+}
+
+.profile-hub .profile-card-drop-after:last-child::after {
+  bottom: calc(-0.35rem - 1px);
+}
+
+@keyframes profile-card-drag-pulse {
+  from {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 0 0.1rem rgba(54, 186, 255, 0.58),
+      0 0 0.58rem rgba(140, 92, 255, 0.24),
+      0 0 1.15rem rgba(230, 80, 197, 0.1),
+      0 0.68rem 1.45rem rgba(2, 5, 20, 0.22);
+  }
+  to {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.17),
+      0 0 0.14rem rgba(54, 186, 255, 0.72),
+      0 0 0.76rem rgba(140, 92, 255, 0.32),
+      0 0 1.45rem rgba(230, 80, 197, 0.15),
+      0 0.8rem 1.65rem rgba(2, 5, 20, 0.26);
+  }
+}
+
+@keyframes profile-card-drop-guide {
+  from {
+    opacity: 0.72;
+    transform: scaleX(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+.profile-hub .profile-card-header {
+  grid-area: header;
+  align-self: end;
+  padding: 0 1rem 0 0.25rem;
+}
+
+.profile-hub .profile-title-copy h3 {
+  font-size: 1.16rem;
+}
+
+.profile-hub .profile-facts {
+  grid-area: facts;
+  align-self: end;
+  justify-self: end;
+  padding: 0 2.7rem 0 1rem;
+  text-align: right;
+}
+
+.profile-hub .profile-progress-block {
+  grid-area: progress;
+  width: 100%;
+  margin-top: 0;
+  padding: 0 2.6rem 0 0.25rem;
+}
+
+.profile-hub .profile-menu-action {
+  width: 100%;
+  padding: 0.56rem 0.66rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.profile-hub .profile-menu-action:hover,
+.profile-hub .profile-menu-action:focus-visible {
+  background: rgba(72, 91, 150, 0.18);
+  outline: none;
+}
+
+.profile-hub .profile-menu-action:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.profile-hub .profile-menu-action-danger {
+  color: #ffdce9;
+}
+
+.profile-hub .profile-menu-action-danger:hover,
+.profile-hub .profile-menu-action-danger:focus-visible {
+  background: color-mix(in srgb, var(--preference-boundary) 15%, transparent);
+}
+
+.profile-hub .hub-footer {
+  margin-top: 1.1rem;
+}
+
+.profile-hub .profile-live-region {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-hub .profile-card-dragging,
+  .profile-hub .profile-card-drop-before::after,
+  .profile-hub .profile-card-drop-after + .profile-card::after,
+  .profile-hub .profile-card-drop-after:last-child::after {
+    animation: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .profile-hub .profile-card-main {
+    min-height: 9.4rem;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "progress"
+      "facts";
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+
+  .profile-hub .profile-card-header {
+    align-self: auto;
+    padding: 0 4.3rem 0 0.25rem;
+  }
+
+  .profile-hub .profile-progress-block {
+    margin-top: auto;
+    padding: 0;
+  }
+
+  .profile-hub .profile-facts {
+    align-self: auto;
+    justify-self: stretch;
+    padding: 0 1.6rem 0 0;
+    text-align: left;
+  }
+
+  .profile-hub .profile-sort-options {
+    justify-content: flex-start;
+  }
+
+  .profile-hub .profile-reorder-hint {
+    text-align: left;
+  }
+}
+
+@media (max-width: 620px) {
+  .profile-hub .profiles-heading {
+    width: 100%;
+  }
+
+  .profile-hub .profiles-title-row {
+    display: grid;
+    width: 100%;
+    grid-template-columns: auto auto 1fr;
+    justify-content: stretch;
+    align-items: center;
+  }
+
+  .profile-hub .profile-order-button {
+    position: static;
+    grid-column: 3;
+    justify-self: end;
+    margin-top: 0;
+  }
+
+  .profile-hub .profile-toolbar-actions {
+    width: 100%;
+    justify-content: center;
+    padding-top: 0;
+  }
+
+  .profile-hub .hub-action-button {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+
+  .profile-hub .profile-order-tools {
+    padding: 0.58rem;
+  }
+
+  .profile-hub .profile-sort-option {
+    flex: 1 1 auto;
+  }
+
+  .profile-hub .profile-storage-alert,
+  .profile-hub .profile-storage-notice {
+    margin-top: -0.8rem;
+  }
+}

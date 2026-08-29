@@ -58,9 +58,26 @@ describe('TranslationService', () => {
     expect(service.plural(3, 'questionnaire.pending.one', 'questionnaire.pending.other')).toBe(
       'Quedan 3 preguntas visibles pendientes',
     );
+    expect(service.t('questionnaire.finish.action')).toBe('Salir');
 
     service.setLocale('en');
     expect(service.t('questionnaireRole.counterpart', { sex: 'Woman' })).toBe('Partner: Woman');
-    expect(service.t('questionnaire.finish.action')).toBe('Finish');
+    expect(service.t('questionnaire.finish.action')).toBe('Exit');
+  });
+
+  it('provides the profile hub resources in both locales', () => {
+    const service = TestBed.inject(TranslationService);
+
+    expect(service.t('homeHub.tagline')).toBe(
+      'Guarda tus perfiles, explora tus preferencias y compara, en privado, cómo encajan con las de otra persona.',
+    );
+    expect(service.plural(2, 'homeHub.profile.answers.one', 'homeHub.profile.answers.other')).toBe(
+      '2 respuestas guardadas',
+    );
+    expect(service.t('homeHub.profiles.sort.completion')).toBe('Más completos');
+
+    service.setLocale('en');
+    expect(service.t('homeHub.profile.reorder', { alias: 'Example' })).toBe('Reorder Example');
+    expect(service.t('homeHub.profile.duplicate')).toBe('Duplicate profile');
   });
 });

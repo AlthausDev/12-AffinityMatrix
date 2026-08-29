@@ -19,43 +19,23 @@ const BODY_FOCUS_FINAL_ORDER = [
   'lips',
   'tongue',
   'hair',
-  'hair-length-short',
-  'hair-length-medium',
-  'hair-length-long',
-  'shaved-bald-head',
-  'facial-hair',
   'ears',
   'neck',
   'chest-general',
-  'breast-size-small',
-  'breast-size-average',
-  'breast-size-large',
   'nipples',
-  'muscles',
-  'slim-build',
-  'curvy-build',
-  'stocky-build',
-  'stature-short',
-  'stature-average',
-  'stature-tall',
   'hands',
   'fingers',
   'bellies',
   'navel',
   'buttocks',
-  'buttocks-size-small',
-  'buttocks-size-average',
-  'buttocks-size-large',
   'legs',
   'thighs',
   'feet',
   'toes',
   'penis',
-  'penis-size-small',
-  'penis-size-average',
-  'penis-size-large',
   'testicles',
   'vulva',
+  'vagina',
   'pubic-hair',
   'body-hair',
   'armpits',
@@ -63,12 +43,6 @@ const BODY_FOCUS_FINAL_ORDER = [
   'sweat',
   'underwear',
   'worn-underwear',
-  'tattoos',
-  'piercings',
-  'facial-piercings',
-  'body-piercings',
-  'nipple-piercings',
-  'genital-piercings',
 ] as const;
 
 const PENETRATION_FINAL_ORDER = insertAfter(base('penetration'), 'double-anal-penetration', [
@@ -77,6 +51,29 @@ const PENETRATION_FINAL_ORDER = insertAfter(base('penetration'), 'double-anal-pe
   'simultaneous-anal-oral-penetration',
   'simultaneous-vaginal-anal-oral-penetration',
 ]);
+
+const SEXUAL_POSITIONS_FINAL_ORDER = [
+  'missionary',
+  'side-by-side-face-to-face',
+  'kneeling-face-to-face',
+  'seated-penetration',
+  'lotus-position',
+  'cowgirl',
+  'reverse-cowgirl',
+  'doggy-style',
+  'prone-rear-entry',
+  'spooning-penetration',
+  'legs-on-shoulders',
+  'butterfly-position',
+  't-position',
+  'standing-penetration',
+  'against-wall',
+  'standing-carry',
+  'wheelbarrow-position',
+  'bridge-position',
+  'sixty-nine',
+  'face-sitting',
+] as const;
 
 const TOYS_FINAL_ORDER = insertAfter(
   without(base('toys'), ['realistic-dildo', 'glass-dildo', 'metal-dildo']),
@@ -141,30 +138,123 @@ const SURREALISM_FINAL_ORDER = [
   'vore-fantasy',
 ] as const;
 
-const EXHIBITIONISM_FINAL_ORDER = insertAfter(
-  without(base('exhibitionism'), ['curtains-open-private']),
-  'voyeurism',
-  ['risk-of-being-seen'],
+const GROUPS_FINAL_ORDER = insertAfter(
+  without(base('groups'), ['hotwife-dynamic']),
+  'watching-partner-with-other',
+  ['erotic-compersion'],
 );
 
-const RESTRAINT_FINAL_ORDER = insertBefore(base('restraint'), 'gag', ['hand-over-mouth']);
-const FLUIDS_FINAL_ORDER = insertAfter(base('fluids'), 'female-ejaculation', ['squirting-on-partner']);
-const EDGE_FINAL_ORDER = insertBefore(
+const EXHIBITIONISM_FINAL_ORDER = [
+  'voyeurism',
+  'preagreed-unannounced-watching',
+  'watching-undressing',
+  'watched-masturbation',
+  'private-striptease',
+  'mirrors',
+  'lights-on',
+  'risk-of-being-seen',
+  'erotic-selfies',
+  'taking-erotic-photos',
+  'erotic-photo-session-together',
+  'erotic-media-exchange',
+  'private-recording',
+  'watch-private-recording-together',
+  'video-call-sex',
+  'webcam-performance-private',
+] as const;
+
+const PLACES_FINAL_ORDER = insertAfter(base('places-settings'), 'sex-in-hotel', [
+  'sex-in-office-after-hours',
+  'sex-in-abandoned-place',
+  'sex-on-secluded-beach',
+  'sex-while-camping',
+]);
+
+const POWER_BASE_WITHOUT_UMBRELLA = without(base('power'), ['service']);
+const POWER_WITH_SERVICE = insertAfter(POWER_BASE_WITHOUT_UMBRELLA, 'domestic-service', [
+  'body-care-service',
+  'attentive-service',
+  'erotic-presentation-service',
+  'footwear-service',
+  'fetish-gear-service',
+]);
+const POWER_FINAL_ORDER = insertAfter(POWER_WITH_SERVICE, 'leash-control', [
+  'ownership-token',
+  'temporary-ownership-marking',
+  'assigned-submissive-name',
+]);
+
+const SENSATION_FINAL_ORDER = [
+  'feather-sensation',
+  'tickling',
+  'sensory-deprivation',
+  'sensory-overload',
+  'ice-play',
+  'temperature-contrast',
+  'warm-wax',
+  'electrostimulation-mild',
+  'rough-grabbing',
+  'scratching',
+  'biting',
+  'pinching',
+  'hair-pulling',
+  'pressure-points',
+  'nipple-pinching',
+  'clothespins',
+  'nipple-clamp-sensation',
+  'breast-slapping',
+  'genital-slapping',
+  'spanking',
+  'wooden-spoon-impact',
+  'slapping-body',
+  'paddling',
+  'flogging',
+  'cropping',
+  'belting',
+  'face-slapping',
+  'whipping',
+  'caning',
+] as const;
+
+const RESTRAINT_BASE_WITHOUT_GENERIC_FURNITURE = without(base('restraint'), ['furniture-restraint']);
+const RESTRAINT_WITH_MOUTH = insertBefore(RESTRAINT_BASE_WITHOUT_GENERIC_FURNITURE, 'gag', ['hand-over-mouth']);
+const RESTRAINT_FINAL_ORDER = insertBefore(RESTRAINT_WITH_MOUTH, 'stocks-restraint', [
+  'st-andrews-cross-restraint',
+  'bondage-bench-restraint',
+  'bondage-chair-restraint',
+]);
+
+const FLUIDS_BASE_ORDER = without(base('fluids'), ['creampie-cleanup']);
+const FLUIDS_WITH_SQUIRTING = insertAfter(FLUIDS_BASE_ORDER, 'female-ejaculation', ['squirting-on-partner']);
+const FLUIDS_WITH_EXTERNAL_OTHER = insertAfter(FLUIDS_WITH_SQUIRTING, 'semen-on-buttocks', ['semen-on-other-body']);
+const FLUIDS_FINAL_ORDER = insertAfter(FLUIDS_WITH_EXTERNAL_OTHER, 'creampie-anal', [
+  'semen-cleanup-manual',
+  'semen-cleanup-oral-external',
+  'semen-cleanup-oral-creampie',
+  'semen-cleanup-other',
+]);
+const EDGE_WITH_SEPARATE_GENITALS = insertBefore(
   without(base('edge'), ['genital-torture']),
   'cock-and-ball-torture',
   ['pussy-torture'],
 );
+const EDGE_FINAL_ORDER = [...EDGE_WITH_SEPARATE_GENITALS, 'ordeal-scene', 'extreme-helplessness-fantasy'];
 
 /** Final deliberate order, extending the base grouping only where final review changes content. */
 export const FINAL_CATALOGUE_PRACTICE_GROUP_ORDER: Readonly<Record<string, readonly string[]>> = {
   ...CATALOGUE_PRACTICE_GROUP_ORDER,
   'manual-masturbation': without(base('manual-masturbation'), ['hand-over-mouth']),
   penetration: PENETRATION_FINAL_ORDER,
+  'sexual-positions': SEXUAL_POSITIONS_FINAL_ORDER,
   toys: TOYS_FINAL_ORDER,
   'body-fetishes': BODY_FOCUS_FINAL_ORDER,
+  groups: GROUPS_FINAL_ORDER,
   roleplay: ROLEPLAY_FINAL_ORDER,
   exhibitionism: EXHIBITIONISM_FINAL_ORDER,
+  'places-settings': PLACES_FINAL_ORDER,
+  power: POWER_FINAL_ORDER,
   restraint: RESTRAINT_FINAL_ORDER,
+  sensation: SENSATION_FINAL_ORDER,
   fluids: FLUIDS_FINAL_ORDER,
   'taboo-fantasies': TABOO_FINAL_ORDER,
   surrealism: SURREALISM_FINAL_ORDER,

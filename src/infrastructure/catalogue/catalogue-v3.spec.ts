@@ -8,6 +8,7 @@ import { describeCataloguePractice } from './v3/content/practice-description';
 
 const questionnaire = new QuestionnaireService();
 const CATEGORY_IDS = [
+  'body-fetishes',
   'affection-intimacy',
   'sexual-style',
   'clothing-appearance',
@@ -16,8 +17,8 @@ const CATEGORY_IDS = [
   'penetration',
   'sexual-positions',
   'toys',
+  'sexual-accessories',
   'orgasm-control',
-  'body-fetishes',
   'groups',
   'roleplay',
   'exhibitionism',
@@ -153,19 +154,37 @@ describe('catalogue v3 snapshot', () => {
 
     expect(positionIds).toEqual([
       'missionary',
-      'legs-on-shoulders',
+      'side-by-side-face-to-face',
+      'kneeling-face-to-face',
+      'seated-penetration',
+      'lotus-position',
       'cowgirl',
       'reverse-cowgirl',
       'doggy-style',
+      'prone-rear-entry',
       'spooning-penetration',
-      'seated-penetration',
-      'lotus-position',
+      'legs-on-shoulders',
+      'butterfly-position',
+      't-position',
       'standing-penetration',
       'against-wall',
+      'standing-carry',
+      'wheelbarrow-position',
+      'bridge-position',
       'sixty-nine',
       'face-sitting',
+      'oral-kneeling-standing-position',
+      'oral-lying-between-legs-position',
+      'oral-side-lying-position',
+      'oral-edge-position',
+      'coital-alignment-position',
+      'standing-rear-entry-position',
+      'mating-press-position',
+      'piledriver-position',
     ]);
     expect(snapshotPractice('missionary')?.categoryId).toBe('sexual-positions');
+    expect(snapshotPractice('side-by-side-face-to-face')?.categoryId).toBe('sexual-positions');
+    expect(snapshotPractice('wheelbarrow-position')?.categoryId).toBe('sexual-positions');
     expect(snapshotPractice('sixty-nine')?.categoryId).toBe('sexual-positions');
     expect(snapshotPractice('vaginal-penetration')?.categoryId).toBe('penetration');
   });
@@ -186,11 +205,13 @@ describe('catalogue v3 snapshot', () => {
     expect(sites('pinwheel')).toEqual(['body']);
   });
 
-  it('groups toys by family rather than mixing unrelated accessories', () => {
-    const ids = CATALOGUE_V3_CONTENT.find((category) => category.id === 'toys')
+  it('groups toys and accessories by family instead of mixing both categories', () => {
+    const toyIds = CATALOGUE_V3_CONTENT.find((category) => category.id === 'toys')
+      ?.practices.map((practice) => practice.id) ?? [];
+    const accessoryIds = CATALOGUE_V3_CONTENT.find((category) => category.id === 'sexual-accessories')
       ?.practices.map((practice) => practice.id) ?? [];
 
-    expect(ids.slice(0, 6)).toEqual([
+    expect(toyIds.slice(0, 6)).toEqual([
       'vibrator',
       'wand-vibrator',
       'bullet-vibrator',
@@ -198,9 +219,13 @@ describe('catalogue v3 snapshot', () => {
       'wearable-vibrator',
       'remote-control-toy',
     ]);
-    expect(ids.indexOf('dildo')).toBeLessThan(ids.indexOf('anal-plug'));
-    expect(ids.indexOf('anal-plug')).toBeLessThan(ids.indexOf('strap-on'));
-    expect(ids.indexOf('strap-on')).toBeLessThan(ids.indexOf('cock-ring'));
+    expect(toyIds.indexOf('dildo')).toBeLessThan(toyIds.indexOf('anal-plug'));
+    expect(toyIds.indexOf('anal-plug')).toBeLessThan(toyIds.indexOf('strap-on'));
+    expect(toyIds).not.toContain('cock-ring');
+    expect(accessoryIds).toContain('cock-ring');
+    expect(accessoryIds).toContain('sex-machine');
+    expect(snapshotPractice('cock-ring')?.categoryId).toBe('sexual-accessories');
+    expect(snapshotPractice('everyday-object-play')?.categoryId).toBe('sexual-accessories');
   });
 
   it('adds blood and scat preferences to fluids while leaving cutting itself in Edge', () => {

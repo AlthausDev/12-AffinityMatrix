@@ -1,5 +1,6 @@
 import { isCatalogueVersion } from '../catalogue/catalogue-version';
 import { ValidationIssue } from '../shared/validator';
+import { validatePhysicalPreferences } from './physical-preferences';
 import { Profile, PROFILE_SCHEMA_VERSION } from './profile';
 import { ProfileDataValidator } from './profile-data.validator';
 
@@ -10,6 +11,7 @@ const PROFILE_KEYS = [
   'catalogueVersion',
   'metadata',
   'settings',
+  'physicalPreferences',
   'answers',
   'createdAt',
   'updatedAt',
@@ -25,6 +27,7 @@ export class ProfileValidator extends ProfileDataValidator<Profile> {
     const issues = [
       ...this.validateAllowedKeys(value, PROFILE_KEYS),
       ...this.validateProfileData(value),
+      ...validatePhysicalPreferences(value['physicalPreferences']),
     ];
 
     if (value['schemaVersion'] !== PROFILE_SCHEMA_VERSION) {

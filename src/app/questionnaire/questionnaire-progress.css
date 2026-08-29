@@ -1,0 +1,176 @@
+.toolbar-sequence-actions {
+  grid-template-columns: minmax(10rem, 15rem) minmax(9rem, 12rem) minmax(10rem, 15rem);
+  align-items: center;
+  gap: clamp(.85rem, 2vw, 1.5rem);
+}
+
+/* The dock itself owns the edge line. Suppress generated inner/outer lines so
+   each bar has exactly one visual boundary: its real CSS border. */
+.questionnaire-dock-inner::before,
+.questionnaire-dock-inner::after,
+.questionnaire-top-dock::before,
+.questionnaire-top-dock::after,
+.questionnaire-bottom-dock::before,
+.questionnaire-bottom-dock::after {
+  content: none !important;
+  display: none !important;
+}
+
+.questionnaire-top-dock,
+.questionnaire-bottom-dock {
+  --questionnaire-dock-edge-gradient: linear-gradient(
+    90deg,
+    rgba(76, 190, 255, .38),
+    rgba(91, 196, 255, .76) 24%,
+    rgba(139, 145, 255, .78) 52%,
+    rgba(209, 106, 255, .76) 78%,
+    rgba(255, 113, 193, .38)
+  );
+  border-style: solid;
+  border-color: transparent;
+  border-image: var(--questionnaire-dock-edge-gradient) 1;
+}
+
+.questionnaire-top-dock {
+  border-width: 0 0 1px;
+}
+
+.questionnaire-bottom-dock {
+  border-width: 1px 0 0;
+}
+
+.category-dock-progress {
+  --category-progress: 0%;
+  --category-progress-color: #ff3f78;
+  display: grid;
+  min-width: 0;
+  align-content: center;
+  gap: .38rem;
+  color: color-mix(in srgb, var(--text-secondary) 90%, #edf8ff);
+  text-align: center;
+  pointer-events: none;
+}
+
+.category-dock-progress-text {
+  overflow: hidden;
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .025em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(0,0,0,.22);
+}
+
+.category-dock-progress-track {
+  display: block;
+  width: 100%;
+  height: .42rem;
+  overflow: hidden;
+  border: 1px solid rgba(113, 167, 240, .22);
+  border-radius: 999px;
+  background: rgba(3, 9, 27, .72);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.42), 0 0 .45rem rgba(74, 119, 210, .08);
+}
+
+.category-dock-progress-fill {
+  --category-progress-tone: color-mix(
+    in hsl shorter hue,
+    #ff4058 calc(100% - var(--category-progress)),
+    #32d278 var(--category-progress)
+  );
+  display: block;
+  width: max(.65rem, var(--category-progress));
+  height: 100%;
+  border-radius: inherit;
+  background: var(--category-progress-tone);
+  box-shadow:
+    0 0 .55rem color-mix(in srgb, var(--category-progress-tone) 52%, transparent),
+    0 0 .95rem color-mix(in srgb, var(--category-progress-tone) 24%, transparent);
+  transition: width 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+@media (min-width: 721px) {
+  /* Keep the desktop bars compact and vertically balanced around their controls. */
+  .questionnaire-overlay {
+    --questionnaire-top-space: 4rem;
+  }
+
+  .questionnaire-overlay.category-navigation-active {
+    --questionnaire-bottom-space: 4rem;
+  }
+
+  .questionnaire-top-dock,
+  .questionnaire-bottom-dock {
+    height: 4rem;
+  }
+
+  .questionnaire-top-dock .questionnaire-dock-inner,
+  .questionnaire-bottom-dock .questionnaire-dock-inner {
+    min-height: 4rem;
+    padding-top: .55rem;
+    padding-bottom: .55rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .toolbar-sequence-actions {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: .48rem;
+  }
+
+  .category-dock-progress {
+    position: absolute;
+    top: .04rem;
+    left: 1.25rem;
+    right: 1.25rem;
+    display: block;
+  }
+
+  .category-dock-progress-text {
+    display: none;
+  }
+
+  .category-dock-progress-track {
+    height: 4px;
+    border: 0;
+    background: rgba(5, 11, 30, .72);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.34);
+  }
+
+  .category-dock-progress-fill {
+    width: max(.5rem, var(--category-progress));
+  }
+
+  /* On mobile the visible bar is the clipped inner surface, while the fixed
+     dock also contains the transparent fade. Put the colored edge on that
+     real silhouette instead of on the outer dock boundary. */
+  .questionnaire-top-dock,
+  .questionnaire-bottom-dock {
+    border: 0;
+    border-image: none;
+  }
+
+  .questionnaire-top-dock .questionnaire-dock-inner {
+    border-style: solid;
+    border-color: transparent;
+    border-width: 0 0 1px;
+    border-image: var(--questionnaire-dock-edge-gradient) 1;
+    background:
+      radial-gradient(circle at 14% 0%, rgba(38,185,255,.09), transparent 30%),
+      radial-gradient(circle at 84% 100%, rgba(211,82,255,.08), transparent 28%),
+      linear-gradient(105deg, rgba(15,48,91,.72), rgba(34,31,88,.69) 52%, rgba(72,31,91,.67));
+  }
+
+  .questionnaire-bottom-dock .questionnaire-dock-inner {
+    border-style: solid;
+    border-color: transparent;
+    border-width: 1px 0 0;
+    border-image: var(--questionnaire-dock-edge-gradient) 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-dock-progress-fill { transition: none; }
+}

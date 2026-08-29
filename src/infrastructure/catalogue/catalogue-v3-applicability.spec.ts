@@ -124,12 +124,12 @@ describe('Catalogue V3 final applicability', () => {
       .toEqual(['use-on-self', 'use-on-partner', 'partner-uses-on-me']);
   });
 
-  it('limits facial-hair attraction to male counterpart variants', () => {
+  it('keeps profile-only appearance dimensions out of questionnaire applicability', () => {
     const lesbian = profile('lesbian-body', 'female', 'homosexual');
     const gayMan = profile('gay-man-body', 'male', 'homosexual');
 
     expect(practiceIds('body-fetishes', lesbian)).not.toContain('facial-hair');
-    expect(practiceIds('body-fetishes', gayMan)).toContain('facial-hair');
+    expect(practiceIds('body-fetishes', gayMan)).not.toContain('facial-hair');
   });
 
   it('gives glory-hole participants explicit sides and filters them by anatomy and orientation', () => {

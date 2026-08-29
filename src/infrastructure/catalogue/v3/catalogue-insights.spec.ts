@@ -1,0 +1,32 @@
+import { describe, expect, it } from 'vitest';
+import { CATALOGUE_INSIGHT_TAGS, CATALOGUE_V3_PRACTICE_INSIGHTS } from './catalogue-insights';
+import { CATALOGUE_V3_SUBCATEGORIES } from './catalogue-taxonomy';
+
+describe('catalogue v3 insight signals', () => {
+  it('defines each semantic tag once', () => {
+    const ids = CATALOGUE_INSIGHT_TAGS.map((tag) => tag.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('tags every practice in every migrated category exactly once', () => {
+    const migratedPracticeIds = CATALOGUE_V3_SUBCATEGORIES
+      .flatMap((subcategory) => subcategory.practiceIds);
+    const taggedPracticeIds = CATALOGUE_V3_PRACTICE_INSIGHTS.map((entry) => entry.practiceId);
+
+    expect(new Set(migratedPracticeIds).size).toBe(migratedPracticeIds.length);
+    expect(new Set(taggedPracticeIds).size).toBe(taggedPracticeIds.length);
+    expect([...taggedPracticeIds].sort()).toEqual([...migratedPracticeIds].sort());
+  });
+
+  it('keeps every final practice between one and four useful semantic tags', () => {
+    for (const entry of CATALOGUE_V3_PRACTICE_INSIGHTS) {
+      const strengths = Object.values(entry.signals);
+      expect(strengths.length, `${entry.practiceId} has no semantic tags`).toBeGreaterThanOrEqual(1);
+      expect(strengths.length, `${entry.practiceId} has too many semantic tags`).toBeLessThanOrEqual(4);
+      for (const strength of strengths) {
+        expect(strength).toBeGreaterThan(0);
+        expect(strength).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+});
