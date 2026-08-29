@@ -43,7 +43,7 @@ import {
                   <div
                     class="semantic-track"
                     role="img"
-                    [attr.aria-label]="themeLabel(entry) + ' · ' + i18n.t('dashboard.semantic.score') + ' ' + entry.score + '%'
+                    [attr.aria-label]="themeLabel(entry) + ' · ' + i18n.t('dashboard.semantic.score') + ' ' + entry.score + '%'"
                   >
                     <span [style.width.%]="entry.score"></span>
                   </div>
