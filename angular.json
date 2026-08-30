@@ -35,6 +35,7 @@
               "src/profile-dashboard-desktop-polish.css",
               "src/profile-dashboard-explanation-integration.css",
               "src/profile-dashboard-role-story.css",
+              "src/profile-dashboard-priority-flow.css",
               "src/profile-dashboard-progress-gradient.css",
               "src/profile-dashboard-insight-polish.css",
               "src/ui-preferences.css",
