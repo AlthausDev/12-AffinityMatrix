@@ -16,47 +16,13 @@ import {
         <div>
           <h3>{{ i18n.t('dashboard.roleProfile.title') }}</h3>
           <p>{{ text(
-            'Ordena tus respuestas según el lugar que ocupas en la acción: hacerla, recibirla o compartirla de forma recíproca.',
-            'Organizes your answers by the place you occupy in the action: doing it, receiving it, or sharing it reciprocally.'
+            'Compara cómo encajan tus respuestas al hacer, recibir o compartir una acción. Afinidad mide intensidad dentro de cada familia; peso relativo indica cómo se reparte esa afinidad entre las tres.',
+            'Compares how your answers fit doing, receiving, or sharing an action. Affinity measures intensity within each family; relative weight shows how that affinity is split between the three.'
           ) }}</p>
         </div>
       </header>
 
       @if (roleProfileAnswerCount() > 0) {
-        <aside class="dashboard-role-reading-note">
-          <div class="dashboard-role-reading-heading">
-            <strong>{{ text('Cómo leer estos números', 'How to read these numbers') }}</strong>
-            <small>{{ text(
-              'Hay tres medidas distintas. Ninguna indica cuánto cuestionario has completado.',
-              'There are three different measures. None of them indicates questionnaire completion.'
-            ) }}</small>
-          </div>
-
-          <div class="dashboard-role-reading-grid">
-            <div>
-              <strong>{{ text('Afinidad media', 'Average affinity') }}</strong>
-              <p>{{ text(
-                'Resume cuánto te atraen, de media, los roles ya respondidos de esa familia. 0% equivale a respuestas sin afinidad positiva; 100% equivaldría a haberlos marcado todos como Favorito. Activo, Receptivo y Mutuo no tienen por qué sumar 100 aquí.',
-                'Summarizes how appealing the answered roles in that family are on average. 0% means no positive affinity; 100% would mean every one was marked Favorite. Active, Receptive, and Mutual do not need to add up to 100 here.'
-              ) }}</p>
-            </div>
-            <div>
-              <strong>{{ text('Peso relativo', 'Relative weight') }}</strong>
-              <p>{{ text(
-                'Reparte toda la afinidad de rol detectada entre las tres familias. Aquí sí: Activo + Receptivo + Mutuo = 100%. Un 39% Activo significa que el 39% del peso de afinidad de rol medido procede de respuestas activas; no que «seas 39% activo».',
-                'Splits all detected role affinity between the three families. Here Active + Receptive + Mutual = 100%. A 39% Active weight means 39% of the measured role-affinity weight comes from active answers; it does not mean you are “39% active”.'
-              ) }}</p>
-            </div>
-            <div>
-              <strong>{{ text('Favoritos', 'Favorites') }}</strong>
-              <p>{{ text(
-                'Indica qué porcentaje de los roles medidos dentro de esa familia marcaste como Favorito. Es una señal de intensidad, independiente del reparto de peso relativo.',
-                'Shows what percentage of measured roles inside that family you marked Favorite. It is an intensity signal, separate from the relative-weight split.'
-              ) }}</p>
-            </div>
-          </div>
-        </aside>
-
         <aside class="dashboard-role-summary">
           <span>{{ text('Lectura rápida', 'Quick read') }}</span>
           <strong>{{ roleProfileDiagnosis() }}</strong>
@@ -76,12 +42,13 @@ import {
               <div class="dashboard-role-metrics">
                 <div class="dashboard-role-metric">
                   <div class="dashboard-role-metric-label">
-                    <span>{{ text('Afinidad media', 'Average affinity') }}</span>
+                    <span>{{ text('Afinidad', 'Affinity') }}</span>
                     <strong>{{ entry.affinityPercentage }}% · {{ affinityDescriptor(entry.affinityPercentage) }}</strong>
                   </div>
                   <div class="dashboard-role-track" role="img" [attr.aria-label]="roleMetricAriaLabel(entry, 'affinity')">
                     <span class="dashboard-role-fill dashboard-role-fill-affinity" [style.width.%]="entry.affinityPercentage"></span>
                   </div>
+                  <small class="dashboard-role-metric-hint">{{ text('0% sin afinidad · 100% favorito', '0% no affinity · 100% favorite') }}</small>
                 </div>
 
                 <div class="dashboard-role-metric">
@@ -92,6 +59,7 @@ import {
                   <div class="dashboard-role-track" role="img" [attr.aria-label]="roleMetricAriaLabel(entry, 'weight')">
                     <span class="dashboard-role-fill dashboard-role-fill-weight" [style.width.%]="entry.profileWeightPercentage"></span>
                   </div>
+                  <small class="dashboard-role-metric-hint">{{ text('Reparto frente a las otras familias', 'Share compared with the other families') }}</small>
                 </div>
               </div>
 
@@ -109,8 +77,8 @@ import {
               <div>
                 <strong>{{ text('Activo ↔ Receptivo', 'Active ↔ Receptive') }}</strong>
                 <small>{{ text(
-                  'Compara sólo las dos familias direccionales. Mutuo queda fuera porque compartir una práctica no es un punto medio matemático entre hacerla y recibirla.',
-                  'Compares only the two directional families. Mutual stays out because sharing a practice is not a mathematical midpoint between doing it and receiving it.'
+                  'Compara hacerla frente a recibirla; lo mutuo se mide aparte.',
+                  'Compares doing it with receiving it; mutual roles are measured separately.'
                 ) }}</small>
               </div>
               <span>{{ roleDirectionEvidenceLabel() }}</span>
@@ -135,8 +103,8 @@ import {
               <div>
                 <strong>{{ text('Preferencia de iniciativa', 'Initiative preference') }}</strong>
                 <small>{{ text(
-                  'Sólo usa respuestas donde has indicado explícitamente quién prefieres que dé el primer paso.',
-                  'Uses only answers where you explicitly stated who you prefer to make the first move.'
+                  'Sólo cuenta respuestas donde indicaste quién prefieres que dé el primer paso.',
+                  'Only counts answers where you stated who you prefer to make the first move.'
                 ) }}</small>
               </div>
               @if (roleProfileCoordinates().initiativeEvidenceCount > 0) {
@@ -242,39 +210,39 @@ export class DashboardRoleProfileComponent {
       const dominantLabel = dominant && lead >= 8 ? this.roleProfileFamilyPhrase(dominant.perspective) : '';
       if (dominantLabel && direction) {
         return this.text(
-          `Perfil bastante versátil: las tres formas de participación tienen peso, aunque destaca ${dominantLabel} y aparece ${direction}.`,
-          `Quite a versatile profile: all three forms of participation carry weight, although ${dominantLabel} stands out and there is ${direction}.`,
+          `Las tres formas de participación tienen bastante peso; destaca ${dominantLabel} y aparece ${direction}.`,
+          `All three forms of participation carry substantial weight; ${dominantLabel} stands out and there is ${direction}.`,
         );
       }
       if (dominantLabel) {
         return this.text(
-          `Perfil bastante versátil: las tres formas de participación tienen peso, con algo más de presencia ${dominantLabel}.`,
-          `Quite a versatile profile: all three forms of participation carry weight, with somewhat more presence ${dominantLabel}.`,
+          `Las tres formas de participación están presentes, con algo más de peso ${dominantLabel}.`,
+          `All three forms of participation are present, with somewhat more weight ${dominantLabel}.`,
         );
       }
       return this.text(
-        'Perfil de roles muy equilibrado: activo, receptivo y mutuo tienen un peso parecido y ninguno domina con claridad.',
-        'Very balanced role profile: active, receptive, and mutual carry similar weight and none clearly dominates.',
+        'Activo, receptivo y mutuo tienen un peso parecido; ninguno domina con claridad.',
+        'Active, receptive, and mutual carry similar weight; none clearly dominates.',
       );
     }
 
     if (!dominant || lead < 8) {
       return direction
-        ? this.text(`Perfil mixto y bastante repartido, con ${direction}.`, `Mixed and fairly distributed profile, with ${direction}.`)
-        : this.text('Perfil mixto y bastante repartido entre las tres familias.', 'Mixed profile, fairly distributed across the three families.');
+        ? this.text(`El reparto es bastante mixto, con ${direction}.`, `The split is fairly mixed, with ${direction}.`)
+        : this.text('El reparto entre las tres familias es bastante mixto.', 'The split across the three families is fairly mixed.');
     }
 
     const dominantLabel = this.roleProfileFamilyPhrase(dominant.perspective);
     if (dominant.perspective === 'neutral') {
       return direction
-        ? this.text(`Predominan las respuestas ${dominantLabel}, con ${direction}.`, `Answers ${dominantLabel} predominate, with ${direction}.`)
-        : this.text(`Predominan las respuestas ${dominantLabel}.`, `Answers ${dominantLabel} predominate.`);
+        ? this.text(`Pesan más las respuestas ${dominantLabel}, con ${direction}.`, `Answers ${dominantLabel} carry more weight, with ${direction}.`)
+        : this.text(`Pesan más las respuestas ${dominantLabel}.`, `Answers ${dominantLabel} carry more weight.`);
     }
 
     const marked = lead >= 20 || dominant.value >= 50;
     return marked
       ? this.text(`Hay un predominio claro ${dominantLabel}.`, `There is a clear predominance ${dominantLabel}.`)
-      : this.text(`Hay una ligera mayor presencia ${dominantLabel}.`, `There is a slightly greater presence ${dominantLabel}.`);
+      : this.text(`Hay algo más de peso ${dominantLabel}.`, `There is somewhat more weight ${dominantLabel}.`);
   }
 
   roleCoordinateLeft(): number {
@@ -316,7 +284,7 @@ export class DashboardRoleProfileComponent {
 
   roleMetricAriaLabel(entry: RoleProfileEntry, metric: 'affinity' | 'weight'): string {
     const label = metric === 'affinity'
-      ? this.text('Afinidad media', 'Average affinity')
+      ? this.text('Afinidad', 'Affinity')
       : this.text('Peso relativo', 'Relative weight');
     const value = metric === 'affinity' ? entry.affinityPercentage : entry.profileWeightPercentage;
     return `${this.rolePerspectiveLabel(entry.perspective)} · ${label} ${value}%`;
