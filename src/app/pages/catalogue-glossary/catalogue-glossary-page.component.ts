@@ -2,20 +2,20 @@ import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
-  CatalogueGlossaryCategory,
-  LocalizedCatalogueGlossaryEntry,
-  localizedCatalogueGlossary,
-} from '../../i18n/catalogue-glossary';
+  FinalCatalogueGlossaryCategory,
+  LocalizedFinalCatalogueGlossaryEntry,
+  localizedFinalCatalogueGlossary,
+} from '../../i18n/catalogue-glossary-final';
 import { TranslationService } from '../../i18n/translation.service';
 import { findRouteParam } from '../../shared/route-param';
 
 interface GlossaryGroup {
-  readonly category: CatalogueGlossaryCategory;
+  readonly category: FinalCatalogueGlossaryCategory;
   readonly label: string;
-  readonly entries: readonly LocalizedCatalogueGlossaryEntry[];
+  readonly entries: readonly LocalizedFinalCatalogueGlossaryEntry[];
 }
 
-const CATEGORY_ORDER: readonly CatalogueGlossaryCategory[] = [
+const CATEGORY_ORDER: readonly FinalCatalogueGlossaryCategory[] = [
   'anatomy',
   'orgasm-control',
   'groups-non-monogamy',
@@ -26,11 +26,12 @@ const CATEGORY_ORDER: readonly CatalogueGlossaryCategory[] = [
   'sensation',
   'fluids',
   'roleplay-fantasy',
+  'places-settings',
   'toys-penetration',
   'edge',
 ];
 
-const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es: string; en: string }>>> = {
+const CATEGORY_LABELS: Readonly<Record<FinalCatalogueGlossaryCategory, Readonly<{ es: string; en: string }>>> = {
   anatomy: { es: 'Anatomía', en: 'Anatomy' },
   'orgasm-control': { es: 'Orgasmo y control', en: 'Orgasm & control' },
   'groups-non-monogamy': { es: 'Grupos y no monogamia consensuada', en: 'Groups & consensual non-monogamy' },
@@ -41,6 +42,7 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
   sensation: { es: 'Sensaciones', en: 'Sensation' },
   fluids: { es: 'Fluidos y sustancias', en: 'Fluids & substances' },
   'roleplay-fantasy': { es: 'Roleplay y fantasía', en: 'Roleplay & fantasy' },
+  'places-settings': { es: 'Lugares y entornos', en: 'Places & settings' },
   'toys-penetration': { es: 'Juguetes y penetración', en: 'Toys & penetration' },
   edge: { es: 'Edge', en: 'Edge' },
 };
@@ -382,7 +384,7 @@ export class CatalogueGlossaryPageComponent {
   readonly groups = computed<readonly GlossaryGroup[]>(() => {
     const locale = this.i18n.locale();
     const normalizedQuery = this.query().trim().toLocaleLowerCase(locale);
-    const entries = localizedCatalogueGlossary(locale).filter((entry) => {
+    const entries = localizedFinalCatalogueGlossary(locale).filter((entry) => {
       if (!normalizedQuery) return true;
       const haystack = [entry.title, entry.definition, ...entry.aliases]
         .join(' ')

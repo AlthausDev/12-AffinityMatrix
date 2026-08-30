@@ -20,7 +20,19 @@ export interface LocalizedFinalCatalogueGlossaryEntry {
   readonly aliases: readonly string[];
 }
 
-const REPLACED_BASE_IDS = new Set(['hotwife', 'cuckold', 'voyeurism', 'glory-hole', 'vulva-pain-play']);
+const EXCLUDED_BASE_IDS = new Set([
+  'hotwife',
+  'cuckold',
+  'voyeurism',
+  'glory-hole',
+  'vulva-pain-play',
+  // Tease & denial no longer exists as a standalone final catalogue practice; orgasm denial and
+  // the surrounding control practices cover the current questionnaire vocabulary instead.
+  'tease-denial',
+  // Pegging no longer has a dedicated catalogue practice after the current penetration/toy split.
+  // Keeping a standalone definition would make the glossary promise vocabulary the questionnaire does not use.
+  'pegging',
+]);
 
 const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
   term(
@@ -130,13 +142,26 @@ const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
   ),
 ] as const;
 
+const FINAL_BASE_GLOSSARY: readonly FinalCatalogueGlossaryEntry[] = CATALOGUE_GLOSSARY
+  .filter((entry) => !EXCLUDED_BASE_IDS.has(entry.id))
+  .map((entry) => entry.id === 'forced-orgasm'
+    ? {
+        ...entry,
+        titleEs: 'Orgasmo forzado',
+        aliases: [...entry.aliases, 'orgasmo forzado'],
+      }
+    : entry);
+
 export const FINAL_CATALOGUE_GLOSSARY: readonly FinalCatalogueGlossaryEntry[] = [
-  ...CATALOGUE_GLOSSARY.filter((entry) => !REPLACED_BASE_IDS.has(entry.id)),
+  ...FINAL_BASE_GLOSSARY,
   ...CLOSING_GLOSSARY_ENTRIES,
 ];
 
 const ALIASES = FINAL_CATALOGUE_GLOSSARY
-  .flatMap((entry) => entry.aliases.map((alias) => ({ alias, entry })))
+  .flatMap((entry) =>
+    [...new Set([...entry.aliases, entry.titleEn, entry.titleEs])]
+      .map((alias) => ({ alias, entry })),
+  )
   .sort((left, right) => right.alias.length - left.alias.length);
 const ALIAS_LOOKUP = new Map(ALIASES.map(({ alias, entry }) => [alias.toLocaleLowerCase(), entry]));
 const TERM_PATTERN = new RegExp(
