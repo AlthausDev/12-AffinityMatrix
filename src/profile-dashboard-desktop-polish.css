@@ -1,0 +1,111 @@
+/* Desktop-only composition. Mobile keeps the denser single-column rhythm that already works well. */
+@media (min-width: 1120px) {
+  .profile-dashboard {
+    width: min(100% - 4rem, 84rem);
+  }
+
+  .profile-dashboard .dashboard-hero {
+    padding-inline: clamp(2rem, 3vw, 3rem);
+  }
+
+  .profile-dashboard .dashboard-action-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+
+  .profile-dashboard .dashboard-action:nth-child(1),
+  .profile-dashboard .dashboard-action:nth-child(2) {
+    grid-column: span 6;
+  }
+
+  .profile-dashboard .dashboard-action:nth-child(3),
+  .profile-dashboard .dashboard-action:nth-child(4),
+  .profile-dashboard .dashboard-action:nth-child(5) {
+    grid-column: span 4;
+    min-height: 8.8rem;
+  }
+
+  .profile-dashboard .dashboard-action:nth-child(3) {
+    background:
+      linear-gradient(145deg, rgba(20, 48, 88, 0.68), rgba(35, 24, 64, 0.72)) padding-box,
+      linear-gradient(135deg, rgba(54, 186, 255, 0.34), rgba(140, 92, 255, 0.31), rgba(230, 80, 197, 0.2)) border-box;
+  }
+
+  .profile-dashboard .dashboard-action:nth-child(4) {
+    background:
+      linear-gradient(145deg, rgba(28, 43, 88, 0.68), rgba(49, 25, 73, 0.7)) padding-box,
+      linear-gradient(135deg, rgba(90, 137, 255, 0.32), rgba(140, 92, 255, 0.38), rgba(230, 80, 197, 0.28)) border-box;
+  }
+
+  .profile-dashboard .dashboard-action:nth-child(5) {
+    background:
+      linear-gradient(145deg, rgba(20, 52, 78, 0.68), rgba(40, 28, 65, 0.72)) padding-box,
+      linear-gradient(135deg, rgba(54, 186, 255, 0.3), rgba(92, 137, 255, 0.3), rgba(140, 92, 255, 0.34)) border-box;
+  }
+
+  .profile-dashboard .dashboard-action-copy strong {
+    font-size: 1.05rem;
+  }
+
+  .profile-dashboard .dashboard-action-copy small {
+    max-width: 34rem;
+    font-size: 0.74rem;
+  }
+
+  .profile-dashboard .dashboard-insight-grid {
+    grid-template-columns: minmax(20rem, 0.82fr) minmax(0, 1.58fr);
+    align-items: start;
+    gap: 0.9rem;
+  }
+
+  .profile-dashboard .dashboard-preference-card {
+    position: sticky;
+    top: 1.2rem;
+    align-self: start;
+  }
+
+  .profile-dashboard .dashboard-preference-layout {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 1.15rem;
+  }
+
+  .profile-dashboard .preference-donut {
+    width: clamp(9.2rem, 10vw, 10.8rem);
+  }
+
+  .profile-dashboard .preference-legend {
+    width: min(100%, 24rem);
+  }
+
+  .profile-dashboard .dashboard-chart-card {
+    padding: 1.18rem;
+  }
+
+  .profile-dashboard .dashboard-chart-heading h3 {
+    font-size: 1.08rem;
+  }
+
+  .profile-dashboard .dashboard-chart-heading p {
+    font-size: 0.73rem;
+  }
+
+  .profile-dashboard .dashboard-category-bars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+}
+
+@media (min-width: 1480px) {
+  .profile-dashboard {
+    width: min(100% - 6rem, 88rem);
+  }
+
+  .profile-dashboard .dashboard-action {
+    min-height: 9.2rem;
+  }
+
+  .profile-dashboard .dashboard-insight-grid {
+    grid-template-columns: minmax(22rem, 0.78fr) minmax(0, 1.72fr);
+  }
+}
