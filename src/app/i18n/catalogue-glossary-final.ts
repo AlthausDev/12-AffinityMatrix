@@ -73,7 +73,7 @@ const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
   ),
 
   term(
-    'restraint', 'stocks', 'Stocks', 'Cepo / stocks', ['stocks', 'cepo'],
+    'restraint', 'stocks', 'Stocks', 'Cepo de inmovilización', ['stocks', 'cepo', 'cepo / stocks'],
     'Rigid restraint furniture that traps wrists, ankles or sometimes the neck in fixed openings. Imagine two solid sections closing around those body areas so the person cannot simply move away.',
     'Mobiliario rígido que inmoviliza muñecas, tobillos o a veces el cuello mediante aberturas fijas. La imagen típica son dos piezas sólidas que se cierran alrededor de esas zonas e impiden apartarse.',
   ),
@@ -144,13 +144,24 @@ const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
 
 const FINAL_BASE_GLOSSARY: readonly FinalCatalogueGlossaryEntry[] = CATALOGUE_GLOSSARY
   .filter((entry) => !EXCLUDED_BASE_IDS.has(entry.id))
-  .map((entry) => entry.id === 'forced-orgasm'
-    ? {
+  .map((entry) => {
+    if (entry.id === 'forced-orgasm') {
+      return {
         ...entry,
         titleEs: 'Orgasmo forzado',
         aliases: [...entry.aliases, 'orgasmo forzado'],
-      }
-    : entry);
+      };
+    }
+    if (entry.id === 'ageplay') {
+      return {
+        ...entry,
+        titleEn: 'Ageplay',
+        titleEs: 'Ageplay',
+        aliases: [...entry.aliases, 'Adult ageplay', 'Ageplay adulto'],
+      };
+    }
+    return entry;
+  });
 
 export const FINAL_CATALOGUE_GLOSSARY: readonly FinalCatalogueGlossaryEntry[] = [
   ...FINAL_BASE_GLOSSARY,
