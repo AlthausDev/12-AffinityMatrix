@@ -47,7 +47,8 @@
               "src/profile-dashboard-readability.css",
               "src/questionnaire-v2.css",
               "src/questionnaire-mobile-performance.css",
-              "src/subpage-title-polish.css"
+              "src/subpage-title-polish.css",
+              "src/desktop-readable-microtype.css"
             ]
           },
           "configurations": {
@@ -70,6 +71,13 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "test": {
+              "builder": "@angular/build:unit-test",
+              "options": {
+                "tsConfig": "tsconfig.spec.json",
+                "buildTarget": "affinity-matrix:build:development"
+              }
             }
           },
           "defaultConfiguration": "production"
