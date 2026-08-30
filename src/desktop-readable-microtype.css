@@ -1,0 +1,145 @@
+/* Final desktop-only legibility floor.
+   This file deliberately changes typography only: no card sizes, panel geometry, gaps or control dimensions. */
+
+/* Edit-profile navigation must sit on the page edge, not inherit the old 50rem-centered offset. */
+app-profile-editor-page .profile-editor-page.profile-editor-page-editing > .profile-entry-back {
+  margin-inline-start: 0 !important;
+}
+
+@media (min-width: 981px) {
+  /* Semantic map: the labels closest to the rails were still below a comfortable desktop floor. */
+  .profile-dashboard .semantic-scale-inline-note {
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+
+  .profile-dashboard .semantic-panel-kicker strong,
+  .profile-dashboard .semantic-kicker {
+    font-size: 0.94rem;
+  }
+
+  .profile-dashboard .semantic-theme-heading strong {
+    font-size: 1.08rem;
+  }
+
+  .profile-dashboard .semantic-theme-heading small {
+    font-size: 0.94rem;
+    line-height: 1.42;
+  }
+
+  .profile-dashboard .semantic-theme-heading > span {
+    font-size: 0.96rem;
+  }
+
+  .profile-dashboard .semantic-spectrum-endpoints {
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  .profile-dashboard .semantic-spectrum-endpoints span,
+  .profile-dashboard .semantic-spectrum-endpoints b {
+    font-size: inherit;
+  }
+
+  .profile-dashboard .semantic-theme-footer small,
+  .profile-dashboard .semantic-relative-axis > small,
+  .profile-dashboard .semantic-coordinate-card small,
+  .profile-dashboard .semantic-note {
+    font-size: 0.92rem;
+    line-height: 1.42;
+  }
+
+  .profile-dashboard .semantic-relative-heading p:last-child {
+    font-size: 0.94rem;
+  }
+
+  .profile-dashboard .semantic-relative-group > header strong,
+  .profile-dashboard .semantic-coordinate-card > header strong {
+    font-size: 1rem;
+  }
+
+  .profile-dashboard .semantic-relative-labels strong,
+  .profile-dashboard .semantic-relative-labels span,
+  .profile-dashboard .coordinate-label {
+    font-size: 0.9rem;
+    line-height: 1.25;
+  }
+
+  .profile-dashboard .semantic-highlight-topline strong,
+  .profile-dashboard .semantic-highlight-topline span {
+    font-size: 0.98rem;
+  }
+
+  .profile-dashboard .semantic-highlight-diagnosis,
+  .profile-dashboard .semantic-highlight small {
+    font-size: 0.9rem;
+  }
+
+  /* Role profile: composition legend and rail hints were still using 0.55-0.62rem legacy values. */
+  .profile-dashboard .dashboard-role-composition-heading strong {
+    font-size: 1rem;
+  }
+
+  .profile-dashboard .dashboard-role-composition-heading small,
+  .profile-dashboard .dashboard-role-composition-heading > span {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .profile-dashboard .dashboard-role-composition-labels > span,
+  .profile-dashboard .dashboard-role-composition-labels b,
+  .profile-dashboard .dashboard-role-composition-labels strong {
+    font-size: 0.9rem;
+  }
+
+  .profile-dashboard .dashboard-role-summary > span {
+    font-size: 0.9rem;
+  }
+
+  .profile-dashboard .dashboard-role-summary > strong {
+    font-size: 1.02rem;
+  }
+
+  .profile-dashboard .dashboard-role-row-heading strong {
+    font-size: 1.08rem;
+  }
+
+  .profile-dashboard .dashboard-role-row-heading small,
+  .profile-dashboard .dashboard-role-row-heading > span,
+  .profile-dashboard .dashboard-role-row-meta,
+  .profile-dashboard .dashboard-role-row-meta strong {
+    font-size: 0.92rem;
+    line-height: 1.38;
+  }
+
+  .profile-dashboard .dashboard-role-metric-label span,
+  .profile-dashboard .dashboard-role-metric-label strong,
+  .profile-dashboard .dashboard-role-metric-hint {
+    font-size: 0.92rem;
+    line-height: 1.3;
+  }
+
+  .profile-dashboard .dashboard-role-spectrum-heading strong {
+    font-size: 1rem;
+  }
+
+  .profile-dashboard .dashboard-role-spectrum-heading small,
+  .profile-dashboard .dashboard-role-spectrum-heading > span,
+  .profile-dashboard .dashboard-role-spectrum-labels,
+  .profile-dashboard .dashboard-role-spectrum-diagnosis,
+  .profile-dashboard .dashboard-role-initiative-empty {
+    font-size: 0.92rem;
+    line-height: 1.38;
+  }
+
+  /* Distribution/action helpers in Normal mode should remain readable from a normal monitor distance. */
+  .profile-dashboard .dashboard-action-copy small,
+  .profile-dashboard .dashboard-chart-heading p,
+  .profile-dashboard .dashboard-insights-heading > p,
+  .profile-dashboard .preference-legend-row,
+  .profile-dashboard .preference-legend-label,
+  .profile-dashboard .preference-legend-value {
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+}
