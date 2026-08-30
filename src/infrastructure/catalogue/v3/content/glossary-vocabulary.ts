@@ -16,10 +16,6 @@ const PRACTICE_VOCABULARY: Readonly<Record<string, Partial<CataloguePracticeSeed
     en: 'Free use',
     es: 'Free use',
   },
-  'adult-ageplay-roleplay': {
-    en: 'Adult ageplay',
-    es: 'Ageplay adulto',
-  },
   'futanari-fantasy': {
     en: 'Futanari fantasy',
     es: 'Fantasía futanari',
@@ -86,9 +82,6 @@ const PRACTICE_VOCABULARY: Readonly<Record<string, Partial<CataloguePracticeSeed
   },
   'fire-play': {
     es: 'Fire play / juego con fuego',
-  },
-  'stocks-restraint': {
-    es: 'Cepo / stocks',
   },
   'dungeon-venue': {
     es: 'Dungeon / sala BDSM',
