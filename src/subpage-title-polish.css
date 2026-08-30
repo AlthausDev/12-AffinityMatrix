@@ -1,5 +1,11 @@
-/* Shared identity cue for utility/subpages. Home, dashboard and catalogue/glossary deliberately keep
-   their own header language. The mark belongs to the title line only, never to the eyebrow or copy. */
+/* Shared identity cue for utility/subpages. Home and dashboard keep their own header language.
+   The mark belongs to the title line only, never to the eyebrow or descriptive copy. */
+
+/* Every explicit subpage title row is centered without moving the copy around it. */
+.subpage-title-row {
+  justify-content: center;
+  margin-inline: auto;
+}
 
 .profile-entry-page .profile-entry-header .subpage-title-row {
   justify-self: center;
@@ -44,50 +50,103 @@ app-questionnaire-category-page .category-header > div:first-child h1::before {
     0 0 1rem color-mix(in srgb, var(--neon-violet) 12%, transparent);
 }
 
+/* Glossary now follows the same identity language. Its search remains independent of the title row. */
+app-catalogue-glossary-page .glossary-page .glossary-header {
+  grid-template-columns: minmax(0, 1fr) !important;
+  justify-items: center;
+  text-align: center;
+}
+
+app-catalogue-glossary-page .glossary-page .glossary-header > div {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+}
+
+app-catalogue-glossary-page .glossary-page .glossary-header h1 {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 0.82rem;
+  text-align: center;
+}
+
+app-catalogue-glossary-page .glossary-page .glossary-header h1::before {
+  content: '';
+  display: block;
+  width: 2.9rem;
+  height: 2.9rem;
+  flex: 0 0 2.9rem;
+  border: 1px solid transparent;
+  border-radius: 0.82rem;
+  background:
+    url('/branding/desiresync-icon.avif') center / 88% 88% no-repeat padding-box,
+    linear-gradient(145deg, rgba(38, 54, 94, 0.52), rgba(31, 25, 69, 0.58)) padding-box,
+    var(--window-border-gradient) border-box;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0.5rem 1.2rem rgba(6, 10, 28, 0.16),
+    0 0 1rem color-mix(in srgb, var(--neon-violet) 12%, transparent);
+}
+
+app-catalogue-glossary-page .glossary-page .glossary-header .lead {
+  margin-inline: auto;
+  text-align: center;
+}
+
+app-catalogue-glossary-page .glossary-page .glossary-search {
+  width: min(100%, 24rem);
+  justify-self: center;
+  text-align: left;
+}
+
 /* Several questionnaire/comparison widgets predate the current readability scale and used 0.62–0.75rem
    helper copy. Raise those floors on desktop only; phone typography already has the desired density. */
 @media (min-width: 981px) {
   app-questionnaire-categories-page .categories-header .lead { font-size: 0.94rem; }
-  app-questionnaire-categories-page .hidden-count { font-size: 0.82rem; }
-  app-questionnaire-categories-page .overall-progress span { font-size: 0.82rem; }
-  app-questionnaire-categories-page .consent-note { font-size: 0.84rem; }
-  app-questionnaire-categories-page .history-note { font-size: 0.82rem; }
-  app-questionnaire-categories-page .category-meta { font-size: 0.76rem; line-height: 1.3; }
-  app-questionnaire-categories-page .category-card-description { font-size: 0.86rem; }
-  app-questionnaire-categories-page .category-visibility-action { font-size: 0.75rem; }
-  app-questionnaire-categories-page .hidden-heading p { font-size: 0.86rem; }
-  app-questionnaire-categories-page .hidden-row { font-size: 0.88rem; }
-  app-questionnaire-categories-page .compact-action { font-size: 0.82rem; }
+  app-questionnaire-categories-page .hidden-count { font-size: 0.88rem; }
+  app-questionnaire-categories-page .overall-progress span { font-size: 0.88rem; }
+  app-questionnaire-categories-page .consent-note { font-size: 0.9rem; }
+  app-questionnaire-categories-page .history-note { font-size: 0.88rem; }
+  app-questionnaire-categories-page .category-meta { font-size: 0.86rem; line-height: 1.35; }
+  app-questionnaire-categories-page .category-card-description { font-size: 0.9rem; }
+  app-questionnaire-categories-page .category-visibility-action { font-size: 0.84rem; }
+  app-questionnaire-categories-page .hidden-heading p { font-size: 0.9rem; }
+  app-questionnaire-categories-page .hidden-row { font-size: 0.9rem; }
+  app-questionnaire-categories-page .compact-action { font-size: 0.86rem; }
 
-  app-questionnaire-category-page .category-progress-label { font-size: 0.74rem; }
-  app-questionnaire-category-page .category-progress-count { font-size: 0.88rem; }
-  app-questionnaire-category-page .save-state { font-size: 0.9rem; }
-  app-questionnaire-category-page .subcategory-summary-copy small { font-size: 0.8rem; }
-  app-questionnaire-category-page .subcategory-progress > strong { font-size: 0.88rem; }
-  app-questionnaire-category-page .subcategory-description { font-size: 0.9rem; }
-  app-questionnaire-category-page .question-card-header p { font-size: 0.9rem; }
+  app-questionnaire-category-page .category-progress-label { font-size: 0.84rem; }
+  app-questionnaire-category-page .category-progress-count { font-size: 0.9rem; }
+  app-questionnaire-category-page .save-state { font-size: 0.92rem; }
+  app-questionnaire-category-page .subcategory-summary-copy small { font-size: 0.88rem; }
+  app-questionnaire-category-page .subcategory-progress > strong { font-size: 0.9rem; }
+  app-questionnaire-category-page .subcategory-description { font-size: 0.92rem; }
+  app-questionnaire-category-page .question-card-header p { font-size: 0.92rem; }
 
-  app-profile-comparison-page .select-field { font-size: 0.9rem; }
-  app-profile-comparison-page .summary-card span { font-size: 0.88rem; }
-  app-profile-comparison-page .affinity-value span { font-size: 0.84rem; }
-  app-profile-comparison-page .category-note { font-size: 0.88rem; }
-  app-profile-comparison-page .comparison-badge { font-size: 0.78rem; }
-  app-profile-comparison-page .answer-pair span:not(.pair-arrow) { font-size: 0.88rem; }
-  app-profile-comparison-page .profile-name { font-size: 0.78rem !important; }
-  app-profile-comparison-page .omitted-note { font-size: 0.88rem; }
+  app-profile-comparison-page .select-field { font-size: 0.92rem; }
+  app-profile-comparison-page .summary-card span { font-size: 0.9rem; }
+  app-profile-comparison-page .affinity-value span { font-size: 0.88rem; }
+  app-profile-comparison-page .category-note { font-size: 0.9rem; }
+  app-profile-comparison-page .comparison-badge { font-size: 0.84rem; }
+  app-profile-comparison-page .answer-pair span:not(.pair-arrow) { font-size: 0.9rem; }
+  app-profile-comparison-page .profile-name { font-size: 0.84rem !important; }
+  app-profile-comparison-page .omitted-note { font-size: 0.9rem; }
 }
 
 @media (max-width: 720px) {
   .profile-entry-page .profile-entry-header .subpage-title-row,
   app-profile-comparison-page .page-header h1,
   app-questionnaire-categories-page .categories-intro h1,
-  app-questionnaire-category-page .category-header > div:first-child h1 {
+  app-questionnaire-category-page .category-header > div:first-child h1,
+  app-catalogue-glossary-page .glossary-page .glossary-header h1 {
     gap: 0.68rem;
   }
 
   app-profile-comparison-page .page-header h1::before,
   app-questionnaire-categories-page .categories-intro h1::before,
-  app-questionnaire-category-page .category-header > div:first-child h1::before {
+  app-questionnaire-category-page .category-header > div:first-child h1::before,
+  app-catalogue-glossary-page .glossary-page .glossary-header h1::before {
     width: 2.55rem;
     height: 2.55rem;
     flex-basis: 2.55rem;
