@@ -45,6 +45,39 @@ app-questionnaire-category-page .category-header > div:first-child h1::before {
     0 0 1rem color-mix(in srgb, var(--neon-violet) 12%, transparent);
 }
 
+/* Several questionnaire/comparison widgets predate the current readability scale and used 0.62–0.75rem
+   helper copy. Raise those floors on desktop only; phone typography already has the desired density. */
+@media (min-width: 981px) {
+  app-questionnaire-categories-page .categories-header .lead { font-size: 0.94rem; }
+  app-questionnaire-categories-page .hidden-count { font-size: 0.82rem; }
+  app-questionnaire-categories-page .overall-progress span { font-size: 0.82rem; }
+  app-questionnaire-categories-page .consent-note { font-size: 0.84rem; }
+  app-questionnaire-categories-page .history-note { font-size: 0.82rem; }
+  app-questionnaire-categories-page .category-meta { font-size: 0.76rem; line-height: 1.3; }
+  app-questionnaire-categories-page .category-card-description { font-size: 0.86rem; }
+  app-questionnaire-categories-page .category-visibility-action { font-size: 0.75rem; }
+  app-questionnaire-categories-page .hidden-heading p { font-size: 0.86rem; }
+  app-questionnaire-categories-page .hidden-row { font-size: 0.88rem; }
+  app-questionnaire-categories-page .compact-action { font-size: 0.82rem; }
+
+  app-questionnaire-category-page .category-progress-label { font-size: 0.74rem; }
+  app-questionnaire-category-page .category-progress-count { font-size: 0.88rem; }
+  app-questionnaire-category-page .save-state { font-size: 0.9rem; }
+  app-questionnaire-category-page .subcategory-summary-copy small { font-size: 0.8rem; }
+  app-questionnaire-category-page .subcategory-progress > strong { font-size: 0.88rem; }
+  app-questionnaire-category-page .subcategory-description { font-size: 0.9rem; }
+  app-questionnaire-category-page .question-card-header p { font-size: 0.9rem; }
+
+  app-profile-comparison-page .select-field { font-size: 0.9rem; }
+  app-profile-comparison-page .summary-card span { font-size: 0.88rem; }
+  app-profile-comparison-page .affinity-value span { font-size: 0.84rem; }
+  app-profile-comparison-page .category-note { font-size: 0.88rem; }
+  app-profile-comparison-page .comparison-badge { font-size: 0.78rem; }
+  app-profile-comparison-page .answer-pair span:not(.pair-arrow) { font-size: 0.88rem; }
+  app-profile-comparison-page .profile-name { font-size: 0.78rem !important; }
+  app-profile-comparison-page .omitted-note { font-size: 0.88rem; }
+}
+
 @media (max-width: 720px) {
   .profile-entry-page .profile-entry-header .subpage-title-row,
   app-profile-comparison-page .page-header h1,
