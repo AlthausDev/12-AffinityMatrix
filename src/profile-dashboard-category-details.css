@@ -1,5 +1,20 @@
 .profile-dashboard .dashboard-category-bars {
+  align-items: stretch;
+  grid-auto-rows: 1fr;
+}
+
+.profile-dashboard .dashboard-category-bars:not(:has(.dashboard-category-row-expanded)) .dashboard-category-row,
+.profile-dashboard .dashboard-category-bars:not(:has(.dashboard-category-row-expanded)) .dashboard-category-toggle {
+  height: 100%;
+}
+
+.profile-dashboard .dashboard-category-bars:not(:has(.dashboard-category-row-expanded)) .dashboard-category-toggle {
+  align-content: space-between;
+}
+
+.profile-dashboard .dashboard-category-bars:has(.dashboard-category-row-expanded) {
   align-items: start;
+  grid-auto-rows: auto;
 }
 
 .profile-dashboard .dashboard-category-row {
