@@ -4,17 +4,21 @@ import { ProfileStore } from '../../core/profile.store';
 import { PROFILE_CODE_CODEC } from '../../core/profile-codec.token';
 import { TranslationService } from '../../i18n/translation.service';
 import { TranslationKey } from '../../i18n/ui/es-ui.translations';
+import { BrandMarkComponent } from '../../shared/brand-mark.component';
 
 @Component({
   selector: 'app-profile-export-page',
-  imports: [RouterLink],
+  imports: [RouterLink, BrandMarkComponent],
   template: `
     <main class="page narrow-page">
       @if (profile(); as currentProfile) {
         <a class="back-link" [routerLink]="['/profiles', currentProfile.id]">{{ i18n.t('export.backProfile') }}</a>
         <header class="page-header">
           <p class="eyebrow">{{ i18n.t('export.eyebrow') }}</p>
-          <h1>{{ i18n.t('export.title') }}</h1>
+          <div class="subpage-title-row">
+            <app-brand-mark />
+            <h1>{{ i18n.t('export.title') }}</h1>
+          </div>
           <p class="muted">{{ i18n.t('export.description') }}</p>
         </header>
         <section class="panel form-grid">
