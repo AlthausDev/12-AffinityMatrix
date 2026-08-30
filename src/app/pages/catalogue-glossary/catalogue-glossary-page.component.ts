@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
@@ -48,7 +49,7 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
   selector: 'app-catalogue-glossary-page',
   imports: [RouterLink],
   template: `
-    <main class="page glossary-page">
+    <main id="glossary-top" class="page glossary-page">
       <nav class="glossary-topbar" [attr.aria-label]="text('Navegación del glosario', 'Glossary navigation')">
         <a class="back-link glossary-profile-link" [routerLink]="['/profiles', profileId]">
           <span aria-hidden="true">←</span>
@@ -120,34 +121,48 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
           <p class="muted">{{ text('Prueba con otro término o borra la búsqueda.', 'Try another term or clear the search.') }}</p>
         </section>
       }
+
+      <button
+        class="glossary-scroll-top"
+        type="button"
+        [attr.aria-label]="text('Volver arriba', 'Back to top')"
+        [title]="text('Volver arriba', 'Back to top')"
+        (click)="scrollToTop()"
+      >
+        <span aria-hidden="true">↑</span>
+      </button>
     </main>
   `,
   styles: `
-    .glossary-page { width: min(100% - 2rem, 72rem); }
+    .glossary-page {
+      width: min(100% - 2rem, 72rem);
+      padding-top: 0.75rem;
+      padding-bottom: clamp(2.5rem, 5vw, 4rem);
+    }
     .glossary-topbar {
-      position: sticky;
+      position: static;
       z-index: 12;
-      top: max(0.65rem, env(safe-area-inset-top));
       display: flex;
       width: max-content;
+      min-height: 2.35rem;
       justify-content: flex-start;
-      margin-bottom: 1.2rem;
+      margin-bottom: 0.9rem;
     }
     .glossary-profile-link {
       display: inline-flex;
-      min-height: 2.45rem;
+      min-height: 2.35rem;
       align-items: center;
       gap: 0.42rem;
       margin: 0;
-      padding: 0.42rem 0.72rem;
-      border: 1px solid color-mix(in srgb, var(--neon-violet) 26%, var(--border-subtle));
-      border-radius: 0.58rem;
-      background: linear-gradient(145deg, rgba(13, 28, 58, 0.88), rgba(34, 22, 61, 0.86));
-      box-shadow: 0 0.45rem 1.2rem rgba(2, 7, 22, 0.2);
+      padding: 0.4rem 0.72rem;
+      border: 1px solid color-mix(in srgb, var(--neon-cyan) 24%, var(--border-subtle));
+      border-radius: 0.65rem;
+      background: linear-gradient(145deg, rgba(12, 28, 59, 0.78), rgba(31, 20, 62, 0.78));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 .45rem 1.1rem rgba(2,6,22,.14);
       color: color-mix(in srgb, var(--text-secondary) 90%, white);
       font-size: 0.75rem;
       font-weight: 760;
-      backdrop-filter: blur(14px) saturate(120%);
+      backdrop-filter: blur(12px) saturate(124%);
       transition: border-color 150ms ease, color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
     }
     .glossary-profile-link:hover {
@@ -161,8 +176,14 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
       grid-template-columns: minmax(0, 1fr) minmax(17rem, 24rem);
       gap: clamp(1.4rem, 4vw, 3rem);
       align-items: end;
+      margin-bottom: 1.25rem;
     }
-    .glossary-header .lead { max-width: 52rem; }
+    .glossary-header h1 {
+      margin-bottom: 0.5rem;
+      font-size: clamp(2rem, 4.8vw, 2.85rem);
+      letter-spacing: -0.04em;
+    }
+    .glossary-header .lead { max-width: 52rem; line-height: 1.52; }
     .glossary-search { display: grid; gap: 0.45rem; }
     .glossary-search > span:first-child {
       color: var(--text-secondary);
@@ -232,17 +253,24 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
       background: rgba(66, 39, 82, 0.66);
       color: var(--text-primary);
     }
-    .glossary-groups { display: grid; gap: 1rem; }
-    .glossary-group { padding: 1.05rem 1.1rem; }
+    .glossary-groups { display: grid; gap: 0.78rem; }
+    .glossary-group {
+      padding: 0.9rem 1rem;
+      border-radius: 0.9rem;
+      background:
+        linear-gradient(145deg, rgba(15, 33, 69, 0.72), rgba(38, 24, 67, 0.72)) padding-box,
+        linear-gradient(135deg, rgba(54,186,255,.38), rgba(65,108,255,.32) 34%, rgba(140,92,255,.4) 68%, rgba(230,80,197,.28)) border-box;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 .7rem 1.8rem rgba(2,6,22,.14);
+    }
     .glossary-group-heading {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 1rem;
-      padding-bottom: 0.72rem;
+      padding-bottom: 0.62rem;
       border-bottom: 1px solid var(--border-subtle);
     }
-    .glossary-group-heading h2 { margin: 0; font-size: 1.14rem; }
+    .glossary-group-heading h2 { margin: 0; font-size: 1.08rem; }
     .glossary-group-heading span {
       color: var(--text-secondary);
       font-size: 0.72rem;
@@ -253,27 +281,93 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
       display: grid;
       grid-template-columns: minmax(9rem, 0.34fr) minmax(0, 1fr);
       gap: 1.1rem;
-      padding: 0.8rem 0.15rem;
+      padding: 0.72rem 0.15rem;
       border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 58%, transparent);
-      scroll-margin-top: 4.5rem;
+      scroll-margin-top: 1rem;
     }
     .glossary-entry:last-child { border-bottom: 0; }
     .glossary-entry dt {
       color: color-mix(in srgb, var(--text-primary) 90%, var(--neon-cyan));
       font-weight: 780;
     }
-    .glossary-entry dd { margin: 0; color: var(--text-secondary); line-height: 1.55; }
+    .glossary-entry dd { margin: 0; color: var(--text-secondary); line-height: 1.5; }
     .glossary-empty { text-align: center; }
+    .glossary-scroll-top { display: none; }
+
+    @media (min-width: 721px) {
+      .glossary-scroll-top {
+        position: fixed;
+        right: clamp(1rem, 2vw, 2rem);
+        bottom: 1.25rem;
+        z-index: 18;
+        display: grid;
+        width: 2.8rem;
+        aspect-ratio: 1;
+        place-items: center;
+        padding: 0;
+        border: 1px solid color-mix(in srgb, var(--neon-cyan) 24%, var(--border-subtle));
+        border-radius: 0.6rem;
+        clip-path: polygon(15% 0,85% 0,100% 15%,100% 85%,85% 100%,15% 100%,0 85%,0 15%);
+        background: linear-gradient(145deg, rgba(18,42,81,.88), rgba(48,29,79,.9));
+        color: var(--text-primary);
+        cursor: pointer;
+        font-size: 1.1rem;
+        font-weight: 800;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 .55rem 1.4rem rgba(2,6,22,.24);
+        backdrop-filter: blur(12px);
+        transition: border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+      }
+      .glossary-scroll-top:hover {
+        border-color: color-mix(in srgb, var(--neon-cyan) 58%, var(--neon-violet));
+        transform: translateY(-1px);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 .65rem 1.6rem rgba(2,6,22,.3);
+      }
+    }
+
     @media (max-width: 720px) {
-      .glossary-page { width: min(100% - 1rem, 72rem); }
-      .glossary-header { grid-template-columns: 1fr; gap: 1rem; }
-      .glossary-entry { grid-template-columns: 1fr; gap: 0.25rem; }
+      .glossary-page {
+        width: min(100% - 1rem, 72rem);
+        padding-top: 4.9rem;
+      }
+      .glossary-topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 25;
+        width: auto;
+        min-height: 4.55rem;
+        margin: 0;
+        padding: 0.5rem 4.35rem 1.3rem 0.5rem;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 14% 0%, rgba(38,185,255,.14), transparent 28%),
+          linear-gradient(to bottom, rgba(10,32,74,.96), rgba(28,35,94,.82) 36%, rgba(61,34,104,.46) 62%, rgba(68,34,104,.14) 78%, transparent 96%);
+      }
+      .glossary-profile-link {
+        pointer-events: auto;
+        backdrop-filter: none;
+      }
+      .glossary-header {
+        grid-template-columns: 1fr;
+        gap: 0.9rem;
+        margin-bottom: 1rem;
+      }
+      .glossary-header h1 { font-size: clamp(1.9rem, 10vw, 2.5rem); }
+      .glossary-entry {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+        scroll-margin-top: 5.1rem;
+      }
+      .glossary-scroll-top { display: none; }
     }
     @media (prefers-reduced-motion: reduce) {
       .glossary-profile-link,
       .glossary-search-field,
-      .glossary-search-clear { transition: none; }
-      .glossary-profile-link:hover { transform: none; }
+      .glossary-search-clear,
+      .glossary-scroll-top { transition: none; }
+      .glossary-profile-link:hover,
+      .glossary-scroll-top:hover { transform: none; }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -281,6 +375,7 @@ const CATEGORY_LABELS: Readonly<Record<CatalogueGlossaryCategory, Readonly<{ es:
 export class CatalogueGlossaryPageComponent {
   readonly i18n = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly document = inject(DOCUMENT);
   readonly profileId = findRouteParam(this.route, 'id') ?? '';
   readonly query = signal('');
 
@@ -312,6 +407,13 @@ export class CatalogueGlossaryPageComponent {
 
   clearQuery(): void {
     this.query.set('');
+  }
+
+  scrollToTop(): void {
+    const window = this.document.defaultView;
+    if (!window) return;
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
   }
 
   text(es: string, en: string): string {

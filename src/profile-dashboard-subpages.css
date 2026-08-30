@@ -1,0 +1,118 @@
+/* Shared visual language for profile utility pages reached from the dashboard.
+   Questionnaire keeps its dedicated dock/window treatment. */
+app-profile-comparison-page .comparison-page,
+app-profile-export-page .page,
+app-profile-editor-page .profile-editor-page.profile-editor-page-editing {
+  padding-top: 0.75rem;
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+app-profile-comparison-page .comparison-page > .back-link,
+app-profile-export-page .page > .back-link,
+app-profile-editor-page .profile-editor-page-editing .profile-entry-back {
+  min-height: 2.35rem;
+  margin-bottom: 0.9rem;
+  padding: 0.4rem 0.72rem;
+  border-radius: 0.65rem;
+  border-color: color-mix(in srgb, var(--neon-cyan) 24%, var(--border-subtle));
+  background: linear-gradient(145deg, rgba(12, 28, 59, 0.72), rgba(31, 20, 62, 0.72));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 .45rem 1.1rem rgba(2,6,22,.12);
+}
+
+app-profile-comparison-page .comparison-page > .page-header,
+app-profile-export-page .page > .page-header,
+app-profile-editor-page .profile-editor-page-editing .profile-entry-header {
+  margin-bottom: 1.15rem;
+}
+
+app-profile-comparison-page .comparison-page > .page-header h1,
+app-profile-export-page .page > .page-header h1,
+app-profile-editor-page .profile-editor-page-editing .profile-entry-header h1 {
+  margin-bottom: 0.48rem;
+  font-size: clamp(2rem, 4.8vw, 2.85rem);
+  letter-spacing: -0.04em;
+}
+
+app-profile-comparison-page .comparison-page > .page-header .lead,
+app-profile-export-page .page > .page-header .muted,
+app-profile-editor-page .profile-editor-page-editing .profile-entry-header .muted {
+  max-width: 48rem;
+  color: color-mix(in srgb, var(--text-primary) 72%, var(--text-secondary));
+  line-height: 1.52;
+}
+
+/* Edit profile used to look like the create-profile ceremony. While editing it now follows the
+   quieter dashboard utility-page language instead. */
+app-profile-editor-page .profile-editor-page.profile-editor-page-editing {
+  width: min(100% - 2rem, 72rem);
+  max-width: 72rem;
+}
+
+app-profile-editor-page .profile-editor-page-editing .profile-entry-brand-slot {
+  display: none;
+}
+
+app-profile-editor-page .profile-editor-page-editing .profile-entry-header {
+  justify-items: start;
+  text-align: left;
+}
+
+app-profile-editor-page .profile-editor-page-editing .profile-entry-header .eyebrow {
+  margin-bottom: 0.34rem;
+}
+
+/* Use the same glass surface family across comparison, export and the editor. */
+app-profile-comparison-page .comparison-page .panel,
+app-profile-export-page .page .panel,
+app-profile-editor-page .profile-editor-page-editing .profile-entry-panel {
+  border: 1px solid transparent;
+  border-radius: 0.9rem;
+  background:
+    linear-gradient(145deg, rgba(15, 33, 69, 0.72), rgba(38, 24, 67, 0.72)) padding-box,
+    linear-gradient(135deg, rgba(54,186,255,.42), rgba(65,108,255,.36) 34%, rgba(140,92,255,.44) 68%, rgba(230,80,197,.32)) border-box;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 .75rem 2rem rgba(2,6,22,.16);
+}
+
+app-profile-comparison-page .comparison-page .comparison-selector,
+app-profile-export-page .page .panel,
+app-profile-editor-page .profile-editor-page-editing .profile-editor-section,
+app-profile-editor-page .profile-editor-page-editing .profile-editor-management-card {
+  backdrop-filter: blur(14px) saturate(122%);
+}
+
+@media (max-width: 720px) {
+  app-profile-comparison-page .comparison-page,
+  app-profile-export-page .page,
+  app-profile-editor-page .profile-editor-page.profile-editor-page-editing {
+    width: min(100% - 1rem, 72rem);
+    padding-top: 0.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  app-profile-comparison-page .comparison-page > .back-link,
+  app-profile-export-page .page > .back-link,
+  app-profile-editor-page .profile-editor-page-editing .profile-entry-back {
+    min-height: 2.35rem;
+    margin-bottom: 0.72rem;
+  }
+
+  app-profile-comparison-page .comparison-page > .page-header,
+  app-profile-export-page .page > .page-header,
+  app-profile-editor-page .profile-editor-page-editing .profile-entry-header {
+    margin-bottom: 1rem;
+  }
+
+  app-profile-editor-page .profile-editor-page-editing .profile-entry-header h1,
+  app-profile-comparison-page .comparison-page > .page-header h1,
+  app-profile-export-page .page > .page-header h1 {
+    font-size: clamp(1.9rem, 10vw, 2.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  app-profile-comparison-page .comparison-page > .back-link,
+  app-profile-export-page .page > .back-link,
+  app-profile-editor-page .profile-editor-page-editing .profile-entry-back {
+    transition: none;
+  }
+}
