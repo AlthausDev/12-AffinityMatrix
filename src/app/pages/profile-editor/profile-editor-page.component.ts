@@ -40,7 +40,7 @@ interface ProfileFormModel {
       [class.profile-editor-page-editing]="isEditing"
     >
       <a class="back-link profile-entry-back" [routerLink]="backLink">
-        {{ isEditing ? i18n.t('export.backProfile') : i18n.t('dashboard.backProfiles') }}
+        {{ isEditing ? (i18n.locale() === 'es' ? '← Panel' : '← Dashboard') : i18n.t('dashboard.backProfiles') }}
       </a>
 
       @if (profileId && !existingProfile) {
