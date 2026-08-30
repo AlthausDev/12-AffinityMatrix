@@ -1,0 +1,592 @@
+.profile-dashboard .dashboard-semantic-card {
+  position: relative;
+  overflow: hidden;
+  margin-top: 1rem;
+  isolation: isolate;
+}
+
+.profile-dashboard .semantic-heading {
+  position: relative;
+  z-index: 1;
+}
+
+.profile-dashboard .semantic-theme-panel,
+.profile-dashboard .semantic-highlight-panel,
+.profile-dashboard .semantic-relative-section,
+.profile-dashboard .semantic-coordinate-section {
+  min-width: 0;
+  padding: 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 74%, transparent);
+  border-radius: 0.78rem;
+  background: linear-gradient(145deg, rgba(15, 33, 69, 0.48), rgba(38, 24, 63, 0.36));
+}
+
+.profile-dashboard .semantic-highlight-panel,
+.profile-dashboard .semantic-relative-section,
+.profile-dashboard .semantic-coordinate-section {
+  margin-top: 0.8rem;
+}
+
+.profile-dashboard .semantic-panel-kicker {
+  margin-bottom: 0.68rem;
+}
+
+.profile-dashboard .semantic-panel-kicker > div {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.profile-dashboard .semantic-panel-kicker strong,
+.profile-dashboard .semantic-relative-heading > small {
+  color: var(--text-secondary);
+  font-size: 0.67rem;
+  font-weight: 620;
+}
+
+.profile-dashboard .semantic-kicker {
+  margin: 0;
+  color: color-mix(in srgb, var(--text-secondary) 78%, var(--neon-cyan));
+  font-size: 0.7rem;
+  font-weight: 780;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.profile-dashboard .semantic-scale-guide {
+  display: grid;
+  gap: 0.72rem;
+  margin-bottom: 1rem;
+  padding: 0.78rem;
+  border: 1px solid color-mix(in srgb, var(--neon-cyan) 20%, var(--border-subtle));
+  border-left: 3px solid color-mix(in srgb, var(--neon-cyan) 66%, var(--neon-violet));
+  border-radius: 0.62rem;
+  background: linear-gradient(145deg, rgba(13, 35, 70, 0.42), rgba(36, 25, 65, 0.34));
+}
+
+.profile-dashboard .semantic-scale-guide-copy {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.profile-dashboard .semantic-scale-guide-copy > strong {
+  font-size: 0.78rem;
+}
+
+.profile-dashboard .semantic-scale-guide-copy p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.66rem;
+  line-height: 1.5;
+}
+
+.profile-dashboard .semantic-scale-guide-copy b {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.profile-dashboard .semantic-scale-anchors {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.profile-dashboard .semantic-scale-anchors > span {
+  display: grid;
+  min-width: 0;
+  gap: 0.08rem;
+  padding: 0.48rem 0.42rem;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 62%, transparent);
+  border-radius: 0.5rem;
+  background: rgba(10, 25, 54, 0.42);
+  text-align: center;
+}
+
+.profile-dashboard .semantic-scale-anchors strong {
+  color: color-mix(in srgb, var(--text-primary) 88%, var(--neon-cyan));
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.profile-dashboard .semantic-scale-anchors b {
+  font-size: 0.61rem;
+  line-height: 1.2;
+}
+
+.profile-dashboard .semantic-scale-anchors small,
+.profile-dashboard .semantic-scale-formula {
+  color: var(--text-secondary);
+  font-size: 0.56rem;
+  line-height: 1.3;
+}
+
+.profile-dashboard .semantic-scale-formula {
+  display: block;
+  padding-top: 0.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--border-subtle) 48%, transparent);
+}
+
+.profile-dashboard .semantic-theme-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.82rem 1.2rem;
+}
+
+.profile-dashboard .semantic-theme {
+  --semantic-accent: #69d9ff;
+  display: grid;
+  align-content: start;
+  gap: 0.34rem;
+  min-width: 0;
+  padding: 0.42rem 0.08rem;
+}
+
+.profile-dashboard .semantic-theme[data-theme='sensuality'] { --semantic-accent: #ff9fc7; }
+.profile-dashboard .semantic-theme[data-theme='play'] { --semantic-accent: #67e7c4; }
+.profile-dashboard .semantic-theme[data-theme='exploration'] { --semantic-accent: #bc7cff; }
+.profile-dashboard .semantic-theme[data-theme='intensity'] { --semantic-accent: #ff6f91; }
+.profile-dashboard .semantic-theme[data-theme='power'] { --semantic-accent: #ffae61; }
+.profile-dashboard .semantic-theme[data-theme='restraint'] { --semantic-accent: #739cff; }
+.profile-dashboard .semantic-theme[data-theme='visibility'] { --semantic-accent: #51d9d0; }
+.profile-dashboard .semantic-theme[data-theme='social'] { --semantic-accent: #e879dc; }
+.profile-dashboard .semantic-theme[data-theme='body-focus'] { --semantic-accent: #e6d56a; }
+.profile-dashboard .semantic-theme-empty { opacity: 0.42; }
+
+.profile-dashboard .semantic-theme-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.profile-dashboard .semantic-theme-heading > div {
+  display: grid;
+  gap: 0.08rem;
+  min-width: 0;
+}
+
+.profile-dashboard .semantic-theme-heading strong {
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.profile-dashboard .semantic-theme-heading small,
+.profile-dashboard .semantic-theme-footer small,
+.profile-dashboard .semantic-highlight small,
+.profile-dashboard .semantic-relative-axis small,
+.profile-dashboard .semantic-coordinate-card small {
+  color: var(--text-secondary);
+  font-size: 0.6rem;
+  line-height: 1.35;
+}
+
+.profile-dashboard .semantic-theme-heading > span {
+  color: color-mix(in srgb, var(--semantic-accent) 82%, white);
+  font-size: 0.67rem;
+  font-weight: 780;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.profile-dashboard .semantic-theme-heading > .semantic-no-score {
+  color: var(--text-secondary);
+}
+
+.profile-dashboard .semantic-spectrum {
+  position: relative;
+  height: 0.62rem;
+  margin: 0.05rem 0.18rem;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 62%, transparent);
+  border-radius: 0.24rem;
+  background: linear-gradient(
+    90deg,
+    rgba(28, 42, 72, 0.62),
+    color-mix(in srgb, var(--semantic-accent) 11%, rgba(43, 42, 87, 0.62)) 50%,
+    color-mix(in srgb, var(--semantic-accent) 34%, rgba(37, 48, 83, 0.68))
+  );
+  box-shadow: inset 0 1px 2px rgba(2, 7, 22, 0.28);
+}
+
+.profile-dashboard .semantic-threshold {
+  position: absolute;
+  top: -0.14rem;
+  bottom: -0.14rem;
+  width: 1px;
+  background: color-mix(in srgb, var(--border-strong) 50%, transparent);
+}
+
+.profile-dashboard .threshold-depends { left: 38%; }
+.profile-dashboard .threshold-curious { left: 50%; }
+.profile-dashboard .threshold-like { left: 78%; }
+
+.profile-dashboard .semantic-spectrum-marker,
+.profile-dashboard .semantic-relative-marker,
+.profile-dashboard .semantic-coordinate-marker {
+  position: absolute;
+  z-index: 2;
+  width: 0.78rem;
+  height: 0.78rem;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border: 2px solid #f5f2ff;
+  border-radius: 0.13rem;
+  background: var(--semantic-accent);
+  box-shadow: 0 0 0.58rem color-mix(in srgb, var(--semantic-accent) 52%, transparent);
+}
+
+.profile-dashboard .semantic-spectrum-marker {
+  top: 50%;
+}
+
+.profile-dashboard .semantic-theme-footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.profile-dashboard .semantic-theme-footer small:last-child {
+  max-width: 60%;
+  text-align: right;
+}
+
+.profile-dashboard .semantic-relative-section {
+  background: linear-gradient(155deg, rgba(13, 31, 65, 0.58), rgba(34, 23, 62, 0.46));
+}
+
+.profile-dashboard .semantic-relative-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 0.72rem;
+}
+
+.profile-dashboard .semantic-relative-heading > div {
+  display: grid;
+  gap: 0.14rem;
+}
+
+.profile-dashboard .semantic-relative-heading h4 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.profile-dashboard .semantic-relative-heading p:last-child {
+  max-width: 58rem;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.64rem;
+  line-height: 1.45;
+}
+
+.profile-dashboard .semantic-relative-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.72rem;
+}
+
+.profile-dashboard .semantic-relative-group {
+  display: grid;
+  gap: 0.56rem;
+  padding: 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 56%, transparent);
+  border-radius: 0.64rem;
+  background: rgba(10, 26, 55, 0.38);
+}
+
+.profile-dashboard .semantic-relative-group > header,
+.profile-dashboard .semantic-coordinate-card > header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.profile-dashboard .semantic-relative-group > header strong,
+.profile-dashboard .semantic-coordinate-card > header strong {
+  font-size: 0.73rem;
+}
+
+.profile-dashboard .semantic-relative-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.62rem;
+}
+
+.profile-dashboard .semantic-relative-axis {
+  display: grid;
+  gap: 0.34rem;
+  min-width: 0;
+}
+
+.profile-dashboard .semantic-relative-labels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+  align-items: end;
+}
+
+.profile-dashboard .semantic-relative-labels strong {
+  font-size: 0.58rem;
+  line-height: 1.22;
+}
+
+.profile-dashboard .semantic-relative-labels span {
+  color: var(--text-secondary);
+  font-size: 0.5rem;
+  text-align: center;
+}
+
+.profile-dashboard .semantic-relative-labels strong:last-child {
+  text-align: right;
+}
+
+.profile-dashboard .semantic-relative-rail {
+  position: relative;
+  height: 0.74rem;
+  margin: 0.12rem 0.1rem;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 66%, transparent);
+  border-radius: 0.25rem;
+  background: linear-gradient(90deg, rgba(49, 116, 166, 0.28), rgba(45, 38, 86, 0.58) 50%, rgba(159, 71, 179, 0.25));
+  box-shadow: inset 0 1px 3px rgba(2, 7, 22, 0.3);
+}
+
+.profile-dashboard .semantic-relative-rail-secondary {
+  background: linear-gradient(90deg, rgba(72, 161, 142, 0.28), rgba(45, 38, 86, 0.58) 50%, rgba(218, 85, 132, 0.27));
+}
+
+.profile-dashboard .semantic-relative-midline {
+  position: absolute;
+  top: -0.18rem;
+  bottom: -0.18rem;
+  left: 50%;
+  width: 1px;
+  background: color-mix(in srgb, var(--border-strong) 46%, transparent);
+}
+
+.profile-dashboard .semantic-relative-marker {
+  top: 50%;
+  --semantic-accent: var(--neon-violet);
+  width: 0.84rem;
+  height: 0.84rem;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet) 58%, var(--neon-magenta));
+}
+
+.profile-dashboard .semantic-relative-marker-secondary {
+  background: linear-gradient(135deg, var(--preference-positive), var(--neon-violet), var(--preference-boundary));
+}
+
+.profile-dashboard .semantic-relative-axis > small {
+  justify-self: center;
+  color: color-mix(in srgb, var(--text-secondary) 82%, white);
+  font-weight: 680;
+  text-align: center;
+}
+
+.profile-dashboard .semantic-coordinate-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.72rem;
+}
+
+.profile-dashboard .semantic-coordinate-card {
+  display: grid;
+  gap: 0.48rem;
+  min-width: 0;
+}
+
+.profile-dashboard .semantic-coordinate-plane {
+  position: relative;
+  min-height: 12.5rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 66%, transparent);
+  border-radius: 0.62rem;
+  background:
+    linear-gradient(90deg, transparent 24.8%, rgba(130, 150, 205, 0.05) 25%, transparent 25.2%, transparent 74.8%, rgba(130, 150, 205, 0.05) 75%, transparent 75.2%),
+    linear-gradient(0deg, transparent 24.8%, rgba(130, 150, 205, 0.05) 25%, transparent 25.2%, transparent 74.8%, rgba(130, 150, 205, 0.05) 75%, transparent 75.2%),
+    linear-gradient(145deg, rgba(10, 23, 52, 0.78), rgba(31, 20, 54, 0.7));
+}
+
+.profile-dashboard .semantic-coordinate-axis {
+  position: absolute;
+  background: color-mix(in srgb, var(--neon-violet) 40%, var(--border-strong));
+}
+
+.profile-dashboard .axis-x { left: 8%; right: 8%; top: 50%; height: 1px; }
+.profile-dashboard .axis-y { top: 10%; bottom: 10%; left: 50%; width: 1px; }
+
+.profile-dashboard .coordinate-label {
+  position: absolute;
+  z-index: 1;
+  padding: 0.12rem 0.24rem;
+  background: rgba(8, 16, 36, 0.78);
+  color: color-mix(in srgb, var(--text-secondary) 88%, white);
+  font-size: 0.52rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.profile-dashboard .label-left { left: 0.25rem; top: 50%; transform: translateY(-50%); }
+.profile-dashboard .label-right { right: 0.25rem; top: 50%; transform: translateY(-50%); text-align: right; }
+.profile-dashboard .label-top { top: 0.25rem; left: 50%; transform: translateX(-50%); text-align: center; }
+.profile-dashboard .label-bottom { bottom: 0.25rem; left: 50%; transform: translateX(-50%); text-align: center; }
+
+.profile-dashboard .semantic-coordinate-marker {
+  --semantic-accent: var(--neon-violet);
+  width: 0.92rem;
+  height: 0.92rem;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-violet) 55%, var(--neon-magenta));
+}
+
+.profile-dashboard .semantic-highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.58rem;
+}
+
+.profile-dashboard .semantic-highlight {
+  --rank-accent: color-mix(in srgb, var(--neon-violet) 74%, var(--neon-cyan));
+  display: grid;
+  align-content: start;
+  gap: 0.34rem;
+  min-height: 6.2rem;
+  padding: 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--rank-accent) 30%, var(--border-subtle));
+  border-radius: 0.62rem;
+  background: linear-gradient(155deg, color-mix(in srgb, var(--rank-accent) 9%, rgba(15, 27, 54, 0.72)), rgba(12, 23, 46, 0.58));
+}
+
+.profile-dashboard .semantic-highlight:nth-child(3n + 2) { --rank-accent: #43dec8; }
+.profile-dashboard .semantic-highlight:nth-child(3n) { --rank-accent: #ff7ea8; }
+
+.profile-dashboard .semantic-highlight-topline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  align-items: start;
+}
+
+.profile-dashboard .semantic-highlight-topline strong {
+  font-size: 0.73rem;
+  line-height: 1.24;
+}
+
+.profile-dashboard .semantic-highlight-topline span {
+  color: color-mix(in srgb, var(--rank-accent) 82%, white);
+  font-size: 0.73rem;
+  font-weight: 800;
+}
+
+.profile-dashboard .semantic-highlight-diagnosis {
+  width: fit-content;
+  padding: 0.15rem 0.36rem;
+  border: 1px solid color-mix(in srgb, var(--rank-accent) 30%, transparent);
+  border-radius: 0.3rem;
+  background: color-mix(in srgb, var(--rank-accent) 9%, rgba(12, 23, 46, 0.5));
+  color: color-mix(in srgb, var(--rank-accent) 68%, white);
+  font-size: 0.59rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.profile-dashboard .semantic-highlight small {
+  margin-top: auto;
+}
+
+.profile-dashboard .semantic-highlight-empty {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+}
+
+.profile-dashboard .semantic-note {
+  max-width: 72rem;
+  margin: 0.82rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.62rem;
+  line-height: 1.46;
+}
+
+.profile-dashboard .semantic-empty {
+  min-height: 9rem;
+}
+
+@media (max-width: 980px) {
+  .profile-dashboard .semantic-theme-list,
+  .profile-dashboard .semantic-relative-groups,
+  .profile-dashboard .semantic-relative-grid,
+  .profile-dashboard .semantic-coordinate-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-dashboard .semantic-highlight-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .profile-dashboard .semantic-theme-panel,
+  .profile-dashboard .semantic-highlight-panel,
+  .profile-dashboard .semantic-relative-section,
+  .profile-dashboard .semantic-coordinate-section {
+    padding: 0.72rem;
+  }
+
+  .profile-dashboard .semantic-scale-guide {
+    padding: 0.68rem;
+  }
+
+  .profile-dashboard .semantic-scale-anchors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profile-dashboard .semantic-scale-anchors > span:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .profile-dashboard .semantic-theme-heading small {
+    display: none;
+  }
+
+  .profile-dashboard .semantic-theme-heading {
+    gap: 0.45rem;
+  }
+
+  .profile-dashboard .semantic-theme-heading > span {
+    font-size: 0.62rem;
+  }
+
+  .profile-dashboard .semantic-theme-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.12rem;
+  }
+
+  .profile-dashboard .semantic-theme-footer small:last-child {
+    max-width: none;
+    text-align: left;
+  }
+
+  .profile-dashboard .semantic-relative-heading {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .profile-dashboard .semantic-coordinate-plane {
+    min-height: 11.5rem;
+  }
+
+  .profile-dashboard .semantic-highlight {
+    min-height: 6.35rem;
+  }
+}
+
+@media (max-width: 370px) {
+  .profile-dashboard .semantic-scale-anchors,
+  .profile-dashboard .semantic-highlight-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-dashboard .semantic-scale-anchors > span:last-child {
+    grid-column: auto;
+  }
+}
