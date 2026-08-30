@@ -35,9 +35,8 @@ app-profile-editor-page .profile-editor-page-editing .profile-entry-header {
   text-align: left;
 }
 
-/* Keep the back action on the real page edge; the old 50rem offset is intentionally cancelled. */
 app-profile-editor-page .profile-editor-page.profile-editor-page-editing > .profile-entry-back {
-  margin-inline-start: 0 !important;
+  margin-left: max(0rem, calc((100% - 67.2rem) / 2)) !important;
   margin-bottom: 0.9rem;
 }
 
@@ -126,7 +125,6 @@ app-settings-page .local-note {
   white-space: normal;
 }
 
-/* Desktop: raise legacy microtype only. Geometry remains untouched. */
 @media (min-width: 981px) {
   .profile-dashboard .dashboard-profile-chips > span,
   .profile-dashboard .dashboard-updated,
@@ -146,7 +144,7 @@ app-settings-page .local-note {
   .profile-dashboard .preference-legend-row,
   .profile-dashboard .preference-legend-label,
   .profile-dashboard .preference-legend-value {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     line-height: 1.4;
   }
 
@@ -157,27 +155,26 @@ app-settings-page .local-note {
   .profile-dashboard .dashboard-category-copy strong { font-size: 1rem; line-height: 1.28; }
   .profile-dashboard .dashboard-subcategory-copy strong { font-size: 0.94rem; }
 
-  /* Semantic dimensions: actual labels currently rendered around the rails. */
   .profile-dashboard .semantic-scale-inline-note {
-    font-size: 0.94rem;
-    line-height: 1.45;
+    font-size: 0.82rem;
+    line-height: 1.4;
   }
 
   .profile-dashboard .semantic-panel-kicker strong,
-  .profile-dashboard .semantic-kicker { font-size: 0.94rem; }
+  .profile-dashboard .semantic-kicker { font-size: 0.82rem; }
 
   .profile-dashboard .semantic-theme-heading strong { font-size: 1.08rem; }
 
   .profile-dashboard .semantic-theme-heading small {
-    font-size: 0.94rem;
-    line-height: 1.42;
+    font-size: 0.86rem;
+    line-height: 1.4;
   }
 
-  .profile-dashboard .semantic-theme-heading > span { font-size: 0.96rem; }
+  .profile-dashboard .semantic-theme-heading > span { font-size: 0.94rem; }
 
   .profile-dashboard .semantic-spectrum-endpoints {
-    font-size: 0.9rem;
-    line-height: 1.3;
+    font-size: 0.8rem;
+    line-height: 1.28;
   }
 
   .profile-dashboard .semantic-spectrum-endpoints span,
@@ -187,12 +184,12 @@ app-settings-page .local-note {
   .profile-dashboard .semantic-relative-axis > small,
   .profile-dashboard .semantic-coordinate-card small,
   .profile-dashboard .semantic-note {
-    font-size: 0.92rem;
-    line-height: 1.42;
+    font-size: 0.84rem;
+    line-height: 1.4;
   }
 
   .profile-dashboard .semantic-relative-heading h4 { font-size: 1.1rem; }
-  .profile-dashboard .semantic-relative-heading p:last-child { font-size: 0.94rem; }
+  .profile-dashboard .semantic-relative-heading p:last-child { font-size: 0.86rem; }
 
   .profile-dashboard .semantic-relative-group > header strong,
   .profile-dashboard .semantic-coordinate-card > header strong { font-size: 1rem; }
@@ -200,61 +197,49 @@ app-settings-page .local-note {
   .profile-dashboard .semantic-relative-labels strong,
   .profile-dashboard .semantic-relative-labels span,
   .profile-dashboard .coordinate-label {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     line-height: 1.25;
   }
 
   .profile-dashboard .semantic-highlight-topline strong,
-  .profile-dashboard .semantic-highlight-topline span { font-size: 0.98rem; }
+  .profile-dashboard .semantic-highlight-topline span { font-size: 0.96rem; }
 
   .profile-dashboard .semantic-highlight-diagnosis,
-  .profile-dashboard .semantic-highlight small { font-size: 0.9rem; }
+  .profile-dashboard .semantic-highlight small { font-size: 0.84rem; }
 
-  .profile-dashboard .semantic-highlight-empty { font-size: 0.92rem; }
+  .profile-dashboard .semantic-highlight-empty { font-size: 0.86rem; }
 
-  /* Role map: composition legend, affinity hints and spectrum labels were still 0.55–0.62rem. */
-  .profile-dashboard .dashboard-role-summary > span { font-size: 0.9rem; }
+  .profile-dashboard .dashboard-role-summary > span { font-size: 0.78rem; }
   .profile-dashboard .dashboard-role-summary > strong { font-size: 1.02rem; }
 
-  .profile-dashboard .dashboard-role-composition-heading strong { font-size: 1rem; }
+  .profile-dashboard .dashboard-role-composition-heading strong { font-size: 0.96rem; }
 
   .profile-dashboard .dashboard-role-composition-heading small,
   .profile-dashboard .dashboard-role-composition-heading > span {
-    font-size: 0.9rem;
-    line-height: 1.4;
+    font-size: 0.82rem;
+    line-height: 1.38;
   }
 
   .profile-dashboard .dashboard-role-composition-labels > span,
-  .profile-dashboard .dashboard-role-composition-labels b,
-  .profile-dashboard .dashboard-role-composition-labels strong { font-size: 0.9rem; }
+  .profile-dashboard .dashboard-role-composition-labels b { font-size: 0.82rem; }
+  .profile-dashboard .dashboard-role-composition-labels strong { font-size: 0.88rem; }
 
   .profile-dashboard .dashboard-role-row-heading strong { font-size: 1.08rem; }
+  .profile-dashboard .dashboard-role-row-heading small { font-size: 0.86rem; line-height: 1.36; }
+  .profile-dashboard .dashboard-role-row-heading > span { font-size: 0.8rem; }
+  .profile-dashboard .dashboard-role-row-meta { font-size: 0.84rem; }
+  .profile-dashboard .dashboard-role-row-meta strong { font-size: 0.9rem; }
 
-  .profile-dashboard .dashboard-role-row-heading small,
-  .profile-dashboard .dashboard-role-row-heading > span,
-  .profile-dashboard .dashboard-role-row-meta,
-  .profile-dashboard .dashboard-role-row-meta strong {
-    font-size: 0.92rem;
-    line-height: 1.38;
-  }
+  .profile-dashboard .dashboard-role-metric-label span { font-size: 0.84rem; }
+  .profile-dashboard .dashboard-role-metric-label strong { font-size: 0.94rem; }
+  .profile-dashboard .dashboard-role-metric-hint { font-size: 0.78rem; line-height: 1.3; }
 
-  .profile-dashboard .dashboard-role-metric-label span,
-  .profile-dashboard .dashboard-role-metric-label strong,
-  .profile-dashboard .dashboard-role-metric-hint {
-    font-size: 0.92rem;
-    line-height: 1.3;
-  }
-
-  .profile-dashboard .dashboard-role-spectrum-heading strong { font-size: 1rem; }
-
-  .profile-dashboard .dashboard-role-spectrum-heading small,
-  .profile-dashboard .dashboard-role-spectrum-heading > span,
-  .profile-dashboard .dashboard-role-spectrum-labels,
-  .profile-dashboard .dashboard-role-spectrum-diagnosis,
-  .profile-dashboard .dashboard-role-initiative-empty {
-    font-size: 0.92rem;
-    line-height: 1.38;
-  }
+  .profile-dashboard .dashboard-role-spectrum-heading strong { font-size: 0.98rem; }
+  .profile-dashboard .dashboard-role-spectrum-heading small { font-size: 0.84rem; line-height: 1.36; }
+  .profile-dashboard .dashboard-role-spectrum-heading > span { font-size: 0.8rem; }
+  .profile-dashboard .dashboard-role-spectrum-labels { font-size: 0.8rem; }
+  .profile-dashboard .dashboard-role-spectrum-diagnosis { font-size: 0.88rem; }
+  .profile-dashboard .dashboard-role-initiative-empty { font-size: 0.84rem; line-height: 1.36; }
 }
 
 @media (min-width: 521px) and (max-width: 980px) {
@@ -267,7 +252,7 @@ app-settings-page .local-note {
 }
 
 @media (max-width: 720px) {
-  app-profile-editor-page .profile-editor-page-editing > .profile-entry-back { margin-inline-start: 0; }
+  app-profile-editor-page .profile-editor-page-editing > .profile-entry-back { margin-left: 0 !important; }
 }
 
 @media (max-width: 520px) {
