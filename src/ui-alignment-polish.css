@@ -5,8 +5,6 @@ app-profile-export-page .page > .page-header > .muted {
 @media (min-width: 1180px) {
   app-settings-page .page-header > .lead {
     left: auto;
-    width: auto;
-    max-width: 48rem;
     transform: none;
   }
 }
