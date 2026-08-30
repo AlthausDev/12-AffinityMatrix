@@ -8,13 +8,13 @@ import { CatalogueCategorySeed, CataloguePracticeSeed } from './types';
  * so the dedicated glossary and inline definitions never describe a different name for the same idea.
  */
 const PRACTICE_VOCABULARY: Readonly<Record<string, Partial<CataloguePracticeSeed>>> = {
-  'tease-and-denial': {
+  'tease-denial': {
     en: 'Tease & denial',
     es: 'Tease & denial',
   },
   'forced-orgasm': {
     en: 'Forced orgasm',
-    es: 'Orgasmo forzado consensuado',
+    es: 'Orgasmo forzado',
   },
   swinging: {
     en: 'Swinging',
