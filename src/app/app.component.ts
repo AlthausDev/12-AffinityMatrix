@@ -12,16 +12,6 @@ import { TranslationService } from './i18n/translation.service';
     <a class="skip-link" href="#main-content" (click)="skipToMain($event)">{{ i18n.t('a11y.skipToMain') }}</a>
     <app-language-switcher />
     <router-outlet />
-    <button
-      class="support-dock"
-      type="button"
-      disabled
-      [attr.aria-label]="i18n.t('settings.support.action')"
-      [attr.title]="i18n.t('settings.support.action')"
-    >
-      <span aria-hidden="true">♡</span>
-      {{ i18n.t('settings.support.title') }}
-    </button>
   `,
   styles: `
     .skip-link {
@@ -40,30 +30,6 @@ import { TranslationService } from './i18n/translation.service';
       transition: transform 120ms ease;
     }
     .skip-link:focus { transform: translateY(0); }
-    .support-dock { display: none; }
-    @media (min-width: 1180px) {
-      .support-dock {
-        position: fixed;
-        z-index: 70;
-        right: 0.85rem;
-        top: 50%;
-        display: inline-flex;
-        min-height: 2.45rem;
-        align-items: center;
-        gap: 0.42rem;
-        padding: 0.48rem 0.72rem;
-        transform: translateY(-50%);
-        border: 1px solid color-mix(in srgb, var(--neon-magenta) 34%, var(--border-subtle));
-        border-radius: 0.65rem;
-        background: linear-gradient(145deg, rgba(16, 33, 67, 0.82), rgba(48, 25, 68, 0.82));
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 .45rem 1.2rem rgba(2,6,22,.18);
-        color: color-mix(in srgb, var(--text-primary) 88%, var(--neon-rose));
-        font-size: 0.82rem;
-        font-weight: 760;
-      }
-      .support-dock:disabled { cursor: default; opacity: 0.82; }
-      .support-dock span { color: var(--neon-rose); font-size: 1rem; line-height: 1; }
-    }
     @media (prefers-reduced-motion: reduce) {
       .skip-link { transition: none; }
     }

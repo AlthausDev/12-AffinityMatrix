@@ -20,6 +20,17 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
         <p class="muted lead">{{ i18n.t('settings.description') }}</p>
       </header>
 
+      <button
+        class="settings-support-dock"
+        type="button"
+        disabled
+        [attr.aria-label]="i18n.t('settings.support.action')"
+        [attr.title]="i18n.t('settings.support.action')"
+      >
+        <span aria-hidden="true">♡</span>
+        {{ i18n.t('settings.support.title') }}
+      </button>
+
       <section class="panel settings-panel">
         <section class="settings-section" aria-labelledby="settings-appearance-title">
           <header class="settings-section-heading">
@@ -103,7 +114,7 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
           </label>
         </section>
 
-        <section class="settings-section support-settings" aria-labelledby="settings-support-title">
+        <section class="settings-section support-settings support-settings-inline" aria-labelledby="settings-support-title">
           <header class="settings-section-heading">
             <h2 id="settings-support-title">{{ i18n.t('settings.support.title') }}</h2>
             <p class="muted">{{ i18n.t('settings.support.description') }}</p>
@@ -134,7 +145,34 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
     .settings-link small { color: var(--text-secondary); font-size: 0.84rem; line-height: 1.4; }
     .support-settings-action { width: fit-content; }
     .support-settings-action:disabled { opacity: 0.78; }
+    .settings-support-dock { display: none; }
     .local-note { font-size: 0.88rem; }
+
+    @media (min-width: 1180px) {
+      .support-settings-inline { display: none; }
+      .settings-support-dock {
+        position: fixed;
+        z-index: 70;
+        right: 0.85rem;
+        top: 50%;
+        display: inline-flex;
+        min-height: 2.45rem;
+        align-items: center;
+        gap: 0.42rem;
+        padding: 0.48rem 0.72rem;
+        transform: translateY(-50%);
+        border: 1px solid color-mix(in srgb, var(--neon-magenta) 34%, var(--border-subtle));
+        border-radius: 0.65rem;
+        background: linear-gradient(145deg, rgba(16, 33, 67, 0.82), rgba(48, 25, 68, 0.82));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 .45rem 1.2rem rgba(2,6,22,.18);
+        color: color-mix(in srgb, var(--text-primary) 88%, var(--neon-rose));
+        font-size: 0.82rem;
+        font-weight: 760;
+      }
+      .settings-support-dock:disabled { cursor: default; opacity: 0.82; }
+      .settings-support-dock span { color: var(--neon-rose); font-size: 1rem; line-height: 1; }
+    }
+
     @media (max-width: 640px) {
       .font-scale-options { grid-template-columns: 1fr; }
       .font-scale-options button { min-height: 3.7rem; grid-template-columns: auto 1fr; justify-items: start; }
