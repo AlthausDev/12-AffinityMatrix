@@ -136,7 +136,10 @@ export const FINAL_CATALOGUE_GLOSSARY: readonly FinalCatalogueGlossaryEntry[] = 
 ];
 
 const ALIASES = FINAL_CATALOGUE_GLOSSARY
-  .flatMap((entry) => entry.aliases.map((alias) => ({ alias, entry })))
+  .flatMap((entry) =>
+    [...new Set([...entry.aliases, entry.titleEn, entry.titleEs])]
+      .map((alias) => ({ alias, entry })),
+  )
   .sort((left, right) => right.alias.length - left.alias.length);
 const ALIAS_LOOKUP = new Map(ALIASES.map(({ alias, entry }) => [alias.toLocaleLowerCase(), entry]));
 const TERM_PATTERN = new RegExp(
