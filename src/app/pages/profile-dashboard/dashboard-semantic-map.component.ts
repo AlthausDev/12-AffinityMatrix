@@ -29,41 +29,14 @@ import {
 
       @if (hasEvidence()) {
         <section class="semantic-theme-panel" [attr.aria-label]="i18n.t('dashboard.semantic.themes')">
-          <div class="semantic-panel-kicker">
+          <div class="semantic-panel-kicker semantic-dimension-heading">
             <div>
               <p class="semantic-kicker">{{ i18n.t('dashboard.semantic.themes') }}</p>
               <strong>{{ i18n.t('dashboard.semantic.inventory', { dimensions: themes().length, tags: semanticTagCount() }) }}</strong>
             </div>
-          </div>
-
-          <div class="semantic-scale-guide">
-            <div class="semantic-scale-guide-copy">
-              <strong>{{ text('Qué significa esta escala', 'What this scale means') }}</strong>
-              <p>{{ text(
-                'No mide cuánto cuestionario has completado. Resume la afinidad de las respuestas que ya existen dentro de cada dimensión.',
-                'It does not measure questionnaire completion. It summarizes the affinity of the answers already present inside each dimension.'
-              ) }}</p>
-              <p><b>0%</b> {{ text(
-                'significa que lo respondido no aporta afinidad positiva: tus respuestas equivalen a «No me interesa» o «No rotundo».',
-                'means the answered items add no positive affinity: your answers are equivalent to “Not interested” or a firm boundary.'
-              ) }}</p>
-              <p><b>100%</b> {{ text(
-                'significa afinidad máxima en todo lo respondido de esa dimensión: el equivalente a marcar «Favorito» de forma consistente.',
-                'means maximum affinity across everything answered in that dimension: the equivalent of consistently marking “Favorite”.'
-              ) }}</p>
-            </div>
-
-            <div class="semantic-scale-anchors" [attr.aria-label]="text('Referencias de la escala', 'Scale references')">
-              <span><strong>0%</strong><b>{{ text('No me interesa', 'Not interested') }}</b><small>{{ text('Sin afinidad positiva', 'No positive affinity') }}</small></span>
-              <span><strong>38%</strong><b>{{ text('Depende', 'Depends') }}</b><small>{{ text('Interés condicionado', 'Conditional interest') }}</small></span>
-              <span><strong>50%</strong><b>{{ text('Curiosidad', 'Curious') }}</b><small>{{ text('Interés exploratorio', 'Exploratory interest') }}</small></span>
-              <span><strong>78%</strong><b>{{ text('Me gusta', 'Like') }}</b><small>{{ text('Afinidad clara', 'Clear affinity') }}</small></span>
-              <span><strong>100%</strong><b>{{ text('Favorito', 'Favorite') }}</b><small>{{ text('Afinidad máxima', 'Maximum affinity') }}</small></span>
-            </div>
-
-            <small class="semantic-scale-formula">{{ text(
-              'Los valores intermedios son medias ponderadas entre esas respuestas. Responder más aumenta la evidencia y la estabilidad del resultado; no empuja el porcentaje hacia 100.',
-              'Intermediate values are weighted averages between those answers. Answering more increases evidence and stability; it does not push the percentage toward 100.'
+            <small class="semantic-scale-inline-note">{{ text(
+              '0% = sin afinidad positiva · Depende ≈ 38 · Curiosidad = 50 · Me gusta ≈ 78 · 100% = Favorito. Responder más añade evidencia, no hace subir el porcentaje.',
+              '0% = no positive affinity · Depends ≈ 38 · Curious = 50 · Like ≈ 78 · 100% = Favorite. More answers add evidence; they do not make the percentage rise.'
             ) }}</small>
           </div>
 
@@ -86,6 +59,10 @@ import {
                   }
                 </div>
 
+                <div class="semantic-spectrum-endpoints" aria-hidden="true">
+                  <span><b>0%</b> {{ text('Sin afinidad', 'No affinity') }}</span>
+                  <span><b>100%</b> {{ text('Favorito', 'Favorite') }}</span>
+                </div>
                 <div class="semantic-spectrum" role="img" [attr.aria-label]="themeAriaLabel(entry)">
                   <span class="semantic-threshold threshold-depends" aria-hidden="true"></span>
                   <span class="semantic-threshold threshold-curious" aria-hidden="true"></span>
@@ -113,8 +90,8 @@ import {
                 <p class="semantic-kicker">{{ i18n.t('dashboard.semantic.coordinates') }}</p>
                 <h4>{{ text('Cuatro comparaciones rápidas', 'Four quick comparisons') }}</h4>
                 <p>{{ text(
-                  'Aquí no comparamos gusto con rechazo, sino el peso relativo de dos familias que pueden gustarte a la vez. El centro significa equilibrio entre ambas.',
-                  'These axes do not compare attraction with rejection; they compare the relative weight of two families that can both appeal to you. The center means balance between them.'
+                  'Cada eje compara el peso relativo de dos tendencias que pueden gustarte a la vez; el centro sólo significa que ambas pesan parecido.',
+                  'Each axis compares the relative weight of two tendencies that can both appeal to you; the center only means they carry similar weight.'
                 ) }}</p>
               </div>
             </header>
@@ -282,12 +259,12 @@ export class DashboardSemanticMapComponent {
   }
 
   dimensionContext(score: number): string {
-    if (score < 15) return this.text('Cerca del extremo «no me interesa».', 'Close to the “not interested” end.');
-    if (score < 32) return this.text('Predominan respuestas frías o poco comprometidas.', 'Cool or low-commitment answers predominate.');
+    if (score < 15) return this.text('Muy cerca de «no me interesa».', 'Very close to “not interested”.');
+    if (score < 32) return this.text('Predominan respuestas de poco interés.', 'Low-interest answers predominate.');
     if (score < 44) return this.text('Se parece más a «depende» que a una preferencia estable.', 'Closer to “depends” than to a stable preference.');
     if (score < 58) return this.text('Zona de curiosidad: interés real, todavía mixto.', 'Curiosity zone: real but still mixed interest.');
     if (score < 70) return this.text('Hay una inclinación positiva clara.', 'There is a clear positive lean.');
-    if (score < 88) return this.text('La dimensión cae cerca de «me gusta».', 'The dimension falls close to “like”.');
+    if (score < 88) return this.text('Está cerca de «me gusta».', 'It is close to “like”.');
     return this.text('Se acerca a una preferencia favorita y consistente.', 'It approaches a consistent favorite-level preference.');
   }
 
