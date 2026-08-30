@@ -44,9 +44,7 @@ describe('catalogue glossary consistency', () => {
         .filter((entry) => !used.has(entry.id))
         .map((entry) => `${entry.id}: ${locale === 'es' ? entry.titleEs : entry.titleEn}`);
 
-      expect(missing).withContext(
-        'A glossary definition should not exist as orphan product vocabulary. Rename catalogue copy to the canonical term, or remove the obsolete glossary entry.',
-      ).toEqual([]);
+      expect(missing).toEqual([]);
     });
   }
 });
