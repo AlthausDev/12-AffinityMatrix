@@ -16,8 +16,8 @@ import {
         <div>
           <h3>{{ i18n.t('dashboard.roleProfile.title') }}</h3>
           <p>{{ text(
-            'Compara cómo encajan tus respuestas al hacer, recibir o compartir una acción. Afinidad mide intensidad dentro de cada familia; peso relativo indica cómo se reparte esa afinidad entre las tres.',
-            'Compares how your answers fit doing, receiving, or sharing an action. Affinity measures intensity within each family; relative weight shows how that affinity is split between the three.'
+            'Cómo tiendes a participar en las prácticas que has respondido: haciendo, recibiendo o compartiendo la acción.',
+            'How you tend to participate in the practices you answered: doing, receiving, or sharing the action.'
           ) }}</p>
         </div>
       </header>
@@ -27,6 +27,40 @@ import {
           <span>{{ text('Lectura rápida', 'Quick read') }}</span>
           <strong>{{ roleProfileDiagnosis() }}</strong>
         </aside>
+
+        <section class="dashboard-role-composition" [attr.aria-label]="roleCompositionAriaLabel()">
+          <div class="dashboard-role-composition-heading">
+            <div>
+              <strong>{{ text('Reparto del perfil', 'Profile split') }}</strong>
+              <small>{{ text(
+                'Qué parte de la afinidad de rol detectada cae en cada forma de participar.',
+                'How much of the detected role affinity falls into each form of participation.'
+              ) }}</small>
+            </div>
+            <span>{{ text('Suma 100%', 'Adds to 100%') }}</span>
+          </div>
+
+          <div class="dashboard-role-composition-rail" role="img" [attr.aria-label]="roleCompositionAriaLabel()">
+            @for (entry of roleProfile(); track entry.perspective) {
+              <span
+                class="dashboard-role-composition-segment"
+                [attr.data-perspective]="entry.perspective"
+                [style.width.%]="entry.profileWeightPercentage"
+                aria-hidden="true"
+              ></span>
+            }
+          </div>
+
+          <div class="dashboard-role-composition-labels">
+            @for (entry of roleProfile(); track entry.perspective) {
+              <span [attr.data-perspective]="entry.perspective">
+                <i aria-hidden="true"></i>
+                <b>{{ rolePerspectiveLabel(entry.perspective) }}</b>
+                <strong>{{ entry.profileWeightPercentage }}%</strong>
+              </span>
+            }
+          </div>
+        </section>
 
         <div class="dashboard-role-profile">
           @for (entry of roleProfile(); track entry.perspective) {
@@ -48,18 +82,7 @@ import {
                   <div class="dashboard-role-track" role="img" [attr.aria-label]="roleMetricAriaLabel(entry, 'affinity')">
                     <span class="dashboard-role-fill dashboard-role-fill-affinity" [style.width.%]="entry.affinityPercentage"></span>
                   </div>
-                  <small class="dashboard-role-metric-hint">{{ text('0% sin afinidad · 100% favorito', '0% no affinity · 100% favorite') }}</small>
-                </div>
-
-                <div class="dashboard-role-metric">
-                  <div class="dashboard-role-metric-label">
-                    <span>{{ text('Peso relativo', 'Relative weight') }}</span>
-                    <strong>{{ entry.profileWeightPercentage }}%</strong>
-                  </div>
-                  <div class="dashboard-role-track" role="img" [attr.aria-label]="roleMetricAriaLabel(entry, 'weight')">
-                    <span class="dashboard-role-fill dashboard-role-fill-weight" [style.width.%]="entry.profileWeightPercentage"></span>
-                  </div>
-                  <small class="dashboard-role-metric-hint">{{ text('Reparto frente a las otras familias', 'Share compared with the other families') }}</small>
+                  <small class="dashboard-role-metric-hint">{{ text('No me interesa ↔ Favorito', 'Not interested ↔ Favorite') }}</small>
                 </div>
               </div>
 
@@ -75,10 +98,10 @@ import {
           <div class="dashboard-role-spectrum-block">
             <div class="dashboard-role-spectrum-heading">
               <div>
-                <strong>{{ text('Activo ↔ Receptivo', 'Active ↔ Receptive') }}</strong>
+                <strong>{{ text('Cuando el rol es direccional', 'When the role is directional') }}</strong>
                 <small>{{ text(
-                  'Compara hacerla frente a recibirla; lo mutuo se mide aparte.',
-                  'Compares doing it with receiving it; mutual roles are measured separately.'
+                  'Compara recibir la acción frente a realizarla. Las prácticas mutuas quedan fuera porque forman una categoría propia.',
+                  'Compares receiving the action with doing it. Mutual practices stay out because they form their own category.'
                 ) }}</small>
               </div>
               <span>{{ roleDirectionEvidenceLabel() }}</span>
@@ -98,21 +121,19 @@ import {
             </div>
           </div>
 
-          <div class="dashboard-role-spectrum-block dashboard-role-spectrum-initiative">
-            <div class="dashboard-role-spectrum-heading">
-              <div>
-                <strong>{{ text('Preferencia de iniciativa', 'Initiative preference') }}</strong>
-                <small>{{ text(
-                  'Sólo cuenta respuestas donde indicaste quién prefieres que dé el primer paso.',
-                  'Only counts answers where you stated who you prefer to make the first move.'
-                ) }}</small>
-              </div>
-              @if (roleProfileCoordinates().initiativeEvidenceCount > 0) {
+          @if (roleProfileCoordinates().initiativeEvidenceCount > 0) {
+            <div class="dashboard-role-spectrum-block dashboard-role-spectrum-initiative">
+              <div class="dashboard-role-spectrum-heading">
+                <div>
+                  <strong>{{ text('Preferencia de iniciativa', 'Initiative preference') }}</strong>
+                  <small>{{ text(
+                    'Sólo cuenta respuestas donde indicaste quién prefieres que dé el primer paso.',
+                    'Only counts answers where you stated who you prefer to make the first move.'
+                  ) }}</small>
+                </div>
                 <span>{{ roleInitiativeEvidenceLabel() }}</span>
-              }
-            </div>
+              </div>
 
-            @if (roleProfileCoordinates().initiativeEvidenceCount > 0) {
               <div class="dashboard-role-spectrum" role="img" [attr.aria-label]="initiativeSpectrumAriaLabel()">
                 <div class="dashboard-role-spectrum-labels" aria-hidden="true">
                   <span>{{ i18n.t('dashboard.roleProfile.initiativePartner') }}</span>
@@ -125,13 +146,8 @@ import {
                 </div>
                 <strong class="dashboard-role-spectrum-diagnosis">{{ initiativeTrendDiagnosis() }}</strong>
               </div>
-            } @else {
-              <p class="dashboard-role-initiative-empty">{{ text(
-                'Aún no hay respuestas con preferencia de iniciativa. No mostramos una posición hasta tener datos reales.',
-                'There are no answers with an initiative preference yet. No position is shown until there is real evidence.'
-              ) }}</p>
-            }
-          </div>
+            </div>
+          }
         </section>
       } @else {
         <div class="dashboard-chart-empty">
@@ -243,6 +259,13 @@ export class DashboardRoleProfileComponent {
     return marked
       ? this.text(`Hay un predominio claro ${dominantLabel}.`, `There is a clear predominance ${dominantLabel}.`)
       : this.text(`Hay algo más de peso ${dominantLabel}.`, `There is somewhat more weight ${dominantLabel}.`);
+  }
+
+  roleCompositionAriaLabel(): string {
+    const values = this.roleProfile()
+      .map((entry) => `${this.rolePerspectiveLabel(entry.perspective)} ${entry.profileWeightPercentage}%`)
+      .join(', ');
+    return `${this.text('Reparto del perfil de roles', 'Role profile split')}: ${values}`;
   }
 
   roleCoordinateLeft(): number {
