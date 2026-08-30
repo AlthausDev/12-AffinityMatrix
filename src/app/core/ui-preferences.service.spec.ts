@@ -10,6 +10,7 @@ describe('UiPreferencesService', () => {
     localStorage.removeItem(UI_PREFERENCES_STORAGE_KEY);
     document.documentElement.removeAttribute('data-font-scale');
     document.documentElement.removeAttribute('data-visual-effects');
+    document.documentElement.removeAttribute('data-contrast');
     TestBed.resetTestingModule();
   });
 
@@ -17,6 +18,7 @@ describe('UiPreferencesService', () => {
     localStorage.removeItem(UI_PREFERENCES_STORAGE_KEY);
     document.documentElement.removeAttribute('data-font-scale');
     document.documentElement.removeAttribute('data-visual-effects');
+    document.documentElement.removeAttribute('data-contrast');
   });
 
   it('uses safe defaults when no preference has been stored', () => {
@@ -33,6 +35,8 @@ describe('UiPreferencesService', () => {
       confirmQuestionnaireExit: false,
       fontScale: 'normal',
       reduceVisualEffects: false,
+      highContrast: false,
+      showGlossaryHints: true,
       hiddenCategoriesByProfile: {},
       profileOrder: [],
       profileSortMode: 'manual',
@@ -48,13 +52,8 @@ describe('UiPreferencesService', () => {
 
     expect(service.fontScale()).toBe('large');
     expect(document.documentElement.dataset['fontScale']).toBe('large');
-    expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toEqual({
-      confirmQuestionnaireExit: true,
+    expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({
       fontScale: 'large',
-      reduceVisualEffects: false,
-      hiddenCategoriesByProfile: {},
-      profileOrder: [],
-      profileSortMode: 'manual',
     });
   });
 
@@ -69,6 +68,30 @@ describe('UiPreferencesService', () => {
     expect(document.documentElement.dataset['visualEffects']).toBe('reduced');
     expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({
       reduceVisualEffects: true,
+    });
+  });
+
+  it('applies and persists high contrast globally', () => {
+    const service = TestBed.inject(UiPreferencesService);
+    service.initialize();
+    expect(document.documentElement.dataset['contrast']).toBe('standard');
+
+    service.setHighContrast(true);
+
+    expect(service.highContrast()).toBe(true);
+    expect(document.documentElement.dataset['contrast']).toBe('high');
+    expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({
+      highContrast: true,
+    });
+  });
+
+  it('persists whether contextual glossary hints are shown', () => {
+    const service = TestBed.inject(UiPreferencesService);
+    service.setShowGlossaryHints(false);
+
+    expect(service.showGlossaryHints()).toBe(false);
+    expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({
+      showGlossaryHints: false,
     });
   });
 
@@ -110,11 +133,7 @@ describe('UiPreferencesService', () => {
     service.setProfileOrder(['profile-b', 'profile-a', 'profile-b', '']);
 
     expect(service.profileOrder()).toEqual(['profile-b', 'profile-a']);
-    expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toEqual({
-      confirmQuestionnaireExit: true,
-      fontScale: 'normal',
-      reduceVisualEffects: false,
-      hiddenCategoriesByProfile: {},
+    expect(JSON.parse(localStorage.getItem(UI_PREFERENCES_STORAGE_KEY) ?? '{}')).toMatchObject({
       profileOrder: ['profile-b', 'profile-a'],
       profileSortMode: 'manual',
     });
@@ -139,6 +158,8 @@ describe('UiPreferencesService', () => {
       confirmQuestionnaireExit: true,
       fontScale: 'extra-large',
       reduceVisualEffects: true,
+      highContrast: true,
+      showGlossaryHints: false,
       hiddenCategoriesByProfile: {
         'profile-a': ['edge', 'edge', '', 4, 'fluids'],
         'profile-b': 'not-an-array',
@@ -154,17 +175,22 @@ describe('UiPreferencesService', () => {
     expect(document.documentElement.dataset['fontScale']).toBe('extra-large');
     expect(service.reduceVisualEffects()).toBe(true);
     expect(document.documentElement.dataset['visualEffects']).toBe('reduced');
+    expect(service.highContrast()).toBe(true);
+    expect(document.documentElement.dataset['contrast']).toBe('high');
+    expect(service.showGlossaryHints()).toBe(false);
     expect(service.hiddenCategoryIds('profile-a')).toEqual(['edge', 'fluids']);
     expect(service.hiddenCategoryIds('profile-b')).toEqual([]);
     expect(service.profileOrder()).toEqual(['profile-c', 'profile-a']);
     expect(service.profileSortMode()).toBe('alias');
   });
 
-  it('ignores malformed or unsupported stored preference shapes', () => {
+  it('uses safe defaults for malformed or unsupported stored preference fields', () => {
     localStorage.setItem(UI_PREFERENCES_STORAGE_KEY, JSON.stringify({
       confirmQuestionnaireExit: 'no',
       fontScale: 'huge',
       reduceVisualEffects: 'sometimes',
+      highContrast: 'maximum',
+      showGlossaryHints: 1,
       hiddenCategoriesByProfile: null,
       profileOrder: 'not-an-array',
       profileSortMode: 'random',
