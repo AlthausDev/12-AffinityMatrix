@@ -32,6 +32,7 @@
               "src/profile-dashboard-category-details.css",
               "src/profile-dashboard-role-profile.css",
               "src/profile-dashboard-semantic-map.css",
+              "src/profile-dashboard-desktop-polish.css",
               "src/profile-dashboard-progress-gradient.css",
               "src/profile-dashboard-insight-polish.css",
               "src/ui-preferences.css",
