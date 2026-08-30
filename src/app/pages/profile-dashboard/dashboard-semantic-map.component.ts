@@ -75,7 +75,7 @@ import {
                 <div class="semantic-theme-footer">
                   <small>{{ entry.evidenceCount > 0 ? evidenceLabel(entry.evidenceCount) : text('Aún no has respondido prácticas de esta dimensión', 'You have not answered practices in this dimension yet') }}</small>
                   @if (entry.evidenceCount > 0) {
-                    <small>{{ dimensionContext(entry.score) }}</small>
+                    <small>{{ dimensionContext(entry) }}</small>
                   }
                 </div>
               </div>
@@ -263,14 +263,18 @@ export class DashboardSemanticMapComponent {
     return this.text('Preferencia muy marcada', 'Very strong preference');
   }
 
-  dimensionContext(score: number): string {
-    if (score < 15) return this.text('Muy cerca del extremo izquierdo.', 'Very close to the left endpoint.');
-    if (score < 32) return this.text('Predomina la parte baja de esta dimensión.', 'The lower side of this dimension predominates.');
+  dimensionContext(entry: SemanticThemeEntry): string {
+    const score = entry.score;
+    const low = this.dimensionEndpointLabel(entry, 'low');
+    const high = this.dimensionEndpointLabel(entry, 'high');
+
+    if (score < 15) return this.text(`Muy cerca de «${low}».`, `Very close to “${low}”.`);
+    if (score < 32) return this.text(`Se mantiene en la zona de «${low}».`, `It remains in the “${low}” area.`);
     if (score < 44) return this.text('Interés condicionado, cerca de «depende».', 'Conditional interest, close to “depends”.');
     if (score < 58) return this.text('Zona de curiosidad: interés real, todavía mixto.', 'Curiosity zone: real but still mixed interest.');
-    if (score < 70) return this.text('Hay una inclinación clara hacia el extremo derecho.', 'There is a clear lean toward the right endpoint.');
-    if (score < 88) return this.text('Está cerca de «me gusta».', 'It is close to “like”.');
-    return this.text('Se acerca al extremo de preferencia máxima.', 'It approaches the maximum-preference endpoint.');
+    if (score < 70) return this.text(`Inclinación clara hacia «${high}».`, `Clear lean toward “${high}”.`);
+    if (score < 88) return this.text(`Cerca de «${high}», con una valoración similar a «me gusta».`, `Close to “${high}”, with a rating similar to “like”.`);
+    return this.text(`Muy cerca del extremo «${high}».`, `Very close to the “${high}” endpoint.`);
   }
 
   affinityDiagnosis(score: number): string {
@@ -357,7 +361,7 @@ export class DashboardSemanticMapComponent {
       case 'body-focus':
         return { low: this.text('General / poco focalizado', 'Broad / unfocused'), high: this.text('Foco corporal / erótico', 'Body / erotic focus') };
       default:
-        return { low: this.text('Baja expresión', 'Low expression'), high: this.themeLabel({ theme: { id: themeId, en: 'High expression', es: 'Expresión alta', descriptionEn: '', descriptionEs: '', tags: [] }, score: 0, evidenceCount: 0 }) };
+        return { low: this.text('Baja expresión', 'Low expression'), high: this.text('Alta expresión', 'High expression') };
     }
   }
 
