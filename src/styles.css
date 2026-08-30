@@ -38,8 +38,25 @@
 
 * { box-sizing: border-box; }
 html { min-height: 100%; background: #050919; font-size: 100%; }
-html[data-font-scale='large'] { font-size: 112.5%; }
-html[data-font-scale='extra-large'] { font-size: 125%; }
+html[data-font-scale='large'] { font-size: 115%; }
+html[data-font-scale='extra-large'] { font-size: 130%; }
+
+@media (min-width: 981px) {
+  html { font-size: 106.25%; }
+  html[data-font-scale='large'] { font-size: 121%; }
+  html[data-font-scale='extra-large'] { font-size: 136%; }
+}
+
+html[data-contrast='high'] {
+  --surface-panel: rgba(15, 25, 54, 0.97);
+  --surface-elevated: rgba(35, 51, 92, 0.99);
+  --text-primary: #ffffff;
+  --text-secondary: #e1e8f6;
+  --border-subtle: rgba(153, 183, 232, 0.58);
+  --border-strong: rgba(188, 211, 247, 0.82);
+  --focus-ring: #d8ebff;
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -67,10 +84,26 @@ h1, h2, h3, p { margin-top: 0; }
 h1 { margin-bottom: 0.75rem; font-size: clamp(2rem, 6vw, 3.5rem); line-height: 1.05; }
 h2 { margin-bottom: 0.5rem; font-size: 1.25rem; }
 h3 { margin-bottom: 0.5rem; }
-.eyebrow { margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.eyebrow { margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 .muted { color: var(--text-secondary); }
 .lead, .form-note { line-height: 1.6; }
 .lead { max-width: 48rem; margin-bottom: 0; }
+
+.subpage-title-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.82rem;
+  margin-bottom: 0.55rem;
+}
+.subpage-title-row app-brand-mark {
+  --brand-mark-size: 2.9rem;
+  flex: 0 0 auto;
+}
+.subpage-title-row h1 {
+  min-width: 0;
+  margin: 0;
+}
 
 .panel, .action-card, .profile-row {
   border: 1px solid transparent;
@@ -132,4 +165,6 @@ h3 { margin-bottom: 0.5rem; }
   .action-grid, .status-list { grid-template-columns: 1fr; }
   .header-actions, .header-actions .button { width: 100%; }
   .questionnaire-modal-page { padding: 1rem; }
+  .subpage-title-row { gap: 0.68rem; }
+  .subpage-title-row app-brand-mark { --brand-mark-size: 2.55rem; }
 }
