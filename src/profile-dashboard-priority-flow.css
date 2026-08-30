@@ -1,4 +1,35 @@
 /* Reorder the dashboard by user value: quick signals first, supporting models afterwards. */
+.profile-dashboard .dashboard-insights-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.72rem;
+}
+
+.profile-dashboard .dashboard-insights-heading {
+  order: 0;
+}
+
+/* The old wrapper grouped Distribution + Roles. Flatten it so mobile and desktop can share one story. */
+.profile-dashboard .dashboard-insight-grid {
+  display: contents;
+}
+
+.profile-dashboard .dashboard-preference-card {
+  order: 1;
+}
+
+.profile-dashboard .dashboard-category-card {
+  order: 2;
+}
+
+.profile-dashboard .dashboard-insights-section > app-dashboard-semantic-map {
+  order: 3;
+}
+
+.profile-dashboard .dashboard-insight-grid > app-dashboard-role-profile {
+  order: 4;
+}
+
 .profile-dashboard .dashboard-semantic-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -33,23 +64,6 @@
 }
 
 @media (min-width: 1120px) {
-  /* Distribution and progress establish context; semantic insights come before the secondary role model. */
-  .profile-dashboard .dashboard-preference-card {
-    order: 1;
-  }
-
-  .profile-dashboard .dashboard-category-card {
-    order: 2;
-  }
-
-  .profile-dashboard .dashboard-insights-section > app-dashboard-semantic-map {
-    order: 3;
-  }
-
-  .profile-dashboard .dashboard-insight-grid > app-dashboard-role-profile {
-    order: 4;
-  }
-
   .profile-dashboard .dashboard-semantic-card {
     margin-top: 0;
   }
@@ -81,7 +95,6 @@
 }
 
 @media (max-width: 980px) {
-  /* On phones/tablets the semantic card keeps its natural position, but the useful highlights are no longer buried at the bottom. */
   .profile-dashboard .dashboard-semantic-card > .semantic-highlight-panel {
     margin-top: 0;
   }
