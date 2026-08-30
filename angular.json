@@ -47,7 +47,8 @@
               "src/profile-dashboard-readability.css",
               "src/questionnaire-v2.css",
               "src/questionnaire-mobile-performance.css",
-              "src/subpage-title-polish.css"
+              "src/subpage-title-polish.css",
+              "src/ui-alignment-polish.css"
             ]
           },
           "configurations": {
