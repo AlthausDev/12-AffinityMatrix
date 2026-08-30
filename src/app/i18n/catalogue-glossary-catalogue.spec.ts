@@ -36,12 +36,29 @@ function usedGlossaryIds(locale: Locale): ReadonlySet<string> {
   );
 }
 
+function normalized(value: string): string {
+  return value.normalize('NFKC').toLocaleLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function usesCanonicalTitle(locale: Locale, title: string): boolean {
+  const canonical = normalized(title);
+  return catalogueCopy(locale).some((copy) => normalized(copy).includes(canonical));
+}
+
 describe('catalogue glossary consistency', () => {
   for (const locale of ['es', 'en'] as const) {
     it(`uses every final ${locale} glossary concept in current catalogue copy`, () => {
       const used = usedGlossaryIds(locale);
       const missing = FINAL_CATALOGUE_GLOSSARY
         .filter((entry) => !used.has(entry.id))
+        .map((entry) => `${entry.id}: ${locale === 'es' ? entry.titleEs : entry.titleEn}`);
+
+      expect(missing).toEqual([]);
+    });
+
+    it(`uses every final ${locale} glossary title literally in current catalogue copy`, () => {
+      const missing = FINAL_CATALOGUE_GLOSSARY
+        .filter((entry) => !usesCanonicalTitle(locale, locale === 'es' ? entry.titleEs : entry.titleEn))
         .map((entry) => `${entry.id}: ${locale === 'es' ? entry.titleEs : entry.titleEn}`);
 
       expect(missing).toEqual([]);
