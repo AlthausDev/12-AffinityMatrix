@@ -38,6 +38,15 @@ app-profile-editor-page .profile-editor-page-editing .profile-entry-header {
   text-align: left;
 }
 
+/* The back button belongs to the same horizontal frame as the editing header instead of floating
+   against the wider page container. */
+app-profile-editor-page .profile-editor-page-editing > .profile-entry-back {
+  display: flex;
+  width: fit-content;
+  margin-inline-start: max(0rem, calc((100% - 67.2rem) / 2));
+  margin-bottom: 0.9rem;
+}
+
 /* Settings returns to a quieter single-column composition. It can grow through clear sections
    without turning into either a sparse two-column dashboard or one unstructured list. */
 app-settings-page .page {
@@ -113,6 +122,16 @@ app-settings-page .local-note {
   border-top: 1px solid color-mix(in srgb, var(--border-subtle) 58%, transparent);
 }
 
+/* On desktop Support sits directly below the fixed language selector and never competes with its menu. */
+@media (min-width: 1180px) {
+  app-settings-page .settings-support-dock {
+    top: 3.55rem !important;
+    right: 0.75rem !important;
+    z-index: 29 !important;
+    transform: none !important;
+  }
+}
+
 /* Category labels are content, not badges: never sacrifice their wording to ellipsis. */
 .profile-dashboard .dashboard-category-copy strong,
 .profile-dashboard .dashboard-subcategory-copy strong {
@@ -121,62 +140,92 @@ app-settings-page .local-note {
   white-space: normal;
 }
 
-/* On desktop the hard-coded micro typography was the real readability problem. The global text-size
-   choice scales these values again, so Large and Very large now remain visibly distinct. */
+/* Desktop normal mode used to leave a second, much smaller typography tier inside dense widgets.
+   Raise only those text floors: no rem-root scaling, no larger cards, gaps, controls or panels. */
 @media (min-width: 981px) {
+  .profile-dashboard .dashboard-profile-chips > span,
+  .profile-dashboard .dashboard-updated,
+  .profile-dashboard .dashboard-progress-caption span,
+  .profile-dashboard .dashboard-progress-message,
+  .profile-dashboard .dashboard-storage-notice {
+    font-size: 0.84rem;
+  }
+
+  .profile-dashboard .completion-ring-core span,
+  .profile-dashboard .preference-donut-core span {
+    font-size: 0.82rem;
+  }
+
+  .profile-dashboard .dashboard-action-copy .eyebrow {
+    font-size: 0.84rem;
+  }
+
+  .profile-dashboard .dashboard-action-copy small,
+  .profile-dashboard .dashboard-chart-heading p,
+  .profile-dashboard .dashboard-insights-heading > p {
+    font-size: 0.9rem;
+    line-height: 1.42;
+  }
+
+  .profile-dashboard .preference-legend-label,
+  .profile-dashboard .preference-legend-value,
+  .profile-dashboard .dashboard-category-heading > strong {
+    font-size: 0.88rem;
+  }
+
   .profile-dashboard .dashboard-category-copy strong { font-size: 1rem; line-height: 1.28; }
-  .profile-dashboard .dashboard-category-copy .dashboard-category-value { font-size: 0.88rem; }
-  .profile-dashboard .dashboard-subcategory-copy strong { font-size: 0.91rem; }
-  .profile-dashboard .dashboard-subcategory-copy span { font-size: 0.82rem; }
+  .profile-dashboard .dashboard-category-copy .dashboard-category-value { font-size: 0.9rem; }
+  .profile-dashboard .dashboard-subcategory-copy strong { font-size: 0.94rem; }
+  .profile-dashboard .dashboard-subcategory-copy span { font-size: 0.88rem; }
 
   .profile-dashboard .semantic-panel-kicker strong,
-  .profile-dashboard .semantic-relative-heading > small { font-size: 0.84rem; }
-  .profile-dashboard .semantic-kicker { font-size: 0.86rem; }
-  .profile-dashboard .semantic-scale-guide-copy > strong { font-size: 0.98rem; }
-  .profile-dashboard .semantic-scale-guide-copy p { font-size: 0.84rem; }
-  .profile-dashboard .semantic-scale-anchors strong { font-size: 0.94rem; }
-  .profile-dashboard .semantic-scale-anchors b { font-size: 0.8rem; }
+  .profile-dashboard .semantic-relative-heading > small { font-size: 0.9rem; }
+  .profile-dashboard .semantic-kicker { font-size: 0.9rem; }
+  .profile-dashboard .semantic-scale-guide-copy > strong { font-size: 1rem; }
+  .profile-dashboard .semantic-scale-guide-copy p { font-size: 0.9rem; }
+  .profile-dashboard .semantic-scale-anchors strong { font-size: 0.96rem; }
+  .profile-dashboard .semantic-scale-anchors b { font-size: 0.86rem; }
   .profile-dashboard .semantic-scale-anchors small,
-  .profile-dashboard .semantic-scale-formula { font-size: 0.76rem; }
-  .profile-dashboard .semantic-theme-heading strong { font-size: 1rem; }
+  .profile-dashboard .semantic-scale-formula { font-size: 0.84rem; }
+  .profile-dashboard .semantic-theme-heading strong { font-size: 1.02rem; }
   .profile-dashboard .semantic-theme-heading small,
   .profile-dashboard .semantic-theme-footer small,
   .profile-dashboard .semantic-highlight small,
   .profile-dashboard .semantic-relative-axis small,
-  .profile-dashboard .semantic-coordinate-card small { font-size: 0.8rem; }
-  .profile-dashboard .semantic-theme-heading > span { font-size: 0.86rem; }
-  .profile-dashboard .semantic-relative-heading h4 { font-size: 1.08rem; }
-  .profile-dashboard .semantic-relative-heading p:last-child { font-size: 0.84rem; }
+  .profile-dashboard .semantic-coordinate-card small { font-size: 0.86rem; }
+  .profile-dashboard .semantic-theme-heading > span { font-size: 0.9rem; }
+  .profile-dashboard .semantic-relative-heading h4 { font-size: 1.1rem; }
+  .profile-dashboard .semantic-relative-heading p:last-child { font-size: 0.9rem; }
   .profile-dashboard .semantic-relative-group > header strong,
-  .profile-dashboard .semantic-coordinate-card > header strong { font-size: 0.93rem; }
-  .profile-dashboard .semantic-relative-labels strong { font-size: 0.78rem; }
-  .profile-dashboard .semantic-relative-labels span { font-size: 0.75rem; }
-  .profile-dashboard .coordinate-label { font-size: 0.75rem; }
+  .profile-dashboard .semantic-coordinate-card > header strong { font-size: 0.96rem; }
+  .profile-dashboard .semantic-relative-labels strong { font-size: 0.86rem; }
+  .profile-dashboard .semantic-relative-labels span { font-size: 0.84rem; }
+  .profile-dashboard .coordinate-label { font-size: 0.84rem; }
   .profile-dashboard .semantic-highlight-topline strong,
-  .profile-dashboard .semantic-highlight-topline span { font-size: 0.92rem; }
-  .profile-dashboard .semantic-highlight-diagnosis { font-size: 0.8rem; }
-  .profile-dashboard .semantic-highlight-empty { font-size: 0.9rem; }
-  .profile-dashboard .semantic-note { font-size: 0.82rem; }
+  .profile-dashboard .semantic-highlight-topline span { font-size: 0.94rem; }
+  .profile-dashboard .semantic-highlight-diagnosis { font-size: 0.88rem; }
+  .profile-dashboard .semantic-highlight-empty { font-size: 0.92rem; }
+  .profile-dashboard .semantic-note { font-size: 0.88rem; }
 
-  .profile-dashboard .dashboard-role-reading-heading > strong { font-size: 0.94rem; }
-  .profile-dashboard .dashboard-role-reading-heading > small { font-size: 0.8rem; }
-  .profile-dashboard .dashboard-role-reading-grid strong { font-size: 0.83rem; }
-  .profile-dashboard .dashboard-role-reading-grid p { font-size: 0.79rem; }
-  .profile-dashboard .dashboard-role-summary > span { font-size: 0.78rem; }
-  .profile-dashboard .dashboard-role-summary > strong { font-size: 0.95rem; }
-  .profile-dashboard .dashboard-role-row-heading strong { font-size: 1.04rem; }
-  .profile-dashboard .dashboard-role-row-heading small { font-size: 0.8rem; }
+  .profile-dashboard .dashboard-role-reading-heading > strong { font-size: 0.96rem; }
+  .profile-dashboard .dashboard-role-reading-heading > small { font-size: 0.86rem; }
+  .profile-dashboard .dashboard-role-reading-grid strong { font-size: 0.9rem; }
+  .profile-dashboard .dashboard-role-reading-grid p { font-size: 0.86rem; }
+  .profile-dashboard .dashboard-role-summary > span { font-size: 0.86rem; }
+  .profile-dashboard .dashboard-role-summary > strong { font-size: 0.98rem; }
+  .profile-dashboard .dashboard-role-row-heading strong { font-size: 1.06rem; }
+  .profile-dashboard .dashboard-role-row-heading small { font-size: 0.86rem; }
   .profile-dashboard .dashboard-role-row-heading > span,
-  .profile-dashboard .dashboard-role-row-meta { font-size: 0.81rem; }
-  .profile-dashboard .dashboard-role-row-meta strong { font-size: 0.86rem; }
-  .profile-dashboard .dashboard-role-metric-label span { font-size: 0.81rem; }
-  .profile-dashboard .dashboard-role-metric-label strong { font-size: 0.89rem; }
-  .profile-dashboard .dashboard-role-spectrum-heading strong { font-size: 0.96rem; }
+  .profile-dashboard .dashboard-role-row-meta { font-size: 0.87rem; }
+  .profile-dashboard .dashboard-role-row-meta strong { font-size: 0.9rem; }
+  .profile-dashboard .dashboard-role-metric-label span { font-size: 0.87rem; }
+  .profile-dashboard .dashboard-role-metric-label strong { font-size: 0.92rem; }
+  .profile-dashboard .dashboard-role-spectrum-heading strong { font-size: 0.98rem; }
   .profile-dashboard .dashboard-role-spectrum-heading small,
   .profile-dashboard .dashboard-role-spectrum-heading > span,
-  .profile-dashboard .dashboard-role-initiative-empty { font-size: 0.8rem; }
-  .profile-dashboard .dashboard-role-spectrum-labels { font-size: 0.78rem; }
-  .profile-dashboard .dashboard-role-spectrum-diagnosis { font-size: 0.82rem; }
+  .profile-dashboard .dashboard-role-initiative-empty { font-size: 0.86rem; }
+  .profile-dashboard .dashboard-role-spectrum-labels { font-size: 0.84rem; }
+  .profile-dashboard .dashboard-role-spectrum-diagnosis { font-size: 0.88rem; }
 }
 
 /* Shorten category progress substantially on phones/tablets. Opening a category deliberately spans
@@ -189,6 +238,12 @@ app-settings-page .local-note {
 
   .profile-dashboard .dashboard-category-row-expanded {
     grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 720px) {
+  app-profile-editor-page .profile-editor-page-editing > .profile-entry-back {
+    margin-inline-start: 0;
   }
 }
 
