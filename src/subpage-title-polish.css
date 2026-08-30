@@ -16,6 +16,32 @@
   margin: 0;
 }
 
+/* Subpage descriptions follow the same centered reading pattern as the glossary. */
+.profile-entry-page .profile-entry-header > .muted,
+app-settings-page .page-header > .lead,
+app-profile-comparison-page .page-header .lead,
+app-questionnaire-categories-page .categories-intro .lead,
+app-questionnaire-category-page .category-header > div:first-child > .muted {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.profile-editor-page.profile-editor-page-editing .profile-entry-header > .muted {
+  width: min(100%, 66rem);
+  max-width: 66rem;
+}
+
+app-profile-comparison-page .page-header > div {
+  width: 100%;
+  text-align: center;
+}
+
+app-profile-comparison-page .page-header .lead,
+app-questionnaire-categories-page .categories-intro .lead,
+app-questionnaire-category-page .category-header > div:first-child > .muted {
+  max-width: 68rem;
+}
+
 /* Comparison and questionnaire pages are large components with their own header markup. Give their
    h1 the exact same compact identity cue without changing the rest of their layout. */
 app-profile-comparison-page .page-header h1,
@@ -132,6 +158,17 @@ app-catalogue-glossary-page .glossary-page .glossary-search {
   app-profile-comparison-page .answer-pair span:not(.pair-arrow) { font-size: 0.9rem; }
   app-profile-comparison-page .profile-name { font-size: 0.84rem !important; }
   app-profile-comparison-page .omitted-note { font-size: 0.9rem; }
+}
+
+@media (min-width: 1180px) {
+  app-settings-page .page-header > .lead {
+    position: relative;
+    left: 50%;
+    width: max-content;
+    max-width: calc(100vw - 4rem);
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 720px) {
