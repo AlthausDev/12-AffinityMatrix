@@ -10,6 +10,7 @@ import {
   computed,
   ViewChild,
 } from '@angular/core';
+import { UiPreferencesService } from '../core/ui-preferences.service';
 import { splitFinalCatalogueGlossaryText } from '../i18n/catalogue-glossary-final';
 import { TranslationService } from '../i18n/translation.service';
 
@@ -24,40 +25,44 @@ let glossaryPopupSequence = 0;
 @Component({
   selector: 'app-catalogue-glossary-text',
   template: `
-    @for (segment of segments(); track $index) {
-      @if (segment.termId && shouldLinkTerm(segment.text); as linked) {
-        <button
-          type="button"
-          class="glossary-term"
-          [attr.aria-expanded]="isVisible(segment.termId!)"
-          [attr.aria-describedby]="isVisible(segment.termId!) ? popupId : null"
-          (mouseenter)="showHover(segment.termId!, segment.definition ?? '', $event)"
-          (mouseleave)="clearHover(segment.termId!)"
-          (focus)="showHover(segment.termId!, segment.definition ?? '', $event)"
-          (blur)="clearHover(segment.termId!)"
-          (click)="togglePinned(segment.termId!, segment.definition ?? '', $event)"
-          (keydown.escape)="closeOnEscape($event)"
-          (pointerdown)="startLongPress(segment.termId!, segment.definition ?? '', $event)"
-          (pointerup)="cancelLongPress()"
-          (pointercancel)="cancelLongPress()"
-          (pointerleave)="cancelLongPress()"
-        >{{ segment.text }}</button>
-      } @else {
-        {{ segment.text }}
+    @if (!preferences.showGlossaryHints()) {
+      {{ text() }}
+    } @else {
+      @for (segment of segments(); track $index) {
+        @if (segment.termId && shouldLinkTerm(segment.text); as linked) {
+          <button
+            type="button"
+            class="glossary-term"
+            [attr.aria-expanded]="isVisible(segment.termId!)"
+            [attr.aria-describedby]="isVisible(segment.termId!) ? popupId : null"
+            (mouseenter)="showHover(segment.termId!, segment.definition ?? '', $event)"
+            (mouseleave)="clearHover(segment.termId!)"
+            (focus)="showHover(segment.termId!, segment.definition ?? '', $event)"
+            (blur)="clearHover(segment.termId!)"
+            (click)="togglePinned(segment.termId!, segment.definition ?? '', $event)"
+            (keydown.escape)="closeOnEscape($event)"
+            (pointerdown)="startLongPress(segment.termId!, segment.definition ?? '', $event)"
+            (pointerup)="cancelLongPress()"
+            (pointercancel)="cancelLongPress()"
+            (pointerleave)="cancelLongPress()"
+          >{{ segment.text }}</button>
+        } @else {
+          {{ segment.text }}
+        }
       }
-    }
 
-    <span
-      #popup
-      [id]="popupId"
-      class="glossary-popup"
-      popover="manual"
-      role="tooltip"
-      [class.is-above]="placement().above"
-      [class.fallback-open]="fallbackOpen()"
-      [style.left.px]="placement().left"
-      [style.top.px]="placement().top"
-    >{{ activeDefinition() }}</span>
+      <span
+        #popup
+        [id]="popupId"
+        class="glossary-popup"
+        popover="manual"
+        role="tooltip"
+        [class.is-above]="placement().above"
+        [class.fallback-open]="fallbackOpen()"
+        [style.left.px]="placement().left"
+        [style.top.px]="placement().top"
+      >{{ activeDefinition() }}</span>
+    }
   `,
   styles: `
     :host { display: contents; }
@@ -100,9 +105,9 @@ let glossaryPopupSequence = 0;
       background: color-mix(in srgb, var(--surface-elevated) 97%, #0f2444 3%);
       box-shadow: 0 0.7rem 1.8rem rgba(0, 0, 0, 0.42);
       color: var(--text-primary);
-      font-size: 0.76rem;
+      font-size: 0.82rem;
       font-weight: 500;
-      line-height: 1.42;
+      line-height: 1.45;
       text-align: left;
       white-space: normal;
     }
@@ -114,20 +119,21 @@ let glossaryPopupSequence = 0;
       .glossary-popup {
         max-width: min(19rem, calc(100vw - 0.75rem));
         max-height: min(13rem, calc(100vh - 0.75rem));
-        font-size: 0.78rem;
+        font-size: 0.82rem;
       }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueGlossaryTextComponent {
+  readonly preferences = inject(UiPreferencesService);
   private readonly i18n = inject(TranslationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject(ElementRef<HTMLElement>);
   private longPressTimer: ReturnType<typeof setTimeout> | undefined;
   private longPressTriggered = false;
 
-  @ViewChild('popup', { static: true }) private popup?: ElementRef<HTMLElement>;
+  @ViewChild('popup', { static: false }) private popup?: ElementRef<HTMLElement>;
 
   readonly popupId = `catalogue-glossary-popup-${++glossaryPopupSequence}`;
   readonly text = input.required<string>();
