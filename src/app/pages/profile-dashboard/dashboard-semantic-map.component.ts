@@ -35,8 +35,8 @@ import {
               <strong>{{ i18n.t('dashboard.semantic.inventory', { dimensions: themes().length, tags: semanticTagCount() }) }}</strong>
             </div>
             <small class="semantic-scale-inline-note">{{ text(
-              '0% = sin afinidad positiva · Depende ≈ 38 · Curiosidad = 50 · Me gusta ≈ 78 · 100% = Favorito. Responder más añade evidencia, no hace subir el porcentaje.',
-              '0% = no positive affinity · Depends ≈ 38 · Curious = 50 · Like ≈ 78 · 100% = Favorite. More answers add evidence; they do not make the percentage rise.'
+              'Cada eje nombra sus propios extremos. El lado izquierdo es una lectura natural de una puntuación baja, no una preferencia opuesta medida aparte. Depende ≈ 38 · Curiosidad = 50 · Me gusta ≈ 78.',
+              'Each axis names its own endpoints. The left side is a natural reading of a low score, not a separately measured opposite preference. Depends ≈ 38 · Curious = 50 · Like ≈ 78.'
             ) }}</small>
           </div>
 
@@ -60,8 +60,8 @@ import {
                 </div>
 
                 <div class="semantic-spectrum-endpoints" aria-hidden="true">
-                  <span><b>0%</b> {{ text('Sin afinidad', 'No affinity') }}</span>
-                  <span><b>100%</b> {{ text('Favorito', 'Favorite') }}</span>
+                  <span><b>0%</b> {{ dimensionEndpointLabel(entry, 'low') }}</span>
+                  <span><b>100%</b> {{ dimensionEndpointLabel(entry, 'high') }}</span>
                 </div>
                 <div class="semantic-spectrum" role="img" [attr.aria-label]="themeAriaLabel(entry)">
                   <span class="semantic-threshold threshold-depends" aria-hidden="true"></span>
@@ -231,6 +231,11 @@ export class DashboardSemanticMapComponent {
     return this.i18n.locale() === 'es' ? entry.theme.descriptionEs : entry.theme.descriptionEn;
   }
 
+  dimensionEndpointLabel(entry: SemanticThemeEntry, side: 'low' | 'high'): string {
+    const endpoints = this.dimensionEndpoints(entry.theme.id);
+    return side === 'low' ? endpoints.low : endpoints.high;
+  }
+
   tagLabel(entry: SemanticInsightEntry): string {
     return this.i18n.locale() === 'es' ? entry.tag.es : entry.tag.en;
   }
@@ -259,13 +264,13 @@ export class DashboardSemanticMapComponent {
   }
 
   dimensionContext(score: number): string {
-    if (score < 15) return this.text('Muy cerca de «no me interesa».', 'Very close to “not interested”.');
-    if (score < 32) return this.text('Predominan respuestas de poco interés.', 'Low-interest answers predominate.');
-    if (score < 44) return this.text('Se parece más a «depende» que a una preferencia estable.', 'Closer to “depends” than to a stable preference.');
+    if (score < 15) return this.text('Muy cerca del extremo izquierdo.', 'Very close to the left endpoint.');
+    if (score < 32) return this.text('Predomina la parte baja de esta dimensión.', 'The lower side of this dimension predominates.');
+    if (score < 44) return this.text('Interés condicionado, cerca de «depende».', 'Conditional interest, close to “depends”.');
     if (score < 58) return this.text('Zona de curiosidad: interés real, todavía mixto.', 'Curiosity zone: real but still mixed interest.');
-    if (score < 70) return this.text('Hay una inclinación positiva clara.', 'There is a clear positive lean.');
+    if (score < 70) return this.text('Hay una inclinación clara hacia el extremo derecho.', 'There is a clear lean toward the right endpoint.');
     if (score < 88) return this.text('Está cerca de «me gusta».', 'It is close to “like”.');
-    return this.text('Se acerca a una preferencia favorita y consistente.', 'It approaches a consistent favorite-level preference.');
+    return this.text('Se acerca al extremo de preferencia máxima.', 'It approaches the maximum-preference endpoint.');
   }
 
   affinityDiagnosis(score: number): string {
@@ -306,7 +311,7 @@ export class DashboardSemanticMapComponent {
 
   themeAriaLabel(entry: SemanticThemeEntry): string {
     if (entry.evidenceCount === 0) return `${this.themeLabel(entry)} · ${this.text('sin datos', 'no data')}`;
-    return `${this.themeLabel(entry)} · ${this.text('afinidad', 'affinity')} ${entry.score} / 100 · ${this.evidenceLabel(entry.evidenceCount)}`;
+    return `${this.themeLabel(entry)} · ${this.dimensionEndpointLabel(entry, 'low')} 0% ↔ ${this.dimensionEndpointLabel(entry, 'high')} 100% · ${entry.score}% · ${this.evidenceLabel(entry.evidenceCount)}`;
   }
 
   relativeAxisAriaLabel(value: number, axis: SemanticAxisDefinition): string {
@@ -327,6 +332,33 @@ export class DashboardSemanticMapComponent {
 
   text(es: string, en: string): string {
     return this.i18n.locale() === 'es' ? es : en;
+  }
+
+  private dimensionEndpoints(themeId: string): { readonly low: string; readonly high: string } {
+    switch (themeId) {
+      case 'connection':
+        return { low: this.text('Casual / poco afectivo', 'Casual / less affectionate'), high: this.text('Conexión / afecto', 'Connection / affection') };
+      case 'sensuality':
+        return { low: this.text('Directo / poco sensorial', 'Direct / less sensory'), high: this.text('Sensualidad / ritmo', 'Sensuality / pace') };
+      case 'play':
+        return { low: this.text('Planificado / serio', 'Planned / serious'), high: this.text('Juego / espontaneidad', 'Play / spontaneity') };
+      case 'exploration':
+        return { low: this.text('Convencional / familiar', 'Conventional / familiar'), high: this.text('Exploración / fantasía', 'Exploration / fantasy') };
+      case 'intensity':
+        return { low: this.text('Suave / baja intensidad', 'Gentle / low intensity'), high: this.text('Intenso / físico', 'Intense / physical') };
+      case 'power':
+        return { low: this.text('Horizontal / sin estructura', 'Horizontal / unstructured'), high: this.text('Poder / servicio', 'Power / service') };
+      case 'restraint':
+        return { low: this.text('Libre / sin restricción', 'Free / unrestricted'), high: this.text('Restricción / limitación', 'Restraint / restriction') };
+      case 'visibility':
+        return { low: this.text('Privado / sin exposición', 'Private / unexposed'), high: this.text('Exposición / contenido', 'Visibility / media') };
+      case 'social':
+        return { low: this.text('Uno a uno / privado', 'One-to-one / private'), high: this.text('Social / no monógamo', 'Social / non-monogamous') };
+      case 'body-focus':
+        return { low: this.text('General / poco focalizado', 'Broad / unfocused'), high: this.text('Foco corporal / erótico', 'Body / erotic focus') };
+      default:
+        return { low: this.text('Baja expresión', 'Low expression'), high: this.themeLabel({ theme: { id: themeId, en: 'High expression', es: 'Expresión alta', descriptionEn: '', descriptionEs: '', tags: [] }, score: 0, evidenceCount: 0 }) };
+    }
   }
 
   private sensitiveBalance(value: number): number {
