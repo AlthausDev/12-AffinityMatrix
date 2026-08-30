@@ -139,8 +139,18 @@ const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
   ),
 ] as const;
 
+const FINAL_BASE_GLOSSARY: readonly FinalCatalogueGlossaryEntry[] = CATALOGUE_GLOSSARY
+  .filter((entry) => !EXCLUDED_BASE_IDS.has(entry.id))
+  .map((entry) => entry.id === 'forced-orgasm'
+    ? {
+        ...entry,
+        titleEs: 'Orgasmo forzado',
+        aliases: [...entry.aliases, 'orgasmo forzado'],
+      }
+    : entry);
+
 export const FINAL_CATALOGUE_GLOSSARY: readonly FinalCatalogueGlossaryEntry[] = [
-  ...CATALOGUE_GLOSSARY.filter((entry) => !EXCLUDED_BASE_IDS.has(entry.id)),
+  ...FINAL_BASE_GLOSSARY,
   ...CLOSING_GLOSSARY_ENTRIES,
 ];
 
