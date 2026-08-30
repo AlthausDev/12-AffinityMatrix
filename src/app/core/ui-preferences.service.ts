@@ -13,6 +13,8 @@ export interface UiPreferences {
   readonly confirmQuestionnaireExit: boolean;
   readonly fontScale: FontScale;
   readonly reduceVisualEffects: boolean;
+  readonly highContrast: boolean;
+  readonly showGlossaryHints: boolean;
   readonly hiddenCategoriesByProfile: Readonly<Record<string, readonly string[]>>;
   readonly profileOrder: readonly string[];
   readonly profileSortMode: ProfileSortMode;
@@ -22,6 +24,8 @@ export const DEFAULT_UI_PREFERENCES: UiPreferences = {
   confirmQuestionnaireExit: true,
   fontScale: 'normal',
   reduceVisualEffects: false,
+  highContrast: false,
+  showGlossaryHints: true,
   hiddenCategoriesByProfile: {},
   profileOrder: [],
   profileSortMode: 'manual',
@@ -37,6 +41,7 @@ export class UiPreferencesService {
   initialize(): void {
     this.applyFontScale(this.state().fontScale);
     this.applyVisualEffects(this.state().reduceVisualEffects);
+    this.applyContrast(this.state().highContrast);
   }
 
   confirmQuestionnaireExit(): boolean {
@@ -49,6 +54,14 @@ export class UiPreferencesService {
 
   reduceVisualEffects(): boolean {
     return this.state().reduceVisualEffects;
+  }
+
+  highContrast(): boolean {
+    return this.state().highContrast;
+  }
+
+  showGlossaryHints(): boolean {
+    return this.state().showGlossaryHints;
   }
 
   hiddenCategoryIds(profileId: string): readonly string[] {
@@ -79,6 +92,15 @@ export class UiPreferencesService {
   setReduceVisualEffects(value: boolean): void {
     this.update({ reduceVisualEffects: value });
     this.applyVisualEffects(value);
+  }
+
+  setHighContrast(value: boolean): void {
+    this.update({ highContrast: value });
+    this.applyContrast(value);
+  }
+
+  setShowGlossaryHints(value: boolean): void {
+    this.update({ showGlossaryHints: value });
   }
 
   setProfileOrder(profileIds: readonly string[]): void {
@@ -150,6 +172,14 @@ export class UiPreferencesService {
           typeof parsed['reduceVisualEffects'] === 'boolean'
             ? parsed['reduceVisualEffects']
             : DEFAULT_UI_PREFERENCES.reduceVisualEffects,
+        highContrast:
+          typeof parsed['highContrast'] === 'boolean'
+            ? parsed['highContrast']
+            : DEFAULT_UI_PREFERENCES.highContrast,
+        showGlossaryHints:
+          typeof parsed['showGlossaryHints'] === 'boolean'
+            ? parsed['showGlossaryHints']
+            : DEFAULT_UI_PREFERENCES.showGlossaryHints,
         hiddenCategoriesByProfile: this.readHiddenCategories(parsed['hiddenCategoriesByProfile']),
         profileOrder: this.readProfileOrder(parsed['profileOrder']),
         profileSortMode: this.isProfileSortMode(parsed['profileSortMode'])
@@ -195,6 +225,10 @@ export class UiPreferencesService {
 
   private applyVisualEffects(value: boolean): void {
     this.document.documentElement.dataset['visualEffects'] = value ? 'reduced' : 'full';
+  }
+
+  private applyContrast(value: boolean): void {
+    this.document.documentElement.dataset['contrast'] = value ? 'high' : 'standard';
   }
 
   private isFontScale(value: unknown): value is FontScale {
