@@ -26,6 +26,9 @@ const EXCLUDED_BASE_IDS = new Set([
   'voyeurism',
   'glory-hole',
   'vulva-pain-play',
+  // Tease & denial no longer exists as a standalone final catalogue practice; orgasm denial and
+  // the surrounding control practices cover the current questionnaire vocabulary instead.
+  'tease-denial',
   // Pegging no longer has a dedicated catalogue practice after the current penetration/toy split.
   // Keeping a standalone definition would make the glossary promise vocabulary the questionnaire does not use.
   'pegging',
