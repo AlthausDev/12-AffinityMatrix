@@ -1,0 +1,251 @@
+.profile-dashboard .dashboard-role-composition {
+  display: grid;
+  gap: 0.48rem;
+  margin: 0 0 0.72rem;
+  padding: 0.68rem 0.74rem;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 58%, transparent);
+  border-radius: 0.62rem;
+  background: linear-gradient(145deg, rgba(11, 29, 61, 0.42), rgba(34, 22, 59, 0.34));
+}
+
+.profile-dashboard .dashboard-role-composition-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.profile-dashboard .dashboard-role-composition-heading > div {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.profile-dashboard .dashboard-role-composition-heading strong {
+  font-size: 0.73rem;
+}
+
+.profile-dashboard .dashboard-role-composition-heading small,
+.profile-dashboard .dashboard-role-composition-heading > span {
+  color: var(--text-secondary);
+  font-size: 0.56rem;
+  line-height: 1.35;
+}
+
+.profile-dashboard .dashboard-role-composition-heading > span {
+  flex: 0 0 auto;
+  padding: 0.13rem 0.32rem;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 55%, transparent);
+  border-radius: 0.28rem;
+  background: rgba(13, 28, 56, 0.4);
+  font-weight: 700;
+}
+
+.profile-dashboard .dashboard-role-composition-rail {
+  display: flex;
+  height: 0.84rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 70%, transparent);
+  border-radius: 0.28rem;
+  background: rgba(10, 22, 48, 0.5);
+  box-shadow: inset 0 1px 3px rgba(2, 7, 22, 0.34);
+}
+
+.profile-dashboard .dashboard-role-composition-segment {
+  display: block;
+  min-width: 0;
+  height: 100%;
+  box-shadow: inset -1px 0 rgba(255, 255, 255, 0.12);
+  transition: width 220ms ease;
+}
+
+.profile-dashboard .dashboard-role-composition-segment[data-perspective='active'] {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--neon-cyan) 80%, var(--preference-positive)), var(--preference-positive));
+}
+
+.profile-dashboard .dashboard-role-composition-segment[data-perspective='receptive'] {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--neon-violet) 78%, var(--neon-cyan)), var(--neon-violet));
+}
+
+.profile-dashboard .dashboard-role-composition-segment[data-perspective='neutral'] {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--neon-magenta) 72%, var(--neon-violet)), var(--neon-magenta));
+}
+
+.profile-dashboard .dashboard-role-composition-labels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.profile-dashboard .dashboard-role-composition-labels > span {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 0.56rem;
+}
+
+.profile-dashboard .dashboard-role-composition-labels i {
+  width: 0.46rem;
+  aspect-ratio: 1;
+  border-radius: 0.14rem;
+  background: var(--text-secondary);
+}
+
+.profile-dashboard .dashboard-role-composition-labels span[data-perspective='active'] i {
+  background: var(--preference-positive);
+}
+
+.profile-dashboard .dashboard-role-composition-labels span[data-perspective='receptive'] i {
+  background: var(--neon-violet);
+}
+
+.profile-dashboard .dashboard-role-composition-labels span[data-perspective='neutral'] i {
+  background: var(--neon-magenta);
+}
+
+.profile-dashboard .dashboard-role-composition-labels b {
+  overflow: hidden;
+  color: color-mix(in srgb, var(--text-secondary) 86%, white);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-dashboard .dashboard-role-composition-labels strong {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.62rem;
+}
+
+.profile-dashboard .dashboard-role-profile {
+  margin-top: 0.05rem;
+}
+
+.profile-dashboard .dashboard-role-row {
+  min-height: 0;
+}
+
+.profile-dashboard .dashboard-role-row .dashboard-role-metrics {
+  grid-template-columns: 1fr;
+}
+
+.profile-dashboard .dashboard-role-spectra {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+@media (min-width: 1120px) {
+  .profile-dashboard .dashboard-insight-grid {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+
+  .profile-dashboard .dashboard-preference-card {
+    position: static;
+    display: grid;
+    grid-template-columns: minmax(12rem, 0.34fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  .profile-dashboard .dashboard-preference-card .dashboard-chart-heading {
+    margin: 0;
+  }
+
+  .profile-dashboard .dashboard-preference-card .dashboard-chart-heading p {
+    max-width: 23rem;
+  }
+
+  .profile-dashboard .dashboard-preference-layout {
+    grid-template-columns: auto minmax(0, 1fr);
+    justify-items: stretch;
+    gap: 1.1rem;
+  }
+
+  .profile-dashboard .preference-donut {
+    width: 6.9rem;
+  }
+
+  .profile-dashboard .preference-donut-core strong {
+    font-size: 1.38rem;
+  }
+
+  .profile-dashboard .preference-legend {
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 0.95rem;
+    row-gap: 0.16rem;
+  }
+
+  .profile-dashboard .preference-legend-row {
+    padding: 0.12rem 0;
+    font-size: 0.63rem;
+  }
+
+  .profile-dashboard .dashboard-role-summary {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.7rem;
+  }
+
+  .profile-dashboard .dashboard-role-summary > span {
+    white-space: nowrap;
+  }
+
+  .profile-dashboard .dashboard-role-composition {
+    grid-template-columns: minmax(12rem, 0.32fr) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 1rem;
+  }
+
+  .profile-dashboard .dashboard-role-composition-heading {
+    grid-row: 1 / span 2;
+  }
+
+  .profile-dashboard .dashboard-role-composition-heading > span {
+    display: none;
+  }
+
+  .profile-dashboard .dashboard-role-composition-rail {
+    align-self: end;
+  }
+
+  .profile-dashboard .dashboard-role-composition-labels {
+    align-self: start;
+  }
+
+  .profile-dashboard .dashboard-role-row {
+    padding: 0.72rem 0.76rem;
+  }
+
+  .profile-dashboard .dashboard-role-row-heading {
+    min-height: 3.2rem;
+  }
+
+  .profile-dashboard .dashboard-role-spectra {
+    margin-top: 0.72rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .profile-dashboard .dashboard-role-composition-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.24rem;
+  }
+
+  .profile-dashboard .dashboard-role-composition-labels {
+    grid-template-columns: 1fr;
+    gap: 0.22rem;
+  }
+
+  .profile-dashboard .dashboard-role-composition-labels > span {
+    grid-template-columns: auto 1fr auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-dashboard .dashboard-role-composition-segment {
+    transition: none;
+  }
+}
