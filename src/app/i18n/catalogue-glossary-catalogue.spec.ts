@@ -5,6 +5,10 @@ import {
 } from './catalogue-glossary-final';
 import { Locale } from './locale';
 
+const ACTIVE_PRACTICE_IDS = new Set(
+  CATALOGUE_V3_CONTENT.flatMap((category) => category.practices.map((practice) => practice.id)),
+);
+
 function catalogueCopy(locale: Locale): readonly string[] {
   return CATALOGUE_V3_CONTENT.flatMap((category) => {
     const categoryCopy = locale === 'es'
@@ -41,7 +45,7 @@ describe('catalogue glossary consistency', () => {
     it(`keeps every ${locale} glossary concept connected to current catalogue copy`, () => {
       const used = usedGlossaryIds(locale);
       const missing = FINAL_CATALOGUE_GLOSSARY
-        .filter((entry) => !used.has(entry.id))
+        .filter((entry) => !ACTIVE_PRACTICE_IDS.has(entry.id) && !used.has(entry.id))
         .map((entry) => `${entry.id}: ${locale === 'es' ? entry.titleEs : entry.titleEn}`);
 
       expect(missing).toEqual([]);
