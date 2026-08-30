@@ -12,6 +12,28 @@ const PRACTICE_VOCABULARY: Readonly<Record<string, Partial<CataloguePracticeSeed
     en: 'Forced orgasm',
     es: 'Orgasmo forzado',
   },
+  'free-use-unaware-roleplay': {
+    en: 'Free use',
+    es: 'Free use',
+  },
+  'adult-ageplay-roleplay': {
+    en: 'Adult ageplay',
+    es: 'Ageplay adulto',
+  },
+  'futanari-fantasy': {
+    en: 'Futanari fantasy',
+    es: 'Fantasía futanari',
+  },
+  'furry-anthro-fantasy': {
+    en: 'Furry / anthro fantasy',
+    es: 'Fantasía furry / anthro',
+  },
+  'vore-fantasy': {
+    en: 'Vore fantasy',
+  },
+  'brat-dynamic': {
+    en: 'Brat dynamic / Brat tamer',
+  },
   swinging: {
     en: 'Swinging',
     es: 'Swinging',
@@ -55,6 +77,24 @@ const PRACTICE_VOCABULARY: Readonly<Record<string, Partial<CataloguePracticeSeed
   caning: {
     en: 'Caning',
     es: 'Caning / vara',
+  },
+  'oral-anal': {
+    es: 'Rimming / anilingus',
+  },
+  'strap-on': {
+    es: 'Strap-on / dildo con arnés',
+  },
+  'fire-play': {
+    es: 'Fire play / juego con fuego',
+  },
+  'stocks-restraint': {
+    es: 'Cepo / stocks',
+  },
+  'dungeon-venue': {
+    es: 'Dungeon / sala BDSM',
+  },
+  'wand-vibrator': {
+    es: 'Vibrador wand',
   },
   'urine-play': {
     en: 'Watersports / urine play',
