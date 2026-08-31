@@ -1,6 +1,6 @@
 .profile-editor-page.profile-editor-page-editing {
-  width: min(100% - 2rem, 50rem);
-  max-width: 50rem;
+  width: min(100% - 2rem, 80rem);
+  max-width: 80rem;
 }
 
 .profile-editor-layout {
@@ -10,17 +10,18 @@
 
 .profile-editor-layout-with-sidebar {
   width: 100%;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 50rem) minmax(14rem, 28rem);
   align-items: start;
   justify-content: center;
   gap: 1.2rem;
 }
 
-.profile-editor-layout-with-sidebar > .profile-editor-main,
-.profile-editor-layout-with-sidebar > .profile-editor-sidebar {
+.profile-editor-layout-with-sidebar > .profile-editor-main {
   grid-column: 1;
-  width: 100%;
-  justify-self: stretch;
+}
+
+.profile-editor-layout-with-sidebar > .profile-editor-sidebar {
+  grid-column: 2;
 }
 
 .profile-editor-main,
@@ -208,7 +209,8 @@
 }
 
 .profile-editor-sidebar {
-  position: static;
+  position: sticky;
+  top: 1rem;
 }
 
 .profile-editor-management-card {
@@ -267,29 +269,44 @@
   font-size: 0.76rem;
 }
 
-@media (min-width: 1600px) {
+@media (max-width: 860px) {
   .profile-editor-page.profile-editor-page-editing {
-    width: min(100% - 2rem, 108.4rem);
-    max-width: 108.4rem;
+    width: min(100% - 2rem, 50rem);
+    max-width: 50rem;
   }
 
   .profile-editor-layout-with-sidebar {
-    grid-template-columns: minmax(22rem, 1fr) minmax(0, 50rem) minmax(22rem, 1fr);
+    grid-template-columns: 1fr;
   }
 
-  .profile-editor-layout-with-sidebar > .profile-editor-main {
-    grid-column: 2;
-  }
-
+  .profile-editor-layout-with-sidebar > .profile-editor-main,
   .profile-editor-layout-with-sidebar > .profile-editor-sidebar {
-    grid-column: 3;
-    width: min(100%, 28rem);
-    justify-self: start;
+    grid-column: 1;
   }
 
   .profile-editor-sidebar {
-    position: sticky;
-    top: 1rem;
+    position: static;
+  }
+
+  .profile-editor-management-card {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(15rem, 1.3fr);
+    align-items: start;
+    gap: 0.8rem 1rem;
+  }
+
+  .profile-editor-management-card > .eyebrow,
+  .profile-editor-management-card > h2 {
+    grid-column: 1;
+  }
+
+  .profile-editor-management-card > h2 {
+    margin: 0;
+  }
+
+  .profile-editor-danger-zone {
+    grid-column: 2;
+    grid-row: 1 / span 2;
   }
 }
 
@@ -299,8 +316,16 @@
   }
 
   .profile-editor-field-grid,
-  .profile-editor-category-list {
+  .profile-editor-category-list,
+  .profile-editor-management-card {
     grid-template-columns: 1fr;
+  }
+
+  .profile-editor-management-card > .eyebrow,
+  .profile-editor-management-card > h2,
+  .profile-editor-danger-zone {
+    grid-column: 1;
+    grid-row: auto;
   }
 
   .profile-editor-category-tools {
