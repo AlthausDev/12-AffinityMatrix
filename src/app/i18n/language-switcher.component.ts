@@ -225,7 +225,7 @@ export class LanguageSwitcherComponent {
     this.closeMenu();
   }
 
-  closeMenuAndReturnFocus(event: KeyboardEvent): void {
+  closeMenuAndReturnFocus(event: Event): void {
     event.stopPropagation();
     this.closeMenu();
     const switcher = event.currentTarget;
