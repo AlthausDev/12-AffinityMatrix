@@ -1,4 +1,4 @@
-/* Workbench hierarchy for utility pages: centered context, indented title, left-aligned copy. */
+/* Workbench hierarchy for utility pages: context and copy at the edge, title indented by the identity mark. */
 .subpage-title-row { justify-content: flex-start; margin: 0 0 0 1rem; }
 .profile-entry-page .profile-entry-header { justify-items: start; text-align: left; }
 .profile-entry-page .profile-entry-header .subpage-title-row { justify-self: start; margin-bottom: 0.6rem; }
@@ -12,9 +12,9 @@
   app-questionnaire-category-page .category-header > div:first-child > .eyebrow,
   app-catalogue-glossary-page .glossary-header .eyebrow
 ) {
-  width: 100%;
-  justify-self: stretch;
-  text-align: center;
+  width: auto;
+  justify-self: start;
+  text-align: left;
 }
 
 :is(
@@ -26,8 +26,8 @@
   app-catalogue-glossary-page .glossary-header .lead
 ) {
   width: auto;
-  max-width: calc(100% - 4.6rem);
-  margin-left: 4.6rem;
+  max-width: 100%;
+  margin-left: 0;
   margin-right: 0;
   text-align: left;
 }
@@ -82,15 +82,15 @@ app-catalogue-glossary-page .glossary-search {
   justify-self: start;
 }
 
-@media (min-width: 1480px) {
+@media (min-width: 1560px) {
   app-profile-editor-page .profile-editor-page-editing .profile-entry-header {
     width: 50rem;
-    margin-left: max(0rem, calc((100% - 89.2rem) / 2));
+    margin-left: calc((100% - 50rem) / 2);
     margin-right: auto;
   }
 
   app-profile-editor-page .profile-editor-page.profile-editor-page-editing > .profile-entry-back {
-    margin-left: max(0rem, calc((100% - 89.2rem) / 2)) !important;
+    margin-left: calc((100% - 50rem) / 2) !important;
   }
 }
 
@@ -139,7 +139,7 @@ app-catalogue-glossary-page .glossary-search {
     app-questionnaire-categories-page .categories-intro .lead,
     app-questionnaire-category-page .category-header > div:first-child > .muted,
     app-catalogue-glossary-page .glossary-header .lead
-  ) { max-width: calc(100% - 0.4rem); margin-left: 0.4rem; }
+  ) { max-width: 100%; margin-left: 0; }
 
   :is(
     app-profile-comparison-page .page-header h1,
