@@ -196,51 +196,35 @@
     grid-auto-rows: auto;
   }
 
-  .profile-dashboard .dashboard-category-bars:not(:has(.dashboard-category-row-expanded)) > .dashboard-category-row,
-  .profile-dashboard .dashboard-category-bars:has(.dashboard-category-row-expanded) > .dashboard-category-row:not(.dashboard-category-row-expanded) {
-    height: 7rem;
-  }
-
   .profile-dashboard .dashboard-category-bars > .dashboard-category-row > .dashboard-category-toggle {
     height: 7rem;
     min-height: 7rem;
-    align-content: space-between;
   }
 
   .profile-dashboard .dashboard-category-bars > .dashboard-category-row.dashboard-category-row-expanded {
     grid-column: auto;
-    height: auto;
     overflow: visible;
     border-color: transparent;
     background: transparent;
     box-shadow: none;
   }
 
-  .profile-dashboard .dashboard-category-bars > .dashboard-category-row.dashboard-category-row-expanded > .dashboard-category-toggle {
+  .profile-dashboard .dashboard-category-row-expanded > .dashboard-category-toggle {
     border: 1px solid color-mix(in srgb, var(--category-accent) 38%, var(--border-subtle));
     border-radius: 0.6rem;
     background: color-mix(in srgb, var(--category-accent) 5%, rgba(20, 35, 70, 0.44));
-    box-shadow: inset 3px 0 0 color-mix(in srgb, var(--category-accent) 66%, transparent);
   }
 
-  .profile-dashboard .dashboard-category-bars > .dashboard-category-row.dashboard-category-row-expanded > .dashboard-subcategory-list {
+  .profile-dashboard .dashboard-category-row-expanded > .dashboard-subcategory-list {
     width: calc(200% + 0.55rem);
     margin-top: 0.55rem;
-    padding: 0.62rem;
-    border: 1px solid color-mix(in srgb, var(--category-accent) 32%, var(--border-subtle));
+    border: 1px solid color-mix(in srgb, var(--category-accent) 24%, var(--border-subtle));
     border-radius: 0.6rem;
-    background: color-mix(in srgb, var(--category-accent) 5%, rgba(17, 29, 61, 0.92));
-    box-shadow:
-      inset 3px 0 0 color-mix(in srgb, var(--category-accent) 58%, transparent),
-      inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    background: rgba(17, 29, 61, 0.96);
   }
 
-  .profile-dashboard .dashboard-category-bars > .dashboard-category-row.dashboard-category-row-expanded:nth-child(even) > .dashboard-subcategory-list {
+  .profile-dashboard .dashboard-category-row-expanded:nth-child(even) > .dashboard-subcategory-list {
     margin-left: calc(-100% - 0.55rem);
-  }
-
-  .profile-dashboard .dashboard-category-bars > .dashboard-category-row.dashboard-category-row-expanded:nth-child(odd) > .dashboard-subcategory-list {
-    margin-left: 0;
   }
 }
 
