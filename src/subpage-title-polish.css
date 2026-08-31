@@ -1,140 +1,82 @@
-/* Shared identity cue for utility/subpages. Home and dashboard keep their own header language.
-   The mark belongs to the title line only, never to the eyebrow or descriptive copy. */
+/* Workbench hierarchy for utility pages: context at the edge, title indented, copy below it. */
+.subpage-title-row { justify-content: flex-start; margin: 0 0 0 1rem; }
+.profile-entry-page .profile-entry-header { justify-items: start; text-align: left; }
+.profile-entry-page .profile-entry-header .subpage-title-row { justify-self: start; margin-bottom: 0.6rem; }
+.profile-entry-page .profile-entry-header .subpage-title-row h1 { margin: 0; }
 
-/* Every explicit subpage title row is centered without moving the copy around it. */
-.subpage-title-row {
-  justify-content: center;
-  padding-right: 3.72rem;
-}
+:is(
+  .page-header > .eyebrow,
+  app-profile-comparison-page .page-header > div > .eyebrow,
+  app-questionnaire-categories-page .categories-intro > .eyebrow,
+  app-questionnaire-category-page .category-header > div:first-child > .eyebrow,
+  app-catalogue-glossary-page .glossary-header .eyebrow
+) { width: auto; text-align: left; }
 
-.profile-entry-page .profile-entry-header .subpage-title-row {
-  margin-bottom: 0.6rem;
-}
-
-/* The small identity label above every subpage title follows the same centred axis. */
-.page-header > .eyebrow,
-app-profile-comparison-page .page-header > div > .eyebrow,
-app-questionnaire-categories-page .categories-intro > .eyebrow,
-app-questionnaire-category-page .category-header > div:first-child > .eyebrow,
-app-catalogue-glossary-page .glossary-page .glossary-header .eyebrow {
-  width: 100%;
-  text-align: center;
-}
-
-/* Subpage descriptions follow the same centered reading pattern as the glossary. */
-.page-header:has(> .subpage-title-row) > .muted,
-app-profile-comparison-page .page-header .lead,
-app-questionnaire-categories-page .categories-intro .lead,
-app-questionnaire-category-page .category-header > div:first-child > .muted {
-  margin-inline: auto;
-  text-align: center;
-}
-
-.profile-editor-page.profile-editor-page-editing .profile-entry-header > .muted {
-  width: min(100%, 50rem);
-  max-width: 50rem;
-}
-
-app-profile-comparison-page .page-header > div {
-  width: 100%;
-  text-align: center;
-}
-
-app-profile-comparison-page .page-header .lead,
-app-questionnaire-categories-page .categories-intro .lead,
-app-questionnaire-category-page .category-header > div:first-child > .muted {
-  max-width: 68rem;
-}
-
-/* Comparison and questionnaire pages are large components with their own header markup. Give their
-   h1 the exact same compact identity cue without changing the rest of their layout. */
-app-profile-comparison-page .page-header h1,
-app-questionnaire-categories-page .categories-intro h1,
-app-questionnaire-category-page .category-header > div:first-child h1 {
-  display: flex;
-  width: 100%;
-  min-width: 0;
-  align-items: center;
-  justify-content: center;
-  gap: 0.82rem;
-  padding-right: 3.72rem;
-  text-align: center;
-}
-
-app-profile-comparison-page .page-header h1::before,
-app-questionnaire-categories-page .categories-intro h1::before,
-app-questionnaire-category-page .category-header > div:first-child h1::before {
-  content: '';
-  display: block;
-  width: 2.9rem;
-  height: 2.9rem;
-  flex: 0 0 2.9rem;
-  border: 1px solid transparent;
-  border-radius: 0.82rem;
-  background:
-    url('/branding/desiresync-icon.avif') center / 88% 88% no-repeat padding-box,
-    linear-gradient(145deg, rgba(38, 54, 94, 0.52), rgba(31, 25, 69, 0.58)) padding-box,
-    var(--window-border-gradient) border-box;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 0.5rem 1.2rem rgba(6, 10, 28, 0.16),
-    0 0 1rem color-mix(in srgb, var(--neon-violet) 12%, transparent);
-}
-
-/* Glossary now follows the same identity language. Its search remains independent of the title row. */
-app-catalogue-glossary-page .glossary-page .glossary-header {
-  grid-template-columns: minmax(0, 1fr) !important;
-  justify-items: center;
-  text-align: center;
-}
-
-app-catalogue-glossary-page .glossary-page .glossary-header > div {
-  display: grid;
-  width: 100%;
-  justify-items: center;
-}
-
-app-catalogue-glossary-page .glossary-page .glossary-header h1 {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  justify-content: center;
-  gap: 0.82rem;
-  padding-right: 3.72rem;
-  text-align: center;
-}
-
-app-catalogue-glossary-page .glossary-page .glossary-header h1::before {
-  content: '';
-  display: block;
-  width: 2.9rem;
-  height: 2.9rem;
-  flex: 0 0 2.9rem;
-  border: 1px solid transparent;
-  border-radius: 0.82rem;
-  background:
-    url('/branding/desiresync-icon.avif') center / 88% 88% no-repeat padding-box,
-    linear-gradient(145deg, rgba(38, 54, 94, 0.52), rgba(31, 25, 69, 0.58)) padding-box,
-    var(--window-border-gradient) border-box;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 0.5rem 1.2rem rgba(6, 10, 28, 0.16),
-    0 0 1rem color-mix(in srgb, var(--neon-violet) 12%, transparent);
-}
-
-app-catalogue-glossary-page .glossary-page .glossary-header .lead {
-  margin-inline: auto;
-  text-align: center;
-}
-
-app-catalogue-glossary-page .glossary-page .glossary-search {
-  width: min(100%, 24rem);
-  justify-self: center;
+:is(
+  .page-header:has(> .subpage-title-row) > .muted,
+  .profile-entry-page .profile-entry-header > .muted,
+  app-profile-comparison-page .page-header .lead,
+  app-questionnaire-categories-page .categories-intro .lead,
+  app-questionnaire-category-page .category-header > div:first-child > .muted,
+  app-catalogue-glossary-page .glossary-header .lead
+) {
+  width: auto;
+  max-width: calc(100% - 4.6rem);
+  margin-left: 4.6rem;
+  margin-right: 0;
   text-align: left;
 }
 
-/* Several questionnaire/comparison widgets predate the current readability scale and used 0.62–0.75rem
-   helper copy. Raise those floors on desktop only; phone typography already has the desired density. */
+app-profile-comparison-page .page-header > div { width: 100%; text-align: left; }
+
+:is(
+  app-profile-comparison-page .page-header h1,
+  app-questionnaire-categories-page .categories-intro h1,
+  app-questionnaire-category-page .category-header > div:first-child h1,
+  app-catalogue-glossary-page .glossary-header h1
+) {
+  display: flex;
+  width: auto;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.82rem;
+  margin-left: 1rem;
+  text-align: left;
+}
+
+:is(
+  app-profile-comparison-page .page-header h1,
+  app-questionnaire-categories-page .categories-intro h1,
+  app-questionnaire-category-page .category-header > div:first-child h1,
+  app-catalogue-glossary-page .glossary-header h1
+)::before {
+  content: '';
+  display: block;
+  width: 2.9rem;
+  height: 2.9rem;
+  flex: 0 0 2.9rem;
+  border: 1px solid transparent;
+  border-radius: 0.82rem;
+  background:
+    url('/branding/desiresync-icon.avif') center / 88% 88% no-repeat padding-box,
+    linear-gradient(145deg, rgba(38, 54, 94, 0.52), rgba(31, 25, 69, 0.58)) padding-box,
+    var(--window-border-gradient) border-box;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 .5rem 1.2rem rgba(6,10,28,.16), 0 0 1rem color-mix(in srgb,var(--neon-violet) 12%,transparent);
+}
+
+app-catalogue-glossary-page .glossary-header {
+  grid-template-columns: minmax(0, 1fr) !important;
+  justify-items: start;
+  text-align: left;
+}
+app-catalogue-glossary-page .glossary-header > div { display: grid; width: 100%; justify-items: start; }
+app-catalogue-glossary-page .glossary-search {
+  width: min(calc(100% - 4.6rem), 24rem);
+  margin-left: 4.6rem;
+  justify-self: start;
+}
+
 @media (min-width: 981px) {
   app-questionnaire-categories-page .categories-header .lead { font-size: 0.94rem; }
   app-questionnaire-categories-page .hidden-count { font-size: 0.88rem; }
@@ -147,7 +89,6 @@ app-catalogue-glossary-page .glossary-page .glossary-search {
   app-questionnaire-categories-page .hidden-heading p { font-size: 0.9rem; }
   app-questionnaire-categories-page .hidden-row { font-size: 0.9rem; }
   app-questionnaire-categories-page .compact-action { font-size: 0.86rem; }
-
   app-questionnaire-category-page .category-progress-label { font-size: 0.84rem; }
   app-questionnaire-category-page .category-progress-count { font-size: 0.9rem; }
   app-questionnaire-category-page .save-state { font-size: 0.92rem; }
@@ -155,7 +96,6 @@ app-catalogue-glossary-page .glossary-page .glossary-search {
   app-questionnaire-category-page .subcategory-progress > strong { font-size: 0.9rem; }
   app-questionnaire-category-page .subcategory-description { font-size: 0.92rem; }
   app-questionnaire-category-page .question-card-header p { font-size: 0.92rem; }
-
   app-profile-comparison-page .select-field { font-size: 0.92rem; }
   app-profile-comparison-page .summary-card span { font-size: 0.9rem; }
   app-profile-comparison-page .affinity-value span { font-size: 0.88rem; }
@@ -167,22 +107,29 @@ app-catalogue-glossary-page .glossary-page .glossary-search {
 }
 
 @media (max-width: 720px) {
-  .profile-entry-page .profile-entry-header .subpage-title-row,
-  app-profile-comparison-page .page-header h1,
-  app-questionnaire-categories-page .categories-intro h1,
-  app-questionnaire-category-page .category-header > div:first-child h1,
-  app-catalogue-glossary-page .glossary-page .glossary-header h1 {
-    gap: 0.68rem;
-    padding-right: 3.23rem;
-  }
+  :is(
+    .subpage-title-row,
+    app-profile-comparison-page .page-header h1,
+    app-questionnaire-categories-page .categories-intro h1,
+    app-questionnaire-category-page .category-header > div:first-child h1,
+    app-catalogue-glossary-page .glossary-header h1
+  ) { margin-left: 0.4rem; gap: 0.68rem; }
 
-  app-profile-comparison-page .page-header h1::before,
-  app-questionnaire-categories-page .categories-intro h1::before,
-  app-questionnaire-category-page .category-header > div:first-child h1::before,
-  app-catalogue-glossary-page .glossary-page .glossary-header h1::before {
-    width: 2.55rem;
-    height: 2.55rem;
-    flex-basis: 2.55rem;
-    border-radius: 0.72rem;
-  }
+  :is(
+    .page-header:has(> .subpage-title-row) > .muted,
+    .profile-entry-page .profile-entry-header > .muted,
+    app-profile-comparison-page .page-header .lead,
+    app-questionnaire-categories-page .categories-intro .lead,
+    app-questionnaire-category-page .category-header > div:first-child > .muted,
+    app-catalogue-glossary-page .glossary-header .lead
+  ) { max-width: calc(100% - 0.4rem); margin-left: 0.4rem; }
+
+  :is(
+    app-profile-comparison-page .page-header h1,
+    app-questionnaire-categories-page .categories-intro h1,
+    app-questionnaire-category-page .category-header > div:first-child h1,
+    app-catalogue-glossary-page .glossary-header h1
+  )::before { width: 2.55rem; height: 2.55rem; flex-basis: 2.55rem; border-radius: 0.72rem; }
+
+  app-catalogue-glossary-page .glossary-search { width: min(calc(100% - 0.4rem),24rem); margin-left: 0.4rem; }
 }
