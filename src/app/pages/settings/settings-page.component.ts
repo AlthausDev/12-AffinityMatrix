@@ -20,16 +20,14 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
         <p class="muted lead">{{ i18n.t('settings.description') }}</p>
       </header>
 
-      <button
+      <div
         class="settings-support-dock"
-        type="button"
-        disabled
+        role="note"
         [attr.aria-label]="i18n.t('settings.support.action')"
-        [attr.title]="i18n.t('settings.support.action')"
       >
         <span aria-hidden="true">♡</span>
-        {{ i18n.t('settings.support.title') }}
-      </button>
+        {{ i18n.t('settings.support.action') }}
+      </div>
 
       <section class="panel settings-panel">
         <section class="settings-section" aria-labelledby="settings-appearance-title">
@@ -89,14 +87,6 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
               <small>{{ i18n.t('settings.glossaryHints.description') }}</small>
             </span>
           </label>
-
-          <a class="settings-link" [routerLink]="['/profiles', profileId, 'glossary']">
-            <span>
-              <strong>{{ i18n.t('settings.glossaryLink.title') }}</strong>
-              <small>{{ i18n.t('settings.glossaryLink.description') }}</small>
-            </span>
-            <span aria-hidden="true">→</span>
-          </a>
         </section>
 
         <section class="settings-section" aria-labelledby="settings-behaviour-title">
@@ -119,9 +109,9 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
             <h2 id="settings-support-title">{{ i18n.t('settings.support.title') }}</h2>
             <p class="muted">{{ i18n.t('settings.support.description') }}</p>
           </header>
-          <button class="button secondary support-settings-action" type="button" disabled>
+          <p class="support-settings-action" role="note">
             {{ i18n.t('settings.support.action') }}
-          </button>
+          </p>
         </section>
 
         <p class="muted local-note">{{ i18n.t('settings.localOnly') }}</p>
@@ -139,12 +129,17 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
     .normal-preview { font-size: 1rem; }
     .large-preview { font-size: 1.2rem; }
     .extra-large-preview { font-size: 1.42rem; }
-    .settings-link { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 4.2rem; padding: 0.9rem 1rem; border: 1px solid var(--border-subtle); border-radius: 0.58rem; background: color-mix(in srgb, var(--surface-elevated) 52%, transparent); color: var(--text-primary); text-decoration: none; }
-    .settings-link:hover { border-color: var(--border-strong); background: color-mix(in srgb, var(--surface-elevated) 72%, transparent); }
-    .settings-link span:first-child { display: grid; gap: 0.2rem; }
-    .settings-link small { color: var(--text-secondary); font-size: 0.84rem; line-height: 1.4; }
-    .support-settings-action { width: fit-content; }
-    .support-settings-action:disabled { opacity: 0.78; }
+    .support-settings-action {
+      width: fit-content;
+      margin: 0;
+      padding: 0.55rem 0.8rem;
+      border: 1px solid color-mix(in srgb, var(--neon-magenta) 30%, var(--border-subtle));
+      border-radius: 0.58rem;
+      background: color-mix(in srgb, var(--surface-elevated) 52%, transparent);
+      color: color-mix(in srgb, var(--text-primary) 88%, var(--neon-rose));
+      font-size: 0.82rem;
+      font-weight: 760;
+    }
     .settings-support-dock { display: none; }
     .local-note { font-size: 0.88rem; }
 
@@ -169,7 +164,6 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
         font-size: 0.82rem;
         font-weight: 760;
       }
-      .settings-support-dock:disabled { cursor: default; opacity: 0.82; }
       .settings-support-dock span { color: var(--neon-rose); font-size: 1rem; line-height: 1; }
     }
 
