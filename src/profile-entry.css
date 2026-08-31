@@ -33,15 +33,6 @@
   margin-bottom: 1.45rem;
   text-align: center;
 }
-.profile-entry-page .profile-entry-brand-slot {
-  display: grid;
-  min-height: 4.1rem;
-  place-items: center;
-  margin-bottom: 0.65rem;
-}
-.profile-entry-page .profile-entry-brand-slot app-brand-mark {
-  --brand-mark-size: 4.1rem;
-}
 .profile-entry-page .profile-entry-header .eyebrow {
   margin-bottom: 0.42rem;
   color: color-mix(in srgb, var(--neon-cyan) 58%, var(--text-secondary));
@@ -268,13 +259,4 @@
   .profile-entry-page .profile-entry-preview .status-list { grid-template-columns: 1fr; }
   .profile-entry-page .form-actions { align-items: stretch; flex-direction: column-reverse; }
   .profile-entry-page .form-actions .button { width: 100%; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .profile-entry-page .profile-entry-back,
-  .profile-entry-page .field input,
-  .profile-entry-page .field select,
-  .profile-entry-page .profile-entry-code-box,
-  .profile-entry-page .check-field,
-  .profile-entry-page .button { transition: none; }
 }
