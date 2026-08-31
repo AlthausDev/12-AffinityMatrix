@@ -16,9 +16,18 @@
   margin: 0;
 }
 
+/* The small identity label above every subpage title follows the same centred axis. */
+.page-header > .eyebrow,
+app-profile-comparison-page .page-header > div > .eyebrow,
+app-questionnaire-categories-page .categories-intro > .eyebrow,
+app-questionnaire-category-page .category-header > div:first-child > .eyebrow,
+app-catalogue-glossary-page .glossary-page .glossary-header .eyebrow {
+  width: 100%;
+  text-align: center;
+}
+
 /* Subpage descriptions follow the same centered reading pattern as the glossary. */
-.profile-entry-page .profile-entry-header > .muted,
-app-settings-page .page-header > .lead,
+.page-header:has(> .subpage-title-row) > .muted,
 app-profile-comparison-page .page-header .lead,
 app-questionnaire-categories-page .categories-intro .lead,
 app-questionnaire-category-page .category-header > div:first-child > .muted {
@@ -27,8 +36,8 @@ app-questionnaire-category-page .category-header > div:first-child > .muted {
 }
 
 .profile-editor-page.profile-editor-page-editing .profile-entry-header > .muted {
-  width: min(100%, 66rem);
-  max-width: 66rem;
+  width: min(100%, 50rem);
+  max-width: 50rem;
 }
 
 app-profile-comparison-page .page-header > div {
@@ -158,17 +167,6 @@ app-catalogue-glossary-page .glossary-page .glossary-search {
   app-profile-comparison-page .answer-pair span:not(.pair-arrow) { font-size: 0.9rem; }
   app-profile-comparison-page .profile-name { font-size: 0.84rem !important; }
   app-profile-comparison-page .omitted-note { font-size: 0.9rem; }
-}
-
-@media (min-width: 1180px) {
-  app-settings-page .page-header > .lead {
-    position: relative;
-    left: 50%;
-    width: max-content;
-    max-width: calc(100vw - 4rem);
-    transform: translateX(-50%);
-    white-space: nowrap;
-  }
 }
 
 @media (max-width: 720px) {
