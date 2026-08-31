@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
-import { RolePerspective } from '../../../domain/catalogue/practice';
 import { Preference } from '../../../domain/profile/preference';
 import { Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
 import { CatalogueStore } from '../../core/catalogue.store';
@@ -17,8 +16,6 @@ import { DashboardRoleProfileComponent } from './dashboard-role-profile.componen
 import { DashboardSemanticMapComponent } from './dashboard-semantic-map.component';
 import {
   buildPreferenceDistribution,
-  buildRoleProfile,
-  buildRoleProfileCoordinates,
   buildSubcategoryProgress,
 } from './profile-dashboard-insights';
 
@@ -38,7 +35,12 @@ import {
         <a class="dashboard-back-link" routerLink="/">{{ i18n.t('dashboard.backProfiles') }}</a>
 
         @if (profile(); as currentProfile) {
-          <a class="dashboard-settings-link" [routerLink]="['/profiles', currentProfile.id, 'settings']">
+          <a
+            class="dashboard-settings-link"
+            [routerLink]="['/profiles', currentProfile.id, 'settings']"
+            [attr.aria-label]="i18n.t('dashboard.settings.action')"
+            [attr.title]="i18n.t('dashboard.settings.action')"
+          >
             {{ i18n.t('dashboard.settings.action') }}
           </a>
         }
@@ -267,6 +269,7 @@ import {
                     <button
                       class="dashboard-category-toggle"
                       type="button"
+                      [id]="'dashboard-category-toggle-' + summary.category.id"
                       [attr.aria-expanded]="isCategoryExpanded(summary.category.id)"
                       [attr.aria-controls]="'dashboard-category-detail-' + summary.category.id"
                       (click)="toggleCategory(summary.category.id)"
@@ -282,7 +285,9 @@ import {
                     @if (isCategoryExpanded(summary.category.id)) {
                       <div
                         class="dashboard-subcategory-list"
+                        role="region"
                         [id]="'dashboard-category-detail-' + summary.category.id"
+                        [attr.aria-labelledby]="'dashboard-category-toggle-' + summary.category.id"
                       >
                         @for (detail of categorySubcategoryProgress(summary.category.id); track detail.id) {
                           <a
@@ -364,15 +369,6 @@ export class ProfileDashboardPageComponent {
     this.categorySummaries().filter((summary) => summary.answered === summary.total).length,
   );
   readonly preferenceDistribution = computed(() => buildPreferenceDistribution(this.profile()));
-  readonly roleProfile = computed(() =>
-    buildRoleProfile(this.profile(), this.catalogueStore.snapshot()?.catalogue.practices),
-  );
-  readonly roleProfileCoordinates = computed(() =>
-    buildRoleProfileCoordinates(this.profile(), this.catalogueStore.snapshot()?.catalogue.practices),
-  );
-  readonly roleProfileAnswerCount = computed(() =>
-    this.roleProfile().reduce((sum, entry) => sum + entry.answerCount, 0),
-  );
   readonly preferenceChartGradient = computed(() => {
     const active = this.preferenceDistribution().filter((entry) => entry.count > 0);
     if (active.length === 0) return 'conic-gradient(rgba(107, 122, 166, 0.18) 0% 100%)';
@@ -423,45 +419,6 @@ export class ProfileDashboardPageComponent {
       this.taxonomy.subcategoriesFor(categoryId),
       category?.practices,
     );
-  }
-
-  rolePerspectiveLabel(perspective: RolePerspective): string {
-    if (perspective === 'active') return this.i18n.t('dashboard.roleProfile.active');
-    if (perspective === 'receptive') return this.i18n.t('dashboard.roleProfile.receptive');
-    return this.i18n.t('dashboard.roleProfile.neutral');
-  }
-
-  roleProfileAnswerLabel(count: number): string {
-    return this.i18n.plural(
-      count,
-      'dashboard.roleProfile.answers.one',
-      'dashboard.roleProfile.answers.other',
-    );
-  }
-
-  roleCoordinateLeft(): number {
-    return Math.max(8, Math.min(92, 50 + this.roleProfileCoordinates().roleBalance * 0.42));
-  }
-
-  roleCoordinateTop(): number {
-    const coordinates = this.roleProfileCoordinates();
-    if (coordinates.initiativeEvidenceCount === 0) return 50;
-    return Math.max(8, Math.min(92, 50 - coordinates.initiativeBalance * 0.42));
-  }
-
-  roleInitiativeEvidenceLabel(): string {
-    const count = this.roleProfileCoordinates().initiativeEvidenceCount;
-    if (count === 0) return this.i18n.t('dashboard.roleProfile.initiativeMissing');
-    return this.i18n.plural(
-      count,
-      'dashboard.roleProfile.initiativeEvidence.one',
-      'dashboard.roleProfile.initiativeEvidence.other',
-    );
-  }
-
-  roleCompassAriaLabel(): string {
-    const coordinates = this.roleProfileCoordinates();
-    return `${this.i18n.t('dashboard.roleProfile.balanceTitle')} · ${this.i18n.t('dashboard.roleProfile.receptive')} ↔ ${this.i18n.t('dashboard.roleProfile.active')}: ${coordinates.roleBalance}; ${this.i18n.t('dashboard.roleProfile.initiativePartner')} ↔ ${this.i18n.t('dashboard.roleProfile.initiativeSelf')}: ${coordinates.initiativeBalance}`;
   }
 
   preferenceLabel(preference: Preference): string {
