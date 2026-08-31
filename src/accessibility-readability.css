@@ -29,11 +29,161 @@ app-questionnaire-role .preference-option { font-size: 0.78rem; }
 app-questionnaire-role .answer-details summary,
 app-questionnaire-role .detail-field { font-size: 0.88rem; }
 
+.profile-dashboard {
+  --a11y-dashboard-micro: 0.8rem;
+  --a11y-dashboard-small: 0.84rem;
+  --a11y-dashboard-detail: 0.86rem;
+}
+
+html[data-font-scale='large'] .profile-dashboard {
+  --a11y-dashboard-micro: 0.9rem;
+  --a11y-dashboard-small: 0.94rem;
+  --a11y-dashboard-detail: 0.98rem;
+}
+
+html[data-font-scale='extra-large'] .profile-dashboard {
+  --a11y-dashboard-micro: 0.98rem;
+  --a11y-dashboard-small: 1.02rem;
+  --a11y-dashboard-detail: 1.08rem;
+}
+
+.profile-dashboard .semantic-panel-kicker strong,
+.profile-dashboard .semantic-kicker,
+.profile-dashboard .semantic-scale-guide-copy p,
+.profile-dashboard .semantic-scale-anchors b,
+.profile-dashboard .semantic-scale-anchors small,
+.profile-dashboard .semantic-scale-formula,
+.profile-dashboard .semantic-relative-labels strong,
+.profile-dashboard .semantic-relative-labels span,
+.profile-dashboard .coordinate-label,
+.profile-dashboard .semantic-highlight-diagnosis,
+.profile-dashboard .dashboard-role-composition-heading small,
+.profile-dashboard .dashboard-role-composition-heading > span,
+.profile-dashboard .dashboard-role-composition-labels > span,
+.profile-dashboard .dashboard-role-composition-labels b,
+.profile-dashboard .dashboard-role-composition-labels strong {
+  font-size: var(--a11y-dashboard-micro);
+}
+
+.profile-dashboard .semantic-scale-inline-note,
+.profile-dashboard .semantic-theme-footer small,
+.profile-dashboard .semantic-highlight small,
+.profile-dashboard .semantic-relative-axis > small,
+.profile-dashboard .semantic-coordinate-card small,
+.profile-dashboard .semantic-note,
+.profile-dashboard .semantic-highlight-empty {
+  font-size: var(--a11y-dashboard-small);
+  line-height: 1.4;
+}
+
+.profile-dashboard .semantic-theme-heading small,
+.profile-dashboard .semantic-relative-heading p:last-child {
+  font-size: var(--a11y-dashboard-detail);
+  line-height: 1.42;
+}
+
+.profile-dashboard .semantic-theme-heading > span {
+  font-size: max(0.82rem, var(--a11y-dashboard-small));
+}
+
+.profile-dashboard .semantic-scale-guide-copy > strong,
+.profile-dashboard .semantic-scale-anchors strong,
+.profile-dashboard .semantic-relative-group > header strong,
+.profile-dashboard .semantic-coordinate-card > header strong,
+.profile-dashboard .dashboard-role-composition-heading strong {
+  font-size: max(0.88rem, var(--a11y-dashboard-small));
+}
+
+.profile-dashboard .semantic-theme-heading strong {
+  font-size: max(1rem, var(--a11y-dashboard-detail));
+}
+
+.profile-dashboard .semantic-theme-heading > span,
+.profile-dashboard .dashboard-role-composition-labels b {
+  white-space: normal;
+}
+
+.profile-dashboard .dashboard-role-composition-labels b {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.profile-dashboard .coordinate-label {
+  max-inline-size: 44%;
+  white-space: normal;
+}
+
+app-catalogue-glossary-page {
+  --a11y-glossary-label: 0.82rem;
+  --a11y-glossary-input: 0.9rem;
+}
+
+html[data-font-scale='large'] app-catalogue-glossary-page {
+  --a11y-glossary-label: 0.92rem;
+  --a11y-glossary-input: 1rem;
+}
+
+html[data-font-scale='extra-large'] app-catalogue-glossary-page {
+  --a11y-glossary-label: 1rem;
+  --a11y-glossary-input: 1.08rem;
+}
+
+app-catalogue-glossary-page .glossary-profile-link,
+app-catalogue-glossary-page .glossary-search > span:first-child,
+app-catalogue-glossary-page .glossary-group-heading span {
+  font-size: var(--a11y-glossary-label);
+}
+
+app-catalogue-glossary-page .glossary-search input {
+  font-size: var(--a11y-glossary-input);
+}
+
 @media (max-width: 720px) {
   .questionnaire-page .category-progress-label { font-size: 0.7rem; }
   .questionnaire-page .category-progress-count { font-size: 0.88rem; }
   .questionnaire-page .question-card-header p { font-size: 0.88rem; }
   app-questionnaire-role .preference-option { font-size: 0.74rem; }
+}
+
+@media (max-width: 620px) {
+  .profile-dashboard .semantic-theme-heading {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+  }
+
+  .profile-dashboard .semantic-theme-heading small {
+    display: block;
+  }
+
+  .profile-dashboard .semantic-theme-heading > span {
+    justify-self: start;
+    text-align: left;
+  }
+
+  .profile-dashboard .semantic-highlight-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-dashboard .semantic-coordinate-plane {
+    min-height: 14rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .profile-dashboard .semantic-relative-group > header,
+  .profile-dashboard .semantic-coordinate-card > header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.18rem;
+  }
+
+  .profile-dashboard .semantic-coordinate-plane {
+    min-height: 15.5rem;
+  }
+
+  .profile-dashboard .coordinate-label {
+    max-inline-size: 46%;
+  }
 }
 
 @media (max-width: 360px) {
