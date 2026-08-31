@@ -92,14 +92,14 @@ app-catalogue-glossary-page .glossary-search {
   }
 }
 
-@media (min-width: 1320px) and (max-width: 1479px) {
+@media (max-width: 1479px) {
   app-profile-editor-page .profile-editor-page.profile-editor-page-editing {
     width: min(100% - 2rem, 50rem);
     max-width: 50rem;
   }
 
   app-profile-editor-page .profile-editor-layout-with-sidebar {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   app-profile-editor-page .profile-editor-layout-with-sidebar > .profile-editor-main,
@@ -110,6 +110,7 @@ app-catalogue-glossary-page .glossary-search {
   app-profile-editor-page .profile-editor-sidebar {
     position: static;
     width: 100%;
+    min-width: 0;
   }
 }
 
