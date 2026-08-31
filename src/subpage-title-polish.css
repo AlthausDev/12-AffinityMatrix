@@ -81,15 +81,15 @@ app-catalogue-glossary-page .glossary-search {
   justify-self: end;
 }
 
-@media (min-width: 1560px) {
+@media (min-width: 1200px) {
   app-profile-editor-page .profile-editor-page-editing .profile-entry-header {
     width: 50rem;
-    margin-left: calc((100% - 50rem) / 2);
+    margin-left: 0;
     margin-right: auto;
   }
 
   app-profile-editor-page .profile-editor-page.profile-editor-page-editing > .profile-entry-back {
-    margin-left: calc((100% - 50rem) / 2) !important;
+    margin-left: 0 !important;
   }
 }
 
