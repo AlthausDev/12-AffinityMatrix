@@ -14,15 +14,15 @@ import { TranslationService } from './translation.service';
       (mouseleave)="closeMenu()"
       (focusin)="openMenu()"
       (focusout)="handleFocusOut($event)"
+      (keydown.escape)="closeMenuAndReturnFocus($event)"
     >
       <button
         class="language-trigger"
         type="button"
-        aria-haspopup="listbox"
+        aria-controls="language-options"
         [attr.aria-expanded]="menuOpen()"
         [attr.aria-label]="i18n.t('language.selectorLabel')"
         (click)="toggleMenu()"
-        (keydown.escape)="closeMenu()"
       >
         <app-locale-flag class="language-mark" [locale]="i18n.locale()" />
         <span class="language-current-label">{{ currentLocaleLabel() }}</span>
@@ -31,16 +31,16 @@ import { TranslationService } from './translation.service';
 
       <div class="language-menu">
         <div
+          id="language-options"
           class="language-menu-surface"
-          role="listbox"
+          role="group"
           [attr.aria-label]="i18n.t('language.selectorLabel')"
         >
           @for (locale of i18n.supportedLocales; track locale.id) {
             <button
               class="language-option"
               type="button"
-              role="option"
-              [attr.aria-selected]="i18n.locale() === locale.id"
+              [attr.aria-pressed]="i18n.locale() === locale.id"
               [class.is-selected]="i18n.locale() === locale.id"
               (click)="selectLanguage(locale.id)"
             >
@@ -222,6 +222,15 @@ export class LanguageSwitcherComponent {
     const next = event.relatedTarget;
     const current = event.currentTarget;
     if (current instanceof HTMLElement && next instanceof Node && current.contains(next)) return;
+    this.closeMenu();
+  }
+
+  closeMenuAndReturnFocus(event: Event): void {
+    event.stopPropagation();
+    const switcher = event.currentTarget;
+    if (switcher instanceof HTMLElement) {
+      switcher.querySelector<HTMLButtonElement>('.language-trigger')?.focus();
+    }
     this.closeMenu();
   }
 

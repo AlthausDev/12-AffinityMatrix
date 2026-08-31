@@ -20,7 +20,19 @@ export interface LocalizedFinalCatalogueGlossaryEntry {
   readonly aliases: readonly string[];
 }
 
-const REPLACED_BASE_IDS = new Set(['hotwife', 'cuckold', 'voyeurism', 'glory-hole', 'vulva-pain-play']);
+const EXCLUDED_BASE_IDS = new Set([
+  'hotwife',
+  'cuckold',
+  'voyeurism',
+  'glory-hole',
+  'vulva-pain-play',
+  // Tease & denial no longer exists as a standalone final catalogue practice; orgasm denial and
+  // the surrounding control practices cover the current questionnaire vocabulary instead.
+  'tease-denial',
+  // Pegging no longer has a dedicated catalogue practice after the current penetration/toy split.
+  // Keeping a standalone definition would make the glossary promise vocabulary the questionnaire does not use.
+  'pegging',
+]);
 
 const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
   term(
@@ -61,7 +73,7 @@ const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
   ),
 
   term(
-    'restraint', 'stocks', 'Stocks', 'Cepo / stocks', ['stocks', 'cepo'],
+    'restraint', 'stocks', 'Stocks', 'Cepo de inmovilización', ['stocks', 'cepo', 'cepo / stocks'],
     'Rigid restraint furniture that traps wrists, ankles or sometimes the neck in fixed openings. Imagine two solid sections closing around those body areas so the person cannot simply move away.',
     'Mobiliario rígido que inmoviliza muñecas, tobillos o a veces el cuello mediante aberturas fijas. La imagen típica son dos piezas sólidas que se cierran alrededor de esas zonas e impiden apartarse.',
   ),
@@ -130,13 +142,37 @@ const CLOSING_GLOSSARY_ENTRIES: readonly FinalCatalogueGlossaryEntry[] = [
   ),
 ] as const;
 
+const FINAL_BASE_GLOSSARY: readonly FinalCatalogueGlossaryEntry[] = CATALOGUE_GLOSSARY
+  .filter((entry) => !EXCLUDED_BASE_IDS.has(entry.id))
+  .map((entry) => {
+    if (entry.id === 'forced-orgasm') {
+      return {
+        ...entry,
+        titleEs: 'Orgasmo forzado',
+        aliases: [...entry.aliases, 'orgasmo forzado'],
+      };
+    }
+    if (entry.id === 'ageplay') {
+      return {
+        ...entry,
+        titleEn: 'Ageplay',
+        titleEs: 'Ageplay',
+        aliases: [...entry.aliases, 'Adult ageplay', 'Ageplay adulto'],
+      };
+    }
+    return entry;
+  });
+
 export const FINAL_CATALOGUE_GLOSSARY: readonly FinalCatalogueGlossaryEntry[] = [
-  ...CATALOGUE_GLOSSARY.filter((entry) => !REPLACED_BASE_IDS.has(entry.id)),
+  ...FINAL_BASE_GLOSSARY,
   ...CLOSING_GLOSSARY_ENTRIES,
 ];
 
 const ALIASES = FINAL_CATALOGUE_GLOSSARY
-  .flatMap((entry) => entry.aliases.map((alias) => ({ alias, entry })))
+  .flatMap((entry) =>
+    [...new Set([...entry.aliases, entry.titleEn, entry.titleEs])]
+      .map((alias) => ({ alias, entry })),
+  )
   .sort((left, right) => right.alias.length - left.alias.length);
 const ALIAS_LOOKUP = new Map(ALIASES.map(({ alias, entry }) => [alias.toLocaleLowerCase(), entry]));
 const TERM_PATTERN = new RegExp(

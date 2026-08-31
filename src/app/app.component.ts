@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { UiPreferencesService } from './core/ui-preferences.service';
 import { LanguageSwitcherComponent } from './i18n/language-switcher.component';
@@ -11,7 +11,8 @@ import { TranslationService } from './i18n/translation.service';
   template: `
     <a class="skip-link" href="#main-content" (click)="skipToMain($event)">{{ i18n.t('a11y.skipToMain') }}</a>
     <app-language-switcher />
-    <router-outlet />
+    <router-outlet (activate)="announceCurrentPage()" />
+    <p class="route-announcer" aria-live="polite" aria-atomic="true">{{ routeAnnouncement() }}</p>
   `,
   styles: `
     .skip-link {
@@ -30,6 +31,18 @@ import { TranslationService } from './i18n/translation.service';
       transition: transform 120ms ease;
     }
     .skip-link:focus { transform: translateY(0); }
+    .route-announcer {
+      position: fixed;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      border: 0;
+      white-space: nowrap;
+    }
     @media (prefers-reduced-motion: reduce) {
       .skip-link { transition: none; }
     }
@@ -38,11 +51,13 @@ import { TranslationService } from './i18n/translation.service';
 })
 export class AppComponent {
   readonly i18n = inject(TranslationService);
+  readonly routeAnnouncement = signal('');
   private readonly uiPreferences = inject(UiPreferencesService);
   private readonly document = inject(DOCUMENT);
 
   constructor() {
     this.uiPreferences.initialize();
+    this.installMobileScrollRecovery();
   }
 
   skipToMain(event: Event): void {
@@ -59,6 +74,49 @@ export class AppComponent {
       if (previousTabIndex === null) main.removeAttribute('tabindex');
       else main.setAttribute('tabindex', previousTabIndex);
     }, { once: true });
+  }
+
+  announceCurrentPage(): void {
+    queueMicrotask(() => {
+      const headings = [...this.document.querySelectorAll<HTMLElement>('h1')];
+      const heading = headings.at(-1)?.textContent?.trim();
+      if (!heading) return;
+
+      this.routeAnnouncement.set('');
+      queueMicrotask(() => this.routeAnnouncement.set(heading));
+    });
+  }
+
+  private installMobileScrollRecovery(): void {
+    const window = this.document.defaultView;
+    if (!window?.matchMedia?.('(max-width: 760px)').matches) return;
+
+    const storageKey = `desiresync-scroll:${window.location.pathname}${window.location.search}`;
+    const savePosition = (): void => {
+      try {
+        window.sessionStorage.setItem(storageKey, String(Math.round(window.scrollY)));
+      } catch {
+        // Storage can be unavailable in hardened/private browser contexts; scrolling still works.
+      }
+    };
+
+    this.document.addEventListener('visibilitychange', () => {
+      if (this.document.visibilityState === 'hidden') savePosition();
+    }, { passive: true });
+    window.addEventListener('pagehide', savePosition, { passive: true });
+
+    let savedPosition = 0;
+    try {
+      savedPosition = Number(window.sessionStorage.getItem(storageKey) ?? 0);
+    } catch {
+      return;
+    }
+    if (!Number.isFinite(savedPosition) || savedPosition <= 0) return;
+
+    // A discarded Android tab recreates the Angular tree asynchronously. Retry once after the
+    // dashboard has had time to recover its real height instead of restoring against a short shell.
+    window.setTimeout(() => window.scrollTo({ top: savedPosition, behavior: 'auto' }), 180);
+    window.setTimeout(() => window.scrollTo({ top: savedPosition, behavior: 'auto' }), 650);
   }
 
   private reducedMotion(): boolean {

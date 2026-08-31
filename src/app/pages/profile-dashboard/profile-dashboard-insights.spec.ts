@@ -2,9 +2,10 @@ import { Practice } from '../../../domain/catalogue/practice';
 import { createProfile } from '../../../domain/profile/profile';
 import { createAnswerKey } from '../../../domain/profile/profile-answer';
 import {
-  buildPracticeProgress,
   buildPreferenceDistribution,
   buildRoleProfile,
+  buildRoleProfileCoordinates,
+  buildSubcategoryProgress,
 } from './profile-dashboard-insights';
 
 describe('buildPreferenceDistribution', () => {
@@ -55,7 +56,7 @@ describe('buildPreferenceDistribution', () => {
   });
 });
 
-describe('buildPracticeProgress', () => {
+describe('buildSubcategoryProgress', () => {
   const practice = (id: string): Practice => ({
     id,
     categoryId: 'category-1',
@@ -64,32 +65,45 @@ describe('buildPracticeProgress', () => {
     compatibleRolePairs: [],
   });
 
-  it('calculates completion from visible projected roles only', () => {
-    const progress = buildPracticeProgress([
+  it('counts questionnaire questions at practice level inside each subcategory', () => {
+    const progress = buildSubcategoryProgress([
+      {
+        id: 'subcategory-a',
+        label: 'Subcategory A',
+        description: 'A',
+        practiceIds: ['practice-a', 'practice-b'],
+      },
+    ], [
       {
         practice: practice('practice-a'),
         roles: [{ answer: {} }, {}, {}],
       },
       {
         practice: practice('practice-b'),
-        roles: [{ answer: {} }, { answer: {} }],
+        roles: [{}, {}],
       },
     ]);
 
     expect(progress).toEqual([
-      expect.objectContaining({ answered: 1, total: 3, completionPercentage: 33 }),
-      expect.objectContaining({ answered: 2, total: 2, completionPercentage: 100 }),
+      expect.objectContaining({
+        id: 'subcategory-a',
+        answered: 1,
+        total: 2,
+        completionPercentage: 50,
+      }),
     ]);
   });
 
-  it('omits practices without visible roles', () => {
-    const progress = buildPracticeProgress([
-      { practice: practice('hidden'), roles: [] },
-      { practice: practice('visible'), roles: [{}] },
+  it('omits taxonomy groups with no visible practices', () => {
+    const progress = buildSubcategoryProgress([
+      { id: 'hidden', label: 'Hidden', description: '', practiceIds: ['hidden-practice'] },
+      { id: 'visible', label: 'Visible', description: '', practiceIds: ['visible-practice'] },
+    ], [
+      { practice: practice('visible-practice'), roles: [{}] },
     ]);
 
     expect(progress).toHaveLength(1);
-    expect(progress[0]?.practice.id).toBe('visible');
+    expect(progress[0]?.id).toBe('visible');
   });
 });
 
@@ -114,7 +128,7 @@ describe('buildRoleProfile', () => {
     },
   ];
 
-  it('groups saved answers by role perspective and separates affinity from favorites', () => {
+  it('weights the full preference scale, aggregates scopes and normalizes role presence to 100%', () => {
     const profile = createProfile({
       id: 'profile-role',
       now: '2026-08-24T09:00:00.000Z',
@@ -139,19 +153,21 @@ describe('buildRoleProfile', () => {
     expect(profileByRole).toEqual([
       expect.objectContaining({
         perspective: 'active',
-        answerCount: 2,
-        affinityCount: 2,
+        answerCount: 1,
+        affinityCount: 1,
         favoriteCount: 1,
-        affinityPercentage: 100,
+        affinityPercentage: 89,
         favoritePercentage: 50,
+        profileWeightPercentage: 37,
       }),
       expect.objectContaining({
         perspective: 'receptive',
         answerCount: 1,
         affinityCount: 0,
         favoriteCount: 0,
-        affinityPercentage: 0,
+        affinityPercentage: 50,
         favoritePercentage: 0,
+        profileWeightPercentage: 21,
       }),
       expect.objectContaining({
         perspective: 'neutral',
@@ -160,8 +176,43 @@ describe('buildRoleProfile', () => {
         favoriteCount: 1,
         affinityPercentage: 100,
         favoritePercentage: 100,
+        profileWeightPercentage: 42,
       }),
     ]);
+    expect(profileByRole.reduce((sum, entry) => sum + entry.profileWeightPercentage, 0)).toBe(100);
+  });
+
+  it('uses explicit initiative details and only directional roles as active/receptive evidence', () => {
+    const profile = createProfile({
+      id: 'profile-role-map',
+      now: '2026-08-29T19:00:00.000Z',
+      answers: {
+        [createAnswerKey('paired', 'give')]: {
+          practiceId: 'paired',
+          roleId: 'give',
+          preference: 'favorite',
+          details: { initiative: 'prefer-initiate' },
+        },
+        [createAnswerKey('paired', 'receive')]: {
+          practiceId: 'paired',
+          roleId: 'receive',
+          preference: 'like',
+          details: { initiative: 'either' },
+        },
+        [createAnswerKey('shared', 'participate')]: {
+          practiceId: 'shared',
+          roleId: 'participate',
+          preference: 'curious',
+        },
+      },
+    });
+
+    expect(buildRoleProfileCoordinates(profile, practices)).toEqual({
+      roleBalance: 12,
+      initiativeBalance: 50,
+      roleEvidenceCount: 2,
+      initiativeEvidenceCount: 2,
+    });
   });
 
   it('ignores saved answers that can no longer be mapped to the current catalogue', () => {
@@ -178,5 +229,12 @@ describe('buildRoleProfile', () => {
     const profileByRole = buildRoleProfile(profile, practices);
 
     expect(profileByRole.every((entry) => entry.answerCount === 0)).toBe(true);
+    expect(profileByRole.every((entry) => entry.profileWeightPercentage === 0)).toBe(true);
+    expect(buildRoleProfileCoordinates(profile, practices)).toEqual({
+      roleBalance: 0,
+      initiativeBalance: 0,
+      roleEvidenceCount: 0,
+      initiativeEvidenceCount: 0,
+    });
   });
 });

@@ -1,6 +1,8 @@
 import { Practice, RolePerspective } from '../../../domain/catalogue/practice';
 import { Profile } from '../../../domain/profile/profile';
+import { InitiativePreference, PracticeAnswer } from '../../../domain/profile/profile-answer';
 import { PREFERENCE_VALUES, Preference } from '../../../domain/profile/preference';
+import { preferenceAffinity } from './profile-preference-affinity';
 
 export interface PreferenceDistributionEntry {
   readonly preference: Preference;
@@ -15,8 +17,17 @@ export interface DashboardPracticeProgressSource {
   readonly roles: readonly { readonly answer?: unknown }[];
 }
 
-export interface PracticeProgressEntry {
-  readonly practice: Practice;
+export interface DashboardSubcategorySource {
+  readonly id: string;
+  readonly label: string;
+  readonly description: string;
+  readonly practiceIds: readonly string[];
+}
+
+export interface SubcategoryProgressEntry {
+  readonly id: string;
+  readonly label: string;
+  readonly description: string;
   readonly answered: number;
   readonly total: number;
   readonly completionPercentage: number;
@@ -24,11 +35,39 @@ export interface PracticeProgressEntry {
 
 export interface RoleProfileEntry {
   readonly perspective: RolePerspective;
+  /** Distinct practice + role combinations, so scoped variants do not dominate the view. */
   readonly answerCount: number;
   readonly affinityCount: number;
   readonly favoriteCount: number;
+  /** Weighted affinity inside this role family across Favorite, Like, Curious and Depends answers. */
   readonly affinityPercentage: number;
+  /** Average share of Favorite answers inside each distinct practice + role combination. */
   readonly favoritePercentage: number;
+  /** Share of all positive/conditional role affinity contributed by this role family. The three families sum to 100. */
+  readonly profileWeightPercentage: number;
+}
+
+export interface RoleProfileCoordinates {
+  /** -100 receptive, +100 active. Neutral/mutual answers remain a separate family. */
+  readonly roleBalance: number;
+  /** -100 partner-led, +100 self-led, based on explicit initiative details only. */
+  readonly initiativeBalance: number;
+  /** Distinct active + receptive practice/role combinations used by the directional spectrum. */
+  readonly roleEvidenceCount: number;
+  readonly initiativeEvidenceCount: number;
+}
+
+interface RoleAnswerGroup {
+  readonly perspective: RolePerspective;
+  readonly answers: readonly PracticeAnswer[];
+}
+
+interface RolePerspectiveAggregate {
+  readonly perspective: RolePerspective;
+  readonly groups: readonly RoleAnswerGroup[];
+  readonly affinityValues: readonly number[];
+  readonly affinityMass: number;
+  readonly favoriteShares: readonly number[];
 }
 
 const ROLE_PERSPECTIVES: readonly RolePerspective[] = ['active', 'receptive', 'neutral'];
@@ -57,27 +96,124 @@ export function buildPreferenceDistribution(
   });
 }
 
-export function buildPracticeProgress(
+export function buildSubcategoryProgress(
+  subcategories: readonly DashboardSubcategorySource[],
   practices: readonly DashboardPracticeProgressSource[] | undefined,
-): readonly PracticeProgressEntry[] {
-  return (practices ?? [])
-    .map(({ practice, roles }) => {
-      const total = roles.length;
-      const answered = roles.filter((role) => role.answer !== undefined).length;
-      return {
-        practice,
-        answered,
-        total,
-        completionPercentage: total === 0 ? 0 : Math.round((answered / total) * 100),
-      };
-    })
-    .filter((entry) => entry.total > 0);
+): readonly SubcategoryProgressEntry[] {
+  const practiceById = new Map((practices ?? []).map((practice) => [practice.practice.id, practice]));
+
+  return subcategories.flatMap((subcategory): SubcategoryProgressEntry[] => {
+    const visiblePractices = subcategory.practiceIds
+      .map((practiceId) => practiceById.get(practiceId))
+      .filter((practice): practice is DashboardPracticeProgressSource => practice !== undefined);
+    const total = visiblePractices.length;
+    if (total === 0) return [];
+
+    const answered = visiblePractices.filter((practice) =>
+      practice.roles.some((role) => role.answer !== undefined),
+    ).length;
+
+    return [{
+      id: subcategory.id,
+      label: subcategory.label,
+      description: subcategory.description,
+      answered,
+      total,
+      completionPercentage: percentage(answered, total),
+    }];
+  });
 }
 
 export function buildRoleProfile(
   profile: Pick<Profile, 'answers'> | undefined,
   practices: readonly Practice[] | undefined,
 ): readonly RoleProfileEntry[] {
+  const aggregates = buildRolePerspectiveAggregates(profile, practices);
+  const totalAffinityMass = aggregates.reduce((sum, entry) => sum + entry.affinityMass, 0);
+  const profileWeights = distributePercentages(
+    aggregates.map((aggregate) => aggregate.affinityMass),
+    totalAffinityMass,
+  );
+
+  return aggregates.map((aggregate, index) => ({
+    perspective: aggregate.perspective,
+    answerCount: aggregate.groups.length,
+    affinityCount: aggregate.groups.filter((group) =>
+      group.answers.some((answer) => answer.preference === 'favorite' || answer.preference === 'like'),
+    ).length,
+    favoriteCount: aggregate.groups.filter((group) =>
+      group.answers.some((answer) => answer.preference === 'favorite'),
+    ).length,
+    affinityPercentage: Math.round(average(aggregate.affinityValues) * 100),
+    favoritePercentage: Math.round(average(aggregate.favoriteShares) * 100),
+    profileWeightPercentage: profileWeights[index] ?? 0,
+  }));
+}
+
+export function buildRoleProfileCoordinates(
+  profile: Pick<Profile, 'answers'> | undefined,
+  practices: readonly Practice[] | undefined,
+): RoleProfileCoordinates {
+  const roleProfile = buildRoleProfile(profile, practices);
+  const active = roleProfile.find((entry) => entry.perspective === 'active');
+  const receptive = roleProfile.find((entry) => entry.perspective === 'receptive');
+  const activeAffinity = active?.affinityPercentage ?? 0;
+  const receptiveAffinity = receptive?.affinityPercentage ?? 0;
+  const directionalAffinity = activeAffinity + receptiveAffinity;
+  const roleBalance = directionalAffinity <= 0
+    ? 0
+    : Math.round(((activeAffinity - receptiveAffinity) / directionalAffinity) * 100);
+
+  const groups = buildRoleAnswerGroups(profile, practices);
+  const initiativeGroups = groups.flatMap((group) => {
+    const directed = group.answers.flatMap((answer) => {
+      const initiative = answer.details?.initiative;
+      const affinity = preferenceAffinity(answer.preference);
+      if (!initiative || affinity <= 0) return [];
+      return [{ direction: initiativeDirection(initiative), affinity }];
+    });
+    const weight = directed.reduce((sum, item) => sum + item.affinity, 0);
+    if (weight <= 0) return [];
+    return [directed.reduce((sum, item) => sum + item.direction * item.affinity, 0) / weight];
+  });
+
+  return {
+    roleBalance: clampBalance(roleBalance),
+    initiativeBalance: clampBalance(Math.round(average(initiativeGroups) * 100)),
+    roleEvidenceCount: (active?.answerCount ?? 0) + (receptive?.answerCount ?? 0),
+    initiativeEvidenceCount: initiativeGroups.length,
+  };
+}
+
+function buildRolePerspectiveAggregates(
+  profile: Pick<Profile, 'answers'> | undefined,
+  practices: readonly Practice[] | undefined,
+): readonly RolePerspectiveAggregate[] {
+  const groups = buildRoleAnswerGroups(profile, practices);
+
+  return ROLE_PERSPECTIVES.map((perspective) => {
+    const perspectiveGroups = groups.filter((group) => group.perspective === perspective);
+    const affinityValues = perspectiveGroups.map((group) => average(
+      group.answers.map((answer) => preferenceAffinity(answer.preference)),
+    ));
+    const favoriteShares = perspectiveGroups.map((group) => average(
+      group.answers.map((answer) => answer.preference === 'favorite' ? 1 : 0),
+    ));
+
+    return {
+      perspective,
+      groups: perspectiveGroups,
+      affinityValues,
+      affinityMass: affinityValues.reduce((sum, value) => sum + value, 0),
+      favoriteShares,
+    };
+  });
+}
+
+function buildRoleAnswerGroups(
+  profile: Pick<Profile, 'answers'> | undefined,
+  practices: readonly Practice[] | undefined,
+): readonly RoleAnswerGroup[] {
   const perspectiveByRole = new Map<string, RolePerspective>();
   for (const practice of practices ?? []) {
     for (const role of practice.roles) {
@@ -85,34 +221,56 @@ export function buildRoleProfile(
     }
   }
 
-  const counts = new Map<RolePerspective, { answerCount: number; affinityCount: number; favoriteCount: number }>(
-    ROLE_PERSPECTIVES.map((perspective) => [perspective, { answerCount: 0, affinityCount: 0, favoriteCount: 0 }]),
-  );
-
+  const answersByRole = new Map<string, PracticeAnswer[]>();
   for (const answer of Object.values(profile?.answers ?? {})) {
-    const perspective = perspectiveByRole.get(roleLookupKey(answer.practiceId, answer.roleId));
-    if (!perspective) continue;
-
-    const current = counts.get(perspective);
-    if (!current) continue;
-    current.answerCount += 1;
-    if (answer.preference === 'favorite' || answer.preference === 'like') current.affinityCount += 1;
-    if (answer.preference === 'favorite') current.favoriteCount += 1;
+    const key = roleLookupKey(answer.practiceId, answer.roleId);
+    if (!perspectiveByRole.has(key)) continue;
+    const current = answersByRole.get(key) ?? [];
+    current.push(answer);
+    answersByRole.set(key, current);
   }
 
-  return ROLE_PERSPECTIVES.map((perspective) => {
-    const current = counts.get(perspective) ?? { answerCount: 0, affinityCount: 0, favoriteCount: 0 };
-    return {
-      perspective,
-      ...current,
-      affinityPercentage: percentage(current.affinityCount, current.answerCount),
-      favoritePercentage: percentage(current.favoriteCount, current.answerCount),
-    };
+  return [...answersByRole.entries()].flatMap(([key, answers]): RoleAnswerGroup[] => {
+    const perspective = perspectiveByRole.get(key);
+    return perspective ? [{ perspective, answers }] : [];
   });
+}
+
+function distributePercentages(values: readonly number[], total: number): readonly number[] {
+  if (total <= 0) return values.map(() => 0);
+
+  const exact = values.map((value) => (value / total) * 100);
+  const roundedDown = exact.map((value) => Math.floor(value));
+  let remaining = 100 - roundedDown.reduce((sum, value) => sum + value, 0);
+  const order = exact
+    .map((value, index) => ({ index, remainder: value - Math.floor(value) }))
+    .sort((left, right) => right.remainder - left.remainder || left.index - right.index);
+
+  const result = [...roundedDown];
+  for (const item of order) {
+    if (remaining <= 0) break;
+    result[item.index] = (result[item.index] ?? 0) + 1;
+    remaining -= 1;
+  }
+  return result;
 }
 
 function roleLookupKey(practiceId: string, roleId: string): string {
   return `${practiceId}\u0000${roleId}`;
+}
+
+function initiativeDirection(initiative: InitiativePreference): number {
+  if (initiative === 'prefer-partner') return -1;
+  if (initiative === 'prefer-initiate') return 1;
+  return 0;
+}
+
+function average(values: readonly number[]): number {
+  return values.length === 0 ? 0 : values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function clampBalance(value: number): number {
+  return Math.max(-100, Math.min(100, value));
 }
 
 function percentage(value: number, total: number): number {

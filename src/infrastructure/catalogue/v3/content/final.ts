@@ -26,6 +26,7 @@ import { addFinalRolePractices, REACTIVATED_V3_PRACTICE_IDS } from './final-role
 import { applyConciseCategoryCopy, applyFinalRolePolish, FINAL_ROLE_POLISH_RETIRED_PRACTICE_IDS } from './final-role-polish';
 import { sanitizeFinalCatalogueSeeds } from './final-seed-sanitization';
 import { FINAL_CONTENT_RETIRED_PRACTICE_IDS } from './final-retirements';
+import { applyGlossaryVocabulary } from './glossary-vocabulary';
 import { normalizeManualDescriptions } from './manual-description-cleanup';
 import { applyManualReleaseReview } from './manual-release-review';
 import { applyManualRoleFollowup } from './manual-role-followup';
@@ -105,5 +106,6 @@ const QUESTIONNAIRE_FOLLOWUP_CONTENT = applyFinalQuestionnaireFollowup(NOISE_APP
 const NATURAL_ROLE_CONTENT = applyMutualRoleNoiseCleanup(QUESTIONNAIRE_FOLLOWUP_CONTENT);
 const PHYSICAL_PROFILE_EXTRACTED_CONTENT = extractPhysicalPreferencesFromCatalogue(NATURAL_ROLE_CONTENT);
 const PRESENTATION_CLEANED_CONTENT = applyFinalPresentationCleanup(PHYSICAL_PROFILE_EXTRACTED_CONTENT);
+const NORMALIZED_CONTENT = normalizeManualDescriptions(PRESENTATION_CLEANED_CONTENT);
 
-export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = normalizeManualDescriptions(PRESENTATION_CLEANED_CONTENT);
+export const CATALOGUE_V3_CONTENT: readonly CatalogueCategorySeed[] = applyGlossaryVocabulary(NORMALIZED_CONTENT);

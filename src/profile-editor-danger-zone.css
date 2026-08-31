@@ -2,16 +2,12 @@
   border-color: color-mix(in srgb, var(--preference-boundary) 88%, #ff9aa4);
   background: linear-gradient(135deg, #c92f46, var(--preference-boundary));
   color: #fff7f8;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    0 0.45rem 1rem color-mix(in srgb, var(--preference-boundary) 18%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 .45rem 1rem color-mix(in srgb,var(--preference-boundary) 18%,transparent);
 }
 
 .profile-editor-danger-zone .button.danger:hover,
 .profile-editor-danger-zone .button.danger:focus-visible {
   border-color: #ff9aa4;
   background: linear-gradient(135deg, #dc3850, #ff6675);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 0.55rem 1.2rem color-mix(in srgb, var(--preference-boundary) 30%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 .55rem 1.2rem color-mix(in srgb,var(--preference-boundary) 30%,transparent);
 }

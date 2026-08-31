@@ -1,0 +1,195 @@
+/* Utility-page hierarchy: context and copy stay left; identity title is centered. */
+.subpage-title-row { margin: 0; }
+.profile-entry-page .profile-entry-header { justify-items: start; text-align: left; }
+.profile-entry-page .profile-entry-header .subpage-title-row { justify-self: stretch; margin-bottom: .6rem; }
+
+:is(
+  .profile-entry-page .profile-entry-header > .eyebrow,
+  .page-header > .eyebrow,
+  app-profile-comparison-page .page-header > div > .eyebrow,
+  app-questionnaire-categories-page .categories-intro > .eyebrow,
+  app-questionnaire-category-page .category-header > div:first-child > .eyebrow,
+  app-catalogue-glossary-page .glossary-header .eyebrow
+) {
+  width: auto;
+  justify-self: start;
+  text-align: left;
+}
+
+:is(
+  .page-header:has(> .subpage-title-row) > .muted,
+  .profile-entry-page .profile-entry-header > .muted,
+  app-profile-comparison-page .page-header .lead,
+  app-questionnaire-categories-page .categories-intro .lead,
+  app-questionnaire-category-page .category-header > div:first-child > .muted,
+  app-catalogue-glossary-page .glossary-header .lead
+) {
+  width: auto;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+}
+
+app-profile-comparison-page .page-header > div { width: 100%; text-align: left; }
+
+:is(
+  app-profile-comparison-page .page-header h1,
+  app-questionnaire-categories-page .categories-intro h1,
+  app-questionnaire-category-page .category-header > div:first-child h1,
+  app-catalogue-glossary-page .glossary-header h1
+) {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: .82rem;
+  margin-left: 0;
+}
+
+:is(
+  app-profile-comparison-page .page-header h1,
+  app-questionnaire-categories-page .categories-intro h1,
+  app-questionnaire-category-page .category-header > div:first-child h1,
+  app-catalogue-glossary-page .glossary-header h1
+)::before {
+  content: '';
+  display: block;
+  width: 2.9rem;
+  height: 2.9rem;
+  flex: 0 0 2.9rem;
+  border: 1px solid transparent;
+  border-radius: .82rem;
+  background:
+    url('/branding/desiresync-icon.avif') center / 88% 88% no-repeat padding-box,
+    linear-gradient(145deg, rgba(38,54,94,.52), rgba(31,25,69,.58)) padding-box,
+    var(--window-border-gradient) border-box;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 .5rem 1.2rem rgba(6,10,28,.16), 0 0 1rem color-mix(in srgb,var(--neon-violet) 12%,transparent);
+}
+
+app-catalogue-glossary-page .glossary-search {
+  width: min(100%,24rem);
+  justify-self: end;
+}
+
+@media (min-width: 721px) {
+  app-catalogue-glossary-page .glossary-header { position: relative; }
+  app-catalogue-glossary-page .glossary-header h1 { position: absolute; top: 1rem; left: 0; }
+  app-catalogue-glossary-page .glossary-header .lead { margin-top: 4rem; }
+}
+
+@media (min-width: 1200px) {
+  app-profile-editor-page .profile-editor-page-editing .profile-entry-header {
+    width: 50rem;
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  app-profile-editor-page .profile-editor-page.profile-editor-page-editing > .profile-entry-back {
+    margin-left: 0 !important;
+  }
+}
+
+@media (max-width: 1479px) {
+  app-profile-editor-page .profile-editor-page.profile-editor-page-editing {
+    width: min(100% - 2rem, 50rem);
+    max-width: 50rem;
+  }
+
+  app-profile-editor-page .profile-editor-layout-with-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  app-profile-editor-page .profile-editor-layout-with-sidebar > .profile-editor-main,
+  app-profile-editor-page .profile-editor-layout-with-sidebar > .profile-editor-sidebar {
+    grid-column: 1;
+  }
+
+  app-profile-editor-page .profile-editor-sidebar {
+    position: static;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1480px) {
+  app-profile-editor-page .profile-editor-page.profile-editor-page-editing {
+    width: min(100% - 2rem, 50rem);
+    max-width: 50rem;
+  }
+
+  app-profile-editor-page .profile-editor-layout-with-sidebar {
+    position: relative;
+    grid-template-columns: 1fr;
+  }
+
+  app-profile-editor-page .profile-editor-layout-with-sidebar > .profile-editor-main,
+  app-profile-editor-page .profile-editor-layout-with-sidebar > .profile-editor-sidebar {
+    grid-column: 1;
+  }
+
+  app-profile-editor-page .profile-editor-sidebar {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 1.2rem);
+    width: 20rem;
+  }
+}
+
+@media (min-width: 981px) {
+  app-questionnaire-categories-page .categories-header .lead { font-size: .94rem; }
+  app-questionnaire-categories-page .hidden-count { font-size: .88rem; }
+  app-questionnaire-categories-page .overall-progress span { font-size: .88rem; }
+  app-questionnaire-categories-page .consent-note { font-size: .9rem; }
+  app-questionnaire-categories-page .history-note { font-size: .88rem; }
+  app-questionnaire-categories-page .category-meta { font-size: .86rem; line-height: 1.35; }
+  app-questionnaire-categories-page .category-card-description { font-size: .9rem; }
+  app-questionnaire-categories-page .category-visibility-action { font-size: .84rem; }
+  app-questionnaire-categories-page .hidden-heading p { font-size: .9rem; }
+  app-questionnaire-categories-page .hidden-row { font-size: .9rem; }
+  app-questionnaire-categories-page .compact-action { font-size: .86rem; }
+  app-questionnaire-category-page .category-progress-label { font-size: .84rem; }
+  app-questionnaire-category-page .category-progress-count { font-size: .9rem; }
+  app-questionnaire-category-page .save-state { font-size: .92rem; }
+  app-questionnaire-category-page .subcategory-summary-copy small { font-size: .88rem; }
+  app-questionnaire-category-page .subcategory-progress > strong { font-size: .9rem; }
+  app-questionnaire-category-page .subcategory-description { font-size: .92rem; }
+  app-questionnaire-category-page .question-card-header p { font-size: .92rem; }
+  app-profile-comparison-page .select-field { font-size: .92rem; }
+  app-profile-comparison-page .summary-card span { font-size: .9rem; }
+  app-profile-comparison-page .affinity-value span { font-size: .88rem; }
+  app-profile-comparison-page .category-note { font-size: .9rem; }
+  app-profile-comparison-page .comparison-badge { font-size: .84rem; }
+  app-profile-comparison-page .answer-pair span:not(.pair-arrow) { font-size: .9rem; }
+  app-profile-comparison-page .profile-name { font-size: .84rem !important; }
+  app-profile-comparison-page .omitted-note { font-size: .9rem; }
+}
+
+@media (max-width: 720px) {
+  :is(
+    .subpage-title-row,
+    app-profile-comparison-page .page-header h1,
+    app-questionnaire-categories-page .categories-intro h1,
+    app-questionnaire-category-page .category-header > div:first-child h1,
+    app-catalogue-glossary-page .glossary-header h1
+  ) { margin-left: 0; gap: .68rem; }
+
+  :is(
+    .page-header:has(> .subpage-title-row) > .muted,
+    .profile-entry-page .profile-entry-header > .muted,
+    app-profile-comparison-page .page-header .lead,
+    app-questionnaire-categories-page .categories-intro .lead,
+    app-questionnaire-category-page .category-header > div:first-child > .muted,
+    app-catalogue-glossary-page .glossary-header .lead
+  ) { max-width: 100%; margin-left: 0; }
+
+  :is(
+    app-profile-comparison-page .page-header h1,
+    app-questionnaire-categories-page .categories-intro h1,
+    app-questionnaire-category-page .category-header > div:first-child h1,
+    app-catalogue-glossary-page .glossary-header h1
+  )::before { width: 2.55rem; height: 2.55rem; flex-basis: 2.55rem; border-radius: .72rem; }
+
+  app-catalogue-glossary-page .glossary-search { width: 100%; justify-self: stretch; }
+}

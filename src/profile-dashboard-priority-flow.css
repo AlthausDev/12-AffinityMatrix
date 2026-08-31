@@ -1,0 +1,101 @@
+/* Reorder the dashboard by user value: quick signals first, supporting models afterwards. */
+.profile-dashboard .dashboard-insights-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.72rem;
+}
+
+.profile-dashboard .dashboard-insights-heading {
+  order: 0;
+}
+
+/* The old wrapper grouped Distribution + Roles. Flatten it so mobile and desktop can share one story. */
+.profile-dashboard .dashboard-insight-grid {
+  display: contents;
+}
+
+.profile-dashboard .dashboard-preference-card {
+  order: 1;
+}
+
+.profile-dashboard .dashboard-category-card {
+  order: 2;
+}
+
+.profile-dashboard .dashboard-insights-section > app-dashboard-semantic-map {
+  order: 3;
+}
+
+.profile-dashboard .dashboard-insight-grid > app-dashboard-role-profile {
+  order: 4;
+}
+
+.profile-dashboard .dashboard-semantic-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.profile-dashboard .dashboard-semantic-card > .semantic-heading {
+  order: 0;
+}
+
+.profile-dashboard .dashboard-semantic-card > .semantic-highlight-panel {
+  order: 1;
+  margin-top: 0;
+  background:
+    linear-gradient(145deg, rgba(18, 38, 76, 0.56), rgba(48, 24, 70, 0.48));
+}
+
+.profile-dashboard .dashboard-semantic-card > .semantic-theme-panel {
+  order: 2;
+  margin-top: 0.78rem;
+}
+
+.profile-dashboard .dashboard-semantic-card > .semantic-relative-section {
+  order: 3;
+}
+
+.profile-dashboard .dashboard-semantic-card > .semantic-coordinate-section {
+  order: 4;
+}
+
+.profile-dashboard .dashboard-semantic-card > .semantic-note {
+  order: 5;
+}
+
+@media (min-width: 1120px) {
+  .profile-dashboard .dashboard-semantic-card {
+    margin-top: 0;
+  }
+
+  .profile-dashboard .semantic-highlight-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.46rem;
+  }
+
+  .profile-dashboard .semantic-highlight {
+    min-height: 5.45rem;
+    padding: 0.58rem;
+  }
+
+  .profile-dashboard .semantic-highlight-topline strong,
+  .profile-dashboard .semantic-highlight-topline span {
+    font-size: 0.69rem;
+  }
+
+  .profile-dashboard .semantic-highlight-diagnosis {
+    font-size: 0.56rem;
+  }
+
+  .profile-dashboard .semantic-theme-panel,
+  .profile-dashboard .semantic-relative-section,
+  .profile-dashboard .semantic-coordinate-section {
+    padding: 0.86rem;
+  }
+}
+
+@media (max-width: 980px) {
+  .profile-dashboard .dashboard-semantic-card > .semantic-highlight-panel {
+    margin-top: 0;
+  }
+}

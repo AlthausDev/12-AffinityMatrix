@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
-import { RolePerspective } from '../../../domain/catalogue/practice';
 import { Preference } from '../../../domain/profile/preference';
 import { Sex, SexualOrientation } from '../../../domain/profile/profile-metadata';
 import { CatalogueStore } from '../../core/catalogue.store';
@@ -8,26 +7,40 @@ import { PROFILE_STORAGE_CONTEXT } from '../../core/profile-repository.token';
 import { ProfileStore } from '../../core/profile.store';
 import { QUESTIONNAIRE_SERVICE } from '../../core/questionnaire-service.token';
 import { UiPreferencesService } from '../../core/ui-preferences.service';
+import { CatalogueTaxonomyService } from '../../i18n/catalogue-taxonomy.service';
 import { CatalogueTextService } from '../../i18n/catalogue-text.service';
 import { TranslationService } from '../../i18n/translation.service';
 import { CompletionProgressComponent } from '../../shared/completion-progress.component';
 import { PointerGlowDirective } from '../../shared/pointer-glow.directive';
+import { DashboardRoleProfileComponent } from './dashboard-role-profile.component';
+import { DashboardSemanticMapComponent } from './dashboard-semantic-map.component';
 import {
-  buildPracticeProgress,
   buildPreferenceDistribution,
-  buildRoleProfile,
+  buildSubcategoryProgress,
 } from './profile-dashboard-insights';
 
 @Component({
   selector: 'app-profile-dashboard-page',
-  imports: [RouterLink, RouterOutlet, CompletionProgressComponent, PointerGlowDirective],
+  imports: [
+    RouterLink,
+    RouterOutlet,
+    CompletionProgressComponent,
+    PointerGlowDirective,
+    DashboardRoleProfileComponent,
+    DashboardSemanticMapComponent,
+  ],
   template: `
     <main class="page profile-dashboard">
       <nav class="dashboard-topbar" [attr.aria-label]="i18n.t('dashboard.actionsLabel')">
         <a class="dashboard-back-link" routerLink="/">{{ i18n.t('dashboard.backProfiles') }}</a>
 
         @if (profile(); as currentProfile) {
-          <a class="dashboard-settings-link" [routerLink]="['/profiles', currentProfile.id, 'settings']">
+          <a
+            class="dashboard-settings-link"
+            [routerLink]="['/profiles', currentProfile.id, 'settings']"
+            [attr.aria-label]="i18n.t('dashboard.settings.action')"
+            [attr.title]="i18n.t('dashboard.settings.action')"
+          >
             {{ i18n.t('dashboard.settings.action') }}
           </a>
         }
@@ -151,6 +164,22 @@ import {
             <a
               class="dashboard-action"
               appPointerGlow
+              [routerLink]="['/profiles', currentProfile.id, 'glossary']"
+            >
+              <span class="dashboard-action-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 4.5h5.5A2.5 2.5 0 0 1 13 7v12a3 3 0 0 0-3-3H5V4.5Z"/><path d="M19 4.5h-3.5A2.5 2.5 0 0 0 13 7v12a3 3 0 0 1 3-3h3V4.5Z"/></svg>
+              </span>
+              <span class="dashboard-action-copy">
+                <span class="eyebrow">{{ i18n.t('dashboard.glossary.eyebrow') }}</span>
+                <strong>{{ i18n.t('dashboard.glossary.title') }}</strong>
+                <small>{{ i18n.t('dashboard.glossary.description') }}</small>
+              </span>
+              <span class="dashboard-action-arrow" aria-hidden="true">→</span>
+            </a>
+
+            <a
+              class="dashboard-action"
+              appPointerGlow
               [routerLink]="['/profiles', currentProfile.id, 'export']"
             >
               <span class="dashboard-action-icon" aria-hidden="true">
@@ -211,74 +240,13 @@ import {
               }
             </article>
 
-            <article class="dashboard-chart-card dashboard-role-card">
-              <header class="dashboard-chart-heading">
-                <div>
-                  <h3>{{ i18n.t('dashboard.roleProfile.title') }}</h3>
-                  <p>{{ i18n.t('dashboard.roleProfile.description') }}</p>
-                </div>
-              </header>
-
-              @if (roleProfileAnswerCount() > 0) {
-                <div class="dashboard-role-legend">
-                  <span>
-                    <span class="dashboard-role-legend-swatch dashboard-role-legend-swatch-affinity" aria-hidden="true"></span>
-                    {{ i18n.t('dashboard.roleProfile.affinity') }} · {{ i18n.t('dashboard.roleProfile.affinityHint') }}
-                  </span>
-                  <span>
-                    <span class="dashboard-role-legend-swatch dashboard-role-legend-swatch-favorite" aria-hidden="true"></span>
-                    {{ i18n.t('dashboard.roleProfile.favorites') }}
-                  </span>
-                </div>
-
-                <div class="dashboard-role-profile">
-                  @for (entry of roleProfile(); track entry.perspective) {
-                    <div class="dashboard-role-row" [class.dashboard-role-row-empty]="entry.answerCount === 0">
-                      <div class="dashboard-role-row-heading">
-                        <strong>{{ rolePerspectiveLabel(entry.perspective) }}</strong>
-                        <span>{{ roleProfileAnswerLabel(entry.answerCount) }}</span>
-                      </div>
-
-                      <div class="dashboard-role-metrics">
-                        <div class="dashboard-role-metric">
-                          <div class="dashboard-role-metric-label">
-                            <span>{{ i18n.t('dashboard.roleProfile.affinity') }}</span>
-                            <strong>{{ entry.affinityPercentage }}%</strong>
-                          </div>
-                          <div
-                            class="dashboard-role-track"
-                            role="img"
-                            [attr.aria-label]="rolePerspectiveLabel(entry.perspective) + ' · ' + i18n.t('dashboard.roleProfile.affinity') + ' ' + entry.affinityPercentage + '%'"
-                          >
-                            <span class="dashboard-role-fill dashboard-role-fill-affinity" [style.width.%]="entry.affinityPercentage"></span>
-                          </div>
-                        </div>
-
-                        <div class="dashboard-role-metric">
-                          <div class="dashboard-role-metric-label">
-                            <span>{{ i18n.t('dashboard.roleProfile.favorites') }}</span>
-                            <strong>{{ entry.favoritePercentage }}%</strong>
-                          </div>
-                          <div
-                            class="dashboard-role-track"
-                            role="img"
-                            [attr.aria-label]="rolePerspectiveLabel(entry.perspective) + ' · ' + i18n.t('dashboard.roleProfile.favorites') + ' ' + entry.favoritePercentage + '%'"
-                          >
-                            <span class="dashboard-role-fill dashboard-role-fill-favorite" [style.width.%]="entry.favoritePercentage"></span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                </div>
-              } @else {
-                <div class="dashboard-chart-empty">
-                  <span aria-hidden="true">◇</span>
-                  <p>{{ i18n.t('dashboard.roleProfile.empty') }}</p>
-                </div>
-              }
-            </article>
+            <app-dashboard-role-profile
+              [profile]="profile()"
+              [practices]="catalogueStore.snapshot()?.catalogue.practices"
+            />
           </div>
+
+          <app-dashboard-semantic-map [profile]="profile()" />
 
           <article class="dashboard-chart-card dashboard-category-card">
             <header class="dashboard-chart-heading dashboard-category-heading">
@@ -301,6 +269,7 @@ import {
                     <button
                       class="dashboard-category-toggle"
                       type="button"
+                      [id]="'dashboard-category-toggle-' + summary.category.id"
                       [attr.aria-expanded]="isCategoryExpanded(summary.category.id)"
                       [attr.aria-controls]="'dashboard-category-detail-' + summary.category.id"
                       (click)="toggleCategory(summary.category.id)"
@@ -316,16 +285,22 @@ import {
                     @if (isCategoryExpanded(summary.category.id)) {
                       <div
                         class="dashboard-subcategory-list"
+                        role="region"
                         [id]="'dashboard-category-detail-' + summary.category.id"
+                        [attr.aria-labelledby]="'dashboard-category-toggle-' + summary.category.id"
                       >
-                        @for (detail of categoryPracticeProgress(summary.category.id); track detail.practice.id) {
-                          <div class="dashboard-subcategory-row">
+                        @for (detail of categorySubcategoryProgress(summary.category.id); track detail.id) {
+                          <a
+                            class="dashboard-subcategory-row"
+                            [routerLink]="['/profiles', currentProfile.id, 'questionnaire', summary.category.id]"
+                            [queryParams]="{ subcategory: detail.id }"
+                          >
                             <div class="dashboard-subcategory-copy">
-                              <strong [title]="catalogueText.practiceLabel(detail.practice)">{{ catalogueText.practiceLabel(detail.practice) }}</strong>
+                              <strong [title]="detail.description">{{ detail.label }}</strong>
                               <span>{{ i18n.t('dashboard.status.categoryValue', { answered: detail.answered, total: detail.total, percentage: detail.completionPercentage }) }}</span>
                             </div>
                             <app-completion-progress [value]="detail.completionPercentage" />
-                          </div>
+                          </a>
                         }
                       </div>
                     }
@@ -365,6 +340,7 @@ export class ProfileDashboardPageComponent {
   readonly catalogueText = inject(CatalogueTextService);
   readonly storageContext = inject(PROFILE_STORAGE_CONTEXT);
   private readonly questionnaireService = inject(QUESTIONNAIRE_SERVICE);
+  private readonly taxonomy = inject(CatalogueTaxonomyService);
   private readonly preferences = inject(UiPreferencesService);
   private readonly route = inject(ActivatedRoute);
   private readonly profileId = this.route.snapshot.paramMap.get('id') ?? '';
@@ -393,12 +369,6 @@ export class ProfileDashboardPageComponent {
     this.categorySummaries().filter((summary) => summary.answered === summary.total).length,
   );
   readonly preferenceDistribution = computed(() => buildPreferenceDistribution(this.profile()));
-  readonly roleProfile = computed(() =>
-    buildRoleProfile(this.profile(), this.catalogueStore.snapshot()?.catalogue.practices),
-  );
-  readonly roleProfileAnswerCount = computed(() =>
-    this.roleProfile().reduce((sum, entry) => sum + entry.answerCount, 0),
-  );
   readonly preferenceChartGradient = computed(() => {
     const active = this.preferenceDistribution().filter((entry) => entry.count > 0);
     if (active.length === 0) return 'conic-gradient(rgba(107, 122, 166, 0.18) 0% 100%)';
@@ -439,27 +409,15 @@ export class ProfileDashboardPageComponent {
     });
   }
 
-  categoryPracticeProgress(categoryId: string) {
+  categorySubcategoryProgress(categoryId: string) {
     const profile = this.profile();
     const snapshot = this.catalogueStore.snapshot();
     if (!profile || !snapshot) return [];
 
-    return buildPracticeProgress(
-      this.questionnaireService.getCategory(snapshot, profile, categoryId, false)?.practices,
-    );
-  }
-
-  rolePerspectiveLabel(perspective: RolePerspective): string {
-    if (perspective === 'active') return this.i18n.t('dashboard.roleProfile.active');
-    if (perspective === 'receptive') return this.i18n.t('dashboard.roleProfile.receptive');
-    return this.i18n.t('dashboard.roleProfile.neutral');
-  }
-
-  roleProfileAnswerLabel(count: number): string {
-    return this.i18n.plural(
-      count,
-      'dashboard.roleProfile.answers.one',
-      'dashboard.roleProfile.answers.other',
+    const category = this.questionnaireService.getCategory(snapshot, profile, categoryId, false);
+    return buildSubcategoryProgress(
+      this.taxonomy.subcategoriesFor(categoryId),
+      category?.practices,
     );
   }
 

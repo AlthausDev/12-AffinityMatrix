@@ -16,9 +16,11 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
       <a class="back-link profile-entry-back" routerLink="/">{{ i18n.t('import.backProfiles') }}</a>
 
       <header class="page-header profile-entry-header">
-        <div class="profile-entry-brand-slot"><app-brand-mark /></div>
         <p class="eyebrow">{{ i18n.t('import.eyebrow') }}</p>
-        <h1>{{ i18n.t('import.title') }}</h1>
+        <div class="subpage-title-row">
+          <app-brand-mark />
+          <h1>{{ i18n.t('import.title') }}</h1>
+        </div>
         <p class="muted">{{ i18n.t('import.description') }}</p>
       </header>
 

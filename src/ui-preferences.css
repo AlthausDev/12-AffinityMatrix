@@ -32,6 +32,54 @@ html[data-visual-effects='reduced'] .button:hover {
   transform: none !important;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .dashboard-hero,
+  .dashboard-settings-link,
+  .dashboard-chart-card,
+  .language-trigger,
+  .language-menu-surface,
+  .profile-entry-panel,
+  .profile-editor-management-card,
+  .panel,
+  .action-card,
+  .profile-row {
+    backdrop-filter: none !important;
+  }
+
+  .dashboard-hero::before,
+  .dashboard-action::before {
+    opacity: 0 !important;
+  }
+
+  .dashboard-action:hover,
+  .dashboard-back-link:hover,
+  .dashboard-settings-link:hover,
+  .button:hover {
+    transform: none !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --surface-panel: rgba(15, 25, 54, 0.97);
+    --surface-elevated: rgba(35, 51, 92, 0.99);
+    --text-primary: #ffffff;
+    --text-secondary: #e1e8f6;
+    --border-subtle: rgba(153, 183, 232, 0.58);
+    --border-strong: rgba(188, 211, 247, 0.82);
+    --focus-ring: #d8ebff;
+  }
+}
+
 @media (max-width: 520px) {
   .profile-dashboard .dashboard-topbar {
     justify-content: flex-start;

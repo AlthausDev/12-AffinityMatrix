@@ -29,6 +29,11 @@ import {
   ES_QUESTIONNAIRE_UX_TRANSLATIONS,
   QuestionnaireUxTranslationKey,
 } from './ui/questionnaire-ux.translations';
+import {
+  EN_SEMANTIC_DASHBOARD_TRANSLATIONS,
+  ES_SEMANTIC_DASHBOARD_TRANSLATIONS,
+  SemanticDashboardTranslationKey,
+} from './ui/semantic-dashboard.translations';
 
 export type TranslationParameters = Readonly<Record<string, string | number>>;
 export type TranslationKey =
@@ -36,7 +41,8 @@ export type TranslationKey =
   | QuestionnaireUxTranslationKey
   | PreferenceScaleTranslationKey
   | DashboardUxTranslationKey
-  | HomeHubTranslationKey;
+  | HomeHubTranslationKey
+  | SemanticDashboardTranslationKey;
 
 const TRANSLATIONS: Readonly<Record<Locale, Readonly<Record<TranslationKey, string>>>> = {
   es: {
@@ -45,6 +51,7 @@ const TRANSLATIONS: Readonly<Record<Locale, Readonly<Record<TranslationKey, stri
     ...ES_PREFERENCE_SCALE_TRANSLATIONS,
     ...ES_DASHBOARD_UX_TRANSLATIONS,
     ...ES_HOME_HUB_TRANSLATIONS,
+    ...ES_SEMANTIC_DASHBOARD_TRANSLATIONS,
   },
   en: {
     ...EN_UI_TRANSLATIONS,
@@ -52,6 +59,7 @@ const TRANSLATIONS: Readonly<Record<Locale, Readonly<Record<TranslationKey, stri
     ...EN_PREFERENCE_SCALE_TRANSLATIONS,
     ...EN_DASHBOARD_UX_TRANSLATIONS,
     ...EN_HOME_HUB_TRANSLATIONS,
+    ...EN_SEMANTIC_DASHBOARD_TRANSLATIONS,
   },
 };
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   firstPendingSubcategoryId,
+  initialSubcategoryId,
   isSubcategoryComplete,
   nextPendingSubcategoryId,
 } from './questionnaire-subcategory-flow';
@@ -17,8 +18,39 @@ describe('questionnaire subcategory progression', () => {
     expect(isSubcategoryComplete(sections[1])).toBe(false);
   });
 
+  it('does not auto-complete a subcategory while a visible role option is unanswered', () => {
+    expect(isSubcategoryComplete({
+      id: 'roles',
+      answered: 2,
+      total: 2,
+      practices: [
+        { roles: [{ answer: { preference: 'like' } }, { answer: { preference: 'curious' } }] },
+        { roles: [{ answer: { preference: 'like' } }, {}] },
+      ],
+    })).toBe(false);
+
+    expect(isSubcategoryComplete({
+      id: 'roles',
+      answered: 2,
+      total: 2,
+      practices: [
+        { roles: [{ answer: { preference: 'like' } }, { answer: { preference: 'curious' } }] },
+        { roles: [{ answer: { preference: 'like' } }, { answer: { preference: 'depends' } }] },
+      ],
+    })).toBe(true);
+  });
+
   it('opens the first pending subcategory when entering a category', () => {
     expect(firstPendingSubcategoryId(sections)).toBe('second');
+  });
+
+  it('honours a visible direct subcategory target before normal progression', () => {
+    expect(initialSubcategoryId(sections, 'third')).toBe('third');
+    expect(initialSubcategoryId(sections, 'first')).toBe('first');
+  });
+
+  it('falls back to the first pending section when a direct target is unknown', () => {
+    expect(initialSubcategoryId(sections, 'missing')).toBe('second');
   });
 
   it('returns no initial section when the category is complete', () => {

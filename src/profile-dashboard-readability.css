@@ -1,0 +1,289 @@
+/* Readability/layout pass for the profile dashboard and utility pages. */
+
+.back-link,
+.profile-entry-page .profile-entry-back,
+.profile-dashboard .dashboard-back-link,
+app-catalogue-glossary-page .glossary-profile-link {
+  border-radius: 0.65rem;
+}
+
+app-profile-editor-page .profile-editor-page-editing .profile-entry-header {
+  width: min(100%, 50rem);
+  margin-inline: auto;
+  justify-items: center;
+  text-align: center;
+}
+
+app-profile-editor-page .profile-editor-page.profile-editor-page-editing > .profile-entry-back {
+  margin-left: max(0rem, calc((100% - 50rem) / 2)) !important;
+  margin-bottom: 0.9rem;
+}
+
+app-settings-page .page {
+  width: min(100% - 2rem, 54rem);
+  max-width: 54rem;
+  padding-top: 0.75rem;
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+app-settings-page .page > .back-link {
+  min-height: 2.35rem;
+  margin-bottom: 0.9rem;
+  padding: 0.4rem 0.72rem;
+  border-radius: 0.65rem;
+  border-color: color-mix(in srgb, var(--neon-cyan) 24%, var(--border-subtle));
+  background: linear-gradient(145deg, rgba(12, 28, 59, 0.72), rgba(31, 20, 62, 0.72));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 .45rem 1.1rem rgba(2,6,22,.12);
+}
+
+app-settings-page .page > .page-header { margin-bottom: 1.15rem; }
+
+app-settings-page .page > .page-header h1 {
+  font-size: clamp(2rem, 4.8vw, 2.85rem);
+  letter-spacing: -0.04em;
+}
+
+app-settings-page .page > .page-header .lead {
+  max-width: 48rem;
+  color: color-mix(in srgb, var(--text-primary) 76%, var(--text-secondary));
+  line-height: 1.55;
+}
+
+app-settings-page .settings-panel {
+  display: grid;
+  gap: 0.8rem;
+  padding: clamp(1rem, 2.4vw, 1.35rem);
+  border-radius: 0.9rem;
+  background:
+    linear-gradient(145deg, rgba(15, 33, 69, 0.72), rgba(38, 24, 67, 0.72)) padding-box,
+    linear-gradient(135deg, rgba(54,186,255,.42), rgba(65,108,255,.36) 34%, rgba(140,92,255,.44) 68%, rgba(230,80,197,.32)) border-box;
+}
+
+app-settings-page .settings-section {
+  display: grid;
+  gap: 0.72rem;
+  padding: 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 72%, transparent);
+  border-radius: 0.72rem;
+  background: linear-gradient(145deg, rgba(15, 37, 75, 0.42), rgba(45, 27, 72, 0.36));
+}
+
+app-settings-page .settings-section-heading h2,
+app-settings-page .settings-section-heading p { margin-bottom: 0; }
+
+app-settings-page .settings-section-heading p {
+  margin-top: 0.28rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+app-settings-page .settings-option {
+  margin: 0;
+  background: color-mix(in srgb, var(--surface-elevated) 58%, transparent);
+}
+
+app-settings-page .local-note {
+  margin: 0.15rem 0 0;
+  padding-top: 0.72rem;
+  border-top: 1px solid color-mix(in srgb, var(--border-subtle) 58%, transparent);
+}
+
+@media (min-width: 1180px) {
+  app-settings-page .settings-support-dock {
+    top: 3.55rem !important;
+    right: 0.75rem !important;
+    z-index: 29 !important;
+    transform: none !important;
+  }
+}
+
+.profile-dashboard .dashboard-category-copy strong,
+.profile-dashboard .dashboard-subcategory-copy strong {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+@media (min-width: 981px) {
+  .profile-dashboard .dashboard-profile-chips > span,
+  .profile-dashboard .dashboard-updated,
+  .profile-dashboard .dashboard-progress-caption span,
+  .profile-dashboard .dashboard-progress-message,
+  .profile-dashboard .dashboard-storage-notice,
+  .profile-dashboard .completion-ring-core span,
+  .profile-dashboard .preference-donut-core span {
+    font-size: 0.86rem;
+  }
+
+  .profile-dashboard .dashboard-action-copy .eyebrow { font-size: 0.86rem; }
+
+  .profile-dashboard .dashboard-action-copy small,
+  .profile-dashboard .dashboard-chart-heading p,
+  .profile-dashboard .dashboard-insights-heading > p,
+  .profile-dashboard .preference-legend-row,
+  .profile-dashboard .preference-legend-label,
+  .profile-dashboard .preference-legend-value {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .profile-dashboard .dashboard-category-heading > strong,
+  .profile-dashboard .dashboard-category-copy .dashboard-category-value,
+  .profile-dashboard .dashboard-subcategory-copy span { font-size: 0.9rem; }
+
+  .profile-dashboard .dashboard-category-copy strong { font-size: 1rem; line-height: 1.28; }
+  .profile-dashboard .dashboard-subcategory-copy strong { font-size: 0.94rem; }
+
+  .profile-dashboard .semantic-scale-inline-note {
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .profile-dashboard .semantic-panel-kicker strong,
+  .profile-dashboard .semantic-kicker { font-size: 0.82rem; }
+
+  .profile-dashboard .semantic-theme-heading strong { font-size: 1.08rem; }
+
+  .profile-dashboard .semantic-theme-heading small {
+    font-size: 0.86rem;
+    line-height: 1.4;
+  }
+
+  .profile-dashboard .semantic-theme-heading > span { font-size: 0.94rem; }
+
+  .profile-dashboard .semantic-spectrum-endpoints {
+    font-size: 0.8rem;
+    line-height: 1.28;
+  }
+
+  .profile-dashboard .semantic-spectrum-endpoints span,
+  .profile-dashboard .semantic-spectrum-endpoints b { font-size: inherit; }
+
+  .profile-dashboard .semantic-theme-footer small,
+  .profile-dashboard .semantic-relative-axis > small,
+  .profile-dashboard .semantic-coordinate-card small,
+  .profile-dashboard .semantic-note {
+    font-size: 0.84rem;
+    line-height: 1.4;
+  }
+
+  .profile-dashboard .semantic-relative-heading h4 { font-size: 1.1rem; }
+  .profile-dashboard .semantic-relative-heading p:last-child { font-size: 0.86rem; }
+
+  .profile-dashboard .semantic-relative-group > header strong,
+  .profile-dashboard .semantic-coordinate-card > header strong { font-size: 1rem; }
+
+  .profile-dashboard .semantic-relative-labels strong,
+  .profile-dashboard .semantic-relative-labels span,
+  .profile-dashboard .coordinate-label {
+    font-size: 0.8rem;
+    line-height: 1.25;
+  }
+
+  .profile-dashboard .semantic-highlight-topline strong,
+  .profile-dashboard .semantic-highlight-topline span { font-size: 0.96rem; }
+
+  .profile-dashboard .semantic-highlight-diagnosis,
+  .profile-dashboard .semantic-highlight small { font-size: 0.84rem; }
+
+  .profile-dashboard .semantic-highlight-empty { font-size: 0.86rem; }
+
+  .profile-dashboard .dashboard-role-summary > span { font-size: 0.78rem; }
+  .profile-dashboard .dashboard-role-summary > strong { font-size: 1.02rem; }
+
+  .profile-dashboard .dashboard-role-composition-heading strong { font-size: 0.96rem; }
+
+  .profile-dashboard .dashboard-role-composition-heading small,
+  .profile-dashboard .dashboard-role-composition-heading > span {
+    font-size: 0.82rem;
+    line-height: 1.38;
+  }
+
+  .profile-dashboard .dashboard-role-composition-labels > span,
+  .profile-dashboard .dashboard-role-composition-labels b { font-size: 0.82rem; }
+  .profile-dashboard .dashboard-role-composition-labels strong { font-size: 0.88rem; }
+
+  .profile-dashboard .dashboard-role-row-heading strong { font-size: 1.08rem; }
+  .profile-dashboard .dashboard-role-row-heading small { font-size: 0.86rem; line-height: 1.36; }
+  .profile-dashboard .dashboard-role-row-heading > span { font-size: 0.8rem; }
+  .profile-dashboard .dashboard-role-row-meta { font-size: 0.84rem; }
+  .profile-dashboard .dashboard-role-row-meta strong { font-size: 0.9rem; }
+
+  .profile-dashboard .dashboard-role-metric-label span { font-size: 0.84rem; }
+  .profile-dashboard .dashboard-role-metric-label strong { font-size: 0.94rem; }
+  .profile-dashboard .dashboard-role-metric-hint { font-size: 0.78rem; line-height: 1.3; }
+
+  .profile-dashboard .dashboard-role-spectrum-heading strong { font-size: 0.98rem; }
+  .profile-dashboard .dashboard-role-spectrum-heading small { font-size: 0.84rem; line-height: 1.36; }
+  .profile-dashboard .dashboard-role-spectrum-heading > span { font-size: 0.8rem; }
+  .profile-dashboard .dashboard-role-spectrum-labels { font-size: 0.8rem; }
+  .profile-dashboard .dashboard-role-spectrum-diagnosis { font-size: 0.88rem; }
+  .profile-dashboard .dashboard-role-initiative-empty { font-size: 0.84rem; line-height: 1.36; }
+}
+
+@media (min-width: 521px) and (max-width: 980px) {
+  .profile-dashboard .dashboard-category-bars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.62rem;
+  }
+
+  .profile-dashboard .dashboard-category-row-expanded { grid-column: 1 / -1; }
+}
+
+@media (max-width: 720px) {
+  app-profile-editor-page .profile-editor-page-editing > .profile-entry-back { margin-left: 0 !important; }
+}
+
+@media (max-width: 520px) {
+  .profile-dashboard .dashboard-category-bars {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .profile-dashboard .dashboard-category-row-expanded { grid-column: 1 / -1; }
+
+  .profile-dashboard .dashboard-category-toggle {
+    min-height: 5rem;
+    align-content: start;
+    gap: 0.36rem;
+    padding: 0.68rem;
+  }
+
+  .profile-dashboard .dashboard-category-copy {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0.3rem 0.42rem;
+  }
+
+  .profile-dashboard .dashboard-category-copy strong {
+    min-width: 0;
+    font-size: 0.84rem;
+    line-height: 1.25;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .profile-dashboard .dashboard-category-copy .dashboard-category-value {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 0.74rem;
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  .profile-dashboard .dashboard-category-chevron {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  app-settings-page .page {
+    width: min(100% - 1rem, 54rem);
+    padding-top: 0.5rem;
+    padding-bottom: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-dashboard .dashboard-category-row,
+  .profile-dashboard .dashboard-category-chevron { transition: none; }
+}

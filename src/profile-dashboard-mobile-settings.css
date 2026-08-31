@@ -34,7 +34,7 @@
     margin: 2.15rem 1.15rem 0 0;
     padding: 0;
     border-color: color-mix(in srgb, var(--neon-violet) 34%, var(--border-subtle));
-    border-radius: 50%;
+    border-radius: 0.62rem;
     background: rgba(22, 33, 68, 0.62);
     color: color-mix(in srgb, var(--text-primary) 88%, var(--neon-cyan));
     font-size: 0;

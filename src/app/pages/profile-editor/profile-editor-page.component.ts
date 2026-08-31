@@ -40,7 +40,7 @@ interface ProfileFormModel {
       [class.profile-editor-page-editing]="isEditing"
     >
       <a class="back-link profile-entry-back" [routerLink]="backLink">
-        {{ isEditing ? i18n.t('export.backProfile') : i18n.t('dashboard.backProfiles') }}
+        {{ isEditing ? (i18n.locale() === 'es' ? '← Panel' : '← Dashboard') : i18n.t('dashboard.backProfiles') }}
       </a>
 
       @if (profileId && !existingProfile) {
@@ -51,9 +51,11 @@ interface ProfileFormModel {
         </section>
       } @else {
         <header class="page-header profile-entry-header">
-          <div class="profile-entry-brand-slot"><app-brand-mark /></div>
           <p class="eyebrow">{{ i18n.t('profileEditor.eyebrow') }}</p>
-          <h1>{{ i18n.t(isEditing ? 'profileEditor.editTitle' : 'profileEditor.createTitle') }}</h1>
+          <div class="subpage-title-row">
+            <app-brand-mark />
+            <h1>{{ i18n.t(isEditing ? 'profileEditor.editTitle' : 'profileEditor.createTitle') }}</h1>
+          </div>
           <p class="muted">{{ i18n.t('profileEditor.description') }}</p>
         </header>
 
