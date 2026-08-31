@@ -1,8 +1,7 @@
 /* Utility-page hierarchy: context and copy stay left; identity title is centered. */
-.subpage-title-row { width: 100%; justify-content: center; margin: 0; }
+.subpage-title-row { margin: 0; }
 .profile-entry-page .profile-entry-header { justify-items: start; text-align: left; }
 .profile-entry-page .profile-entry-header .subpage-title-row { justify-self: stretch; margin-bottom: .6rem; }
-.profile-entry-page .profile-entry-header .subpage-title-row h1 { margin: 0; }
 
 :is(
   .profile-entry-page .profile-entry-header > .eyebrow,
@@ -90,6 +89,51 @@ app-catalogue-glossary-page .glossary-search {
 
   app-profile-editor-page .profile-editor-page.profile-editor-page-editing > .profile-entry-back {
     margin-left: 0 !important;
+  }
+}
+
+@media (min-width: 1320px) and (max-width: 1479px) {
+  app-profile-editor-page .profile-editor-page.profile-editor-page-editing {
+    width: min(100% - 2rem, 50rem);
+    max-width: 50rem;
+  }
+
+  app-profile-editor-page .profile-editor-layout-with-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  app-profile-editor-page .profile-editor-layout-with-sidebar > .profile-editor-main,
+  app-profile-editor-page .profile-editor-layout-with-sidebar > .profile-editor-sidebar {
+    grid-column: 1;
+  }
+
+  app-profile-editor-page .profile-editor-sidebar {
+    position: static;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1480px) {
+  app-profile-editor-page .profile-editor-page.profile-editor-page-editing {
+    width: min(100% - 2rem, 50rem);
+    max-width: 50rem;
+  }
+
+  app-profile-editor-page .profile-editor-layout-with-sidebar {
+    position: relative;
+    grid-template-columns: 1fr;
+  }
+
+  app-profile-editor-page .profile-editor-layout-with-sidebar > .profile-editor-main,
+  app-profile-editor-page .profile-editor-layout-with-sidebar > .profile-editor-sidebar {
+    grid-column: 1;
+  }
+
+  app-profile-editor-page .profile-editor-sidebar {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 1.2rem);
+    width: 20rem;
   }
 }
 
