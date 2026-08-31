@@ -1,0 +1,121 @@
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+:is(h1, h2, h3, h4, p, small, strong, label, dt, dd) {
+  overflow-wrap: anywhere;
+}
+
+.questionnaire-page .category-progress-label { font-size: 0.7rem; }
+.questionnaire-page .category-progress-count { font-size: 0.86rem; }
+.questionnaire-page .save-state { font-size: 0.9rem; }
+.questionnaire-page .subcategory-summary-copy small { font-size: 0.8rem; }
+.questionnaire-page .subcategory-progress > strong { font-size: 0.88rem; }
+.questionnaire-page .subcategory-description,
+.questionnaire-page .question-card-header p { font-size: 0.9rem; }
+app-questionnaire-role .scope-note,
+app-questionnaire-role .filtered-note,
+app-questionnaire-role .text-button { font-size: 0.8rem; }
+app-questionnaire-role .preference-option { font-size: 0.78rem; }
+app-questionnaire-role .answer-details summary,
+app-questionnaire-role .detail-field { font-size: 0.88rem; }
+
+@media (max-width: 720px) {
+  .questionnaire-page .category-progress-label { font-size: 0.7rem; }
+  .questionnaire-page .category-progress-count { font-size: 0.88rem; }
+  .questionnaire-page .question-card-header p { font-size: 0.88rem; }
+  app-questionnaire-role .preference-option { font-size: 0.74rem; }
+}
+
+@media (max-width: 360px) {
+  app-questionnaire-role .preference-option { font-size: 0.7rem; }
+}
+
+@media (pointer: coarse) {
+  button:not(.text-button),
+  .button,
+  [role='button'] {
+    min-block-size: 2.75rem;
+    min-inline-size: 2.75rem;
+  }
+
+  app-questionnaire-role .text-button {
+    min-block-size: 2.75rem;
+    padding-block: 0.65rem;
+  }
+}
+
+@media (forced-colors: active) {
+  :root {
+    --surface-page: Canvas;
+    --surface-panel: Canvas;
+    --surface-elevated: Canvas;
+    --text-primary: CanvasText;
+    --text-secondary: CanvasText;
+    --border-subtle: CanvasText;
+    --border-strong: CanvasText;
+    --focus-ring: Highlight;
+    --error-text: LinkText;
+  }
+
+  body {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  [class*='panel'],
+  [class*='card'],
+  [class*='window'] {
+    border-color: CanvasText;
+    box-shadow: none;
+  }
+
+  .button,
+  button,
+  input,
+  select,
+  textarea,
+  summary {
+    border-color: ButtonText;
+  }
+
+  .button,
+  button {
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .button.danger,
+  .field-error,
+  [role='alert'] {
+    color: LinkText;
+  }
+
+  :is(button, a, input, select, textarea, summary):focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  [aria-pressed='true'],
+  input:checked {
+    outline: 2px solid Highlight;
+    outline-offset: 1px;
+  }
+
+  .semantic-spectrum-marker,
+  .semantic-relative-marker,
+  .semantic-coordinate-marker {
+    border-color: HighlightText !important;
+    background: Highlight !important;
+    box-shadow: none !important;
+  }
+}
