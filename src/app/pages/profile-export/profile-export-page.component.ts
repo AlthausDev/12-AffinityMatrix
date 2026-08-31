@@ -28,8 +28,20 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
               <span><strong>{{ i18n.t('export.includeMetadata.title') }}</strong><small>{{ i18n.t('export.includeMetadata.description') }}</small></span>
             </label>
           }
-          <label class="field"><span>{{ i18n.t('export.codeLabel') }}</span><textarea class="code-box" readonly [value]="exportResult().code"></textarea></label>
-          @if (exportResult().error) { <p class="alert" role="alert">{{ exportResult().error }}</p> }
+          <label class="field">
+            <span>{{ i18n.t('export.codeLabel') }}</span>
+            <textarea
+              id="profile-export-code"
+              class="code-box"
+              readonly
+              [value]="exportResult().code"
+              [attr.aria-invalid]="exportResult().error ? 'true' : null"
+              [attr.aria-describedby]="exportResult().error ? 'profile-export-code-error' : null"
+            ></textarea>
+          </label>
+          @if (exportResult().error) {
+            <p id="profile-export-code-error" class="alert" role="alert">{{ exportResult().error }}</p>
+          }
           @if (copyStatus(); as status) { <p class="muted form-note" role="status">{{ i18n.t(status) }}</p> }
           <div class="form-actions"><button class="button" type="button" [disabled]="!exportResult().code" (click)="copyCode()">{{ i18n.t('export.copyCode') }}</button></div>
         </section>
