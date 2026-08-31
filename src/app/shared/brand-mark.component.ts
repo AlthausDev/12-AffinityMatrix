@@ -31,7 +31,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
       place-items: center;
       overflow: hidden;
       border: 1px solid transparent;
-      border-radius: 1.35rem;
+      border-radius: 0.82rem;
       background:
         linear-gradient(145deg, rgba(38, 54, 94, 0.52), rgba(31, 25, 69, 0.58)) padding-box,
         var(--window-border-gradient) border-box;
