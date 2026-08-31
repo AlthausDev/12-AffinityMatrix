@@ -46,7 +46,6 @@ app-profile-comparison-page .page-header > div { width: 100%; text-align: left; 
   justify-content: center;
   gap: .82rem;
   margin-left: 0;
-  text-align: center;
 }
 
 :is(
