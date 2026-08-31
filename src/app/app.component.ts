@@ -1,7 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter } from 'rxjs';
+import { RouterOutlet } from '@angular/router';
 import { UiPreferencesService } from './core/ui-preferences.service';
 import { LanguageSwitcherComponent } from './i18n/language-switcher.component';
 import { TranslationService } from './i18n/translation.service';
@@ -12,7 +11,7 @@ import { TranslationService } from './i18n/translation.service';
   template: `
     <a class="skip-link" href="#main-content" (click)="skipToMain($event)">{{ i18n.t('a11y.skipToMain') }}</a>
     <app-language-switcher />
-    <router-outlet />
+    <router-outlet (activate)="announceCurrentPage()" />
     <p class="route-announcer" aria-live="polite" aria-atomic="true">{{ routeAnnouncement() }}</p>
   `,
   styles: `
@@ -55,14 +54,10 @@ export class AppComponent {
   readonly routeAnnouncement = signal('');
   private readonly uiPreferences = inject(UiPreferencesService);
   private readonly document = inject(DOCUMENT);
-  private readonly router = inject(Router);
 
   constructor() {
     this.uiPreferences.initialize();
     this.installMobileScrollRecovery();
-    this.router.events
-      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe(() => queueMicrotask(() => this.announceCurrentPage()));
   }
 
   skipToMain(event: Event): void {
@@ -81,13 +76,15 @@ export class AppComponent {
     }, { once: true });
   }
 
-  private announceCurrentPage(): void {
-    const headings = [...this.document.querySelectorAll<HTMLElement>('h1')];
-    const heading = headings.at(-1)?.textContent?.trim();
-    if (!heading) return;
+  announceCurrentPage(): void {
+    queueMicrotask(() => {
+      const headings = [...this.document.querySelectorAll<HTMLElement>('h1')];
+      const heading = headings.at(-1)?.textContent?.trim();
+      if (!heading) return;
 
-    this.routeAnnouncement.set('');
-    queueMicrotask(() => this.routeAnnouncement.set(heading));
+      this.routeAnnouncement.set('');
+      queueMicrotask(() => this.routeAnnouncement.set(heading));
+    });
   }
 
   private installMobileScrollRecovery(): void {
