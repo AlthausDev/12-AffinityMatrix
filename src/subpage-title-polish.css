@@ -71,13 +71,17 @@ app-profile-comparison-page .page-header > div { width: 100%; text-align: left; 
 
 app-catalogue-glossary-page .glossary-header > div {
   display: grid;
-  width: 100%;
   justify-items: start;
 }
 app-catalogue-glossary-page .glossary-search {
   width: min(100%,24rem);
-  margin-left: 0;
   justify-self: end;
+}
+
+@media (min-width: 721px) {
+  app-catalogue-glossary-page .glossary-header { position: relative; }
+  app-catalogue-glossary-page .glossary-header h1 { position: absolute; inset: 1rem 0 auto; }
+  app-catalogue-glossary-page .glossary-header .lead { margin-top: 4rem; }
 }
 
 @media (min-width: 1200px) {
@@ -192,5 +196,5 @@ app-catalogue-glossary-page .glossary-search {
     app-catalogue-glossary-page .glossary-header h1
   )::before { width: 2.55rem; height: 2.55rem; flex-basis: 2.55rem; border-radius: .72rem; }
 
-  app-catalogue-glossary-page .glossary-search { width: 100%; margin-left: 0; justify-self: stretch; }
+  app-catalogue-glossary-page .glossary-search { width: 100%; justify-self: stretch; }
 }
