@@ -1,14 +1,31 @@
 /* Shared identity cue for utility/subpages. Home and dashboard keep their own header language.
-   The mark belongs to the title line only, never to the eyebrow or descriptive copy. */
+   Subpages use a workbench-style hierarchy: context at the left edge, title slightly indented,
+   then supporting copy aligned beneath the title text rather than centred like a landing page. */
 
-/* Every explicit subpage title row is centered without moving the copy around it. */
+.page-header:has(> .subpage-title-row),
+.profile-entry-page .profile-entry-header,
+app-profile-comparison-page .page-header > div,
+app-questionnaire-categories-page .categories-intro,
+app-questionnaire-category-page .category-header > div:first-child,
+app-catalogue-glossary-page .glossary-page .glossary-header > div {
+  --subpage-title-indent: 1.15rem;
+  --subpage-copy-indent: 4.9rem;
+}
+
+.page-header:has(> .subpage-title-row),
+.profile-entry-page .profile-entry-header {
+  justify-items: start;
+  text-align: left;
+}
+
 .subpage-title-row {
-  justify-content: center;
-  margin-inline: auto;
+  justify-content: flex-start;
+  margin-inline: 0;
+  margin-left: var(--subpage-title-indent, 1.15rem);
 }
 
 .profile-entry-page .profile-entry-header .subpage-title-row {
-  justify-self: center;
+  justify-self: start;
   margin-bottom: 0.6rem;
 }
 
@@ -16,53 +33,55 @@
   margin: 0;
 }
 
-/* The small identity label above every subpage title follows the same centred axis. */
 .page-header > .eyebrow,
 app-profile-comparison-page .page-header > div > .eyebrow,
 app-questionnaire-categories-page .categories-intro > .eyebrow,
 app-questionnaire-category-page .category-header > div:first-child > .eyebrow,
 app-catalogue-glossary-page .glossary-page .glossary-header .eyebrow {
-  width: 100%;
-  text-align: center;
+  width: auto;
+  text-align: left;
 }
 
-/* Subpage descriptions follow the same centered reading pattern as the glossary. */
 .page-header:has(> .subpage-title-row) > .muted,
+.profile-entry-page .profile-entry-header > .muted,
 app-profile-comparison-page .page-header .lead,
 app-questionnaire-categories-page .categories-intro .lead,
 app-questionnaire-category-page .category-header > div:first-child > .muted {
-  margin-inline: auto;
-  text-align: center;
+  width: auto;
+  max-width: calc(100% - var(--subpage-copy-indent, 4.9rem));
+  margin-left: var(--subpage-copy-indent, 4.9rem);
+  margin-right: 0;
+  text-align: left;
 }
 
 .profile-editor-page.profile-editor-page-editing .profile-entry-header > .muted {
-  width: min(100%, 50rem);
-  max-width: 50rem;
+  width: auto;
+  max-width: calc(100% - var(--subpage-copy-indent, 4.9rem));
 }
 
 app-profile-comparison-page .page-header > div {
   width: 100%;
-  text-align: center;
+  text-align: left;
 }
 
 app-profile-comparison-page .page-header .lead,
 app-questionnaire-categories-page .categories-intro .lead,
 app-questionnaire-category-page .category-header > div:first-child > .muted {
-  max-width: 68rem;
+  max-width: min(68rem, calc(100% - var(--subpage-copy-indent, 4.9rem)));
 }
 
-/* Comparison and questionnaire pages are large components with their own header markup. Give their
-   h1 the exact same compact identity cue without changing the rest of their layout. */
+/* Comparison and questionnaire pages use their h1 pseudo-element as the same identity mark. */
 app-profile-comparison-page .page-header h1,
 app-questionnaire-categories-page .categories-intro h1,
 app-questionnaire-category-page .category-header > div:first-child h1 {
   display: flex;
-  width: 100%;
+  width: auto;
   min-width: 0;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.82rem;
-  text-align: center;
+  margin-left: var(--subpage-title-indent, 1.15rem);
+  text-align: left;
 }
 
 app-profile-comparison-page .page-header h1::before,
@@ -85,26 +104,28 @@ app-questionnaire-category-page .category-header > div:first-child h1::before {
     0 0 1rem color-mix(in srgb, var(--neon-violet) 12%, transparent);
 }
 
-/* Glossary now follows the same identity language. Its search remains independent of the title row. */
+/* Glossary follows the same hierarchy; search aligns with the body copy instead of floating on a
+   separate centred axis. */
 app-catalogue-glossary-page .glossary-page .glossary-header {
   grid-template-columns: minmax(0, 1fr) !important;
-  justify-items: center;
-  text-align: center;
+  justify-items: start;
+  text-align: left;
 }
 
 app-catalogue-glossary-page .glossary-page .glossary-header > div {
   display: grid;
   width: 100%;
-  justify-items: center;
+  justify-items: start;
 }
 
 app-catalogue-glossary-page .glossary-page .glossary-header h1 {
   display: flex;
   min-width: 0;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.82rem;
-  text-align: center;
+  margin-left: var(--subpage-title-indent, 1.15rem);
+  text-align: left;
 }
 
 app-catalogue-glossary-page .glossary-page .glossary-header h1::before {
@@ -126,14 +147,56 @@ app-catalogue-glossary-page .glossary-page .glossary-header h1::before {
 }
 
 app-catalogue-glossary-page .glossary-page .glossary-header .lead {
-  margin-inline: auto;
-  text-align: center;
+  max-width: calc(100% - var(--subpage-copy-indent, 4.9rem));
+  margin-left: var(--subpage-copy-indent, 4.9rem);
+  margin-right: 0;
+  text-align: left;
 }
 
 app-catalogue-glossary-page .glossary-page .glossary-search {
-  width: min(100%, 24rem);
-  justify-self: center;
+  width: min(calc(100% - var(--subpage-copy-indent, 4.9rem)), 24rem);
+  margin-left: var(--subpage-copy-indent, 4.9rem);
+  justify-self: start;
   text-align: left;
+}
+
+/* Editing keeps the main form on its own visual axis, but gives the danger zone enough room to be
+   readable. At narrower desktop widths it drops below the form instead of being squeezed. */
+@media (min-width: 1440px) {
+  app-profile-editor-page .profile-editor-page.profile-editor-page-editing {
+    width: min(100% - 2rem, 92rem);
+    max-width: 92rem;
+  }
+
+  app-profile-editor-page .profile-editor-page-editing .profile-editor-layout-with-sidebar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 50rem) minmax(0, 1fr);
+  }
+
+  app-profile-editor-page .profile-editor-page-editing .profile-editor-layout-with-sidebar > .profile-editor-sidebar {
+    width: min(100%, 19rem);
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1439px) {
+  app-profile-editor-page .profile-editor-page.profile-editor-page-editing {
+    width: min(100% - 2rem, 50rem);
+    max-width: 50rem;
+  }
+
+  app-profile-editor-page .profile-editor-page-editing .profile-editor-layout-with-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  app-profile-editor-page .profile-editor-page-editing .profile-editor-layout-with-sidebar > .profile-editor-main,
+  app-profile-editor-page .profile-editor-page-editing .profile-editor-layout-with-sidebar > .profile-editor-sidebar {
+    grid-column: 1;
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  app-profile-editor-page .profile-editor-page-editing .profile-editor-sidebar {
+    position: static;
+  }
 }
 
 /* Several questionnaire/comparison widgets predate the current readability scale and used 0.62–0.75rem
@@ -170,12 +233,23 @@ app-catalogue-glossary-page .glossary-page .glossary-search {
 }
 
 @media (max-width: 720px) {
-  .profile-entry-page .profile-entry-header .subpage-title-row,
+  .subpage-title-row,
   app-profile-comparison-page .page-header h1,
   app-questionnaire-categories-page .categories-intro h1,
   app-questionnaire-category-page .category-header > div:first-child h1,
   app-catalogue-glossary-page .glossary-page .glossary-header h1 {
     gap: 0.68rem;
+    margin-left: 0.45rem;
+  }
+
+  .page-header:has(> .subpage-title-row) > .muted,
+  .profile-entry-page .profile-entry-header > .muted,
+  app-profile-comparison-page .page-header .lead,
+  app-questionnaire-categories-page .categories-intro .lead,
+  app-questionnaire-category-page .category-header > div:first-child > .muted,
+  app-catalogue-glossary-page .glossary-page .glossary-header .lead {
+    max-width: calc(100% - 0.45rem);
+    margin-left: 0.45rem;
   }
 
   app-profile-comparison-page .page-header h1::before,
@@ -186,5 +260,10 @@ app-catalogue-glossary-page .glossary-page .glossary-search {
     height: 2.55rem;
     flex-basis: 2.55rem;
     border-radius: 0.72rem;
+  }
+
+  app-catalogue-glossary-page .glossary-page .glossary-search {
+    width: min(calc(100% - 0.45rem), 24rem);
+    margin-left: 0.45rem;
   }
 }
