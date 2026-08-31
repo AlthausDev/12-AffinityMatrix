@@ -4,16 +4,11 @@
 /* Every explicit subpage title row is centered without moving the copy around it. */
 .subpage-title-row {
   justify-content: center;
-  margin-inline: auto;
+  padding-right: 3.72rem;
 }
 
 .profile-entry-page .profile-entry-header .subpage-title-row {
-  justify-self: center;
   margin-bottom: 0.6rem;
-}
-
-.profile-entry-page .profile-entry-header .subpage-title-row h1 {
-  margin: 0;
 }
 
 /* The small identity label above every subpage title follows the same centred axis. */
@@ -62,6 +57,7 @@ app-questionnaire-category-page .category-header > div:first-child h1 {
   align-items: center;
   justify-content: center;
   gap: 0.82rem;
+  padding-right: 3.72rem;
   text-align: center;
 }
 
@@ -104,6 +100,7 @@ app-catalogue-glossary-page .glossary-page .glossary-header h1 {
   align-items: center;
   justify-content: center;
   gap: 0.82rem;
+  padding-right: 3.72rem;
   text-align: center;
 }
 
@@ -176,6 +173,7 @@ app-catalogue-glossary-page .glossary-page .glossary-search {
   app-questionnaire-category-page .category-header > div:first-child h1,
   app-catalogue-glossary-page .glossary-page .glossary-header h1 {
     gap: 0.68rem;
+    padding-right: 3.23rem;
   }
 
   app-profile-comparison-page .page-header h1::before,
