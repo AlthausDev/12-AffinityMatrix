@@ -77,18 +77,6 @@ app-catalogue-glossary-page .glossary-search {
   justify-self: start;
 }
 
-@media (min-width: 1440px) {
-  app-profile-editor-page .profile-editor-page.profile-editor-page-editing { width: min(100% - 2rem, 92rem); max-width: 92rem; }
-  app-profile-editor-page .profile-editor-layout-with-sidebar > .profile-editor-sidebar { width: min(100%, 19rem); }
-}
-
-@media (min-width: 1200px) and (max-width: 1439px) {
-  app-profile-editor-page .profile-editor-page.profile-editor-page-editing { width: min(100% - 2rem, 50rem); max-width: 50rem; }
-  app-profile-editor-page .profile-editor-layout-with-sidebar { grid-template-columns: 1fr; }
-  app-profile-editor-page .profile-editor-layout-with-sidebar > :is(.profile-editor-main,.profile-editor-sidebar) { grid-column: 1; width: 100%; }
-  app-profile-editor-page .profile-editor-sidebar { position: static; }
-}
-
 @media (min-width: 981px) {
   app-questionnaire-categories-page .categories-header .lead { font-size: 0.94rem; }
   app-questionnaire-categories-page .hidden-count { font-size: 0.88rem; }
