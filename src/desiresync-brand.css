@@ -15,6 +15,7 @@
 }
 
 .profile-hub .empty-orb {
+  border-radius: 0.72rem;
   background:
     url('/branding/desiresync-icon.avif') center / 88% 88% no-repeat,
     linear-gradient(145deg, rgba(31, 119, 190, 0.2), rgba(145, 53, 152, 0.22));

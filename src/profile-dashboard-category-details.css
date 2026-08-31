@@ -17,6 +17,10 @@
   grid-auto-rows: auto;
 }
 
+.profile-dashboard .dashboard-category-bars:has(.dashboard-category-row-expanded) .dashboard-category-toggle {
+  min-height: 4.3rem;
+}
+
 .profile-dashboard .dashboard-category-row {
   --category-accent: #65dfff;
   overflow: hidden;
@@ -41,6 +45,7 @@
 .profile-dashboard .dashboard-category-toggle {
   display: grid;
   width: 100%;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 0.48rem;
   padding: 0.68rem 0.74rem;
   border: 0;
@@ -62,6 +67,7 @@
 
 .profile-dashboard .dashboard-category-copy {
   display: grid;
+  height: 100%;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 0.62rem;
