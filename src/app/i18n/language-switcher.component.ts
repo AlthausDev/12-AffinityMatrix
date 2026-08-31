@@ -227,11 +227,11 @@ export class LanguageSwitcherComponent {
 
   closeMenuAndReturnFocus(event: Event): void {
     event.stopPropagation();
-    this.closeMenu();
     const switcher = event.currentTarget;
     if (switcher instanceof HTMLElement) {
       switcher.querySelector<HTMLButtonElement>('.language-trigger')?.focus();
     }
+    this.closeMenu();
   }
 
   selectLanguage(locale: Locale): void {
