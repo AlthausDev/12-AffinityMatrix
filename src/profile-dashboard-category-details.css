@@ -159,60 +159,21 @@
   white-space: nowrap;
 }
 
-.profile-dashboard .dashboard-subcategory-row .completion-progress {
-  height: 0.31rem;
-}
+.profile-dashboard .dashboard-subcategory-row .completion-progress { height: 0.31rem; }
 
 @media (max-width: 520px) {
-  /* On phone the category grid is deliberately two columns. Equal fractional rows make every
-     collapsed card inherit the height of the tallest row (or of an expanded card), producing huge
-     empty gaps. Let each row size from its own content and keep the expanded card spanning both. */
-  .profile-dashboard .dashboard-category-bars,
-  .profile-dashboard .dashboard-category-bars:has(.dashboard-category-row-expanded) {
-    align-items: start;
-    grid-auto-rows: auto;
-  }
-
+  .profile-dashboard .dashboard-category-bars { align-items: start; grid-auto-rows: auto; }
   .profile-dashboard .dashboard-category-bars:not(:has(.dashboard-category-row-expanded)) .dashboard-category-row,
-  .profile-dashboard .dashboard-category-bars:not(:has(.dashboard-category-row-expanded)) .dashboard-category-toggle {
-    height: auto;
-  }
-
-  .profile-dashboard .dashboard-category-row {
-    align-self: start;
-  }
-
-  .profile-dashboard .dashboard-category-copy {
-    height: auto;
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .profile-dashboard .dashboard-category-copy .dashboard-category-value {
-    grid-column: 1;
-    grid-row: 2;
-    white-space: normal;
-  }
-
-  .profile-dashboard .dashboard-category-chevron {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-  }
-
-  .profile-dashboard .dashboard-subcategory-copy {
-    align-items: start;
-    grid-template-columns: 1fr;
-    gap: 0.16rem;
-  }
-
-  .profile-dashboard .dashboard-subcategory-copy span {
-    white-space: normal;
-  }
+  .profile-dashboard .dashboard-category-bars:not(:has(.dashboard-category-row-expanded)) .dashboard-category-toggle { height: auto; }
+  .profile-dashboard .dashboard-category-copy { height: auto; grid-template-columns: minmax(0, 1fr) auto; }
+  .profile-dashboard .dashboard-category-copy .dashboard-category-value { grid-column: 1; grid-row: 2; white-space: normal; }
+  .profile-dashboard .dashboard-category-chevron { grid-column: 2; grid-row: 1 / span 2; }
+  .profile-dashboard .dashboard-subcategory-copy { align-items: start; grid-template-columns: 1fr; gap: 0.16rem; }
+  .profile-dashboard .dashboard-subcategory-copy span { white-space: normal; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .profile-dashboard .dashboard-category-row,
   .profile-dashboard .dashboard-category-chevron,
-  .profile-dashboard .dashboard-subcategory-row {
-    transition: none;
-  }
+  .profile-dashboard .dashboard-subcategory-row { transition: none; }
 }
