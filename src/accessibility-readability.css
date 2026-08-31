@@ -15,19 +15,40 @@
   overflow-wrap: anywhere;
 }
 
-.questionnaire-page .category-progress-label { font-size: 0.7rem; }
-.questionnaire-page .category-progress-count { font-size: 0.86rem; }
-.questionnaire-page .save-state { font-size: 0.9rem; }
-.questionnaire-page .subcategory-summary-copy small { font-size: 0.8rem; }
-.questionnaire-page .subcategory-progress > strong { font-size: 0.88rem; }
+.questionnaire-page {
+  --a11y-questionnaire-micro: 0.8rem;
+  --a11y-questionnaire-small: 0.88rem;
+  --a11y-questionnaire-detail: 0.9rem;
+  --a11y-questionnaire-option: 0.78rem;
+}
+
+html[data-font-scale='large'] .questionnaire-page {
+  --a11y-questionnaire-micro: 0.9rem;
+  --a11y-questionnaire-small: 0.98rem;
+  --a11y-questionnaire-detail: 1rem;
+  --a11y-questionnaire-option: 0.88rem;
+}
+
+html[data-font-scale='extra-large'] .questionnaire-page {
+  --a11y-questionnaire-micro: 0.98rem;
+  --a11y-questionnaire-small: 1.06rem;
+  --a11y-questionnaire-detail: 1.1rem;
+  --a11y-questionnaire-option: 0.96rem;
+}
+
+.questionnaire-page .category-progress-label { font-size: max(0.7rem, var(--a11y-questionnaire-micro)); }
+.questionnaire-page .category-progress-count { font-size: max(0.86rem, var(--a11y-questionnaire-small)); }
+.questionnaire-page .save-state { font-size: max(0.9rem, var(--a11y-questionnaire-small)); }
+.questionnaire-page .subcategory-summary-copy small { font-size: var(--a11y-questionnaire-micro); }
+.questionnaire-page .subcategory-progress > strong { font-size: var(--a11y-questionnaire-small); }
 .questionnaire-page .subcategory-description,
-.questionnaire-page .question-card-header p { font-size: 0.9rem; }
-app-questionnaire-role .scope-note,
-app-questionnaire-role .filtered-note,
-app-questionnaire-role .text-button { font-size: 0.8rem; }
-app-questionnaire-role .preference-option { font-size: 0.78rem; }
-app-questionnaire-role .answer-details summary,
-app-questionnaire-role .detail-field { font-size: 0.88rem; }
+.questionnaire-page .question-card-header p { font-size: var(--a11y-questionnaire-detail); }
+.questionnaire-page app-questionnaire-role .scope-note,
+.questionnaire-page app-questionnaire-role .filtered-note,
+.questionnaire-page app-questionnaire-role .text-button { font-size: var(--a11y-questionnaire-micro); }
+.questionnaire-page app-questionnaire-role .preference-option { font-size: var(--a11y-questionnaire-option); }
+.questionnaire-page app-questionnaire-role .answer-details summary,
+.questionnaire-page app-questionnaire-role .detail-field { font-size: var(--a11y-questionnaire-small); }
 
 .profile-dashboard {
   --a11y-dashboard-micro: 0.8rem;
@@ -139,10 +160,10 @@ app-catalogue-glossary-page .glossary-search input {
 }
 
 @media (max-width: 720px) {
-  .questionnaire-page .category-progress-label { font-size: 0.7rem; }
-  .questionnaire-page .category-progress-count { font-size: 0.88rem; }
-  .questionnaire-page .question-card-header p { font-size: 0.88rem; }
-  app-questionnaire-role .preference-option { font-size: 0.74rem; }
+  .questionnaire-page .category-progress-label { font-size: max(0.7rem, var(--a11y-questionnaire-micro)); }
+  .questionnaire-page .category-progress-count { font-size: max(0.88rem, var(--a11y-questionnaire-small)); }
+  .questionnaire-page .question-card-header p { font-size: var(--a11y-questionnaire-detail); }
+  .questionnaire-page app-questionnaire-role .preference-option { font-size: max(0.74rem, var(--a11y-questionnaire-option)); }
 }
 
 @media (max-width: 620px) {
@@ -187,7 +208,9 @@ app-catalogue-glossary-page .glossary-search input {
 }
 
 @media (max-width: 360px) {
-  app-questionnaire-role .preference-option { font-size: 0.7rem; }
+  .questionnaire-page app-questionnaire-role .preference-option {
+    font-size: max(0.7rem, var(--a11y-questionnaire-option));
+  }
 }
 
 @media (pointer: coarse) {
