@@ -1,6 +1,6 @@
 .profile-editor-page.profile-editor-page-editing {
-  width: min(100% - 2rem, 80rem);
-  max-width: 80rem;
+  width: min(100% - 2rem, 90rem);
+  max-width: 90rem;
 }
 
 .profile-editor-layout {
@@ -10,7 +10,7 @@
 
 .profile-editor-layout-with-sidebar {
   width: 100%;
-  grid-template-columns: minmax(0, 50rem) minmax(14rem, 28rem);
+  grid-template-columns: minmax(0, 56rem) minmax(16rem, 32rem);
   align-items: start;
   justify-content: center;
   gap: 1.2rem;
@@ -32,7 +32,7 @@
 
 .profile-editor-main {
   width: 100%;
-  max-width: 50rem;
+  max-width: 56rem;
 }
 
 .profile-editor-section {
@@ -271,12 +271,12 @@
 
 @media (min-width: 1360px) {
   .profile-editor-page.profile-editor-page-editing {
-    width: min(100% - 2rem, 108.4rem);
-    max-width: 108.4rem;
+    width: min(100% - 2rem, 122.4rem);
+    max-width: 122.4rem;
   }
 
   .profile-editor-layout-with-sidebar {
-    grid-template-columns: minmax(14rem, 1fr) minmax(0, 50rem) minmax(14rem, 1fr);
+    grid-template-columns: minmax(16rem, 1fr) minmax(0, 56rem) minmax(16rem, 1fr);
   }
 
   .profile-editor-layout-with-sidebar > .profile-editor-main {
@@ -285,15 +285,15 @@
 
   .profile-editor-layout-with-sidebar > .profile-editor-sidebar {
     grid-column: 3;
-    width: min(100%, 28rem);
+    width: min(100%, 32rem);
     justify-self: start;
   }
 }
 
 @media (max-width: 860px) {
   .profile-editor-page.profile-editor-page-editing {
-    width: min(100% - 2rem, 50rem);
-    max-width: 50rem;
+    width: min(100% - 2rem, 56rem);
+    max-width: 56rem;
   }
 
   .profile-editor-layout-with-sidebar {
@@ -333,7 +333,7 @@
 
 @media (max-width: 640px) {
   .profile-editor-page.profile-editor-page-editing {
-    width: min(100% - 1.2rem, 50rem);
+    width: min(100% - 1.2rem, 56rem);
   }
 
   .profile-editor-field-grid,
