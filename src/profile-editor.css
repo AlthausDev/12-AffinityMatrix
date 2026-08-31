@@ -1,6 +1,6 @@
 .profile-editor-page.profile-editor-page-editing {
-  width: min(100% - 2rem, 84rem);
-  max-width: 84rem;
+  width: min(100% - 2rem, 71.2rem);
+  max-width: 71.2rem;
 }
 
 .profile-editor-layout {
@@ -9,18 +9,18 @@
 }
 
 .profile-editor-layout-with-sidebar {
-  grid-template-columns: minmax(14rem, 16rem) minmax(0, 50rem) minmax(14rem, 16rem);
+  grid-template-columns: minmax(0, 50rem) minmax(18rem, 20rem);
   align-items: start;
-  justify-content: center;
+  justify-content: start;
   gap: 1.2rem;
 }
 
 .profile-editor-layout-with-sidebar > .profile-editor-main {
-  grid-column: 2;
+  grid-column: 1;
 }
 
 .profile-editor-layout-with-sidebar > .profile-editor-sidebar {
-  grid-column: 3;
+  grid-column: 2;
 }
 
 .profile-editor-main,
