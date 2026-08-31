@@ -1,16 +1,21 @@
-/* Workbench hierarchy for utility pages: context at the edge, title indented, copy below it. */
+/* Workbench hierarchy for utility pages: centered context, indented title, left-aligned copy. */
 .subpage-title-row { justify-content: flex-start; margin: 0 0 0 1rem; }
 .profile-entry-page .profile-entry-header { justify-items: start; text-align: left; }
 .profile-entry-page .profile-entry-header .subpage-title-row { justify-self: start; margin-bottom: 0.6rem; }
 .profile-entry-page .profile-entry-header .subpage-title-row h1 { margin: 0; }
 
 :is(
+  .profile-entry-page .profile-entry-header > .eyebrow,
   .page-header > .eyebrow,
   app-profile-comparison-page .page-header > div > .eyebrow,
   app-questionnaire-categories-page .categories-intro > .eyebrow,
   app-questionnaire-category-page .category-header > div:first-child > .eyebrow,
   app-catalogue-glossary-page .glossary-header .eyebrow
-) { width: auto; text-align: left; }
+) {
+  width: 100%;
+  justify-self: stretch;
+  text-align: center;
+}
 
 :is(
   .page-header:has(> .subpage-title-row) > .muted,
@@ -75,6 +80,18 @@ app-catalogue-glossary-page .glossary-search {
   width: min(calc(100% - 4.6rem), 24rem);
   margin-left: 4.6rem;
   justify-self: start;
+}
+
+@media (min-width: 1480px) {
+  app-profile-editor-page .profile-editor-page-editing .profile-entry-header {
+    width: 50rem;
+    margin-left: max(0rem, calc((100% - 89.2rem) / 2));
+    margin-right: auto;
+  }
+
+  app-profile-editor-page .profile-editor-page.profile-editor-page-editing > .profile-entry-back {
+    margin-left: max(0rem, calc((100% - 89.2rem) / 2)) !important;
+  }
 }
 
 @media (min-width: 981px) {
