@@ -79,13 +79,16 @@ interface ProfileFormModel {
                   <label class="field">
                     <span>{{ i18n.t('profileEditor.alias') }}</span>
                     <input
+                      id="profile-alias"
                       type="text"
                       autocomplete="off"
                       [placeholder]="i18n.t('common.optional')"
                       [formField]="profileForm.alias"
+                      [attr.aria-invalid]="profileForm.alias().touched() && profileForm.alias().invalid() ? 'true' : null"
+                      [attr.aria-describedby]="profileForm.alias().touched() && profileForm.alias().invalid() ? 'profile-alias-error' : null"
                     />
                     @if (profileForm.alias().touched() && profileForm.alias().invalid()) {
-                      <small class="field-error">
+                      <small id="profile-alias-error" class="field-error" role="alert">
                         {{ i18n.t('validation.alias.maxLength', { max: aliasMaxLength }) }}
                       </small>
                     }

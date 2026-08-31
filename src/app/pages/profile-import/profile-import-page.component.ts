@@ -28,15 +28,18 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
         <label class="field">
           <span>{{ i18n.t('import.codeLabel') }}</span>
           <textarea
+            id="profile-import-code"
             class="profile-entry-code-box"
             [placeholder]="i18n.t('import.codePlaceholder')"
             [value]="code()"
+            [attr.aria-invalid]="codeError() ? 'true' : null"
+            [attr.aria-describedby]="codeError() ? 'profile-import-code-error' : null"
             (input)="updateCode($event)"
           ></textarea>
         </label>
 
         @if (codeError(); as errorKey) {
-          <p class="alert profile-entry-alert" role="alert">{{ i18n.t(errorKey) }}</p>
+          <p id="profile-import-code-error" class="alert profile-entry-alert" role="alert">{{ i18n.t(errorKey) }}</p>
         }
 
         <div class="form-actions">
@@ -47,7 +50,11 @@ import { BrandMarkComponent } from '../../shared/brand-mark.component';
       </section>
 
       @if (preview(); as portable) {
-        <section class="profile-entry-panel profile-entry-preview" aria-labelledby="import-preview-title">
+        <section
+          class="profile-entry-panel profile-entry-preview"
+          aria-labelledby="import-preview-title"
+          aria-live="polite"
+        >
           <div>
             <p class="eyebrow">{{ i18n.t('import.validProfile') }}</p>
             <h2 id="import-preview-title">{{ portable.metadata.alias || i18n.t('common.untitledProfile') }}</h2>

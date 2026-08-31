@@ -1,7 +1,4 @@
 import { Routes } from '@angular/router';
-import { ProfileEditorPageComponent } from './pages/profile-editor/profile-editor-page.component';
-import { ProfileExportPageComponent } from './pages/profile-export/profile-export-page.component';
-import { ProfileImportPageComponent } from './pages/profile-import/profile-import-page.component';
 import { PRODUCT_NAME } from './shared/product-brand';
 
 const brandedTitle = (page: string): string => `${PRODUCT_NAME} · ${page}`;
@@ -16,17 +13,23 @@ export const routes: Routes = [
   },
   {
     path: 'profiles/new',
-    component: ProfileEditorPageComponent,
+    loadComponent: () =>
+      import('./pages/profile-editor/profile-editor-page.component')
+        .then((module) => module.ProfileEditorPageComponent),
     title: brandedTitle('Create profile'),
   },
   {
     path: 'profiles/import',
-    component: ProfileImportPageComponent,
+    loadComponent: () =>
+      import('./pages/profile-import/profile-import-page.component')
+        .then((module) => module.ProfileImportPageComponent),
     title: brandedTitle('Import profile'),
   },
   {
     path: 'profiles/:id/edit',
-    component: ProfileEditorPageComponent,
+    loadComponent: () =>
+      import('./pages/profile-editor/profile-editor-page.component')
+        .then((module) => module.ProfileEditorPageComponent),
     title: brandedTitle('Edit profile'),
   },
   {
@@ -52,7 +55,9 @@ export const routes: Routes = [
   },
   {
     path: 'profiles/:id/export',
-    component: ProfileExportPageComponent,
+    loadComponent: () =>
+      import('./pages/profile-export/profile-export-page.component')
+        .then((module) => module.ProfileExportPageComponent),
     title: brandedTitle('Export profile'),
   },
   {
