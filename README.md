@@ -64,9 +64,21 @@ Run the test suite with:
 npm test
 ```
 
-## Development approach
+## Development principles
 
 The project is developed incrementally, keeping catalogue semantics, profile portability, comparison behavior, backwards compatibility, localization, and UI presentation independently maintainable.
+
+A few rules guide that work:
+
+1. Domain rules should not depend on Angular.
+2. Profile data must remain portable across compatible versions.
+3. New UI features should not silently change catalogue semantics.
+4. Compatibility logic should remain explicit and testable.
+5. Privacy-sensitive data should stay local unless the user deliberately exports or shares it.
+
+## Status
+
+Active personal project. The current priority is refining the catalogue, profile workflow, comparison model, responsive UI and documentation before considering optional persistence or synchronization features.
 
 ## License and attribution
 
