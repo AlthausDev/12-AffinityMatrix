@@ -51,10 +51,25 @@ The detailed dependency rules, aggregate boundaries, versioning rules, localizat
 - Vitest
 - Browser local storage for the current persistence layer
 
+## Local development
+
+```bash
+npm install
+npm start
+```
+
+Run the test suite with:
+
+```bash
+npm test
+```
+
 ## Development approach
 
 The project is developed incrementally, keeping catalogue semantics, profile portability, comparison behavior, backwards compatibility, localization, and UI presentation independently maintainable.
 
-## License
+## License and attribution
 
 Licensed under the [MIT License](LICENSE).
+
+If you reuse substantial parts of DesireSync, please retain the license notice and include a reasonable credit to **Sam Althaus / AlthausDev** and, where practical, a link back to this repository.
