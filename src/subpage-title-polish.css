@@ -48,6 +48,30 @@ app-profile-comparison-page .page-header > div { width: 100%; text-align: left; 
   margin-left: 0;
 }
 
+/* The catalogue landing page is deliberately less ceremonial than the other
+   utility subpages: keep its identity mark and title tied to the explanatory
+   copy instead of centering the title independently. */
+app-questionnaire-categories-page .categories-intro {
+  display: grid;
+  justify-items: start;
+}
+
+app-questionnaire-categories-page .categories-intro h1 {
+  justify-content: flex-start;
+  gap: .72rem;
+}
+
+app-questionnaire-categories-page .categories-header .lead {
+  max-width: 46rem;
+  margin-top: .52rem;
+  line-height: 1.5;
+}
+
+app-questionnaire-categories-page .consent-note {
+  padding: .62rem .78rem;
+  line-height: 1.48;
+}
+
 :is(
   app-profile-comparison-page .page-header h1,
   app-questionnaire-categories-page .categories-intro h1,
